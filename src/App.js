@@ -5,6 +5,9 @@ import { Route, Routes } from "react-router-dom";
 
 import Home from "./pages/home/Home";
 
+import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
+import AddEntradaProducto from "./pages/entradaProducto/AddEntradaProducto";
+
 import Products from "./pages/products/Products";
 import Productsadd from "./pages/products/Productsadd";
 import ProductsDetails from "./pages/products/ProductsDetails";
@@ -14,6 +17,10 @@ import StoreAdd from "./pages/settings/stores/StoreAdd";
 import StoreDetails from "./pages/settings/stores/StoreDetails";
 import RackAdd from "./pages/settings/stores/racks/RackAdd";
 import RackDetail from "./pages/settings/stores/racks/RackDetail";
+
+import Providers from './pages/provider/Providers'
+import ProviderAdd from "./pages/provider/ProviderAdd";
+import ProviderDetails from "./pages/provider/ProviderDetails";
 
 import Familia from "./pages/settings/Familia";
 import FamiliaAdd from "./pages/settings/familia/FamiliaAdd";
@@ -30,10 +37,20 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
 
+        {/* Rutas Products-in */}
+        <Route path="/products-in" element={<EntradaProduto />} />
+        <Route path="/entrada/add" element={<AddEntradaProducto />} />
+        {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
+
         {/* Rutas Productos */}
         <Route path="/products" element={<Products />} />
         <Route path="/products/add" element={<Productsadd />} />
         <Route path="/product/:id" element={<ProductsDetails />} />
+
+        {/* Rutas Providers */}
+        <Route path="/providers" element={<Providers />} />
+        <Route path="/provider/add" element={<ProviderAdd />} />
+        <Route path="/provider/:id" element={<ProviderDetails />} />
 
         {/* Rutas miscelaneos */}
         <Route path="/stores" element={<Stores />} />

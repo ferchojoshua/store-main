@@ -33,8 +33,16 @@ const NavbarComponent = () => {
               Inicio
             </Nav.Link>
 
+            <Nav.Link as={Link} to="/products-in">
+              Entrada de Producto
+            </Nav.Link>
+
             <Nav.Link as={Link} to="/products">
               Productos
+            </Nav.Link>
+
+            <Nav.Link as={Link} to="/providers">
+              Proveedores
             </Nav.Link>
 
             <NavDropdown title="Miscelaneos" id="navbarScrollingDropdown">

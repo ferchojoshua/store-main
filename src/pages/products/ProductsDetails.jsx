@@ -219,9 +219,16 @@ const ProductsDetails = () => {
             </Form.Select>
           </InputGroup>
 
-          <Button variant="primary" onClick={() => saveChangesAsync()}>
-            Guardar Cambios
-          </Button>
+          {isEdit ? (
+            <Button
+              variant="outline-primary"
+              onClick={() => saveChangesAsync()}
+            >
+              Guardar cambios
+            </Button>
+          ) : (
+            <></>
+          )}
         </Form>
       </Container>
     </div>
