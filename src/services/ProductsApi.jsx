@@ -26,7 +26,6 @@ export const addProductAsync = async (data) => {
   const result = { statusResponse: true, data: [], error: null };
   try {
     await axios.post(controller, data).then((resp) => {
-      console.log(resp);
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;

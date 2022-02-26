@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Container, Button, InputGroup, FormControl } from "react-bootstrap";
+import { Container, InputGroup, FormControl } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { simpleMessage } from "../../../helpers/Helpers";
 import { addStoreAsync } from "../../../services/AlmacenApi";
+
+import { Button, IconButton, Tooltip } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleArrowLeft,
+  faSave,
+} from "@fortawesome/free-solid-svg-icons";
 
 const StoreAdd = () => {
   let navigate = useNavigate();
@@ -40,9 +47,13 @@ const StoreAdd = () => {
             onClick={() => {
               navigate("/stores/");
             }}
-            style={{ marginRight: 20 }}
-            variant="primary"
+            style={{ marginRight: 20, borderRadius: 20 }}
+            variant="outlined"
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faCircleArrowLeft}
+            />
             Regresar
           </Button>
 
@@ -60,13 +71,14 @@ const StoreAdd = () => {
             onChange={(e) => setName(e.target.value)}
           />
 
-          <Button
-            variant="outline-secondary"
-            id="button-addon2"
-            onClick={() => saveChangesAsync()}
-          >
-            Agregar Almacen
-          </Button>
+          <Tooltip title="Agregar Almacen">
+            <IconButton onClick={() => saveChangesAsync()}>
+              <FontAwesomeIcon
+                icon={faSave}
+                style={{ fontSize: 30, color: "#2196f3" }}
+              />
+            </IconButton>
+          </Tooltip>
         </InputGroup>
       </Container>
     </div>

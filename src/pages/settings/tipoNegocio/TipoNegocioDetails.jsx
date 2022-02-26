@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, InputGroup, FormControl } from "react-bootstrap";
+import { Container, InputGroup, FormControl } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { simpleMessage } from "../../../helpers/Helpers";
@@ -7,6 +7,15 @@ import {
   getTipoNegocioByIdAsync,
   updateTipoNegocioByIdAsync,
 } from "../../../services/TipoNegocioApi";
+
+import { Button, IconButton, Tooltip } from "@mui/material";
+import {
+  faCancel,
+  faCircleArrowLeft,
+  faEdit,
+  faSave,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const TipoNegocioDetails = () => {
   let navigate = useNavigate();
@@ -62,22 +71,28 @@ const TipoNegocioDetails = () => {
             onClick={() => {
               navigate("/tipo-negocio/");
             }}
-            style={{ marginRight: 20 }}
-            variant="primary"
+            style={{ marginRight: 20, borderRadius: 20 }}
+            variant="outlined"
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faCircleArrowLeft}
+            />
             Regresar
           </Button>
 
           <h1>Detalle Tipo Negocio # {id}</h1>
 
-          <Button
+          <IconButton
             onClick={() => {
               setIsEdit(!isEdit);
             }}
-            variant="danger"
           >
-            {isEdit ? "Cancelar" : "Editar"}
-          </Button>
+            <FontAwesomeIcon
+              style={{ fontSize: 30, color: isEdit ? "#2196f3" : "#ff9800" }}
+              icon={isEdit ? faCancel : faEdit}
+            />
+          </IconButton>
         </div>
 
         <hr />
@@ -92,13 +107,14 @@ const TipoNegocioDetails = () => {
             disabled={!isEdit}
           />
           {isEdit ? (
-            <Button
-              variant="outline-secondary"
-              id="button-addon2"
-              onClick={() => saveChangesAsync()}
-            >
-              Guardar cambios
-            </Button>
+            <Tooltip title="Agregar Tipo Negocio">
+              <IconButton onClick={() => saveChangesAsync()}>
+                <FontAwesomeIcon
+                  icon={faSave}
+                  style={{ fontSize: 30, color: "#2196f3" }}
+                />
+              </IconButton>
+            </Tooltip>
           ) : (
             <></>
           )}

@@ -7,6 +7,9 @@ import Home from "./pages/home/Home";
 
 import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
 import AddEntradaProducto from "./pages/entradaProducto/AddEntradaProducto";
+import EntradaProductoDetails from "./pages/entradaProducto/EntradaProductoDetails";
+
+import MoverProducto from "./pages/traslate-products/MoverProducto";
 
 import Products from "./pages/products/Products";
 import Productsadd from "./pages/products/Productsadd";
@@ -18,7 +21,7 @@ import StoreDetails from "./pages/settings/stores/StoreDetails";
 import RackAdd from "./pages/settings/stores/racks/RackAdd";
 import RackDetail from "./pages/settings/stores/racks/RackDetail";
 
-import Providers from './pages/provider/Providers'
+import Providers from "./pages/provider/Providers";
 import ProviderAdd from "./pages/provider/ProviderAdd";
 import ProviderDetails from "./pages/provider/ProviderDetails";
 
@@ -29,6 +32,7 @@ import FamiliaDetails from "./pages/settings/familia/FamiliaDetails";
 import TipoNegocio from "./pages/settings/TipoNegocio";
 import TipoNegocioAdd from "./pages/settings/tipoNegocio/TipoNegocioAdd";
 import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails";
+import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
 
 function App() {
   return (
@@ -40,7 +44,12 @@ function App() {
         {/* Rutas Products-in */}
         <Route path="/products-in" element={<EntradaProduto />} />
         <Route path="/entrada/add" element={<AddEntradaProducto />} />
-        {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
+        <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
+
+        {/* Rutas Products-in */}
+        <Route path="/traslate-products" element={<MoverProducto />} />
+        <Route path="/traslate-products/add" element={<MoverProductoAdd />} />
+        {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
 
         {/* Rutas Productos */}
         <Route path="/products" element={<Products />} />

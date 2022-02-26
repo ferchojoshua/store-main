@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Button,
-  InputGroup,
-  FormControl,
-  Table,
-} from "react-bootstrap";
+import { Container, InputGroup, FormControl, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { simpleMessage } from "../../../helpers/Helpers";
@@ -19,6 +13,17 @@ import {
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
+import { Button, IconButton, Tooltip } from "@mui/material";
+import {
+  faCancel,
+  faCircleArrowLeft,
+  faCirclePlus,
+  faEdit,
+  faSave,
+  faExternalLinkAlt,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const StoreDetails = () => {
   let navigate = useNavigate();
@@ -107,22 +112,28 @@ const StoreDetails = () => {
             onClick={() => {
               navigate("/stores/");
             }}
-            style={{ marginRight: 20 }}
-            variant="primary"
+            style={{ marginRight: 20, borderRadius: 20 }}
+            variant="outlined"
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faCircleArrowLeft}
+            />
             Regresar
           </Button>
 
           <h1>Detalle Almacen # {id}</h1>
 
-          <Button
+          <IconButton
             onClick={() => {
               setIsEdit(!isEdit);
             }}
-            variant="danger"
           >
-            {isEdit ? "Cancelar" : "Editar"}
-          </Button>
+            <FontAwesomeIcon
+              style={{ fontSize: 30, color: isEdit ? "#2196f3" : "#ff9800" }}
+              icon={isEdit ? faCancel : faEdit}
+            />
+          </IconButton>
         </div>
 
         <hr />
@@ -137,13 +148,14 @@ const StoreDetails = () => {
             disabled={!isEdit}
           />
           {isEdit ? (
-            <Button
-              variant="outline-secondary"
-              id="button-addon2"
-              onClick={() => saveChangesAsync()}
-            >
-              Guardar cambios
-            </Button>
+            <Tooltip title="Agregar Tipo Negocio">
+              <IconButton onClick={() => saveChangesAsync()}>
+                <FontAwesomeIcon
+                  icon={faSave}
+                  style={{ fontSize: 30, color: "#2196f3" }}
+                />
+              </IconButton>
+            </Tooltip>
           ) : (
             <></>
           )}
@@ -166,7 +178,9 @@ const StoreDetails = () => {
             onClick={() => {
               navigate(`/store/rack/add/${id}`);
             }}
-            variant="success"
+            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+            style={{ borderRadius: 20 }}
+            variant="outlined"
           >
             Agregar Rack
           </Button>
@@ -189,20 +203,22 @@ const StoreDetails = () => {
                   <td>{item.id}</td>
                   <td style={{ textAlign: "left" }}>{item.description}</td>
                   <td>
-                    <Button
-                      style={{ marginRight: 10 }}
+                    <IconButton
+                      style={{ marginRight: 10, color: "#009688" }}
                       onClick={() => {
                         var data = { id: id, rackId: item.id };
                         data = JSON.stringify(data);
                         navigate(`/store/rack/${data}`);
                       }}
-                      variant="info"
                     >
-                      Ver
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteRack(item)}>
-                      Eliminar
-                    </Button>
+                      <FontAwesomeIcon icon={faExternalLinkAlt} />
+                    </IconButton>
+                    <IconButton
+                      style={{ color: "#f50057" }}
+                      onClick={() => deleteRack(item)}
+                    >
+                      <FontAwesomeIcon icon={faTrashAlt} />
+                    </IconButton>
                   </td>
                 </tr>
               );

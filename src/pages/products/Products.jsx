@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Container, Table, Button } from "react-bootstrap";
+import React, { useState, useEffect, useContext } from "react";
+import { DataContext } from "../../context/DataContext";
+import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
@@ -9,22 +10,42 @@ import {
   deleteProductAsync,
   getProductsAsync,
 } from "../../services/ProductsApi";
+import { Button, IconButton } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCirclePlus,
+  faExternalLinkAlt,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import PaginationComponent from "../../components/PaginationComponent";
+import Loading from "../../components/Loading";
 
 const Products = () => {
+  const { reload, setIsLoading } = useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [productList, setProductList] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(10);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = productList.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   useEffect(() => {
     (async () => {
+      setIsLoading(true);
       const result = await getProductsAsync();
       if (!result.statusResponse) {
+        setIsLoading(false);
         simpleMessage(result.error, "error");
         return;
       }
+      setIsLoading(false);
       setProductList(result.data);
     })();
-  }, [productList]);
+  }, [reload]);
 
   const deleteProduct = async (item) => {
     MySwal.fire({
@@ -63,10 +84,12 @@ const Products = () => {
           <h1>Lista de Productos</h1>
 
           <Button
+            variant="outlined"
+            style={{ borderRadius: 20 }}
+            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             onClick={() => {
               navigate(`/products/add`);
             }}
-            variant="primary"
           >
             Agregar Producto
           </Button>
@@ -89,9 +112,9 @@ const Products = () => {
             </tr>
           </thead>
           <tbody>
-            {productList.map((item) => {
+            {currentItem.map((item) => {
               return (
-                <tr>
+                <tr key={item.id}>
                   <td>{item.id}</td>
                   <td style={{ textAlign: "left" }}>
                     {item.tipoNegocio.description}
@@ -106,28 +129,33 @@ const Products = () => {
                   <td style={{ textAlign: "left" }}>{item.modelo}</td>
                   <td style={{ textAlign: "left" }}>{item.um}</td>
                   <td>
-                    <Button
-                      style={{ marginRight: 10 }}
+                    <IconButton
+                      style={{ marginRight: 10, color: "#009688" }}
                       onClick={() => {
                         navigate(`/product/${item.id}`);
                       }}
-                      variant="info"
                     >
-                      Ver
-                    </Button>
-                    <Button
-                      variant="danger"
+                      <FontAwesomeIcon icon={faExternalLinkAlt} />
+                    </IconButton>
+                    <IconButton
+                      style={{ color: "#f50057" }}
                       onClick={() => deleteProduct(item)}
                     >
-                      Eliminar
-                    </Button>
+                      <FontAwesomeIcon icon={faTrashAlt} />
+                    </IconButton>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </Table>
+        <PaginationComponent
+          data={productList}
+          paginate={paginate}
+          itemsperPage={itemsperPage}
+        />
       </Container>
+      <Loading />
     </div>
   );
 };

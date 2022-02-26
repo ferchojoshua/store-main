@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { DataContext } from "../../context/DataContext";
 import {
-  Container,
   Button,
   InputGroup,
   FormControl,
@@ -14,9 +14,30 @@ import { simpleMessage } from "../../helpers/Helpers";
 import { getProductsAsync } from "../../services/ProductsApi";
 import { getprovidersAsync } from "../../services/ProviderApi";
 
-import { Autocomplete, TextField } from "@mui/material";
+import Loading from "../../components/Loading";
+
+import {
+  Autocomplete,
+  TextField,
+  Container,
+  Typography,
+  Divider,
+} from "@mui/material";
+
+import SmallModal from "../../components/modals/SmallModal";
+import AddProviderComponent from "./AddProviderComponent";
+import AddProductComponent from "./AddProductComponent";
+import MediumModal from "../../components/modals/MediumModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleArrowLeft,
+  faClipboard,
+  faSave
+} from "@fortawesome/free-solid-svg-icons";
+import { addEntradaProductoAsync } from "../../services/ProductIsApi";
 
 const AddEntradaProducto = () => {
+  const { reload, setIsLoading } = useContext(DataContext);
   let navigate = useNavigate();
 
   const [tipoEntrada, setTipoEntrada] = useState("");
@@ -25,7 +46,7 @@ const AddEntradaProducto = () => {
   const [providerList, setProviderList] = useState([]);
   const [selectedProvider, setSelectedProvider] = useState("");
 
-  const [montoFactura, setMontoFactura] = useState("");
+  const [montoFactura, setMontoFactura] = useState(0);
 
   const [productList, setProductList] = useState([]);
 
@@ -48,27 +69,15 @@ const AddEntradaProducto = () => {
 
   const [productDetailList, setProductDetailList] = useState([]);
 
-  const saveChangesAsync = async () => {
-    // const data = {
-    //   description: description,
-    // };
-    // if (description === "") {
-    //   simpleMessage("Ingrese una descripcion...", "error");
-    //   return;
-    // }
-    // const result = await addFamiliaAsync(data);
-    // if (!result.statusResponse) {
-    //   simpleMessage(result.error, "error");
-    //   return;
-    // }
-    // simpleMessage("Exito...!", "success");
-    // navigate("/familia/");
-  };
+  const [showProviderModal, setShowProvidermodal] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   useEffect(() => {
     (async () => {
+      setIsLoading(true);
       const resultProviders = await getprovidersAsync();
       if (!resultProviders.statusResponse) {
+        setIsLoading(false);
         simpleMessage(resultProviders.error, "error");
         return;
       }
@@ -76,12 +85,14 @@ const AddEntradaProducto = () => {
 
       const resultProducts = await getProductsAsync();
       if (!resultProducts.statusResponse) {
+        setIsLoading(false);
         simpleMessage(resultProducts.error, "error");
         return;
       }
       setProductList(resultProducts.data);
+      setIsLoading(false);
     })();
-  }, []);
+  }, [reload]);
 
   //Devuelve un entero positivo
   const funcCantidad = (value) => {
@@ -282,15 +293,18 @@ const AddEntradaProducto = () => {
       );
       return;
     }
+
     const data = {
       product: selectedProduct,
       cantidad,
-      costoCompra: costo,
+      costoUnitario: costo,
       descuento: descuento ? descuento : 0,
       impuesto: impuesto ? impuesto : 0,
-      precioVentaMayor: precioVenta,
-      precioVentaDetalle: precioVentaDetalle,
+      costoCompra: cantidad * costo,
+      precioVentaMayor: parseFloat(precioVenta),
+      precioVentaDetalle: parseFloat(precioVentaDetalle),
     };
+    setMontoFactura(montoFactura + cantidad * costo);
     setSelectedProduct("");
     setCantidad("");
     setPrecioCompra("");
@@ -303,13 +317,72 @@ const AddEntradaProducto = () => {
     setBaseGananciaDetalle("");
     setGananciaDetalle("");
     setPrecioVentaDetalle("");
-
     setProductDetailList([...productDetailList, data]);
+  };
+
+  const deleteFromProductDetailList = (item) => {
+    const filtered = productDetailList.filter(
+      (p) => p.product.barCode !== item.product.barCode
+    );
+    setMontoFactura(montoFactura - item.costoCompra);
+    setProductDetailList(filtered);
+  };
+
+  const addProdutInn = async () => {
+    if (!noFactura) {
+      simpleMessage("Ingrese numero de factura", "error");
+      return;
+    }
+
+    if (!tipoEntrada) {
+      simpleMessage("Ingrese tipo de entrada", "error");
+      return;
+    }
+
+    if (!tipoCompra) {
+      simpleMessage("Ingrese tipo de pago", "error");
+      return;
+    }
+
+    if (!selectedProvider) {
+      simpleMessage("Seleccione un proveedor", "error");
+      return;
+    }
+
+    if (!montoFactura) {
+      simpleMessage("Ingrese al menos un producto para guardar", "error");
+      return;
+    }
+
+    const data = {
+      noFactura,
+      tipoEntrada,
+      tipoPago: tipoCompra,
+      provider: selectedProvider,
+      montoFactura,
+      productInDetails: productDetailList,
+    };
+    setIsLoading(true);
+
+    const result = await addEntradaProductoAsync(data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      simpleMessage(result.error, "error");
+      return;
+    }
+    setNoFactura("");
+    setTipoEntrada("");
+    setTipoCompra("");
+    setSelectedProvider("");
+    setMontoFactura(0);
+    setProductDetailList([]);
+    setIsLoading(false);
+    simpleMessage("Exito...!", "success");
   };
 
   return (
     <div>
-      <Container>
+      <Container maxWidth="xl">
         <div
           style={{
             marginTop: 20,
@@ -322,9 +395,13 @@ const AddEntradaProducto = () => {
             onClick={() => {
               navigate("/products-in/");
             }}
-            style={{ marginRight: 20 }}
-            variant="primary"
+            style={{ marginRight: 20, borderRadius: 20 }}
+            variant="outline-primary"
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faCircleArrowLeft}
+            />
             Regresar
           </Button>
 
@@ -356,11 +433,11 @@ const AddEntradaProducto = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text>Tipo de Compra</InputGroup.Text>
+              <InputGroup.Text>Tipo de Pago</InputGroup.Text>
               <Form.Select onChange={(e) => setTipoCompra(e.target.value)}>
-                <option>Seleccione un tipo de compra...</option>
-                <option>Compra de Contado</option>
-                <option>Compra de Credito</option>
+                <option>Seleccione un tipo de pago...</option>
+                <option>Pago de Contado</option>
+                <option>Pago de Credito</option>
               </Form.Select>
             </InputGroup>
 
@@ -383,24 +460,12 @@ const AddEntradaProducto = () => {
                   />
                 )}
               />
-              <Button variant="outline-secondary">Agregar Proveedor</Button>
-              {/* <input
-                className="form-control"
-                list="datalistOptions"
-                id="exampleDataList"
-                placeholder="Seleccione un proveedor..."
-              />
-              <datalist id="datalistOptions">
-                {providerList.map((item) => {
-                  return (
-                    <option
-                      key={item.id}
-                      value={item.nombre}
-                      onChange={() => setSelectedProvider(item.id)}
-                    />
-                  );
-                })}
-              </datalist> */}
+              <Button
+                variant="outline-secondary"
+                onClick={() => setShowProvidermodal(!showProviderModal)}
+              >
+                Agregar Proveedor
+              </Button>
             </InputGroup>
           </Col>
 
@@ -426,7 +491,12 @@ const AddEntradaProducto = () => {
                   />
                 )}
               />
-              <Button variant="outline-secondary">Agregar Producto</Button>
+              <Button
+                variant="outline-secondary"
+                onClick={() => setShowProductModal(true)}
+              >
+                Agregar Producto
+              </Button>
             </InputGroup>
 
             <Row>
@@ -626,8 +696,13 @@ const AddEntradaProducto = () => {
                 </Row>
                 <Button
                   variant="outline-primary"
+                  style={{ borderRadius: 20 }}
                   onClick={() => addToProductList()}
                 >
+                  <FontAwesomeIcon
+                    style={{ marginRight: 10, fontSize: 20 }}
+                    icon={faClipboard}
+                  />
                   Agregar al Detalle
                 </Button>
               </Col>
@@ -652,59 +727,156 @@ const AddEntradaProducto = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th style={{ textAlign: "left" }}>Nombre</th>
+              <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
               <th>Cantidad</th>
-              <th>Costo de Compra</th>
+              <th>Costo Unitario</th>
               <th>Descuento</th>
               <th>Impuesto</th>
+              <th>Costo de Compra</th>
               <th>P.V. Mayor</th>
               <th>P.V. Detalle</th>
               <th>Eliminar</th>
             </tr>
           </thead>
           <tbody>
-            {productDetailList.map((item) => {
-              return (
-                <tr>
-                  <td>{productDetailList.indexOf(item) + 1}</td>
-                  <td style={{ textAlign: "left" }}>
-                    {item.product.description}
-                  </td>
-                  <td>{item.cantidad}</td>
-                  <td>
-                    {item.costoCompra.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>{`${item.descuento}%`}</td>
-                  <td>{`${item.impuesto}%`}</td>
-                  <td>
-                    {item.precioVentaMayor.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>
-                    {item.precioVentaDetalle.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      // onClick={() => deleteFamilia(item)}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
+            {productDetailList ? (
+              productDetailList.map((item) => {
+                return (
+                  <tr>
+                    <td>{productDetailList.indexOf(item) + 1}</td>
+                    <td style={{ textAlign: "left", minWidth: 250 }}>
+                      {item.product.description}
+                    </td>
+                    <td>{item.cantidad}</td>
+                    <td>
+                      {item.costoUnitario.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>{`${item.descuento}%`}</td>
+                    <td>{`${item.impuesto}%`}</td>
+                    <td>
+                      {item.costoCompra.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>
+                      {item.precioVentaMayor.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>
+                      {item.precioVentaDetalle.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>
+                      <Button
+                        variant="danger"
+                        onClick={() => deleteFromProductDetailList(item)}
+                      >
+                        Eliminar
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <></>
+            )}
           </tbody>
         </Table>
       </Container>
+
+      <Container maxWidth="xl">
+        <Divider style={{ marginTop: 20, marginBottom: 5 }} />
+        <div className="row justify-content-around align-items-center">
+          <div className="col-sm-2 ">
+            <Typography
+              style={{
+                marginBottom: 10,
+                fontSize: 13,
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              Total de Productos
+            </Typography>
+            <Typography
+              style={{
+                fontSize: 12,
+                color: "#2196f3",
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              {productDetailList.length}
+            </Typography>
+          </div>
+
+          <div className="col-sm-2 ">
+            <Typography
+              style={{
+                marginBottom: 10,
+                fontSize: 13,
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              Total a Pagar
+            </Typography>
+            <Typography
+              style={{
+                fontSize: 12,
+                color: "#f50057",
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              {new Intl.NumberFormat("es-NI", {
+                style: "currency",
+                currency: "NIO",
+              }).format(montoFactura)}
+            </Typography>
+          </div>
+
+          <div className="col-sm-2 ">
+            <Button
+              variant="outline-primary"
+              style={{ borderRadius: 20 }}
+              onClick={() => addProdutInn()}
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faSave}
+              />
+              Guardar Entrada de Producto
+            </Button>
+          </div>
+        </div>
+      </Container>
+
+      <Loading />
+
+      <SmallModal
+        titulo={"Agregar Proveedor"}
+        isVisible={showProviderModal}
+        setVisible={setShowProvidermodal}
+      >
+        <AddProviderComponent setShowModal={setShowProvidermodal} />
+      </SmallModal>
+
+      <MediumModal
+        titulo={"Agregar Producto"}
+        isVisible={showProductModal}
+        setVisible={setShowProductModal}
+      >
+        <AddProductComponent setShowModal={setShowProductModal} />
+      </MediumModal>
     </div>
   );
 };

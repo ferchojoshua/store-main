@@ -1,20 +1,19 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../context/DataContext";
-import { Container, InputGroup, FormControl, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { faSave } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  Container,
+  Button,
+  InputGroup,
+  FormControl,
+  Form,
+} from "react-bootstrap";
 import { simpleMessage } from "../../helpers/Helpers";
 import { addProviderAsync } from "../../services/ProviderApi";
 
-import { Button } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleArrowLeft,
-  faCirclePlus,
-} from "@fortawesome/free-solid-svg-icons";
-
-const ProviderAdd = () => {
+const AddProviderComponent = ({ setShowModal }) => {
   const { reload, setReload } = useContext(DataContext);
-  let navigate = useNavigate();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -47,39 +46,14 @@ const ProviderAdd = () => {
       simpleMessage(result.error, "error");
       return;
     }
-    simpleMessage("Exito...!", "success");
     setReload(!reload);
-    navigate("/providers/");
+    setShowModal(false);
+    simpleMessage("Exito...!", "success");
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <Button
-            onClick={() => {
-              navigate("/providers/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Agregar Proveedor</h1>
-        </div>
-
+      <Container style={{ textAlign: "center" }}>
         <hr />
 
         <Form.Group className="mb-3">
@@ -130,15 +104,14 @@ const ProviderAdd = () => {
           </InputGroup>
         </Form.Group>
 
+        <hr />
+
         <Button
+          variant="outline-primary"
           style={{ borderRadius: 20 }}
-          variant="outlined"
           onClick={() => saveChangesAsync()}
         >
-          <FontAwesomeIcon
-            style={{ marginRight: 10, fontSize: 20 }}
-            icon={faCirclePlus}
-          />
+          <FontAwesomeIcon style={{ marginRight: 10 }} icon={faSave} />
           Agregar Proveedor
         </Button>
       </Container>
@@ -146,4 +119,4 @@ const ProviderAdd = () => {
   );
 };
 
-export default ProviderAdd;
+export default AddProviderComponent;

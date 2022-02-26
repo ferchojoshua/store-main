@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../context/DataContext";
-import { Container, InputGroup, FormControl, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Button,
+  InputGroup,
+  FormControl,
+  Form,
+} from "react-bootstrap";
 import { simpleMessage } from "../../helpers/Helpers";
 import { getFamiliasAsync } from "../../services/FamiliaApi";
 import { addProductAsync } from "../../services/ProductsApi";
 import { getTipoNegocioAsync } from "../../services/TipoNegocioApi";
-import { Button } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleArrowLeft,
-  faCirclePlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSave } from "@fortawesome/free-regular-svg-icons";
 
-const Productsadd = () => {
+const AddProductComponent = ({ setShowModal }) => {
   const { reload, setReload } = useContext(DataContext);
-  let navigate = useNavigate();
   const [description, setDescription] = useState("");
 
   const [barCode, setBarCode] = useState("");
@@ -59,10 +59,9 @@ const Productsadd = () => {
       simpleMessage(result.error, "error");
       return;
     }
-    simpleMessage("Exito...!", "success");
-    navigate("/products/");
-
     setReload(!reload);
+    setShowModal(false);
+    simpleMessage("Exito...!", "success");
   };
 
   useEffect(() => {
@@ -85,33 +84,9 @@ const Productsadd = () => {
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <Button
-            onClick={() => {
-              navigate("/products/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Agregar Producto</h1>
-        </div>
-
+      <Container style={{ textAlign: "center" }}>
         <hr />
+
         <Form>
           <InputGroup className="mb-3">
             <InputGroup.Text>Tipo negocio</InputGroup.Text>
@@ -193,15 +168,14 @@ const Productsadd = () => {
             </Form.Select>
           </InputGroup>
 
+          <hr />
+
           <Button
+            variant="outline-primary"
             style={{ borderRadius: 20 }}
-            variant="outlined"
             onClick={() => saveChangesAsync()}
           >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCirclePlus}
-            />
+            <FontAwesomeIcon style={{ marginRight: 10 }} icon={faSave} />
             Agregar Producto
           </Button>
         </Form>
@@ -210,4 +184,4 @@ const Productsadd = () => {
   );
 };
 
-export default Productsadd;
+export default AddProductComponent;

@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Button,
-  InputGroup,
-  FormControl,
-  Table,
-} from "react-bootstrap";
+import React, { useState } from "react";
+import { Container, InputGroup, FormControl } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { simpleMessage } from "../../../../helpers/Helpers";
 import { addRackToStoreAsync } from "../../../../services/AlmacenApi";
+import { Button, IconButton, Tooltip } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleArrowLeft, faSave } from "@fortawesome/free-solid-svg-icons";
 
 const RackAdd = () => {
   let navigate = useNavigate();
@@ -49,9 +46,13 @@ const RackAdd = () => {
             onClick={() => {
               navigate(`/store/${id}`);
             }}
-            style={{ marginRight: 20 }}
-            variant="primary"
+            style={{ marginRight: 20, borderRadius: 20 }}
+            variant="outlined"
           >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faCircleArrowLeft}
+            />
             Regresar
           </Button>
 
@@ -69,13 +70,14 @@ const RackAdd = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          <Button
-            variant="outline-secondary"
-            id="button-addon2"
-            onClick={() => saveChangesAsync()}
-          >
-            Agregar Rack
-          </Button>
+          <Tooltip title="Agregar Rack">
+            <IconButton onClick={() => saveChangesAsync()}>
+              <FontAwesomeIcon
+                icon={faSave}
+                style={{ fontSize: 30, color: "#2196f3" }}
+              />
+            </IconButton>
+          </Tooltip>
         </InputGroup>
       </Container>
     </div>
