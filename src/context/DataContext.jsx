@@ -1,6 +1,5 @@
 import React, { createContext, useState } from "react";
 
-
 export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
@@ -8,6 +7,7 @@ export const DataProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLogged, setIsLogged] = useState(null);
   const [reload, setReload] = useState(false);
+  const [user, setUser] = useState([]);
   const [access, setAccess] = useState([]);
 
   return (
@@ -22,6 +22,9 @@ export const DataProvider = ({ children }) => {
         reload,
         setReload,
         access,
+        setAccess,
+        user,
+        setUser,
       }}
     >
       {children}

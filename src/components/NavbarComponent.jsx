@@ -1,18 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { DataContext } from "../context/DataContext";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faDolly,
+  faCodeBranch,
   faEllipsisVertical,
   faHome,
   faLeftRight,
   faList,
-  faUsers,
+  faShield,
+  faSignOutAlt,
+  faUserCircle,
+  faUserCog,
 } from "@fortawesome/free-solid-svg-icons";
+import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import { getToken, logOutAsync } from "../services/Account";
+import { simpleMessage } from "../helpers/Helpers";
+import { useNavigate } from "react-router-dom";
 
 const NavbarComponent = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
   const [active, setActive] = useState("home");
+
+  const { user, setIsLogged, setTitle } = useContext(DataContext);
+  let navigate = useNavigate();
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const token = getToken();
+
+  const myAccount = () => {
+    setTitle("Mi Cuenta");
+    navigate(`/account`);
+  };
+
+  const logOut = async () => {
+    const result = await logOutAsync(token);
+    if (!result.statusResponse) {
+      simpleMessage("error", "No se pudo cerrar sesion, intente de nuevo");
+    }
+    setIsLogged(false);
+    setTitle("Auto&Moto");
+  };
 
   return (
     <Navbar
@@ -54,7 +92,7 @@ const NavbarComponent = () => {
             <Nav.Link
               eventKey="home"
               style={{
-                fontWeight: "bold",
+                fontWeight: active === "home" ? "bold" : "",
                 color: active === "home" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
@@ -67,7 +105,7 @@ const NavbarComponent = () => {
 
             <Nav.Link
               style={{
-                fontWeight: "bold",
+                fontWeight: active === "products-in" ? "bold" : "",
                 color: active === "products-in" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
@@ -81,7 +119,7 @@ const NavbarComponent = () => {
 
             <Nav.Link
               style={{
-                fontWeight: "bold",
+                fontWeight: active === "traslate-products" ? "bold" : "",
                 color: active === "traslate-products" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
@@ -95,19 +133,19 @@ const NavbarComponent = () => {
 
             <Nav.Link
               style={{
-                fontWeight: "bold",
-                color: active === "products" ? "#bbdefb" : "#9e9e9e",
+                fontWeight: active === "traslate-products" ? "bold" : "",
+                color: active === "security" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
-              eventKey="products"
+              eventKey="security"
               as={Link}
-              to="/products"
+              to="/security"
             >
-              <FontAwesomeIcon icon={faDolly} style={{ marginRight: 10 }} />
-              Productos
+              <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
+              Seguridad
             </Nav.Link>
 
-            <Nav.Link
+            {/* <Nav.Link
               style={{
                 fontWeight: "bold",
                 color: active === "providers" ? "#bbdefb" : "#9e9e9e",
@@ -119,7 +157,7 @@ const NavbarComponent = () => {
             >
               <FontAwesomeIcon icon={faUsers} style={{ marginRight: 10 }} />
               Proveedores
-            </Nav.Link>
+            </Nav.Link> */}
 
             <NavDropdown
               drop="start"
@@ -136,6 +174,12 @@ const NavbarComponent = () => {
               <NavDropdown.Item as={Link} to="/stores">
                 Almacenes
               </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/providers">
+                Proveedores
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/products">
+                Productos
+              </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/tipo-negocio">
                 Tipo Negocio
               </NavDropdown.Item>
@@ -144,15 +188,69 @@ const NavbarComponent = () => {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          {/* <Form className="d-flex">
-            <FormControl
-              type="search"
-              placeholder="Buscar"
-              className="me-2"
-              aria-label="Search"
-            />
-            <Button variant="outline-success">Buscar</Button>
-          </Form> */}
+          <div>
+            <a
+              style={{
+                fontWeight: "bold",
+                color: "#9e9e9e",
+                fontSize: 15,
+              }}
+            >
+              {user}
+            </a>
+
+            <IconButton
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+              style={{ marginLeft: 10 }}
+            >
+              <FontAwesomeIcon
+                icon={faUserCircle}
+                style={{ color: "#9e9e9e" }}
+              />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem
+                onClick={myAccount}
+                // style={{ color: darkMode ? "#7bc0c5" : "#105155" }}
+              >
+                <FontAwesomeIcon icon={faUserCog} style={{ marginRight: 20 }} />
+                Mi cuenta
+              </MenuItem>
+              <MenuItem onClick={logOut}>
+                <FontAwesomeIcon
+                  icon={faSignOutAlt}
+                  style={{ marginRight: 20 }}
+                />
+                Cerrar Sesion
+              </MenuItem>
+              <Divider />
+              <MenuItem disabled style={{ color: "#2196f3" }}>
+                <FontAwesomeIcon
+                  icon={faCodeBranch}
+                  style={{ marginRight: 20 }}
+                />
+                Version - 1.0
+              </MenuItem>
+            </Menu>
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>

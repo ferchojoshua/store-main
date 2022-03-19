@@ -1,8 +1,10 @@
-// import logo from "./logo.svg";
+import React, { useEffect, useContext } from "react";
+import { DataContext } from "./context/DataContext";
 import "./App.css";
 import NavbarComponent from "./components/NavbarComponent";
 import { Route, Routes } from "react-router-dom";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 import Home from "./pages/home/Home";
 
 import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
@@ -33,13 +35,61 @@ import TipoNegocio from "./pages/settings/TipoNegocio";
 import TipoNegocioAdd from "./pages/settings/tipoNegocio/TipoNegocioAdd";
 import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails";
 import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
+import Loading from "./components/Loading";
+import Login from "./pages/Login";
+import { getToken, getUser, getUserAsync } from "./services/Account";
+import { simpleMessage } from "./helpers/Helpers";
+import MyAccount from "./pages/account/MyAccount";
+import SecurityContiner from "./pages/security/SecurityContiner";
 
 function App() {
-  return (
+  const { setIsLoading, isLogged, setIsLogged, setUser } =
+    useContext(DataContext);
+
+  const user = getUser();
+  const token = getToken();
+
+  useEffect(() => {
+    setIsLoading(true);
+    if (!user) {
+      setIsLoading(false);
+      setIsLogged(false);
+      return;
+    }
+    if (!token) {
+      setIsLoading(false);
+      setIsLogged(false);
+      return;
+    }
+    (async () => {
+      const result = await getUserAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        simpleMessage(result.error, "error");
+        return;
+      }
+      setIsLogged(true);
+      setIsLoading(false);
+    })();
+    setUser(user);
+    setIsLogged(true);
+    setIsLoading(false);
+  }, []);
+
+  if (isLogged === null) {
+    return <Loading />;
+  }
+
+  return isLogged ? (
     <div className="App">
       <NavbarComponent />
       <Routes>
         <Route path="/" element={<Home />} />
+
+        {/* Rutas Account */}
+        <Route path="/account" element={<MyAccount />} />
+        {/* <Route path="/entrada/add" element={<AddEntradaProducto />} />
+        <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
 
         {/* Rutas Products-in */}
         <Route path="/products-in" element={<EntradaProduto />} />
@@ -49,6 +99,11 @@ function App() {
         {/* Rutas Products-in */}
         <Route path="/traslate-products" element={<MoverProducto />} />
         <Route path="/traslate-products/add" element={<MoverProductoAdd />} />
+        {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
+
+        {/* Rutas Seguridad */}
+        <Route path="/security" element={<SecurityContiner />} />
+        {/* <Route path="/traslate-products/add" element={<MoverProductoAdd />} /> */}
         {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
 
         {/* Rutas Productos */}
@@ -75,10 +130,13 @@ function App() {
         <Route path="/tipo-negocio" element={<TipoNegocio />} />
         <Route path="/tipo-negocio/add" element={<TipoNegocioAdd />} />
         <Route path="/tipo-negocio/:id" element={<TipoNegocioDetails />} />
-        {/* <Route path="/miscelaneos" element={<SettingsContainer />} /> */}
-        {/* <Route path="*" element={<h1>No encontrado</h1>} /> */}
       </Routes>
+
+      <Loading />
+      <ToastContainer />
     </div>
+  ) : (
+    <Login />
   );
 }
 
