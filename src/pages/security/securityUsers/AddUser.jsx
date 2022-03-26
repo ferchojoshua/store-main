@@ -5,26 +5,28 @@ import {
   Button,
   Divider,
   Grid,
-  InputAdornment,
-  IconButton,
+  // InputAdornment,
+  // IconButton,
   InputLabel,
   FormControl,
   Select,
   MenuItem,
+  Container,
 } from "@mui/material";
-import { Container } from "react-bootstrap";
-import { faEye, faEyeSlash, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getToken } from "../../../services/Account";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty } from "lodash";
 import { createUserAsync } from "../../../services/UsersApi";
+import { useNavigate } from "react-router-dom";
 
 const AddUser = ({ setShowModal }) => {
   const { setIsLoading, reload, setReload } = useContext(DataContext);
   const token = getToken();
-  const [showPassword, setShowPassword] = useState(false);
+  let navigate = useNavigate();
+  // const [showPassword, setShowPassword] = useState(false);
   const [rolesList, setRolesList] = useState([]);
 
   const [firstName, setFirstName] = useState("");
@@ -36,8 +38,6 @@ const AddUser = ({ setShowModal }) => {
   const [address, setAddress] = useState("");
 
   const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [selectedRol, setSelectedRol] = useState("");
 
   useEffect(() => {
@@ -46,6 +46,10 @@ const AddUser = ({ setShowModal }) => {
       const rolesResult = await getRolesAsync(token);
       if (!rolesResult.statusResponse) {
         setIsLoading(false);
+        if (rolesResult.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError("No se pudo cargar los roles");
         return;
       }
@@ -64,7 +68,7 @@ const AddUser = ({ setShowModal }) => {
         phoneNumber,
         address,
         userName,
-        password,
+        // password,
         rolId: selectedRol,
       };
 
@@ -72,6 +76,10 @@ const AddUser = ({ setShowModal }) => {
       const result = await createUserAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError("Ocurrio un error..., intente de nuevo");
         return;
       }
@@ -104,20 +112,20 @@ const AddUser = ({ setShowModal }) => {
       return (isValid = false);
     }
 
-    if (isEmpty(password)) {
-      toastError("Debe ingresar una contraseña");
-      return (isValid = false);
-    }
+    // if (isEmpty(password)) {
+    //   toastError("Debe ingresar una contraseña");
+    //   return (isValid = false);
+    // }
 
-    if (isEmpty(passwordConfirm)) {
-      toastError("Debe confirmar la contraseña");
-      return (isValid = false);
-    }
+    // if (isEmpty(passwordConfirm)) {
+    //   toastError("Debe confirmar la contraseña");
+    //   return (isValid = false);
+    // }
 
-    if (password !== passwordConfirm) {
-      toastError("Las contraseñas no son iguales");
-      return (isValid = false);
-    }
+    // if (password !== passwordConfirm) {
+    //   toastError("Las contraseñas no son iguales");
+    //   return (isValid = false);
+    // }
 
     if (selectedRol === "") {
       toastError("Debe seleccionar un rol");
@@ -167,10 +175,11 @@ const AddUser = ({ setShowModal }) => {
               style={{ marginBottom: 10, marginTop: 10 }}
               variant="standard"
               onChange={(e) => setSecondLastName(e.target.value.toUpperCase())}
-              label={"Agundo Apellido"}
+              label={"Segundo Apellido"}
               value={secondLastName}
             />
-
+          </Grid>
+          <Grid item sm={6}>
             <TextField
               fullWidth
               style={{ marginBottom: 10, marginTop: 10 }}
@@ -179,8 +188,7 @@ const AddUser = ({ setShowModal }) => {
               label={"Telefono"}
               value={phoneNumber}
             />
-          </Grid>
-          <Grid item sm={6}>
+
             <TextField
               fullWidth
               required
@@ -201,7 +209,7 @@ const AddUser = ({ setShowModal }) => {
               value={userName}
             />
 
-            <TextField
+            {/* <TextField
               fullWidth
               required
               style={{ marginBottom: 10, marginTop: 10 }}
@@ -232,8 +240,8 @@ const AddUser = ({ setShowModal }) => {
                   </InputAdornment>
                 ),
               }}
-            />
-
+            /> */}
+            {/* 
             <TextField
               fullWidth
               required
@@ -265,7 +273,7 @@ const AddUser = ({ setShowModal }) => {
                   </InputAdornment>
                 ),
               }}
-            />
+            /> */}
 
             <FormControl
               variant="standard"

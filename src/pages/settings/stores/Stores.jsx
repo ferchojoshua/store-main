@@ -2,20 +2,24 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import Loading from "../../../components/Loading";
 import PaginationComponent from "../../../components/PaginationComponent";
-import { simpleMessage } from "../../../helpers/Helpers";
+import { toastError } from "../../../helpers/Helpers";
 import { getStoresAsync } from "../../../services/AlmacenApi";
-import { Button, IconButton } from "@mui/material";
+import { Button, IconButton, Paper } from "@mui/material";
 import {
   faCirclePlus,
   faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getToken } from "../../../services/Account";
+import { isEmpty } from "lodash";
+import SmallModal from "../../../components/modals/SmallModal";
+import StoreAdd from "./StoreAdd";
+import NoData from "../../../components/NoData";
 
 const Stores = () => {
   let navigate = useNavigate();
-  const { setIsLoading } = useContext(DataContext);
+  const { setIsLoading, reload, setIsDefaultPass } = useContext(DataContext);
   const [storesList, setStoresList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,86 +29,116 @@ const Stores = () => {
   const currentItem = storesList.slice(indexFirst, indexLast);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const token = getToken();
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getStoresAsync();
+      const result = await getStoresAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
-        simpleMessage(result.error, "error");
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("Ocurrio un error al descargar la lista...");
+        return;
+      }
+    
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
         return;
       }
       setIsLoading(false);
       setStoresList(result.data);
     })();
-  }, [storesList.almacen]);
+  }, [reload]);
 
   return (
     <div>
       <Container>
-        <div
+        <Paper
+          elevation={10}
           style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
+            borderRadius: 30,
+            padding: 20,
           }}
         >
-          <h1>Almacenes</h1>
-
-          <Button
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              navigate(`/store/add`);
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
-            variant="outlined"
           >
-            Agregar Almacen
-          </Button>
-        </div>
+            <h1>Almacenes</h1>
 
-        <hr />
+            <Button
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                setShowModal(true);
+              }}
+              variant="outlined"
+            >
+              Agregar Almacen
+            </Button>
+          </div>
 
-        <Table hover size="sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style={{ width: 150 }}>Numero de Racks</th>
-              <th style={{ textAlign: "left" }}>Nombre</th>
-              <th>Ver Detalles</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItem.map((item) => {
-              return (
-                <tr key={item.almacen.id}>
-                  <td>{item.almacen.id}</td>
-                  <td style={{ width: 150 }}>{item.racksNumber}</td>
-                  <td style={{ textAlign: "left" }}>{item.almacen.name}</td>
-                  <td>
-                    <IconButton
-                      style={{ marginRight: 10, color: "#009688" }}
-                      onClick={() => {
-                        navigate(`/store/${item.almacen.id}`);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faExternalLinkAlt} />
-                    </IconButton>
-                  </td>
+          <hr />
+
+          {isEmpty(currentItem) ? (
+            <NoData />
+          ) : (
+            <Table hover size="sm">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th style={{ width: 150 }}>Numero de Racks</th>
+                  <th style={{ textAlign: "left" }}>Nombre</th>
+                  <th>Ver Detalles</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-        <PaginationComponent
-          data={storesList}
-          paginate={paginate}
-          itemsperPage={itemsperPage}
-        />
+              </thead>
+              <tbody>
+                {currentItem.map((item) => {
+                  return (
+                    <tr key={item.almacen.id}>
+                      <td>{item.almacen.id}</td>
+                      <td style={{ width: 150 }}>{item.racksNumber}</td>
+                      <td style={{ textAlign: "left" }}>{item.almacen.name}</td>
+                      <td>
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            navigate(`/store/${item.almacen.id}`);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          )}
+          <PaginationComponent
+            data={storesList}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
+        </Paper>
       </Container>
-      <Loading />
+
+      <SmallModal
+        titulo={"Agregar Almacen"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <StoreAdd setShowModal={setShowModal} />
+      </SmallModal>
     </div>
   );
 };

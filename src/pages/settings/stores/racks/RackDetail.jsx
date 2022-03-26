@@ -1,17 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { Container, Button, InputGroup, FormControl } from "react-bootstrap";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../../helpers/Helpers";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  TextField,
+  Button,
+  Divider,
+  Container,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import { getToken } from "../../../../services/Account";
 import {
   getRackByIdAsync,
   updateRackAsync,
 } from "../../../../services/AlmacenApi";
+import { DataContext } from "../../../../context/DataContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPenToSquare,
+  faSave,
+  faXmarkCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
-const RackDetail = () => {
+const RackDetail = ({ selectedRack, setShowModal }) => {
+  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+    useContext(DataContext);
+  const token = getToken();
   let navigate = useNavigate();
-  const { data } = useParams();
-  const parametros = JSON.parse(data);
 
   const [rack, setRack] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
@@ -19,91 +35,101 @@ const RackDetail = () => {
 
   useEffect(() => {
     (async () => {
-      const result = await getRackByIdAsync(parametros.rackId);
+      setIsLoading(true);
+      const result = await getRackByIdAsync(token, selectedRack.id);
       if (!result.statusResponse) {
-        simpleMessage(result.error, "error");
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("Ocurrio un error al cargar los datos");
         return;
       }
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
       setDescription(result.data.description);
       setRack(result.data);
     })();
   }, []);
 
   const saveChangesAsync = async () => {
+    setIsLoading(true);
     const data = {
-      id: parametros.rackId,
+      id: selectedRack.id,
       description: description,
     };
     if (description === rack.description) {
-      simpleMessage("Ingrese una descripcion diferente...", "error");
+      setIsLoading(false);
+      toastError("Ingrese una descripcion diferente");
       return;
     }
-    const result = await updateRackAsync(data);
+    const result = await updateRackAsync(token, data);
     if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("Ocurrio un error al guardar los cambios, intente de nuevo");
       return;
     }
-    simpleMessage("Exito...!", "success");
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    setReload(!reload);
+    setIsLoading(false);
+    toastSuccess("Cambio realizado...!");
     setIsEdit(false);
+    setShowModal(false);
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
+      <Container style={{ width: 500 }}>
+        <Divider />
+
+        <TextField
+          fullWidth
+          style={{ marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setDescription(e.target.value.toUpperCase())}
+          value={description}
+          label={"Descripcion rack"}
+          disabled={!isEdit}
+          placeholder={"Ingrese descripcion"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title={"editar"}>
+                  <IconButton
+                    style={{ marginRight: 10 }}
+                    onClick={() => setIsEdit(!isEdit)}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "#ff5722" }}
+                      icon={isEdit ? faXmarkCircle : faPenToSquare}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ),
           }}
+        />
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 10 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveChangesAsync()}
+          disabled={!isEdit}
         >
-          <Button
-            onClick={() => {
-              navigate(`/store/${parametros.id}`);
-            }}
-            style={{ marginRight: 20 }}
-            variant="primary"
-          >
-            Regresar
-          </Button>
-
-          <h1>Detalle Rack # {parametros.rackId}</h1>
-
-          <Button
-            onClick={() => {
-              setIsEdit(!isEdit);
-            }}
-            variant="danger"
-          >
-            {isEdit ? "Cancelar" : "Editar"}
-          </Button>
-        </div>
-
-        <hr />
-
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Descripcion</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={!isEdit}
-          />
-          {isEdit ? (
-            <Button
-              variant="outline-secondary"
-              id="button-addon2"
-              onClick={() => saveChangesAsync()}
-            >
-              Guardar cambios
-            </Button>
-          ) : (
-            <></>
-          )}
-        </InputGroup>
+          Guardar cambios
+        </Button>
       </Container>
     </div>
   );

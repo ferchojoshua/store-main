@@ -36,6 +36,11 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [userUpdate, setUserUpdate] = useState(false);
   const [userDelete, setUserDelete] = useState(false);
 
+  const [rolesVer, setRolesVer] = useState(false);
+  const [rolesCreate, setRolesCreate] = useState(false);
+  const [rolesUpdate, setRolesUpdate] = useState(false);
+  const [rolesDelete, setRolesDelete] = useState(false);
+
   const [miscelaneosVer, setMiscelaneosVer] = useState(false);
   const [miscelaneosCreate, setMiscelaneosCreate] = useState(false);
   const [miscelaneosUpdate, setMiscelaneosUpdate] = useState(false);
@@ -60,6 +65,19 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "USER DELETE":
           setUserDelete(item.isEnable);
+          break;
+
+        case "ROLES VER":
+          setRolesVer(item.isEnable);
+          break;
+        case "ROLES CREATE":
+          setRolesCreate(item.isEnable);
+          break;
+        case "ROLES UPDATE":
+          setRolesUpdate(item.isEnable);
+          break;
+        case "ROLES DELETE":
+          setRolesDelete(item.isEnable);
           break;
 
         case "MISCELANEOS VER":
@@ -115,6 +133,19 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = userDelete;
           break;
 
+        case "ROLES VER":
+          item.isEnable = rolesVer;
+          break;
+        case "ROLES CREATE":
+          item.isEnable = rolesCreate;
+          break;
+        case "ROLES UPDATE":
+          item.isEnable = rolesUpdate;
+          break;
+        case "ROLES DELETE":
+          item.isEnable = rolesDelete;
+          break;
+
         case "MISCELANEOS VER":
           item.isEnable = miscelaneosVer;
           break;
@@ -167,7 +198,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           <div className="col-sm-9 ">
             <TextField
               fullWidth
-              style={{ marginBottom: 10, marginTop: 20 }}
+              style={{ marginBottom: 10, marginTop: 10 }}
               variant="standard"
               onChange={(e) => setRolName(e.target.value.toUpperCase())}
               label={"Nombre rol"}
@@ -196,45 +227,25 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             </Button>
           </div>
         </div>
-        <Grid container style={{ marginTop: 10 }}>
-          <Grid item sm={6}>
+
+        {/* Modulo Miscelaneos  */}
+        <div
+          className="row justify-content-around align-items-center"
+          style={{ marginTop: 20 }}
+        >
+          <div className="col-sm-4 ">
             <Typography
               style={{
                 fontSize: 17,
-                marginTop: 40,
+                marginTop: 10,
                 color: "#2196f3",
                 fontWeight: 800,
-                // textAlign: "left",
               }}
             >
               Modulo Miscelaneos
             </Typography>
-
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 35,
-                color: "#2196f3",
-                fontWeight: 800,
-                // textAlign: "left",
-              }}
-            >
-              Modulo Seguridad de Usuarios
-            </Typography>
-
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 40,
-                color: "#2196f3",
-                fontWeight: 800,
-                // textAlign: "left",
-              }}
-            >
-              Modulo Entrada de Productos
-            </Typography>
-          </Grid>
-          <Grid item sm={6} style={{ paddingLeft: 20, paddingRight: 20 }}>
+          </div>
+          <div className="col-sm-8 ">
             <div className="row justify-content-around align-items-center">
               <div className="col-sm-3 ">
                 <FormControlLabel
@@ -289,7 +300,26 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                 />
               </div>
             </div>
+          </div>
+        </div>
 
+        <hr />
+
+        {/* Modulo Seguridad de Usuarios */}
+        <div className="row justify-content-around align-items-center">
+          <div className="col-sm-4 ">
+            <Typography
+              style={{
+                fontSize: 17,
+                marginTop: 10,
+                color: "#2196f3",
+                fontWeight: 800,
+              }}
+            >
+              Modulo Seguridad de Usuarios
+            </Typography>
+          </div>
+          <div className="col-sm-8 ">
             <div className="row justify-content-around align-items-center">
               <div className="col-sm-3 ">
                 <FormControlLabel
@@ -344,7 +374,101 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                 />
               </div>
             </div>
+          </div>
+        </div>
 
+        <hr />
+
+        {/* Modulo Seguridad de Roles */}
+        <div className="row justify-content-around align-items-center">
+          <div className="col-sm-4 ">
+            <Typography
+              style={{
+                fontSize: 17,
+                marginTop: 10,
+                color: "#2196f3",
+                fontWeight: 800,
+              }}
+            >
+              Modulo Seguridad de Roles
+            </Typography>
+          </div>
+          <div className="col-sm-8 ">
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      disabled={!isEdit}
+                      checked={rolesVer}
+                      onChange={() => setRolesVer(!rolesVer)}
+                    />
+                  }
+                  label="Ver"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      disabled={!isEdit}
+                      checked={rolesCreate}
+                      onChange={() => setRolesCreate(!rolesCreate)}
+                    />
+                  }
+                  label="Crear"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      disabled={!isEdit}
+                      checked={rolesUpdate}
+                      onChange={() => setRolesUpdate(!rolesUpdate)}
+                    />
+                  }
+                  label="Editar"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      disabled={!isEdit}
+                      checked={rolesDelete}
+                      onChange={() => setRolesDelete(!rolesDelete)}
+                    />
+                  }
+                  label="Eliminar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        {/* Modulo Entrada de Productos */}
+        <div className="row justify-content-around align-items-center">
+          <div className="col-sm-4 ">
+            <Typography
+              style={{
+                fontSize: 17,
+                marginTop: 10,
+                color: "#2196f3",
+                fontWeight: 800,
+                // textAlign: "left",
+              }}
+            >
+              Modulo Entrada de Productos
+            </Typography>
+          </div>
+          <div className="col-sm-8 ">
             <div className="row justify-content-around align-items-center">
               <div className="col-sm-3 ">
                 <FormControlLabel
@@ -353,7 +477,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                     <Checkbox
                       disabled={!isEdit}
                       checked={inProductsVer}
-                      onChange={() => setInProductsVer(!inProductsCreate)}
+                      onChange={() => setInProductsVer(!inProductsVer)}
                     />
                   }
                   label="Ver"
@@ -399,8 +523,11 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                 />
               </div>
             </div>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
+
+        <hr />
+
         <Button
           fullWidth
           variant="outlined"
@@ -412,7 +539,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           Guardar Cambios
         </Button>
       </Container>
-      <Loading/>
+      <Loading />
     </div>
   );
 };

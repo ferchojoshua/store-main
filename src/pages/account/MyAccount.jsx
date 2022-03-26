@@ -124,7 +124,7 @@ const MyAccount = () => {
 
       <SmallModal
         isVisible={showModal}
-        setVisible={`setShowModal`}
+        setVisible={setShowModal}
         titulo="Cambiar Contraseña"
       >
         <ChangePass setShowModal={setShowModal} />

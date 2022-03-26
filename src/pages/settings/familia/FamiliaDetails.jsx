@@ -1,37 +1,64 @@
-import React, { useState, useEffect } from "react";
-import { Container, InputGroup, FormControl } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  TextField,
+  Button,
+  Divider,
+  Container,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
 import {
-  getFamiliaByIdAsync,
-  updateFamiliaByIdAsync,
-} from "../../../services/FamiliaApi";
-
-import { Button, IconButton, Tooltip } from "@mui/material";
+  simpleMessage,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import {
-  faCancel,
-  faCircleArrowLeft,
-  faEdit,
+  faPenToSquare,
   faSave,
+  faXmarkCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DataContext } from "../../../context/DataContext";
+import { getToken } from "../../../services/Account";
+import {
+  getFamiliaByIdAsync,
+  updateFamiliaAsync,
+} from "../../../services/TipoNegocioApi";
 
-const FamiliaDetails = () => {
+const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
   let navigate = useNavigate();
-  const { id } = useParams();
-
+  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+    useContext(DataContext);
   const [familia, setFamilia] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState("");
 
+  const token = getToken();
+
   useEffect(() => {
     (async () => {
-      const result = await getFamiliaByIdAsync(id);
+      setIsLoading(true);
+      const result = await getFamiliaByIdAsync(token, selectedFamilia.id);
       if (!result.statusResponse) {
-        simpleMessage(result.error, "error");
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("Ocurrio un error al cargar los datos");
         return;
       }
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
       setDescription(result.data.description);
       setFamilia(result.data);
     })();
@@ -39,86 +66,81 @@ const FamiliaDetails = () => {
 
   const saveChangesAsync = async () => {
     const data = {
-      id: id,
+      id: selectedFamilia.id,
       description: description,
     };
     if (description === familia.description) {
-      simpleMessage("Ingrese una descripcion diferente...", "error");
+      toastError("Ingrese una descripcion diferente...");
       return;
     }
-    const result = await updateFamiliaByIdAsync(data);
+    const result = await updateFamiliaAsync(token, data);
     if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
       simpleMessage(result.error, "error");
       return;
     }
-    simpleMessage("Exito...!", "success");
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    setReload(!reload);
+    setIsLoading(false);
+    toastSuccess("Cambio realizado...!");
     setIsEdit(false);
+    setShowModal(false);
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
+      <Container style={{ width: 450 }}>
+        <Divider />
+
+        <TextField
+          fullWidth
+          style={{ marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setDescription(e.target.value.toUpperCase())}
+          value={description}
+          label={"Descripcion"}
+          disabled={!isEdit}
+          placeholder={"Ingrese descripcion"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title={"editar"}>
+                  <IconButton
+                    style={{ marginRight: 10 }}
+                    onClick={() => setIsEdit(!isEdit)}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "#ff5722" }}
+                      icon={isEdit ? faXmarkCircle : faPenToSquare}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ),
           }}
+        />
+
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 10 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveChangesAsync()}
+          disabled={!isEdit}
         >
-          <Button
-            onClick={() => {
-              navigate("/familia/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Detalle Familia # {id}</h1>
-
-          <IconButton
-            onClick={() => {
-              setIsEdit(!isEdit);
-            }}
-          >
-            <FontAwesomeIcon
-              style={{ fontSize: 30, color: isEdit ? "#2196f3" : "#ff9800" }}
-              icon={isEdit ? faCancel : faEdit}
-            />
-          </IconButton>
-        </div>
-
-        <hr />
-
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Descripcion</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={!isEdit}
-          />
-          {isEdit ? (
-            <Tooltip title="Agregar Tipo Negocio">
-              <IconButton onClick={() => saveChangesAsync()}>
-                <FontAwesomeIcon
-                  icon={faSave}
-                  style={{ fontSize: 30, color: "#2196f3" }}
-                />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <></>
-          )}
-        </InputGroup>
+          Guardar cambios
+        </Button>
       </Container>
     </div>
   );

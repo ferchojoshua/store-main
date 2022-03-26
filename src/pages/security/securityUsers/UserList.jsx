@@ -46,22 +46,15 @@ import { isEmpty } from "lodash";
 import MediumModal from "../../../components/modals/MediumModal";
 import AddUser from "./AddUser";
 import EditUser from "./EditUser";
+import NoData from "../../../components/NoData";
 
 const UserList = () => {
   const { setReload, reload, setIsLoading } = useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [userList, setUserList] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
-
-  //Para la paginacion
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsperPage] = useState(10);
-  const indexLast = currentPage * itemsperPage;
-  const indexFirst = indexLast - itemsperPage;
-  const currentItem = userList.slice(indexFirst, indexLast);
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const withSearch = currentItem.filter((val) => {
+  const withSearch = userList.filter((val) => {
     if (searchTerm === "") {
       return val;
     } else if (
@@ -71,6 +64,14 @@ const UserList = () => {
       return val;
     }
   });
+
+  //Para la paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(10);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = withSearch.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -287,17 +288,8 @@ const UserList = () => {
           }}
         />
 
-        {isEmpty(currentItem) ? (
-          <div>
-            <Typography style={{ color: "#ff5722" }} variant="h6">
-              No hay nada que mostrar
-            </Typography>
-
-            <FontAwesomeIcon
-              style={{ color: "#ff5722", fontSize: 100 }}
-              icon={faDatabase}
-            />
-          </div>
+        {isEmpty(withSearch) ? (
+          <NoData />
         ) : (
           <Table hover size="sm">
             <thead>
@@ -360,7 +352,7 @@ const UserList = () => {
           </Table>
         )}
         <PaginationComponent
-          data={userList}
+          data={withSearch}
           paginate={paginate}
           itemsperPage={itemsperPage}
         />

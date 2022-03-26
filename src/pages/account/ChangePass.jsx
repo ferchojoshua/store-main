@@ -16,13 +16,14 @@ import { simpleMessage } from "../../helpers/Helpers";
 import { changePasswordAsync, getToken } from "../../services/Account";
 
 const ChangePass = ({ setShowModal }) => {
-  const { user, setIsLoading } = useContext(DataContext);
+  const { setIsLoading } = useContext(DataContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPasword, setNewPasword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const token = getToken();
+
   const validateData = () => {
     let isValid = true;
 
@@ -57,14 +58,14 @@ const ChangePass = ({ setShowModal }) => {
     if (validateData()) {
       setIsLoading(true);
       const data = {
-        id: user.id,
         oldPassword: currentPassword,
         newPassword: newPasword,
       };
+
       const result = await changePasswordAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
-        simpleMessage( "No se pudo cambiar la contraseña","error");
+        simpleMessage("No se pudo cambiar la contraseña", "error");
         return;
       }
       setIsLoading(false);
@@ -117,7 +118,7 @@ const ChangePass = ({ setShowModal }) => {
           onChange={(e) => setNewPasword(e.target.value)}
           style={{ marginTop: 20 }}
           value={newPasword}
-          // type={showPassword ? "text" : "password"}
+          type={showPassword ? "text" : "password"}
           label={"Contraseña nueva"}
           placeholder={"Ingrese nueva contraseña"}
           InputProps={{
@@ -151,7 +152,7 @@ const ChangePass = ({ setShowModal }) => {
           style={{ marginTop: 20 }}
           value={passwordConfirm}
           label={"Confirme su contraseña"}
-          // type={showPassword ? "text" : "password"}
+          type={showPassword ? "text" : "password"}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

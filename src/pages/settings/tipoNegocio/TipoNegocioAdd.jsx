@@ -1,86 +1,77 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Container, InputGroup, FormControl } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
-import { addTipoNegocioAsync } from "../../../services/TipoNegocioApi";
-import { Button, IconButton, Tooltip } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCircleArrowLeft,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
+  simpleMessage,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
+import { addTipoNegocioAsync } from "../../../services/TipoNegocioApi";
+import { TextField, Button, Divider, Container } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { getToken } from "../../../services/Account";
 
-const TipoNegocioAdd = () => {
-  const { reload, setReload } = useContext(DataContext);
+const TipoNegocioAdd = ({ setShowModal }) => {
+  const { reload, setReload, setIsLoading, setIsDefaultPass } =
+    useContext(DataContext);
   let navigate = useNavigate();
   const [description, setDescription] = useState("");
+  const token = getToken();
 
   const saveChangesAsync = async () => {
     const data = {
       description: description,
     };
     if (description === "") {
-      simpleMessage("Ingrese una descripcion...", "error");
+      toastError("Ingrese una descripcion...");
       return;
     }
-    const result = await addTipoNegocioAsync(data);
+    setIsLoading(true);
+    const result = await addTipoNegocioAsync(token, data);
     if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("Ocurrio un error..., Intente de nuevo");
       return;
     }
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    setIsLoading(false);
     setReload(!reload);
-    simpleMessage("Exito...!", "success");
-    navigate("/tipo-negocio/");
+    toastSuccess("Tipo de Negocio Creado");
+    setShowModal(false);
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
+      <Container style={{ width: 450 }}>
+        <Divider />
+
+        <TextField
+          fullWidth
+          required
+          style={{ marginBottom: 10, marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setDescription(e.target.value.toUpperCase())}
+          label={"Description"}
+          value={description}
+        />
+
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 10 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveChangesAsync()}
         >
-          <Button
-            onClick={() => {
-              navigate("/tipo-negocio/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Agregar Tipo Negocio</h1>
-        </div>
-        <hr />
-
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Descripcion</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <Tooltip title="Agregar Tipo Negocio">
-            <IconButton onClick={() => saveChangesAsync()}>
-              <FontAwesomeIcon
-                icon={faSave}
-                style={{ fontSize: 30, color: "#2196f3" }}
-              />
-            </IconButton>
-          </Tooltip>
-        </InputGroup>
+          Agregar Tipo de Negocio
+        </Button>
       </Container>
     </div>
   );

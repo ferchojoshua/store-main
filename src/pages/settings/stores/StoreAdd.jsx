@@ -1,85 +1,73 @@
-import React, { useState } from "react";
-import { Container, InputGroup, FormControl } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
+import React, { useState, useContext } from "react";
+import { DataContext } from "../../../context/DataContext";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { addStoreAsync } from "../../../services/AlmacenApi";
-
-import { Button, IconButton, Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleArrowLeft,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { getToken } from "../../../services/Account";
 
-const StoreAdd = () => {
-  let navigate = useNavigate();
+const StoreAdd = ({ setShowModal }) => {
+  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+    useContext(DataContext);
   const [name, setName] = useState("");
+  const token = getToken();
+  let navigate = useNavigate();
 
   const saveChangesAsync = async () => {
+    setIsLoading(true);
     const data = {
       name: name,
     };
     if (name === "") {
-      simpleMessage("Ingrese un nombre...", "error");
+      setIsLoading(false);
+      toastError("Debe ingresar un nombre...");
       return;
     }
-    const result = await addStoreAsync(data);
+    const result = await addStoreAsync(token, data);
+
     if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("Ocurrio un error..., Intente de nuevo");
       return;
     }
-    simpleMessage("Exito...!", "success");
-    navigate("/stores/");
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    setIsLoading(false);
+    toastSuccess("Almacen creado");
+    setReload(!reload);
+    setShowModal(false);
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
+      <Container style={{ width: 500 }}>
+        <Divider />
+        <TextField
+          fullWidth
+          required
+          style={{ marginBottom: 10, marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setName(e.target.value.toUpperCase())}
+          label={"Nombre almacen"}
+          value={name}
+        />
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 10 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveChangesAsync()}
         >
-          <Button
-            onClick={() => {
-              navigate("/stores/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Agregar Almacen</h1>
-        </div>
-
-        <hr />
-
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Nombre</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <Tooltip title="Agregar Almacen">
-            <IconButton onClick={() => saveChangesAsync()}>
-              <FontAwesomeIcon
-                icon={faSave}
-                style={{ fontSize: 30, color: "#2196f3" }}
-              />
-            </IconButton>
-          </Tooltip>
-        </InputGroup>
+          Agregar Almacen
+        </Button>
       </Container>
     </div>
   );

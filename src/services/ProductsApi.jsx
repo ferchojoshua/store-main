@@ -3,10 +3,16 @@ import axios from "axios";
 
 const controller = `${url}Productos/`;
 
-export const getProductsAsync = async () => {
+export const getProductsAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.get(controller).then((resp) => {
+    await authAxios.get(controller).then((resp) => {
       if (resp.status !== 200) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -22,10 +28,16 @@ export const getProductsAsync = async () => {
   return result;
 };
 
-export const addProductAsync = async (data) => {
+export const addProductAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.post(controller, data).then((resp) => {
+    await authAxios.post(controller, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -41,11 +53,17 @@ export const addProductAsync = async (data) => {
   return result;
 };
 
-export const getProductByIdAsync = async (id) => {
+export const getProductByIdAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   try {
-    await axios.get(controller + id).then((resp) => {
+    await authAxios.get(controller + id).then((resp) => {
       if (resp.status !== 200) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -62,11 +80,17 @@ export const getProductByIdAsync = async (id) => {
   return result;
 };
 
-export const updateProductAsync = async (data) => {
+export const updateProductAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}UpdateProduct`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.put(service, data).then((resp) => {
+    await authAxios.put(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -82,10 +106,16 @@ export const updateProductAsync = async (data) => {
   return result;
 };
 
-export const deleteProductAsync = async (id) => {
+export const deleteProductAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.delete(controller + id).then((resp) => {
+    await authAxios.delete(controller + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;

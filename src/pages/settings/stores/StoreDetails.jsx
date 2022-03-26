@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Container, InputGroup, FormControl, Table } from "react-bootstrap";
+import React, { useState, useEffect, useContext } from "react";
+import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import RackAdd from "./racks/RackAdd";
+import {
+  TextField,
+  Button,
+  Divider,
+  InputAdornment,
+  IconButton,
+  Container,
+  Paper,
+} from "@mui/material";
+
 import {
   deleteRackAsync,
   getRackStoreAsync,
@@ -13,19 +24,28 @@ import {
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-import { Button, IconButton, Tooltip } from "@mui/material";
 import {
   faCancel,
   faCircleArrowLeft,
   faCirclePlus,
   faEdit,
-  faSave,
   faExternalLinkAlt,
   faTrashAlt,
+  faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getToken } from "../../../services/Account";
+import { DataContext } from "../../../context/DataContext";
+import SmallModal from "../../../components/modals/SmallModal";
+import { isEmpty } from "lodash";
+import PaginationComponent from "../../../components/PaginationComponent";
+import RackDetail from "./racks/RackDetail";
+import NoData from "../../../components/NoData";
 
 const StoreDetails = () => {
+  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+    useContext(DataContext);
+  const token = getToken();
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const { id } = useParams();
@@ -35,26 +55,56 @@ const StoreDetails = () => {
   const [name, setName] = useState("");
 
   const [rackList, setRackList] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedRack, setSelectedRack] = useState([]);
+
+  //Para la paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(10);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = rackList.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     (async () => {
-      const result = await getStoreByIdAsync(id);
+      setIsLoading(true);
+      const result = await getStoreByIdAsync(token, id);
       if (!result.statusResponse) {
-        simpleMessage(result.error, "error");
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("Ocurrio un error al cargar almacenes");
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
         return;
       }
       setName(result.data.name);
       setStore(result.data);
 
-      const resultRacks = await getRackStoreAsync(id);
+      const resultRacks = await getRackStoreAsync(token, id);
       if (!resultRacks.statusResponse) {
-        simpleMessage(resultRacks.error, "error");
+        setIsLoading(false);
+        if (resultRacks.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("Ocurrio un error al cargar los racks");
         return;
       }
-
+      if (resultRacks.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
       setRackList(resultRacks.data);
     })();
-  }, [rackList]);
+  }, [reload]);
 
   const saveChangesAsync = async () => {
     const data = {
@@ -62,15 +112,24 @@ const StoreDetails = () => {
       name: name,
     };
     if (name === store.name) {
-      simpleMessage("Ingrese un nombre diferente...", "error");
+      toastError("Ingrese un nombre diferente...");
       return;
     }
-    const result = await updateStoreAsync(data);
+    const result = await updateStoreAsync(token, data);
     if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("Ocurrio un error al guardar los cambios");
       return;
     }
-    simpleMessage("Exito...!", "success");
+    if (result.data.isDefaultPass) {
+      setIsDefaultPass(true);
+      return;
+    }
+    setReload(!reload);
+    toastSuccess("Cambios realizados...");
     setIsEdit(false);
   };
 
@@ -85,13 +144,25 @@ const StoreDetails = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         (async () => {
-          const result = await deleteRackAsync(item.id);
+          setIsLoading(true);
+          const result = await deleteRackAsync(token, item.id);
           if (!result.statusResponse) {
-            Swal.fire(result.error, "", "error");
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
+            toastError("Ocurrio un error al eliminar rack");
+            return;
+          }
+          if (result.data.isDefaultPass) {
+            setIsDefaultPass(true);
             return;
           }
         })();
-        Swal.fire("Eliminado!", "", "success");
+        setIsLoading(false);
+        setReload(!reload);
+        toastSuccess("Rack eliminado...");
       }
     });
   };
@@ -99,133 +170,172 @@ const StoreDetails = () => {
   return (
     <div>
       <Container>
-        <div
+        <Paper
+          elevation={10}
           style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
+            borderRadius: 30,
+            padding: 20,
           }}
         >
-          <Button
-            onClick={() => {
-              navigate("/stores/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Detalle Almacen # {id}</h1>
-
-          <IconButton
-            onClick={() => {
-              setIsEdit(!isEdit);
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
           >
-            <FontAwesomeIcon
-              style={{ fontSize: 30, color: isEdit ? "#2196f3" : "#ff9800" }}
-              icon={isEdit ? faCancel : faEdit}
-            />
-          </IconButton>
-        </div>
+            <Button
+              onClick={() => {
+                navigate("/stores/");
+              }}
+              style={{ marginRight: 20, borderRadius: 20 }}
+              variant="outlined"
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faCircleArrowLeft}
+              />
+              Regresar
+            </Button>
 
-        <hr />
+            <h1>Detalle Almacen # {id}</h1>
 
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Nombre</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Name"
+            <IconButton
+              onClick={() => {
+                setIsEdit(!isEdit);
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
+                icon={isEdit ? faCancel : faEdit}
+              />
+            </IconButton>
+          </div>
+
+          <hr />
+
+          <TextField
+            fullWidth
+            variant="standard"
+            onChange={(e) => setName(e.target.value.toUpperCase())}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            label={"Nombre Almacen"}
             disabled={!isEdit}
+            placeholder={"Ingrese nombre almacen"}
+            InputProps={
+              isEdit
+                ? {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          style={{ marginRight: 10 }}
+                          onClick={() => saveChangesAsync()}
+                        >
+                          <FontAwesomeIcon
+                            style={{ color: "#ff5722" }}
+                            icon={faPaperPlane}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+                : {}
+            }
           />
-          {isEdit ? (
-            <Tooltip title="Agregar Tipo Negocio">
-              <IconButton onClick={() => saveChangesAsync()}>
-                <FontAwesomeIcon
-                  icon={faSave}
-                  style={{ fontSize: 30, color: "#2196f3" }}
-                />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <></>
-          )}
-        </InputGroup>
 
-        <hr />
+          <Divider />
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h4>Lista de Raks</h4>
-
-          <Button
-            onClick={() => {
-              navigate(`/store/rack/add/${id}`);
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            style={{ borderRadius: 20 }}
-            variant="outlined"
           >
-            Agregar Rack
-          </Button>
-        </div>
+            <h4>Lista de Raks</h4>
 
-        <hr />
+            <Button
+              onClick={() => {
+                setShowModal(true);
+              }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              style={{ borderRadius: 20 }}
+              variant="outlined"
+            >
+              Agregar Rack
+            </Button>
+          </div>
 
-        <Table hover size="sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style={{ textAlign: "left" }}>Descripcion</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rackList.map((item) => {
-              return (
+          <hr />
+
+          {isEmpty(currentItem) ? (
+            <NoData />
+          ) : (
+            <Table hover size="sm">
+              <thead>
                 <tr>
-                  <td>{item.id}</td>
-                  <td style={{ textAlign: "left" }}>{item.description}</td>
-                  <td>
-                    <IconButton
-                      style={{ marginRight: 10, color: "#009688" }}
-                      onClick={() => {
-                        var data = { id: id, rackId: item.id };
-                        data = JSON.stringify(data);
-                        navigate(`/store/rack/${data}`);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faExternalLinkAlt} />
-                    </IconButton>
-                    <IconButton
-                      style={{ color: "#f50057" }}
-                      onClick={() => deleteRack(item)}
-                    >
-                      <FontAwesomeIcon icon={faTrashAlt} />
-                    </IconButton>
-                  </td>
+                  <th>#</th>
+                  <th style={{ textAlign: "left" }}>Descripcion</th>
+                  <th>Acciones</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+              </thead>
+              <tbody>
+                {rackList.map((item) => {
+                  return (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td style={{ textAlign: "left" }}>{item.description}</td>
+                      <td>
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            setSelectedRack(item);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deleteRack(item)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          )}
+          <PaginationComponent
+            data={rackList}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
+        </Paper>
       </Container>
+      <SmallModal
+        titulo={"Agregar Rack"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <RackAdd setShowModal={setShowModal} />
+      </SmallModal>
+
+      <SmallModal
+        titulo={`Editar: ${selectedRack.description}`}
+        isVisible={showEditModal}
+        setVisible={setShowEditModal}
+      >
+        <RackDetail
+          selectedRack={selectedRack}
+          setShowModal={setShowEditModal}
+        />
+      </SmallModal>
     </div>
   );
 };

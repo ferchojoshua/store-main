@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect, useContext } from "react";
+import { DataContext } from "../../context/DataContext";
 
 const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
+  const { reload, setReload, setIsLoading, isTokenNull, setIsTokenNull } =
+    useContext(DataContext);
+  return <div>Home</div>;
+};
 
-export default Home
+export default Home;

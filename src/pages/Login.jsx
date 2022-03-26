@@ -35,7 +35,7 @@ function Copyright(props) {
 const Login = () => {
   let navigate = useNavigate();
   // const [movimientosList, setmovimientosList] = useState([]);
-  const { setIsLoading, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, setIsLogged, setIsTokenNull } = useContext(DataContext);
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -54,7 +54,9 @@ const Login = () => {
       simpleMessage("Usuario o contraseña incorrecto", "error");
       return;
     }
-
+    if (!result.data.user.token) {
+      setIsTokenNull(true);
+    }
     actionLog();
     setIsLoading(false);
     navigate("/");

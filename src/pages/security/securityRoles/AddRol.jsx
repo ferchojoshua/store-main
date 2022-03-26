@@ -29,6 +29,11 @@ const AddRol = ({ setShowModal }) => {
   const [userUpdate, setUserUpdate] = useState(false);
   const [userDelete, setUserDelete] = useState(false);
 
+  const [rolesVer, setRolesVer] = useState(false);
+  const [rolesCreate, setRolesCreate] = useState(false);
+  const [rolesUpdate, setRolesUpdate] = useState(false);
+  const [rolesDelete, setRolesDelete] = useState(false);
+
   const [miscelaneosVer, setMiscelaneosVer] = useState(false);
   const [miscelaneosCreate, setMiscelaneosCreate] = useState(false);
   const [miscelaneosUpdate, setMiscelaneosUpdate] = useState(false);
@@ -114,6 +119,23 @@ const AddRol = ({ setShowModal }) => {
           description: "ENTRADAPRODUCTOS DELETE",
           IsEnable: inProductsDelete,
         },
+
+        {
+          description: "ROLES VER",
+          IsEnable: rolesVer,
+        },
+        {
+          description: "ROLES CREATE",
+          IsEnable: rolesCreate,
+        },
+        {
+          description: "ROLES UPDATE",
+          IsEnable: rolesUpdate,
+        },
+        {
+          description: "ROLES DELETE",
+          IsEnable: rolesDelete,
+        },
       ],
       roleName: rolName,
     };
@@ -187,6 +209,17 @@ const AddRol = ({ setShowModal }) => {
               }}
             >
               Modulo Seguridad de Usuarios
+            </Typography>
+
+            <Typography
+              style={{
+                fontSize: 17,
+                marginTop: 35,
+                color: "#2196f3",
+                fontWeight: 800,
+              }}
+            >
+              Modulo Seguridad de Roles
             </Typography>
 
             <Typography
@@ -310,6 +343,57 @@ const AddRol = ({ setShowModal }) => {
                     <Checkbox
                       checked={userDelete}
                       onChange={() => setUserDelete(!userDelete)}
+                    />
+                  }
+                  label="Eliminar"
+                />
+              </div>
+            </div>
+
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      checked={userVer}
+                      onChange={() => setRolesVer(!rolesVer)}
+                    />
+                  }
+                  label="Ver"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      checked={userCreate}
+                      onChange={() => setRolesCreate(!rolesCreate)}
+                    />
+                  }
+                  label="Crear"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      checked={userUpdate}
+                      onChange={() => setRolesUpdate(!rolesUpdate)}
+                    />
+                  }
+                  label="Editar"
+                />
+              </div>
+              <div className="col-sm-3 ">
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={
+                    <Checkbox
+                      checked={userDelete}
+                      onChange={() => setRolesDelete(!rolesDelete)}
                     />
                   }
                   label="Eliminar"

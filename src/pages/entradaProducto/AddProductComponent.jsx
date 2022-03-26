@@ -8,7 +8,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { simpleMessage } from "../../helpers/Helpers";
-import { getFamiliasAsync } from "../../services/FamiliaApi";
+// import { getFamiliasAsync } from "../../services/FamiliaApi";
 import { addProductAsync } from "../../services/ProductsApi";
 import { getTipoNegocioAsync } from "../../services/TipoNegocioApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -71,16 +71,37 @@ const AddProductComponent = ({ setShowModal }) => {
         simpleMessage(resultTipoNegocio.error, "error");
         return;
       }
+      console.log(resultTipoNegocio.data);
       setTipoNegocio(resultTipoNegocio.data);
 
-      const resultFamilia = await getFamiliasAsync();
-      if (!resultFamilia.statusResponse) {
-        simpleMessage(resultFamilia.error, "error");
-        return;
-      }
-      setFamilia(resultFamilia.data);
+      // const resultFamilia = await getFamiliasAsync();
+      // if (!resultFamilia.statusResponse) {
+      //   simpleMessage(resultFamilia.error, "error");
+      //   return;
+      // }
+      // setFamilia(resultFamilia.data);
     })();
   }, []);
+
+  const handleChangeTN = async (value) => {
+    console.log(value)
+    // setFamilia([]);
+    // setselectedDepartment(value);
+    // const data = {
+    //   idDepartment: value,
+    // };
+    // if (event.target.value !== "") {
+    //   const result = await getMunicipalitiesbyDepartmentAsync(token, data);
+    //   if (!result.statusResponse) {
+    //     setIsLoading(false);
+    //     simpleMessage("error", "No se pudieron cargar los municipios");
+    //     return;
+    //   }
+    //   setMunicipalitiesList(result.data);
+    // } else {
+    //   setMunicipalitiesList([]);
+    // }
+  };
 
   return (
     <div>

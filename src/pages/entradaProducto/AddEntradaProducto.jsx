@@ -1,40 +1,42 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../context/DataContext";
-import {
-  Button,
-  InputGroup,
-  FormControl,
-  Form,
-  Row,
-  Table,
-  Col,
-} from "react-bootstrap";
+import { InputGroup, Form, Row, Table, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../helpers/Helpers";
+import { simpleMessage, toastError } from "../../helpers/Helpers";
 import { getProductsAsync } from "../../services/ProductsApi";
 import { getprovidersAsync } from "../../services/ProviderApi";
 
-import Loading from "../../components/Loading";
-
 import {
-  Autocomplete,
   TextField,
-  Container,
-  Typography,
+  Button,
   Divider,
+  InputAdornment,
+  IconButton,
+  Container,
+  Paper,
+  Autocomplete,
+  Typography,
+  Select,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Grid,
+  Tooltip,
 } from "@mui/material";
 
 import SmallModal from "../../components/modals/SmallModal";
-import AddProviderComponent from "./AddProviderComponent";
-import AddProductComponent from "./AddProductComponent";
+import ProviderAdd from "../../pages/settings/provider/ProviderAdd";
 import MediumModal from "../../components/modals/MediumModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleArrowLeft,
+  faCirclePlus,
   faClipboard,
-  faSave
+  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { addEntradaProductoAsync } from "../../services/ProductIsApi";
+import { getToken } from "../../services/Account";
+import Productsadd from "../settings/products/Productsadd";
 
 const AddEntradaProducto = () => {
   const { reload, setIsLoading } = useContext(DataContext);
@@ -72,21 +74,31 @@ const AddEntradaProducto = () => {
   const [showProviderModal, setShowProvidermodal] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
 
+  const token = getToken();
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultProviders = await getprovidersAsync();
+      const resultProviders = await getprovidersAsync(token);
       if (!resultProviders.statusResponse) {
         setIsLoading(false);
-        simpleMessage(resultProviders.error, "error");
+        if (resultProviders.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("No se pudo cargar lista de proveedores");
         return;
       }
       setProviderList(resultProviders.data);
 
-      const resultProducts = await getProductsAsync();
+      const resultProducts = await getProductsAsync(token);
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
-        simpleMessage(resultProducts.error, "error");
+        if (resultProducts.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("No se pudo cargar lista de productos");
         return;
       }
       setProductList(resultProducts.data);
@@ -383,413 +395,483 @@ const AddEntradaProducto = () => {
   return (
     <div>
       <Container maxWidth="xl">
-        <div
+        <Paper
+          elevation={10}
           style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
+            borderRadius: 30,
+            padding: 20,
           }}
         >
-          <Button
-            onClick={() => {
-              navigate("/products-in/");
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
             }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outline-primary"
           >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
+            <Button
+              onClick={() => {
+                navigate("/products-in/");
+              }}
+              style={{ marginRight: 20, borderRadius: 20 }}
+              variant="outlined"
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faCircleArrowLeft}
+              />
+              Regresar
+            </Button>
 
-          <h1>Agregar Entrada de Producto</h1>
-        </div>
+            <h1>Agregar Entrada de Producto</h1>
+          </div>
 
-        <hr />
+          <hr />
 
-        <Row>
-          <Col xs={12} md={4}>
-            <InputGroup className="mb-3">
-              <InputGroup.Text>N° Factura</InputGroup.Text>
-              <FormControl
-                type="text"
-                aria-label="Description"
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setNoFactura(e.target.value.toUpperCase())}
+                label={"N° Factura"}
                 value={noFactura}
-                onChange={(e) => setNoFactura(e.target.value)}
               />
-            </InputGroup>
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Tipo de Entrada</InputGroup.Text>
-              <Form.Select onChange={(e) => setTipoEntrada(e.target.value)}>
-                <option>Seleccione un tipo de entrada...</option>
-                <option>Compra</option>
-                <option>Devolucion</option>
-                <option>Remision</option>;<option>Anulacion</option>;
-              </Form.Select>
-            </InputGroup>
-
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Tipo de Pago</InputGroup.Text>
-              <Form.Select onChange={(e) => setTipoCompra(e.target.value)}>
-                <option>Seleccione un tipo de pago...</option>
-                <option>Pago de Contado</option>
-                <option>Pago de Credito</option>
-              </Form.Select>
-            </InputGroup>
-
-            <InputGroup className="mb-3">
-              <Autocomplete
-                id="combo-box-demo"
-                className="form-control"
-                options={providerList}
-                getOptionLabel={(op) => (op ? `${op.nombre}` || "" : "")}
-                value={selectedProvider}
-                onChange={(event, newValue) => {
-                  setSelectedProvider(newValue);
-                }}
-                noOptionsText="Proveedor no encontrado..."
-                renderInput={(params) => (
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    label="Seleccione un proveedor..."
-                  />
-                )}
-              />
-              <Button
-                variant="outline-secondary"
-                onClick={() => setShowProvidermodal(!showProviderModal)}
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginTop: 20 }}
+                required
               >
-                Agregar Proveedor
-              </Button>
-            </InputGroup>
-          </Col>
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un tipo de entrada...
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={tipoEntrada}
+                  onChange={(e) => setTipoEntrada(e.target.value)}
+                  label="Unidad de Medida"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={0} value="">
+                    <em>Seleccione un tipo de entrada...</em>
+                  </MenuItem>
 
-          <Col xs={12} md={8}>
-            <InputGroup className="mb-3">
-              <Autocomplete
-                id="combo-box-demo"
-                className="form-control"
-                options={productList}
-                getOptionLabel={(op) =>
-                  op ? `${op.barCode} - ${op.description}` || "" : ""
-                }
-                value={selectedProduct}
-                onChange={(event, newValue) => {
-                  setSelectedProduct(newValue);
-                }}
-                noOptionsText="Producto no encontrado..."
-                renderInput={(params) => (
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    label="Seleccione un producto..."
-                  />
-                )}
-              />
-              <Button
-                variant="outline-secondary"
-                onClick={() => setShowProductModal(true)}
+                  <MenuItem key={1} value={"PIEZA"}>
+                    Compra
+                  </MenuItem>
+                  <MenuItem key={2} value={"SET"}>
+                    Devolucion
+                  </MenuItem>
+                  <MenuItem key={3} value={"PAR"}>
+                    Remision
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginTop: 20 }}
+                required
               >
-                Agregar Producto
-              </Button>
-            </InputGroup>
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un tipo de pago...
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={tipoCompra}
+                  onChange={(e) => setTipoCompra(e.target.value)}
+                  label="Unidad de Medida"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={0} value="">
+                    <em>Seleccione un tipo de pago...</em>
+                  </MenuItem>
 
-            <Row>
-              <Col xs={12} md={4}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <InputGroup.Text>Codigo</InputGroup.Text>
-                    <FormControl
-                      type="text"
-                      disabled={true}
-                      value={selectedProduct ? selectedProduct.id : ""}
-                    />
-                  </InputGroup>
-                </Form.Group>
-              </Col>
-              <Col xs={12} md={8}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <InputGroup.Text>Descripcion</InputGroup.Text>
-                    <FormControl
-                      type="text"
-                      disabled={true}
-                      value={selectedProduct ? selectedProduct.description : ""}
-                    />
-                  </InputGroup>
-                </Form.Group>
-              </Col>
-            </Row>
+                  <MenuItem key={1} value={"PIEZA"}>
+                    Pago de Contado
+                  </MenuItem>
+                  <MenuItem key={2} value={"SET"}>
+                    Pago de Credito
+                  </MenuItem>
+                </Select>
+              </FormControl>
 
-            <Row>
-              <Col xs={12} md={3}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <InputGroup.Text>Cantidad</InputGroup.Text>
-                    <FormControl
-                      value={cantidad}
-                      onChange={(e) => funcCantidad(e.target.value)}
+              <div
+                style={{
+                  marginTop: 20,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignContent: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Autocomplete
+                  id="combo-box-demo"
+                  fullWidth
+                  options={providerList}
+                  getOptionLabel={(op) => (op ? `${op.nombre}` || "" : "")}
+                  value={selectedProvider}
+                  onChange={(event, newValue) => {
+                    setSelectedProvider(newValue);
+                  }}
+                  noOptionsText="Proveedor no encontrado..."
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un proveedor..."
                     />
-                  </InputGroup>
-                </Form.Group>
-              </Col>
-              <Col xs={12} md={2}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <InputGroup.Text>C$</InputGroup.Text>
-                    <FormControl
-                      type="text"
-                      value={precioCompra}
-                      placeholder="Monto de compra..."
-                      onChange={(e) => funcPrecioCompra(e.target.value)}
-                    />
-                  </InputGroup>
-                </Form.Group>
-              </Col>
+                  )}
+                />
 
-              <Col xs={12} md={2}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <FormControl
-                      type="text"
-                      placeholder="Descuento..."
-                      value={descuento}
-                      onChange={(e) => funcDescuento(e.target.value)}
+                <Tooltip title="Agregar Proveedor" style={{ marginTop: 5 }}>
+                  <IconButton onClick={() => setShowProvidermodal(true)}>
+                    <FontAwesomeIcon
+                      style={{
+                        fontSize: 25,
+                        color: "#ff5722",
+                      }}
+                      icon={faCirclePlus}
                     />
-                    <InputGroup.Text>%</InputGroup.Text>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </Grid>
 
-              <Col xs={12} md={2}>
-                <Form.Group className="mb-3">
-                  <InputGroup>
-                    <FormControl
-                      type="text"
-                      placeholder="Impuesto..."
-                      value={impuesto}
-                      onChange={(e) => funcImpuesto(e.target.value)}
+            <Grid item xs={12} md={8}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignContent: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Autocomplete
+                  id="combo-box-demo"
+                  fullWidth
+                  options={productList}
+                  getOptionLabel={(op) =>
+                    op
+                      ? `${op.barCode ? op.barCode : ""} - ${op.description}` ||
+                        ""
+                      : ""
+                  }
+                  value={selectedProduct}
+                  onChange={(event, newValue) => {
+                    setSelectedProduct(newValue);
+                  }}
+                  noOptionsText="Producto no encontrado..."
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un producto..."
                     />
-                    <InputGroup.Text>%</InputGroup.Text>
-                  </InputGroup>
-                </Form.Group>
-              </Col>
+                  )}
+                />
 
-              <Col xs={12} md={3}>
-                <h6 style={{ marginTop: 10 }}>{`Costo = ${costo.toLocaleString(
-                  "es-NI",
-                  {
+                <Tooltip title="Agregar Producto" style={{ marginTop: 5 }}>
+                  <IconButton onClick={() => setShowProductModal(true)}>
+                    <FontAwesomeIcon
+                      style={{
+                        fontSize: 25,
+                        color: "#ff5722",
+                      }}
+                      icon={faCirclePlus}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
+
+              <div className="row justify-content-around align-items-center">
+                <div className="col-sm-3">
+                  <TextField
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Codigo"}
+                    value={selectedProduct ? selectedProduct.id : ""}
+                    disabled={true}
+                  />
+                </div>
+                <div className="col-sm-5">
+                  <TextField
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Descripcion"}
+                    value={selectedProduct ? selectedProduct.description : ""}
+                    disabled={true}
+                  />
+                </div>
+              </div>
+
+              <div className="row justify-content-around align-items-center">
+                <div className="col-sm-2">
+                  <TextField
+                    fullWidth
+                    required
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Cantidad"}
+                    value={cantidad}
+                    onChange={(e) => funcCantidad(e.target.value)}
+                  />
+                </div>
+
+                <div className="col-sm-3">
+                  <TextField
+                    fullWidth
+                    required
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Monto de compra C$"}
+                    value={precioCompra}
+                    onChange={(e) => funcPrecioCompra(e.target.value)}
+                  />
+                </div>
+
+                <div className="col-sm-2">
+                  <TextField
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Descuento %"}
+                    value={descuento}
+                    onChange={(e) => funcDescuento(e.target.value)}
+                  />
+                </div>
+
+                <div className="col-sm-2">
+                  <TextField
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                    variant="standard"
+                    label={"Impuesto %"}
+                    value={impuesto}
+                    onChange={(e) => funcImpuesto(e.target.value)}
+                  />
+                </div>
+
+                <div className="col-sm-3">
+                  <h6
+                    style={{ marginTop: 20 }}
+                  >{`Costo = ${costo.toLocaleString("es-NI", {
                     style: "currency",
                     currency: "NIO",
-                  }
-                )}`}</h6>
-              </Col>
-            </Row>
+                  })}`}</h6>
+                </div>
+              </div>
 
-            <Row>
-              <Col xs={12}>
-                <h5 style={{ marginTop: 10 }}>Precio de venta C$</h5>
-                <hr />
-                <Row>
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Ganancia..."
-                          value={baseGanancia}
-                          onChange={(e) =>
-                            funcPorcentGananciaMayor(e.target.value)
-                          }
-                        />
-                        <InputGroup.Text>%</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+              <Row>
+                <Col xs={12}>
+                  <h5 style={{ marginTop: 10 }}>Precio de venta C$</h5>
+                  <hr />
+                  <Row>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Ganancia..."
+                            value={baseGanancia}
+                            onChange={(e) =>
+                              funcPorcentGananciaMayor(e.target.value)
+                            }
+                          />
+                          <InputGroup.Text>%</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Ganancia..."
-                          value={ganancia}
-                          onChange={(e) => funcGananciaMayor(e.target.value)}
-                        />
-                        <InputGroup.Text>C$</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Ganancia..."
+                            value={ganancia}
+                            onChange={(e) => funcGananciaMayor(e.target.value)}
+                          />
+                          <InputGroup.Text>C$</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Precio de venta..."
-                          value={precioVenta}
-                          onChange={(e) => funcPrecioVenta(e.target.value)}
-                        />
-                        <InputGroup.Text>C$</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Precio de venta..."
+                            value={precioVenta}
+                            onChange={(e) => funcPrecioVenta(e.target.value)}
+                          />
+                          <InputGroup.Text>C$</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <h5 className="align-middle">Mayor</h5>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <h5 className="align-middle">Mayor</h5>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Ganancia..."
-                          value={baseGananciaDetalle}
-                          onChange={(e) =>
-                            funcPorcentGananciaDetalle(e.target.value)
-                          }
-                        />
-                        <InputGroup.Text>%</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Ganancia..."
+                            value={baseGananciaDetalle}
+                            onChange={(e) =>
+                              funcPorcentGananciaDetalle(e.target.value)
+                            }
+                          />
+                          <InputGroup.Text>%</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Ganancia..."
-                          value={gananciaDetalle}
-                          onChange={(e) => funcGananciaDetalle(e.target.value)}
-                        />
-                        <InputGroup.Text>C$</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Ganancia..."
+                            value={gananciaDetalle}
+                            onChange={(e) =>
+                              funcGananciaDetalle(e.target.value)
+                            }
+                          />
+                          <InputGroup.Text>C$</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <Form.Group className="mb-3">
-                      <InputGroup>
-                        <FormControl
-                          type="text"
-                          placeholder="Precio de venta..."
-                          value={precioVentaDetalle}
-                          onChange={(e) =>
-                            funcPrecioVentaDetalle(e.target.value)
-                          }
-                        />
-                        <InputGroup.Text>C$</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
+                    <Col xs={12} md={3}>
+                      <Form.Group className="mb-3">
+                        <InputGroup>
+                          <FormControl
+                            type="text"
+                            placeholder="Precio de venta..."
+                            value={precioVentaDetalle}
+                            onChange={(e) =>
+                              funcPrecioVentaDetalle(e.target.value)
+                            }
+                          />
+                          <InputGroup.Text>C$</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
 
-                  <Col xs={12} md={3}>
-                    <h5 className="align-middle">Detalle</h5>
-                  </Col>
-                </Row>
-                <Button
-                  variant="outline-primary"
-                  style={{ borderRadius: 20 }}
-                  onClick={() => addToProductList()}
-                >
-                  <FontAwesomeIcon
-                    style={{ marginRight: 10, fontSize: 20 }}
-                    icon={faClipboard}
-                  />
-                  Agregar al Detalle
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+                    <Col xs={12} md={3}>
+                      <h5 className="align-middle">Detalle</h5>
+                    </Col>
+                  </Row>
+                  <Button
+                    variant="outline-primary"
+                    style={{ borderRadius: 20 }}
+                    onClick={() => addToProductList()}
+                  >
+                    <FontAwesomeIcon
+                      style={{ marginRight: 10, fontSize: 20 }}
+                      icon={faClipboard}
+                    />
+                    Agregar al Detalle
+                  </Button>
+                </Col>
+              </Row>
+            </Grid>
+          </Grid>
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h5>Detalle de Entrada</h5>
-        </div>
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+            }}
+          >
+            <h5>Detalle de Entrada</h5>
+          </div>
 
-        <hr />
+          <hr />
 
-        <Table hover size="sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
-              <th>Cantidad</th>
-              <th>Costo Unitario</th>
-              <th>Descuento</th>
-              <th>Impuesto</th>
-              <th>Costo de Compra</th>
-              <th>P.V. Mayor</th>
-              <th>P.V. Detalle</th>
-              <th>Eliminar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productDetailList ? (
-              productDetailList.map((item) => {
-                return (
-                  <tr>
-                    <td>{productDetailList.indexOf(item) + 1}</td>
-                    <td style={{ textAlign: "left", minWidth: 250 }}>
-                      {item.product.description}
-                    </td>
-                    <td>{item.cantidad}</td>
-                    <td>
-                      {item.costoUnitario.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
-                    <td>{`${item.descuento}%`}</td>
-                    <td>{`${item.impuesto}%`}</td>
-                    <td>
-                      {item.costoCompra.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
-                    <td>
-                      {item.precioVentaMayor.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
-                    <td>
-                      {item.precioVentaDetalle.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
-                    <td>
-                      <Button
-                        variant="danger"
-                        onClick={() => deleteFromProductDetailList(item)}
-                      >
-                        Eliminar
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <></>
-            )}
-          </tbody>
-        </Table>
+          <Table hover size="sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
+                <th>Cantidad</th>
+                <th>Costo Unitario</th>
+                <th>Descuento</th>
+                <th>Impuesto</th>
+                <th>Costo de Compra</th>
+                <th>P.V. Mayor</th>
+                <th>P.V. Detalle</th>
+                <th>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productDetailList ? (
+                productDetailList.map((item) => {
+                  return (
+                    <tr>
+                      <td>{productDetailList.indexOf(item) + 1}</td>
+                      <td style={{ textAlign: "left", minWidth: 250 }}>
+                        {item.product.description}
+                      </td>
+                      <td>{item.cantidad}</td>
+                      <td>
+                        {item.costoUnitario.toLocaleString("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        })}
+                      </td>
+                      <td>{`${item.descuento}%`}</td>
+                      <td>{`${item.impuesto}%`}</td>
+                      <td>
+                        {item.costoCompra.toLocaleString("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        })}
+                      </td>
+                      <td>
+                        {item.precioVentaMayor.toLocaleString("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        })}
+                      </td>
+                      <td>
+                        {item.precioVentaDetalle.toLocaleString("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        })}
+                      </td>
+                      <td>
+                        <Button
+                          variant="danger"
+                          onClick={() => deleteFromProductDetailList(item)}
+                        >
+                          Eliminar
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <></>
+              )}
+            </tbody>
+          </Table>
+        </Paper>
       </Container>
 
       <Container maxWidth="xl">
@@ -859,15 +941,12 @@ const AddEntradaProducto = () => {
           </div>
         </div>
       </Container>
-
-      <Loading />
-
       <SmallModal
         titulo={"Agregar Proveedor"}
         isVisible={showProviderModal}
         setVisible={setShowProvidermodal}
       >
-        <AddProviderComponent setShowModal={setShowProvidermodal} />
+        <ProviderAdd setShowModal={setShowProvidermodal} />
       </SmallModal>
 
       <MediumModal
@@ -875,7 +954,7 @@ const AddEntradaProducto = () => {
         isVisible={showProductModal}
         setVisible={setShowProductModal}
       >
-        <AddProductComponent setShowModal={setShowProductModal} />
+        <Productsadd setShowModal={setShowProductModal} />
       </MediumModal>
     </div>
   );

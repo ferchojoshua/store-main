@@ -6,6 +6,7 @@ export const DataProvider = ({ children }) => {
   const [title, setTitle] = useState("Auto&Moto");
   const [isLoading, setIsLoading] = useState(true);
   const [isLogged, setIsLogged] = useState(null);
+  const [isDefaultPass, setIsDefaultPass] = useState(true);
   const [reload, setReload] = useState(false);
   const [user, setUser] = useState([]);
   const [access, setAccess] = useState([]);
@@ -25,6 +26,8 @@ export const DataProvider = ({ children }) => {
         setAccess,
         user,
         setUser,
+        isDefaultPass,
+        setIsDefaultPass,
       }}
     >
       {children}

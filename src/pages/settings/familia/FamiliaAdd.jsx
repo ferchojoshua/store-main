@@ -1,84 +1,70 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Container, InputGroup, FormControl } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
-import { addFamiliaAsync } from "../../../services/FamiliaApi";
-import { Button, IconButton, Tooltip } from "@mui/material";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleArrowLeft, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { getToken } from "../../../services/Account";
+import { addFamiliaToTipoNegocioAsync } from "../../../services/TipoNegocioApi";
 
-const FamiliaAdd = () => {
-  const { reload, setReload } = useContext(DataContext);
+const FamiliaAdd = ({ setShowModal, idTN }) => {
+  const { reload, setReload, setIsLoading } = useContext(DataContext);
   let navigate = useNavigate();
   const [description, setDescription] = useState("");
+  const token = getToken();
 
   const saveChangesAsync = async () => {
     const data = {
+      idTipoNegocio: idTN,
       description: description,
     };
+   
     if (description === "") {
-      simpleMessage("Ingrese una descripcion...", "error");
+      toastError("Ingrese una descripcion...");
       return;
     }
-    const result = await addFamiliaAsync(data);
+    setIsLoading(true);
+    const result = await addFamiliaToTipoNegocioAsync(token, data);
     if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("No se pudo agregar familia, intente de nuevo");
       return;
     }
-    simpleMessage("Exito...!", "success");
+    setIsLoading(false);
+    toastSuccess("Familia Agregada...!");
     setReload(!reload);
-    navigate("/familia/");
+    setShowModal(false);
   };
 
   return (
     <div>
-      <Container>
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
+      <Container style={{ width: 450 }}>
+        <Divider />
+
+        <TextField
+          fullWidth
+          required
+          style={{ marginBottom: 10, marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setDescription(e.target.value.toUpperCase())}
+          label={"Descripcion"}
+          value={description}
+        />
+
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 25 }}
+          onClick={() => saveChangesAsync()}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
         >
-          <Button
-            onClick={() => {
-              navigate("/familia/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Agregar Familia</h1>
-        </div>
-
-        <hr />
-
-        <InputGroup className="mb-3">
-          <InputGroup.Text>Descripcion</InputGroup.Text>
-          <FormControl
-            type="text"
-            aria-label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <Tooltip title="Agregar Familia">
-            <IconButton onClick={() => saveChangesAsync()}>
-              <FontAwesomeIcon
-                icon={faSave}
-                style={{ fontSize: 30, color: "#2196f3" }}
-              />
-            </IconButton>
-          </Tooltip>
-        </InputGroup>
+          Agregar Familia
+        </Button>
       </Container>
     </div>
   );

@@ -145,20 +145,6 @@ const NavbarComponent = () => {
               Seguridad
             </Nav.Link>
 
-            {/* <Nav.Link
-              style={{
-                fontWeight: "bold",
-                color: active === "providers" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              eventKey="providers"
-              as={Link}
-              to="/providers"
-            >
-              <FontAwesomeIcon icon={faUsers} style={{ marginRight: 10 }} />
-              Proveedores
-            </Nav.Link> */}
-
             <NavDropdown
               drop="start"
               title={
@@ -182,9 +168,6 @@ const NavbarComponent = () => {
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/tipo-negocio">
                 Tipo Negocio
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/familia">
-                Familia
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>

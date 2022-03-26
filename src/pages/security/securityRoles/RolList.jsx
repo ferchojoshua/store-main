@@ -2,14 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 
-
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import {
- 
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 
 import { Button, IconButton, Typography } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,6 +21,7 @@ import { isEmpty } from "lodash";
 import MediumModal from "../../../components/modals/MediumModal";
 import AddRol from "./AddRol";
 import EditRol from "./EditRol";
+import NoData from "../../../components/NoData";
 
 const RolList = () => {
   const { setReload, reload, setIsLoading } = useContext(DataContext);
@@ -118,16 +114,7 @@ const RolList = () => {
         <hr />
 
         {isEmpty(currentItem) ? (
-          <div>
-            <Typography style={{ color: "#ff5722" }} variant="h6">
-              No hay nada que mostrar
-            </Typography>
-
-            <FontAwesomeIcon
-              style={{ color: "#ff5722", fontSize: 100 }}
-              icon={faDatabase}
-            />
-          </div>
+          <NoData />
         ) : (
           <Table hover size="sm">
             <thead>

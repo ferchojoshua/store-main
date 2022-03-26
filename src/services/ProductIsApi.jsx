@@ -3,10 +3,16 @@ import axios from "axios";
 
 const controller = `${url}ProductIns/`;
 
-export const getEntradasAsync = async () => {
+export const getEntradasAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.get(controller).then((resp) => {
+    await authAxios.get(controller).then((resp) => {
       if (resp.status !== 200) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -22,10 +28,16 @@ export const getEntradasAsync = async () => {
   return result;
 };
 
-export const getEntradaByIdAsync = async (id) => {
+export const getEntradaByIdAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.get(controller + id).then((resp) => {
+    await authAxios.get(controller + id).then((resp) => {
       if (resp.status !== 200) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -41,10 +53,16 @@ export const getEntradaByIdAsync = async (id) => {
   return result;
 };
 
-export const addEntradaProductoAsync = async (data) => {
+export const addEntradaProductoAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    baseURL: controller,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    await axios.post(controller, data).then((resp) => {
+    await authAxios.post(controller, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
