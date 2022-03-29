@@ -22,12 +22,16 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
 import SmallModal from "../../../components/modals/SmallModal";
 import FamiliaAdd from "../familia/FamiliaAdd";
 
 const Productsadd = ({ setShowModal }) => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass } =
+  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [description, setDescription] = useState("");
@@ -83,6 +87,14 @@ const Productsadd = ({ setShowModal }) => {
       return;
     }
 
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;
@@ -107,6 +119,14 @@ const Productsadd = ({ setShowModal }) => {
         return;
       }
 
+      if (resultTipoNegocio.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (resultTipoNegocio.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -125,6 +145,14 @@ const Productsadd = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         toastError("No se pudo cargar la lista de familias");
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
         return;
       }
 

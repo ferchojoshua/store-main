@@ -6,27 +6,33 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 
-import { Button, IconButton, Typography } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
-  faDatabase,
   faExternalLinkAlt,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { deleteRolAsync, getRolesAsync } from "../../../services/RolApi";
 import { isEmpty } from "lodash";
 import MediumModal from "../../../components/modals/MediumModal";
 import AddRol from "./AddRol";
 import EditRol from "./EditRol";
 import NoData from "../../../components/NoData";
+import { useNavigate } from "react-router-dom";
 
 const RolList = () => {
-  const { setReload, reload, setIsLoading } = useContext(DataContext);
+  const { setReload, reload, setIsLoading, setIsLogged } = useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [rolList, setRolList] = useState([]);
+
+  let navigate = useNavigate();
 
   //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +56,10 @@ const RolList = () => {
       const result = await getRolesAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError("No se pudo cargar los roles");
         return;
       }
@@ -71,7 +81,20 @@ const RolList = () => {
         (async () => {
           const result = await deleteRolAsync(token, item.roleName);
           if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
             toastError("No puedo eliminar rol, Intentelo de nuevo!");
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
             return;
           }
         })();

@@ -11,7 +11,11 @@ import {
   faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getToken } from "../../../services/Account";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../services/Account";
 import { isEmpty } from "lodash";
 import SmallModal from "../../../components/modals/SmallModal";
 import StoreAdd from "./StoreAdd";
@@ -19,7 +23,8 @@ import NoData from "../../../components/NoData";
 
 const Stores = () => {
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsDefaultPass } = useContext(DataContext);
+  const { setIsLoading, reload, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
   const [storesList, setStoresList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +50,15 @@ const Stores = () => {
         toastError("Ocurrio un error al descargar la lista...");
         return;
       }
-    
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;

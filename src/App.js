@@ -22,8 +22,14 @@ import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails"
 import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
 import Loading from "./components/Loading";
 import Login from "./pages/Login";
-import { getToken, getUser, getUserAsync } from "./services/Account";
-import { simpleMessage } from "./helpers/Helpers";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+  getUser,
+  getUserAsync,
+} from "./services/Account";
+import { navigatorVersion, oSVersion, simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
 
@@ -49,11 +55,13 @@ function App() {
     if (!user) {
       setIsLoading(false);
       setIsLogged(false);
+      setIsDefaultPass(false);
       return;
     }
     if (!token) {
       setIsLoading(false);
       setIsLogged(false);
+      setIsDefaultPass(false);
       return;
     }
     (async () => {
@@ -63,7 +71,13 @@ function App() {
         simpleMessage(result.error, "error");
         return;
       }
-
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
       if (result.data.isDefaultPass) {
         setIsLoading(false);
         return;
@@ -77,7 +91,7 @@ function App() {
     setIsLoading(false);
   }, [isLogged]);
 
-  if (isLogged === null) {
+  if (isLogged === null || isDefaultPass === null) {
     return <Loading />;
   }
 

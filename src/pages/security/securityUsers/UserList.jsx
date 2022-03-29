@@ -9,7 +9,7 @@ import {
   toastError,
   toastSuccess,
 } from "../../../helpers/Helpers";
-
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -19,12 +19,10 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
-  faDatabase,
   faExternalLinkAlt,
   faKey,
   faSearch,
@@ -41,7 +39,11 @@ import {
   getInactiveUsersAsync,
   resetPasswordAsync,
 } from "../../../services/UsersApi";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { isEmpty } from "lodash";
 import MediumModal from "../../../components/modals/MediumModal";
 import AddUser from "./AddUser";
@@ -49,10 +51,11 @@ import EditUser from "./EditUser";
 import NoData from "../../../components/NoData";
 
 const UserList = () => {
-  const { setReload, reload, setIsLoading } = useContext(DataContext);
+  const { setReload, reload, setIsLoading, setIsLogged } =
+    useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [userList, setUserList] = useState([]);
-
+  let navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const withSearch = userList.filter((val) => {
     if (searchTerm === "") {
@@ -101,9 +104,22 @@ const UserList = () => {
 
       if (!result.statusResponse) {
         setIsLoading(false);
-        simpleMessage(result.error, "error");
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError("No se pudo cargar lista de usuarios");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       setIsLoading(false);
       setUserList(result.data);
     })();
@@ -128,7 +144,20 @@ const UserList = () => {
         (async () => {
           const result = await deactivateUserAsync(token, item.userName);
           if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
             toastError("No puedo desactivar usuario, Intentelo de nuevo!");
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
             return;
           }
           setReload(!reload);
@@ -151,7 +180,20 @@ const UserList = () => {
         (async () => {
           const result = await resetPasswordAsync(token, item.id);
           if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
             toastError("No puedo resetear la contraseña, Intentelo de nuevo!");
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
             return;
           }
           setReload(!reload);
@@ -184,9 +226,22 @@ const UserList = () => {
 
     if (!result.statusResponse) {
       setIsLoading(false);
-      simpleMessage(result.error, "error");
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError("No se pudo cargar la lista de usuarios");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     setIsLoading(false);
     setUserList(result.data);
   };
@@ -303,7 +358,7 @@ const UserList = () => {
               </tr>
             </thead>
             <tbody>
-              {withSearch.map((item) => {
+              {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
                     <td style={{ textAlign: "left" }}>{item.userName}</td>

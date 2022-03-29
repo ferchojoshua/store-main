@@ -5,8 +5,6 @@ import {
   Button,
   Divider,
   Grid,
-  // InputAdornment,
-  // IconButton,
   InputLabel,
   FormControl,
   Select,
@@ -15,7 +13,11 @@ import {
 } from "@mui/material";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty } from "lodash";
@@ -23,10 +25,10 @@ import { createUserAsync } from "../../../services/UsersApi";
 import { useNavigate } from "react-router-dom";
 
 const AddUser = ({ setShowModal }) => {
-  const { setIsLoading, reload, setReload } = useContext(DataContext);
+  const { setIsLoading, reload, setReload, setIsLogged } =
+    useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
-  // const [showPassword, setShowPassword] = useState(false);
   const [rolesList, setRolesList] = useState([]);
 
   const [firstName, setFirstName] = useState("");
@@ -53,6 +55,14 @@ const AddUser = ({ setShowModal }) => {
         toastError("No se pudo cargar los roles");
         return;
       }
+
+      if (rolesResult.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
       setIsLoading(false);
       setRolesList(rolesResult.data);
     })();
@@ -68,7 +78,6 @@ const AddUser = ({ setShowModal }) => {
         phoneNumber,
         address,
         userName,
-        // password,
         rolId: selectedRol,
       };
 
@@ -83,6 +92,15 @@ const AddUser = ({ setShowModal }) => {
         toastError("Ocurrio un error..., intente de nuevo");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       setIsLoading(false);
       toastSuccess("Usuario creado");
       setReload(!reload);
@@ -111,21 +129,6 @@ const AddUser = ({ setShowModal }) => {
       toastError("Debe ingresar un usuario");
       return (isValid = false);
     }
-
-    // if (isEmpty(password)) {
-    //   toastError("Debe ingresar una contraseña");
-    //   return (isValid = false);
-    // }
-
-    // if (isEmpty(passwordConfirm)) {
-    //   toastError("Debe confirmar la contraseña");
-    //   return (isValid = false);
-    // }
-
-    // if (password !== passwordConfirm) {
-    //   toastError("Las contraseñas no son iguales");
-    //   return (isValid = false);
-    // }
 
     if (selectedRol === "") {
       toastError("Debe seleccionar un rol");

@@ -3,7 +3,11 @@ import { TextField, Button, Divider, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { DataContext } from "../../../context/DataContext";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import {
   getProviderByIdAsync,
   updateProviderAsync,
@@ -16,7 +20,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ProviderDetails = ({ selectedProvider, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
@@ -36,6 +40,15 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
+
+        if (result.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+
         toastError("No se pudieron cargar los datos del proveeedor");
         return;
       }
@@ -84,6 +97,14 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
         return;
       }
       toastError("No se pudieron guardar los cambios, intentelo de nnuevo");
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
       return;
     }
 

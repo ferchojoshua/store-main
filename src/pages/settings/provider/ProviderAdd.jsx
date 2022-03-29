@@ -6,10 +6,14 @@ import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { addProviderAsync } from "../../../services/ProviderApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 
 const ProviderAdd = ({ setShowModal }) => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass } =
+  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [name, setName] = useState("");
@@ -50,6 +54,14 @@ const ProviderAdd = ({ setShowModal }) => {
         return;
       }
       toastError("No se pudo guardar, intentelo de nuevo");
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
       return;
     }
 

@@ -20,14 +20,18 @@ import {
   faExternalLinkAlt,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { isEmpty } from "lodash";
 import SmallModal from "../../../components/modals/SmallModal";
 import ProviderDetails from "./ProviderDetails";
 import NoData from "../../../components/NoData";
 
 const Providers = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass } =
+  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
@@ -57,6 +61,14 @@ const Providers = () => {
           return;
         }
         toastError("Ocurrio un problema al cargar los proveedores");
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
         return;
       }
 
@@ -92,6 +104,15 @@ const Providers = () => {
             toastError("Ocurrio un error al eliminar, intentelo de nuevo");
             return;
           }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
+
           if (result.data.isDefaultPass) {
             setIsDefaultPass(true);
             return;

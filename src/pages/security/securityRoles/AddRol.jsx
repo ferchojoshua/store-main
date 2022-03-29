@@ -13,12 +13,19 @@ import {
 import { Container } from "react-bootstrap";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { createRolAsync } from "../../../services/RolApi";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { useNavigate } from "react-router-dom";
 
 const AddRol = ({ setShowModal }) => {
-  const { setIsLoading, reload, setReload } = useContext(DataContext);
+  const { setIsLoading, reload, setReload, setIsLogged } =
+    useContext(DataContext);
+  let navigate = useNavigate();
   const [rolName, setRolName] = useState("");
   const token = getToken();
 
@@ -144,9 +151,22 @@ const AddRol = ({ setShowModal }) => {
     const result = await createRolAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
       toastError("No se creo el rol, intente de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     setIsLoading(false);
     toastSuccess("Rol creado");
     setReload(!reload);

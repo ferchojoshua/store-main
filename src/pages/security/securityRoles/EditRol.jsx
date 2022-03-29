@@ -16,13 +16,20 @@ import {
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import { updateRolAsync } from "../../../services/RolApi";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import Loading from "../../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const EditRol = ({ setShowModal, selectedRol }) => {
-  const { setIsLoading, reload, setReload } = useContext(DataContext);
+  const { setIsLoading, reload, setReload, setIsLogged } =
+    useContext(DataContext);
+  let navigate = useNavigate();
   const token = getToken();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -181,9 +188,22 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     const result = await updateRolAsync(token, editedRol);
     if (!result.statusResponse) {
       setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
       toastError("Eror al actualizar, intente de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     setIsLoading(false);
     toastSuccess("Rol actualizado!");
     setReload(!reload);

@@ -17,7 +17,7 @@ import { faUserLock } from "@fortawesome/free-solid-svg-icons";
 
 import background from "../components/media/img1Encab.png";
 import { createTokenAsync } from "../services/Account";
-import { simpleMessage } from "../helpers/Helpers";
+import { navigatorVersion, oSVersion, simpleMessage } from "../helpers/Helpers";
 
 function Copyright(props) {
   return (
@@ -35,7 +35,7 @@ function Copyright(props) {
 const Login = () => {
   let navigate = useNavigate();
   // const [movimientosList, setmovimientosList] = useState([]);
-  const { setIsLoading, setIsLogged, setIsTokenNull } = useContext(DataContext);
+  const { setIsLoading, setIsLogged } = useContext(DataContext);
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -47,6 +47,8 @@ const Login = () => {
       username: user,
       password,
       rememberMe: true,
+      userBrowser: navigatorVersion(),
+      userSO: oSVersion(),
     };
     const result = await createTokenAsync(data);
     if (!result.statusResponse) {
@@ -54,9 +56,7 @@ const Login = () => {
       simpleMessage("Usuario o contraseña incorrecto", "error");
       return;
     }
-    if (!result.data.user.token) {
-      setIsTokenNull(true);
-    }
+
     actionLog();
     setIsLoading(false);
     navigate("/");

@@ -5,11 +5,16 @@ import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
 import { addFamiliaToTipoNegocioAsync } from "../../../services/TipoNegocioApi";
 
 const FamiliaAdd = ({ setShowModal, idTN }) => {
-  const { reload, setReload, setIsLoading } = useContext(DataContext);
+  const { reload, setReload, setIsLoading, setIsLogged } =
+    useContext(DataContext);
   let navigate = useNavigate();
   const [description, setDescription] = useState("");
   const token = getToken();
@@ -19,7 +24,7 @@ const FamiliaAdd = ({ setShowModal, idTN }) => {
       idTipoNegocio: idTN,
       description: description,
     };
-   
+
     if (description === "") {
       toastError("Ingrese una descripcion...");
       return;
@@ -35,6 +40,15 @@ const FamiliaAdd = ({ setShowModal, idTN }) => {
       toastError("No se pudo agregar familia, intente de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     setIsLoading(false);
     toastSuccess("Familia Agregada...!");
     setReload(!reload);

@@ -34,7 +34,11 @@ import {
   faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getToken } from "../../../services/Account";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../services/Account";
 import { DataContext } from "../../../context/DataContext";
 import SmallModal from "../../../components/modals/SmallModal";
 import { isEmpty } from "lodash";
@@ -43,7 +47,7 @@ import RackDetail from "./racks/RackDetail";
 import NoData from "../../../components/NoData";
 
 const StoreDetails = () => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
@@ -80,6 +84,15 @@ const StoreDetails = () => {
         toastError("Ocurrio un error al cargar almacenes");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -97,6 +110,15 @@ const StoreDetails = () => {
         toastError("Ocurrio un error al cargar los racks");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (resultRacks.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -124,6 +146,15 @@ const StoreDetails = () => {
       toastError("Ocurrio un error al guardar los cambios");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;
@@ -155,6 +186,15 @@ const StoreDetails = () => {
             toastError("Ocurrio un error al eliminar rack");
             return;
           }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
+
           if (result.data.isDefaultPass) {
             setIsDefaultPass(true);
             return;

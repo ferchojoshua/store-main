@@ -9,7 +9,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import { toastError, toastSuccess } from "../../../../helpers/Helpers";
-import { getToken } from "../../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../../services/Account";
 import {
   getRackByIdAsync,
   updateRackAsync,
@@ -24,7 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const RackDetail = ({ selectedRack, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
@@ -46,6 +50,15 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
         toastError("Ocurrio un error al cargar los datos");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -77,6 +90,15 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
       toastError("Ocurrio un error al guardar los cambios, intente de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;

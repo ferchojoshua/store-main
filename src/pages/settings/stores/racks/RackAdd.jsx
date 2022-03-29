@@ -6,11 +6,11 @@ import { addRackToStoreAsync } from "../../../../services/AlmacenApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../../../context/DataContext";
-import { getToken } from "../../../../services/Account";
+import { deleteToken, deleteUserData, getToken } from "../../../../services/Account";
 import { useNavigate } from "react-router-dom";
 
 const RackAdd = ({ setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged} =
     useContext(DataContext);
   const { id } = useParams();
   const [description, setDescription] = useState("");
@@ -38,6 +38,15 @@ const RackAdd = ({ setShowModal }) => {
       toastError("Ocurrio un error..., intente de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;

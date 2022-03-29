@@ -16,7 +16,11 @@ import {
   getFamiliasByTNAsync,
   getTipoNegocioAsync,
 } from "../../../services/TipoNegocioApi";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
 import { DataContext } from "../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -26,7 +30,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const ProductsDetails = ({ selectedProduct, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
@@ -61,6 +65,15 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         toastError("No se pudo cargar Tipos de Negocio");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (resultTipoNegocio.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -76,6 +89,15 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         toastError("No se pudo cargar la lista de familias");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -122,6 +144,15 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       toastError("No se pudieron guardar los cambios, intentelo de nuevo");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;
@@ -147,6 +178,15 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         toastError("No se pudo cargar la lista de familias");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;

@@ -33,3 +33,32 @@ export const toastError = (message) => {
     ),
   });
 };
+
+export const oSVersion = () => {
+  var OSName = "Unknown OS";
+  if (navigator.appVersion.indexOf("Win") != -1) OSName = "WINDOWS";
+  if (navigator.appVersion.indexOf("Mac") != -1) OSName = "MACOS";
+  if (navigator.appVersion.indexOf("X11") != -1) OSName = "UNIX";
+  if (navigator.appVersion.indexOf("Linux") != -1) OSName = "LINUX";
+  return OSName;
+};
+
+export const navigatorVersion = () => {
+  var sBrowser,
+    sUsrAg = navigator.userAgent;
+  if (sUsrAg.indexOf("Edg") > -1) {
+    sBrowser = "Microsoft Edge";
+  } else if (sUsrAg.indexOf("Chrome") > -1) {
+    sBrowser = "Google Chrome";
+  } else if (sUsrAg.indexOf("Safari") > -1) {
+    sBrowser = "Apple Safari";
+  } else if (sUsrAg.indexOf("Opera") > -1) {
+    sBrowser = "Opera";
+  } else if (sUsrAg.indexOf("Firefox") > -1) {
+    sBrowser = "Mozilla Firefox";
+  } else if (sUsrAg.indexOf("MSIE") > -1) {
+    sBrowser = "Microsoft Internet Explorer";
+  }
+
+  return sBrowser;
+};

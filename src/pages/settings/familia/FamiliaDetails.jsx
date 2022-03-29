@@ -21,7 +21,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DataContext } from "../../../context/DataContext";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
 import {
   getFamiliaByIdAsync,
   updateFamiliaAsync,
@@ -29,7 +33,7 @@ import {
 
 const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
   let navigate = useNavigate();
-  const { setIsLoading, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const [familia, setFamilia] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
@@ -50,6 +54,15 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
         toastError("Ocurrio un error al cargar los datos");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -83,6 +96,15 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
       simpleMessage(result.error, "error");
       return;
     }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
     if (result.data.isDefaultPass) {
       setIsDefaultPass(true);
       return;
