@@ -27,13 +27,17 @@ import {
 import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
 import Productsadd from "./Productsadd";
 import ProductsDetails from "./ProductsDetails";
 
 const Products = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass } =
+  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
@@ -81,6 +85,14 @@ const Products = () => {
         return;
       }
 
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
@@ -110,6 +122,14 @@ const Products = () => {
               return;
             }
             toastError("No se pudo eliminar producto, intentelo de nuevo");
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
             return;
           }
 
