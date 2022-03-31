@@ -7,11 +7,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import Home from "./pages/home/Home";
 
-import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
-import AddEntradaProducto from "./pages/entradaProducto/AddEntradaProducto";
-import EntradaProductoDetails from "./pages/entradaProducto/EntradaProductoDetails";
+// import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
+import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
+// import EntradaProductoDetails from "./pages/entradaProducto/EntradaProductoDetails";
 
-import MoverProducto from "./pages/traslate-products/MoverProducto";
+// import MoverProducto from "./pages/traslate-products/MoverProducto";
 
 import Products from "./pages/settings/products/Products";
 import Stores from "./pages/settings/stores/Stores";
@@ -19,7 +19,7 @@ import StoreDetails from "./pages/settings/stores/StoreDetails";
 import Providers from "./pages/settings/provider/Providers";
 
 import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails";
-import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
+// import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
 import Loading from "./components/Loading";
 import Login from "./pages/Login";
 import {
@@ -29,7 +29,7 @@ import {
   getUser,
   getUserAsync,
 } from "./services/Account";
-import { navigatorVersion, oSVersion, simpleMessage } from "./helpers/Helpers";
+import { simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
 
@@ -37,6 +37,7 @@ import Page401 from "./components/errorPages/Page401.jsx";
 import NotFound from "./components/errorPages/NotFound.jsx";
 import TipoNegocio from "./pages/settings/tipoNegocio/TipoNegocio";
 import SetNewPasswordComponent from "./components/SetNewPasswordComponent";
+import InventoryContainer from "./pages/inventory/InventoryContainer";
 function App() {
   const {
     setIsLoading,
@@ -80,6 +81,7 @@ function App() {
       }
       if (result.data.isDefaultPass) {
         setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
       setIsDefaultPass(false);
@@ -105,18 +107,19 @@ function App() {
           <Route path="/" element={<Home />} />
           {/* Rutas Account */}
           <Route path="/account" element={<MyAccount />} />
-          {/* <Route path="/entrada/add" element={<AddEntradaProducto />} />
-        <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-          {/* Rutas Products-in */}
-          <Route path="/products-in" element={<EntradaProduto />} />
+
+          {/* Ruta Inventario */}
+          <Route path="/inventory" element={<InventoryContainer />} />
+
           <Route path="/entrada/add" element={<AddEntradaProducto />} />
-          <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
+          {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
           {/* Rutas Products-in */}
-          <Route path="/traslate-products" element={<MoverProducto />} />
-          <Route path="/traslate-products/add" element={<MoverProductoAdd />} />
+          {/* <Route path="/traslate-products" element={<MoverProducto />} />
+          <Route path="/traslate-products/add" element={<MoverProductoAdd />} /> */}
           {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
           {/* Rutas Seguridad */}
           <Route path="/security" element={<SecurityContiner />} />
+
           {/* <Route path="/traslate-products/add" element={<MoverProductoAdd />} /> */}
           {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
 

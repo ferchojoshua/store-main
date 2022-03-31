@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DataContext } from "../../context/DataContext";
+import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../helpers/Helpers";
+import { simpleMessage } from "../../../helpers/Helpers";
 
 import moment from "moment/moment";
-import Loading from "../../components/Loading";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleCheck,
@@ -14,7 +14,7 @@ import {
   faExternalLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { IconButton, Button } from "@mui/material";
-import PaginationComponent from "../../components/PaginationComponent";
+import PaginationComponent from "../../../components/PaginationComponent";
 
 const MoverProducto = () => {
   let navigate = useNavigate();

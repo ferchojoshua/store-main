@@ -4,11 +4,7 @@ import { Container, Table } from "react-bootstrap";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import {
-  simpleMessage,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -251,7 +247,7 @@ const UserList = () => {
       <Container>
         <div
           style={{
-            marginTop: 20,
+            // marginTop: 10,
             display: "flex",
             flexDirection: "row",
             alignContent: "center",

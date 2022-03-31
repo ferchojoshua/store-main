@@ -4,15 +4,19 @@ import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBoxesStacked,
   faCodeBranch,
+  faDollyBox,
   faEllipsisVertical,
   faHome,
-  faLeftRight,
-  faList,
+  faPeopleCarryBox,
   faShield,
   faSignOutAlt,
+  faSitemap,
+  faSliders,
   faUserCircle,
   faUserCog,
+  faWarehouse,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { getToken, logOutAsync } from "../services/Account";
@@ -104,31 +108,20 @@ const NavbarComponent = () => {
             </Nav.Link>
 
             <Nav.Link
+              eventKey="Inventario"
               style={{
-                fontWeight: active === "products-in" ? "bold" : "",
-                color: active === "products-in" ? "#bbdefb" : "#9e9e9e",
+                fontWeight: active === "Inventario" ? "bold" : "",
+                color: active === "Inventario" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
-              eventKey="products-in"
               as={Link}
-              to="/products-in"
+              to="/Inventory"
             >
-              <FontAwesomeIcon icon={faList} style={{ marginRight: 10 }} />
-              Entrada de Producto
-            </Nav.Link>
-
-            <Nav.Link
-              style={{
-                fontWeight: active === "traslate-products" ? "bold" : "",
-                color: active === "traslate-products" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              eventKey="traslate-products"
-              as={Link}
-              to="/traslate-products"
-            >
-              <FontAwesomeIcon icon={faLeftRight} style={{ marginRight: 10 }} />
-              Traslado de Producto
+              <FontAwesomeIcon
+                icon={faBoxesStacked}
+                style={{ marginRight: 10 }}
+              />
+              Inventario
             </Nav.Link>
 
             <Nav.Link
@@ -155,22 +148,39 @@ const NavbarComponent = () => {
               }
               id="navbarScrollingDropdown"
             >
-              <NavDropdown.Header>Miscelaneos</NavDropdown.Header>
+              <NavDropdown.Header>
+                <FontAwesomeIcon icon={faSliders} style={{ marginRight: 10 }} />
+                Miscelaneos
+              </NavDropdown.Header>
               <NavDropdown.Divider />
               <NavDropdown.Item as={Link} to="/stores">
+                <FontAwesomeIcon
+                  icon={faWarehouse}
+                  style={{ marginRight: 10 }}
+                />
                 Almacenes
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/providers">
+                <FontAwesomeIcon
+                  icon={faPeopleCarryBox}
+                  style={{ marginRight: 10 }}
+                />
                 Proveedores
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/products">
+                <FontAwesomeIcon
+                  icon={faDollyBox}
+                  style={{ marginRight: 10 }}
+                />
                 Productos
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/tipo-negocio">
+                <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
                 Tipo Negocio
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
+
           <div>
             <a
               style={{
@@ -210,10 +220,7 @@ const NavbarComponent = () => {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem
-                onClick={myAccount}
-                // style={{ color: darkMode ? "#7bc0c5" : "#105155" }}
-              >
+              <MenuItem onClick={myAccount}>
                 <FontAwesomeIcon icon={faUserCog} style={{ marginRight: 20 }} />
                 Mi cuenta
               </MenuItem>

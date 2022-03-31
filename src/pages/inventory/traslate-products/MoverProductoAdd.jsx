@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DataContext } from "../../context/DataContext";
+import { DataContext } from "../../../context/DataContext";
 import { Button, InputGroup, Form, Row, Table, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../helpers/Helpers";
-import { getProductsAsync } from "../../services/ProductsApi";
-import { getprovidersAsync } from "../../services/ProviderApi";
+import { simpleMessage } from "../../../helpers/Helpers";
+import { getProductsAsync } from "../../../services/ProductsApi";
+import { getprovidersAsync } from "../../../services/ProviderApi";
 
-import Loading from "../../components/Loading";
+import Loading from "../../../components/Loading";
 
 import {
   Autocomplete,
@@ -20,9 +20,9 @@ import {
   FormControl,
 } from "@mui/material";
 
-import SmallModal from "../../components/modals/SmallModal";
+import SmallModal from "../../../components/modals/SmallModal";
 
-import MediumModal from "../../components/modals/MediumModal";
+import MediumModal from "../../../components/modals/MediumModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleArrowLeft,
@@ -30,8 +30,8 @@ import {
   faL,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
-import { addEntradaProductoAsync } from "../../services/ProductIsApi";
-import { getStoresAsync } from "../../services/AlmacenApi";
+import { addEntradaProductoAsync } from "../../../services/ProductIsApi";
+import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const MoverProductoAdd = () => {
   const { reload, setIsLoading } = useContext(DataContext);

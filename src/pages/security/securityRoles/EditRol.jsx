@@ -5,7 +5,6 @@ import {
   Button,
   Divider,
   Typography,
-  Grid,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
@@ -218,7 +217,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           <div className="col-sm-9 ">
             <TextField
               fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
+              style={{ marginBottom: 10, marginTop: 20 }}
               variant="standard"
               onChange={(e) => setRolName(e.target.value.toUpperCase())}
               label={"Nombre rol"}
