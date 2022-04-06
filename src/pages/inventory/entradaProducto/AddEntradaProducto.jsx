@@ -31,7 +31,8 @@ import DetallesDeEntrada from "./entradaProductosComponents/DetallesDeEntrada";
 import ProductDescription from "./entradaProductosComponents/ProductDescription";
 
 const AddEntradaProducto = () => {
-  const { setIsLoading, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, setIsLogged, reload, setReload } =
+    useContext(DataContext);
   let navigate = useNavigate();
 
   const [tipoEntrada, setTipoEntrada] = useState("");
@@ -203,7 +204,7 @@ const AddEntradaProducto = () => {
       setIsLogged(false);
       return;
     }
-
+    setReload(!reload);
     setNoFactura("");
     setTipoEntrada("");
     setTipoCompra("");
@@ -250,8 +251,8 @@ const AddEntradaProducto = () => {
 
           <hr />
 
-          <Grid container spacing={5}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={3}>
               <DetallesDeEntrada
                 setNoFactura={setNoFactura}
                 noFactura={noFactura}
@@ -264,7 +265,7 @@ const AddEntradaProducto = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={9}>
               <ProductDescription
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

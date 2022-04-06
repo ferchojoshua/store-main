@@ -3,11 +3,16 @@ import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLeftRight, faList } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDollyBox,
+  faLeftRight,
+  faList,
+} from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 
 import EntradaProduto from "./entradaProducto/EntradaProduto";
 import MoverProducto from "./traslate-products/MoverProducto";
+import Products from "./products/Products";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -73,6 +78,15 @@ const InventoryContainer = () => {
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
+
+          <Tab
+            icon={
+              <FontAwesomeIcon icon={faDollyBox} style={{ fontSize: 20 }} />
+            }
+            label="Productos"
+            {...a11yProps(0)}
+            style={{ fontSize: 12 }}
+          />
         </Tabs>
         <Divider style={{ marginTop: 10 }} />
 
@@ -80,7 +94,11 @@ const InventoryContainer = () => {
           <EntradaProduto />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <MoverProducto/>
+          <MoverProducto />
+        </TabPanel>
+
+        <TabPanel value={value} index={2}>
+          <Products />
         </TabPanel>
       </Paper>
     </Container>

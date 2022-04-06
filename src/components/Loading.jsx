@@ -10,7 +10,7 @@ const Loading = () => {
   return (
     <div>
       <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ color: "#fff", zIndex: 2000 }}
         open={isLoading}
       >
         <SyncLoader size={10} margin={3} color={"#36D7B7"} />

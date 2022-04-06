@@ -1,11 +1,7 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import {
-  simpleMessage,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { addTipoNegocioAsync } from "../../../services/TipoNegocioApi";
 import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

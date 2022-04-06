@@ -167,13 +167,13 @@ const NavbarComponent = () => {
                 />
                 Proveedores
               </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/products">
+              {/* <NavDropdown.Item as={Link} to="/products">
                 <FontAwesomeIcon
                   icon={faDollyBox}
                   style={{ marginRight: 10 }}
                 />
                 Productos
-              </NavDropdown.Item>
+              </NavDropdown.Item> */}
               <NavDropdown.Item as={Link} to="/tipo-negocio">
                 <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
                 Tipo Negocio

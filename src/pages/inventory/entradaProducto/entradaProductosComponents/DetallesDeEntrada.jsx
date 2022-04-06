@@ -39,6 +39,7 @@ const DetallesDeEntrada = ({
   const [providerList, setProviderList] = useState([]);
   const [showProviderModal, setShowProvidermodal] = useState(false);
   let navigate = useNavigate();
+  
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -131,7 +132,6 @@ const DetallesDeEntrada = ({
           variant="standard"
           fullWidth
           style={{ marginTop: 20 }}
-          required
         >
           <InputLabel id="demo-simple-select-standard-label">
             Seleccione un tipo de pago...

@@ -28,7 +28,7 @@ import {
   deleteToken,
 } from "../../../services/Account";
 import SmallModal from "../../../components/modals/SmallModal";
-import FamiliaAdd from "../familia/FamiliaAdd";
+import FamiliaAdd from "../../settings/familia/FamiliaAdd";
 
 const Productsadd = ({ setShowModal }) => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =

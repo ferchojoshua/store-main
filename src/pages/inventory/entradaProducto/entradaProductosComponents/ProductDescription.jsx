@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toastError } from "../../../../helpers/Helpers";
 import MediumModal from "../../../../components/modals/MediumModal";
-import Productsadd from "../../../settings/products/Productsadd";
+import Productsadd from "../../products/Productsadd";
 import { getProductsAsync } from "../../../../services/ProductsApi";
 
 const ProductDescription = ({
@@ -251,7 +251,7 @@ const ProductDescription = ({
         <hr />
 
         <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5">
+          <div className="col-sm-6">
             <div
               style={{
                 display: "flex",
@@ -292,23 +292,61 @@ const ProductDescription = ({
               </Tooltip>
             </div>
           </div>
-          <div className="col-sm-3">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Codigo"}
-              value={selectedProduct ? selectedProduct.id : ""}
-              disabled={true}
-            />
-          </div>
-          <div className="col-sm-4">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Descripcion"}
-              value={selectedProduct ? selectedProduct.description : ""}
-              disabled={true}
-            />
+          <div className="col-sm-6">
+            {selectedProduct ? (
+              <div className="row justify-content-around align-items-center">
+                <div className="col-sm-2">
+                  <p
+                    style={{
+                      textAlign: "center",
+                      color: "#2979ff",
+                      fontWeight: "bold",
+                    }}
+                  >{`Codigo: ${selectedProduct.id}`}</p>
+                </div>
+                <div className="col-sm-2">
+                  <p
+                    style={{
+                      textAlign: "center",
+                      color: "#2979ff",
+                      fontWeight: "bold",
+                    }}
+                  >{`Existencia: ${selectedProduct.existencia}`}</p>
+                </div>
+                <div className="col-sm-2">
+                  <p
+                    style={{
+                      textAlign: "center",
+                      color: "#4caf50",
+                      fontWeight: "bold",
+                    }}
+                  >{`PVM: ${selectedProduct.precioVentaMayor.toLocaleString(
+                    "es-NI",
+                    {
+                      textAlign: "center",
+                      style: "currency",
+                      currency: "NIO",
+                    }
+                  )}`}</p>
+                </div>
+                <div className="col-sm-2">
+                  <p
+                    style={{
+                      color: "#4caf50",
+                      fontWeight: "bold",
+                    }}
+                  >{`PVD: ${selectedProduct.precioVentaDetalle.toLocaleString(
+                    "es-NI",
+                    {
+                      style: "currency",
+                      currency: "NIO",
+                    }
+                  )}`}</p>
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
 
@@ -325,13 +363,13 @@ const ProductDescription = ({
             />
           </div>
 
-          <div className="col-sm-3">
+          <div className="col-sm-2">
             <TextField
               fullWidth
               required
               style={{ marginTop: 20 }}
               variant="standard"
-              label={"Monto de compra C$"}
+              label={"Monto C$"}
               value={precioCompra}
               onChange={(e) => funcPrecioCompra(e.target.value)}
             />
@@ -360,13 +398,12 @@ const ProductDescription = ({
           </div>
 
           <div className="col-sm-3">
-            <h6 style={{ marginTop: 20 }}>{`Costo = ${costo.toLocaleString(
-              "es-NI",
-              {
-                style: "currency",
-                currency: "NIO",
-              }
-            )}`}</h6>
+            <h6
+              style={{ marginTop: 20, color: "#e91e63", fontWeight: "bold" }}
+            >{`Costo = ${costo.toLocaleString("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            })}`}</h6>
           </div>
         </div>
       </Paper>

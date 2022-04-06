@@ -10,13 +10,7 @@ import {
   deleteProductAsync,
   getProductsAsync,
 } from "../../../services/ProductsApi";
-import {
-  Button,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-} from "@mui/material";
+import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
@@ -148,119 +142,111 @@ const Products = () => {
   return (
     <div>
       <Container>
-        <Paper
-          elevation={10}
+        <div
           style={{
-            borderRadius: 30,
-            padding: 20,
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+            justifyContent: "space-between",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-              justifyContent: "space-between",
+          <h1>Lista de Productos</h1>
+
+          <Button
+            variant="outlined"
+            style={{ borderRadius: 20 }}
+            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+            onClick={() => {
+              setShowModal(true);
             }}
           >
-            <h1>Lista de Productos</h1>
+            Agregar Producto
+          </Button>
+        </div>
 
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-            >
-              Agregar Producto
-            </Button>
-          </div>
+        <hr />
 
-          <hr />
+        <TextField
+          style={{ marginBottom: 20, width: 600 }}
+          variant="standard"
+          onChange={(e) => setSearchTerm(e.target.value.toLocaleUpperCase())}
+          value={searchTerm}
+          label={"Buscar producto"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton>
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    style={{ color: "#1769aa" }}
+                  />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-          <TextField
-            style={{ marginBottom: 20, width: 600 }}
-            variant="standard"
-            onChange={(e) => setSearchTerm(e.target.value.toLocaleUpperCase())}
-            value={searchTerm}
-            label={"Buscar producto"}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton>
-                    <FontAwesomeIcon
-                      icon={faSearch}
-                      style={{ color: "#1769aa" }}
-                    />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          {isEmpty(withSearch) ? (
-            <NoData />
-          ) : (
-            <Table hover size="sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th style={{ textAlign: "left" }}>Tipo Negocio</th>
-                  <th style={{ textAlign: "left" }}>Familia</th>
-                  <th style={{ textAlign: "left" }}>Descripcion</th>
-                  <th style={{ textAlign: "left" }}>Codigo de Barras</th>
-                  <th style={{ textAlign: "left" }}>Marca</th>
-                  <th style={{ textAlign: "left" }}>Modelo</th>
-                  <th style={{ textAlign: "left" }}>U/M</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItem.map((item) => {
-                  return (
-                    <tr key={item.id}>
-                      <td>{item.id}</td>
-                      <td style={{ textAlign: "left" }}>
-                        {item.tipoNegocio.description}
-                      </td>
-                      <td style={{ textAlign: "left" }}>
-                        {item.familia ? item.familia.description : ""}
-                      </td>
-                      <td style={{ textAlign: "left" }}>{item.description}</td>
-                      <td style={{ textAlign: "left" }}>{item.barCode}</td>
-                      <td style={{ textAlign: "left" }}>{item.marca}</td>
-                      <td style={{ textAlign: "left" }}>{item.modelo}</td>
-                      <td style={{ textAlign: "left" }}>{item.um}</td>
-                      <td>
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedProduct(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteProduct(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          )}
-          <PaginationComponent
-            data={withSearch}
-            paginate={paginate}
-            itemsperPage={itemsperPage}
-          />
-        </Paper>
+        {isEmpty(withSearch) ? (
+          <NoData />
+        ) : (
+          <Table hover size="sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th style={{ textAlign: "left" }}>Tipo Negocio</th>
+                <th style={{ textAlign: "left" }}>Familia</th>
+                <th style={{ textAlign: "left" }}>Descripcion</th>
+                <th style={{ textAlign: "left" }}>Codigo de Barras</th>
+                <th style={{ textAlign: "left" }}>Marca</th>
+                <th style={{ textAlign: "left" }}>Modelo</th>
+                <th style={{ textAlign: "left" }}>U/M</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItem.map((item) => {
+                return (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td style={{ textAlign: "left" }}>
+                      {item.tipoNegocio.description}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {item.familia ? item.familia.description : ""}
+                    </td>
+                    <td style={{ textAlign: "left" }}>{item.description}</td>
+                    <td style={{ textAlign: "left" }}>{item.barCode}</td>
+                    <td style={{ textAlign: "left" }}>{item.marca}</td>
+                    <td style={{ textAlign: "left" }}>{item.modelo}</td>
+                    <td style={{ textAlign: "left" }}>{item.um}</td>
+                    <td>
+                      <IconButton
+                        style={{ marginRight: 10, color: "#009688" }}
+                        onClick={() => {
+                          setSelectedProduct(item);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faExternalLinkAlt} />
+                      </IconButton>
+                      <IconButton
+                        style={{ color: "#f50057" }}
+                        onClick={() => deleteProduct(item)}
+                      >
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                      </IconButton>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        )}
+        <PaginationComponent
+          data={withSearch}
+          paginate={paginate}
+          itemsperPage={itemsperPage}
+        />
       </Container>
 
       <MediumModal

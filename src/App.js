@@ -7,19 +7,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import Home from "./pages/home/Home";
 
-// import EntradaProduto from "./pages/entradaProducto/EntradaProduto";
-import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
-// import EntradaProductoDetails from "./pages/entradaProducto/EntradaProductoDetails";
+import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";
 
-// import MoverProducto from "./pages/traslate-products/MoverProducto";
-
-import Products from "./pages/settings/products/Products";
 import Stores from "./pages/settings/stores/Stores";
 import StoreDetails from "./pages/settings/stores/StoreDetails";
 import Providers from "./pages/settings/provider/Providers";
 
 import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails";
-// import MoverProductoAdd from "./pages/traslate-products/MoverProductoAdd";
+
 import Loading from "./components/Loading";
 import Login from "./pages/Login";
 import {
@@ -38,6 +33,10 @@ import NotFound from "./components/errorPages/NotFound.jsx";
 import TipoNegocio from "./pages/settings/tipoNegocio/TipoNegocio";
 import SetNewPasswordComponent from "./components/SetNewPasswordComponent";
 import InventoryContainer from "./pages/inventory/InventoryContainer";
+import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
+import DateAdapter from "@mui/lab/AdapterMoment";
+import { LocalizationProvider } from "@mui/lab";
+
 function App() {
   const {
     setIsLoading,
@@ -101,48 +100,42 @@ function App() {
     isDefaultPass ? (
       <SetNewPasswordComponent />
     ) : (
-      <div className="App">
-        <NavbarComponent />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          {/* Rutas Account */}
-          <Route path="/account" element={<MyAccount />} />
+      <LocalizationProvider dateAdapter={DateAdapter}>
+        <div className="App">
+          <NavbarComponent />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            {/* Rutas Account */}
+            <Route path="/account" element={<MyAccount />} />
 
-          {/* Ruta Inventario */}
-          <Route path="/inventory" element={<InventoryContainer />} />
+            {/* Ruta Inventario */}
+            <Route path="/inventory" element={<InventoryContainer />} />
 
-          <Route path="/entrada/add" element={<AddEntradaProducto />} />
-          {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-          {/* Rutas Products-in */}
-          {/* <Route path="/traslate-products" element={<MoverProducto />} />
-          <Route path="/traslate-products/add" element={<MoverProductoAdd />} /> */}
-          {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-          {/* Rutas Seguridad */}
-          <Route path="/security" element={<SecurityContiner />} />
+            <Route path="/entrada/add" element={<AddEntradaProducto />} />
+            <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
 
-          {/* <Route path="/traslate-products/add" element={<MoverProductoAdd />} /> */}
-          {/*<Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
+            {/* Rutas Seguridad */}
+            <Route path="/security" element={<SecurityContiner />} />
 
-          {/* Rutas miscelaneos */}
-          <Route path="/stores" element={<Stores />} />
-          <Route path="/store/:id" element={<StoreDetails />} />
-          <Route path="/providers" element={<Providers />} />
+            {/* Rutas miscelaneos */}
+            <Route path="/stores" element={<Stores />} />
+            <Route path="/store/:id" element={<StoreDetails />} />
+            <Route path="/providers" element={<Providers />} />
 
-          <Route path="/products" element={<Products />} />
+            {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
+            <Route path="/tipo-negocio" element={<TipoNegocio />} />
+            <Route path="/tipo-negocio/:id" element={<TipoNegocioDetails />} />
 
-          {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
-          <Route path="/tipo-negocio" element={<TipoNegocio />} />
-          <Route path="/tipo-negocio/:id" element={<TipoNegocioDetails />} />
+            {/* Rutas Error */}
+            <Route path="/unauthorized" element={<Page401 />} />
+            <Route path="*" element={<NotFound />} />
+            {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
+          </Routes>
 
-          {/* Rutas Error */}
-          <Route path="/unauthorized" element={<Page401 />} />
-          <Route path="*" element={<NotFound />} />
-          {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-        </Routes>
-
-        <Loading />
-        <ToastContainer />
-      </div>
+          <Loading />
+          <ToastContainer />
+        </div>
+      </LocalizationProvider>
     )
   ) : (
     <Login />

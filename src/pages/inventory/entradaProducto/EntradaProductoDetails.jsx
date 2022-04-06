@@ -1,234 +1,415 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DataContext } from "../../context/DataContext";
-import { InputGroup, FormControl, Row, Table, Col } from "react-bootstrap";
+import { DataContext } from "../../../context/DataContext";
+import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import ProductDetailInComponent from "./entradaProductoDetailsComponents/ProductDetailInComponent";
+import {
+  Button,
+  Container,
+  Paper,
+  IconButton,
+  Typography,
+} from "@mui/material";
 
-import { Container } from "@mui/material";
-
-import { Button } from "@mui/material";
-import { faCircleArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCancel,
+  faCircleArrowLeft,
+  faPenToSquare,
+  faSave,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getEntradaByIdAsync } from "../../services/ProductIsApi";
-import Loading from "../../components/Loading";
-import moment from "moment";
+import {
+  getEntradaByIdAsync,
+  putProductInAsync,
+} from "../../../services/ProductIsApi";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../services/Account";
+
+import MediumModal from "../../../components/modals/MediumModal";
+import DetalleProductoComponent from "./entradaProductoDetailsComponents/DetalleProductoComponent";
 
 const EntradaProductoDetails = () => {
-  const { setIsLoading } = useContext(DataContext);
+  const { setIsLoading, setIsLogged, setReload, reload } =
+    useContext(DataContext);
   let navigate = useNavigate();
   const { id } = useParams();
-  const [ordenCompra, setOrdenCompra] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+
+  const [noFactura, setNoFactura] = useState("");
+  const [tipoEntrada, setTipoEntrada] = useState("");
+  const [tipoCompra, setTipoCompra] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("");
-  const [almacenName, setAlmacenName] = useState("");
+
   const [montoFactura, setMontoFactura] = useState("");
   const [productList, setProductList] = useState([]);
+
+  const [selectedStore, setSelectedStore] = useState("");
+
+  const [fechaIngreso, setFechaIngreso] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState([]);
+
+  const token = getToken();
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getEntradaByIdAsync(id);
+      const result = await getEntradaByIdAsync(token, id);
       if (!result.statusResponse) {
         setIsLoading(false);
-        simpleMessage(result.error, "error");
+        toastError(result.error);
         return;
       }
       setIsLoading(false);
-      setOrdenCompra(result.data);
-      setSelectedProvider(result.data.provider.nombre);
-      setAlmacenName(result.data.almacen.name);
+      setNoFactura(result.data.noFactura);
+      setTipoEntrada(result.data.tipoEntrada);
+      setTipoCompra(result.data.tipoPago);
+      setSelectedProvider(result.data.provider.id);
+      setSelectedStore(result.data.almacen.id);
       setMontoFactura(result.data.montoFactura);
       setProductList(result.data.productInDetails);
+      setFechaIngreso(result.data.fechaIngreso);
     })();
   }, []);
+
+  const saveChanges = async () => {
+    if (!noFactura) {
+      toastError("Ingrese numero de factura");
+      return;
+    }
+
+    if (!tipoEntrada) {
+      toastError("Ingrese tipo de entrada");
+      return;
+    }
+
+    if (!tipoCompra) {
+      toastError("Ingrese tipo de pago");
+      return;
+    }
+
+    if (!selectedProvider) {
+      toastError("Seleccione un proveedor");
+      return;
+    }
+
+    if (!montoFactura) {
+      toastError("Ingrese al menos un producto para guardar");
+      return;
+    }
+
+    const data = {
+      id,
+      noFactura,
+      tipoEntrada,
+      tipoPago: tipoCompra,
+      providerId: selectedProvider,
+      montoFactura,
+      productInDetails: productList,
+      fechaIngreso,
+    };
+
+    setIsLoading(true);
+    const result = await putProductInAsync(token, data);
+    if (!result.statusResponse) {
+      console.log(result);
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError(result.error);
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    setReload(!reload);
+    setIsLoading(false);
+    setIsEdit(false);
+    toastSuccess("Cambios Relizados...!");
+  };
+
+  const editDetail = (data) => {
+    const {
+      id,
+      cantidad,
+      costoCompra,
+      costoUnitario,
+      descuento,
+      impuesto,
+      precioVentaDetalle,
+      precioVentaMayor,
+      product,
+    } = data;
+    const editedList = productList.map((item) =>
+      item.id === id
+        ? {
+            id,
+            cantidad,
+            costoCompra,
+            costoUnitario,
+            descuento,
+            impuesto,
+            precioVentaMayor,
+            precioVentaDetalle,
+            product,
+          }
+        : item
+    );
+    setProductList(editedList);
+    let result = 0;
+    productList.map((item) => {
+      result += item.costoCompra;
+    });
+    setMontoFactura(result);
+    setShowModal(false);
+  };
 
   return (
     <div>
       <Container maxWidth="xl">
-        <div
+        <Paper
+          elevation={10}
           style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-           
+            borderRadius: 30,
+            padding: 20,
           }}
         >
-          <Button
-            onClick={() => {
-              navigate("/products-in/");
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outlined"
           >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
-            />
-            Regresar
-          </Button>
-
-          <h1>Detalle Orden # {id}</h1>
-        </div>
-
-        <hr />
-
-        <Row>
-          <Col xs={12} md={6}>
-            <InputGroup className="mb-3">
-              <InputGroup.Text>N° Factura</InputGroup.Text>
-              <FormControl
-                type="text"
-                aria-label="Description"
-                defaultValue={ordenCompra.noFactura}
-                disabled
+            <Button
+              onClick={() => {
+                navigate("/inventory/");
+              }}
+              style={{ marginRight: 20, borderRadius: 20 }}
+              variant="outlined"
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faCircleArrowLeft}
               />
-            </InputGroup>
+              Regresar
+            </Button>
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Tipo de Compra</InputGroup.Text>
-              <FormControl
-                type="text"
-                aria-label="Description"
-                defaultValue={ordenCompra.tipoEntrada}
-                disabled
+            <h1>Detalle Orden # {id}</h1>
+
+            <IconButton
+              onClick={() => {
+                setIsEdit(!isEdit);
+              }}
+            >
+              <FontAwesomeIcon
+                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
+                icon={isEdit ? faCancel : faPenToSquare}
               />
-            </InputGroup>
+            </IconButton>
+          </div>
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Tipo de Pago</InputGroup.Text>
-              <FormControl
-                type="text"
-                disabled
-                aria-label="Description"
-                defaultValue={ordenCompra.tipoPago}
-              />
-            </InputGroup>
+          <hr />
 
-            {ordenCompra.fechaVencimiento ? (
-              <InputGroup className="mb-3">
-                <InputGroup.Text>Fecha de Venc.</InputGroup.Text>
-                <FormControl
-                  type="text"
-                  aria-label="Description"
-                  defaultValue={moment(ordenCompra.fechaVencimiento).format(
-                    "L"
-                  )}
-                  disabled
-                />
-              </InputGroup>
-            ) : (
-              <></>
-            )}
-          </Col>
+          <ProductDetailInComponent
+            setNoFactura={setNoFactura}
+            noFactura={noFactura}
+            tipoEntrada={tipoEntrada}
+            setTipoEntrada={setTipoEntrada}
+            tipoCompra={tipoCompra}
+            setTipoCompra={setTipoCompra}
+            selectedProvider={selectedProvider}
+            setSelectedProvider={setSelectedProvider}
+            fechaIngreso={fechaIngreso}
+            setFechaIngreso={setFechaIngreso}
+            isEdit={isEdit}
+            selectedStore={selectedStore}
+            setSelectedStore={setSelectedStore}
+          />
 
-          <Col xs={12} md={6}>
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Fecha Ingreso</InputGroup.Text>
-              <FormControl
-                type="text"
-                disabled
-                defaultValue={moment(ordenCompra.fechaIngreso).format("L")}
-              />
-            </InputGroup>
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+            }}
+          >
+            <h5>Detalle de Compra</h5>
+          </div>
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Proveedor</InputGroup.Text>
-              <FormControl
-                disabled
-                type="text"
-                defaultValue={selectedProvider}
-              />
-            </InputGroup>
+          <hr />
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Almacen</InputGroup.Text>
-              <FormControl disabled type="text" defaultValue={almacenName} />
-            </InputGroup>
+          <Table hover size="sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
+                <th>Cantidad</th>
+                <th>Costo Unitario</th>
+                <th>Descuento</th>
+                <th>Impuesto</th>
+                <th>Costo de Compra</th>
+                <th>P.V. Mayor</th>
+                <th>P.V. Detalle</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productList.map((item) => {
+                return (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td style={{ textAlign: "left", minWidth: 250 }}>
+                      {item.product.description}
+                    </td>
+                    <td>{item.cantidad}</td>
+                    <td>
+                      {item.costoUnitario.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>{`${item.descuento}%`}</td>
+                    <td>{`${item.impuesto}%`}</td>
+                    <td>
+                      {item.costoCompra.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>
+                      {item.precioVentaMayor.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td>
+                      {item.precioVentaDetalle.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
 
-            <InputGroup className="mb-3">
-              <InputGroup.Text>Monto factura</InputGroup.Text>
-              <FormControl
-                type="text"
-                disabled
-                defaultValue={montoFactura.toLocaleString("es-NI", {
+                    <td>
+                      <IconButton
+                        style={{ color: "#2196f3" }}
+                        onClick={() => {
+                          setSelectedDetail(item);
+                          setShowModal(true);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faPenToSquare} />
+                      </IconButton>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Paper>
+      </Container>
+
+      <Container style={{ marginTop: 20 }} maxWidth="xl">
+        <Paper
+          elevation={10}
+          style={{
+            borderRadius: 30,
+            padding: 20,
+          }}
+        >
+          <div className="row justify-content-around align-items-center">
+            <div className="col-sm-4 ">
+              <Typography
+                style={{
+                  marginBottom: 10,
+                  fontSize: 15,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Total de Productos
+              </Typography>
+              <Typography
+                style={{
+                  fontSize: 14,
+                  color: "#2196f3",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {productList.length}
+              </Typography>
+            </div>
+
+            <div className="col-sm-4 ">
+              <Typography
+                style={{
+                  marginBottom: 10,
+                  fontSize: 15,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Monto de Compra
+              </Typography>
+              <Typography
+                style={{
+                  fontSize: 14,
+                  color: "#f50057",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {new Intl.NumberFormat("es-NI", {
                   style: "currency",
                   currency: "NIO",
-                })}
-              />
-            </InputGroup>
-          </Col>
-        </Row>
+                }).format(montoFactura)}
+              </Typography>
+            </div>
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h5>Detalle de Compra</h5>
-        </div>
-
-        <hr />
-
-        <Table hover size="sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
-              <th>Cantidad</th>
-              <th>Costo Unitario</th>
-              <th>Descuento</th>
-              <th>Impuesto</th>
-              <th>Costo de Compra</th>
-              <th>P.V. Mayor</th>
-              <th>P.V. Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productList.map((item) => {
-              return (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td style={{ textAlign: "left", minWidth: 250 }}>
-                    {item.product.description}
-                  </td>
-                  <td>{item.cantidad}</td>
-                  <td>
-                    {item.costoUnitario.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>{`${item.descuento}%`}</td>
-                  <td>{`${item.impuesto}%`}</td>
-                  <td>
-                    {item.costoCompra.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>
-                    {item.precioVentaMayor.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                  <td>
-                    {item.precioVentaDetalle.toLocaleString("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    })}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+            <div className="col-sm-4 ">
+              <Button
+                variant="outlined"
+                style={{ borderRadius: 20 }}
+                onClick={() => saveChanges()}
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 10, fontSize: 20 }}
+                  icon={faSave}
+                />
+                Guardar Cambios
+              </Button>
+            </div>
+          </div>
+        </Paper>
       </Container>
-      <Loading />
+
+      <MediumModal
+        titulo={`Editar Detalle Producto #:${selectedDetail.id}`}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <DetalleProductoComponent
+          selectedDetail={selectedDetail}
+          editDetail={editDetail}
+        />
+      </MediumModal>
     </div>
   );
 };

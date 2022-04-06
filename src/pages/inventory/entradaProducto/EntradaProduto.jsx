@@ -54,7 +54,6 @@ const EntradaProduto = () => {
         setIsLogged(false);
         return;
       }
-      console.log(result.data);
       setIsLoading(false);
       setEntradaList(result.data);
     })();

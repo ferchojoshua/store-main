@@ -1,87 +1,36 @@
-import React, { useContext, useState, useEffect } from "react";
-import {
-  TextField,
-  Tooltip,
-  Paper,
-  Autocomplete,
-  IconButton,
-  Divider,
-  Button,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { TextField, Button, Divider, Typography, Paper } from "@mui/material";
+import { getToken } from "../../../../services/Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus, faClipboard } from "@fortawesome/free-solid-svg-icons";
-import { DataContext } from "../../../../context/DataContext";
-import {
-  deleteToken,
-  deleteUserData,
-  getToken,
-} from "../../../../services/Account";
-import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../../helpers/Helpers";
-import MediumModal from "../../../../components/modals/MediumModal";
-import Productsadd from "../../../settings/products/Productsadd";
-import { getProductsAsync } from "../../../../services/ProductsApi";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-const ProductDescription = ({
-  selectedProduct,
-  setSelectedProduct,
-  cantidad,
-  setCantidad,
-  precioCompra,
-  setPrecioCompra,
-  descuento,
-  setDescuento,
-  impuesto,
-  setImpuesto,
-  costo,
-  setCosto,
-  baseGanancia,
-  setBaseGanancia,
-  ganancia,
-  setGanancia,
-  precioVenta,
-  setPrecioVenta,
-  baseGananciaDetalle,
-  setBaseGananciaDetalle,
-  gananciaDetalle,
-  setGananciaDetalle,
-  precioVentaDetalle,
-  setPrecioVentaDetalle,
-  addToProductList,
-}) => {
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
-  const token = getToken();
-  let navigate = useNavigate();
-  const [productList, setProductList] = useState([]);
-  const [showProductModal, setShowProductModal] = useState(false);
+const DetalleProductoComponent = ({ selectedDetail, editDetail }) => {
+  const [product] = useState(selectedDetail.product);
+  const [cantidad, setCantidad] = useState(selectedDetail.cantidad);
+  const [precioCompra, setPrecioCompra] = useState(selectedDetail.costoCompra);
+  const [costo, setCosto] = useState(selectedDetail.costoUnitario);
+  const [descuento, setDescuento] = useState(selectedDetail.descuento);
+  const [impuesto, setImpuesto] = useState(selectedDetail.impuesto);
+
+  const [baseGanancia, setBaseGanancia] = useState("");
+  const [ganancia, setGanancia] = useState("");
+  const [precioVenta, setPrecioVenta] = useState(
+    selectedDetail.precioVentaMayor
+  );
+
+  const [baseGananciaDetalle, setBaseGananciaDetalle] = useState("");
+  const [gananciaDetalle, setGananciaDetalle] = useState("");
+  const [precioVentaDetalle, setPrecioVentaDetalle] = useState(
+    selectedDetail.precioVentaDetalle
+  );
 
   useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      const resultProducts = await getProductsAsync(token);
-      if (!resultProducts.statusResponse) {
-        setIsLoading(false);
-        if (resultProducts.error.request.status === 401) {
-          navigate("/unauthorized");
-          return;
-        }
-        toastError("No se pudo cargar lista de productos");
-        return;
-      }
+    funcPrecioVentaDetalle(selectedDetail.precioVentaDetalle);
+    funcPrecioVenta(selectedDetail.precioVentaMayor);
+  }, []);
 
-      if (resultProducts.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-      setProductList(resultProducts.data);
-      setIsLoading(false);
-    })();
-  }, [reload]);
+  const token = getToken();
 
-  //Devuelve un entero positivo
   const funcCantidad = (value) => {
     if (/^[0-9]+$/.test(value.toString()) || value === "") {
       let pC = 0;
@@ -149,7 +98,6 @@ const ProductDescription = ({
     }
   };
 
-  //Devuelve un entero positivo
   const funcPorcentGananciaMayor = (value) => {
     if (/^\d*\.?\d*$/.test(value.toString())) {
       let factor = value / 100 + 1;
@@ -161,6 +109,18 @@ const ProductDescription = ({
     }
   };
 
+  //Devuelve un entero positivo
+  const funcPorcentGananciaDetalle = (value) => {
+    if (/^\d*\.?\d*$/.test(value.toString())) {
+      let factor = value / 100 + 1;
+      let factorGanancia = costo * factor;
+      setGananciaDetalle((factorGanancia - costo).toFixed(2));
+      setPrecioVentaDetalle(factorGanancia.toFixed(2));
+      setBaseGananciaDetalle(value);
+      return;
+    }
+  };
+
   const funcGananciaMayor = (value) => {
     if (/^\d*\.?\d*$/.test(value.toString())) {
       let factorGanancia = parseFloat(value) + costo;
@@ -168,6 +128,17 @@ const ProductDescription = ({
       setBaseGanancia(factor.toFixed(2));
       setPrecioVenta(factorGanancia.toFixed(2));
       setGanancia(value);
+      return;
+    }
+  };
+
+  const funcGananciaDetalle = (value) => {
+    if (/^\d*\.?\d*$/.test(value.toString())) {
+      let factorGanancia = parseFloat(value) + costo;
+      let factor = (value / costo) * 100;
+      setBaseGananciaDetalle(factor.toFixed(2));
+      setPrecioVentaDetalle(factorGanancia.toFixed(2));
+      setGananciaDetalle(value);
       return;
     }
   };
@@ -189,29 +160,6 @@ const ProductDescription = ({
     }
   };
 
-  //Devuelve un entero positivo
-  const funcPorcentGananciaDetalle = (value) => {
-    if (/^\d*\.?\d*$/.test(value.toString())) {
-      let factor = value / 100 + 1;
-      let factorGanancia = costo * factor;
-      setGananciaDetalle((factorGanancia - costo).toFixed(2));
-      setPrecioVentaDetalle(factorGanancia.toFixed(2));
-      setBaseGananciaDetalle(value);
-      return;
-    }
-  };
-
-  const funcGananciaDetalle = (value) => {
-    if (/^\d*\.?\d*$/.test(value.toString())) {
-      let factorGanancia = parseFloat(value) + costo;
-      let factor = (value / costo) * 100;
-      setBaseGananciaDetalle(factor.toFixed(2));
-      setPrecioVentaDetalle(factorGanancia.toFixed(2));
-      setGananciaDetalle(value);
-      return;
-    }
-  };
-
   const funcPrecioVentaDetalle = (value) => {
     if (/^\d*\.?\d*$/.test(value.toString())) {
       if (costo > value) {
@@ -229,8 +177,28 @@ const ProductDescription = ({
     }
   };
 
+  const setEditedDetail = () => {
+    const data = selectedDetail;
+    data.cantidad = parseInt(cantidad);
+    data.costoCompra = parseFloat(precioCompra);
+    data.costoUnitario = parseFloat(costo);
+    data.descuento = parseInt(descuento);
+    data.impuesto = parseInt(impuesto);
+    data.precioVentaMayor = parseFloat(precioVenta);
+    data.precioVentaDetalle = parseFloat(precioVentaDetalle);
+    editDetail(data);
+  };
+
   return (
-    <div>
+    <div style={{ width: 700 }}>
+      <Divider />
+      <Typography
+        variant="h5"
+        style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+      >
+        {`Descripcion: ${product.description}`}
+      </Typography>
+
       <Paper
         elevation={10}
         style={{
@@ -238,86 +206,11 @@ const ProductDescription = ({
           padding: 20,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h4>Datos del Producto</h4>
-        </div>
-
-        <hr />
-
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Autocomplete
-                id="combo-box-demo"
-                fullWidth
-                options={productList}
-                getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-                value={selectedProduct}
-                onChange={(event, newValue) => {
-                  setSelectedProduct(newValue);
-                }}
-                noOptionsText="Producto no encontrado..."
-                renderInput={(params) => (
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    label="Seleccione un producto..."
-                  />
-                )}
-              />
-
-              <Tooltip title="Agregar Producto" style={{ marginTop: 5 }}>
-                <IconButton onClick={() => setShowProductModal(true)}>
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
-                    }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </div>
-          <div className="col-sm-3">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Codigo"}
-              value={selectedProduct ? selectedProduct.id : ""}
-              disabled={true}
-            />
-          </div>
-          <div className="col-sm-4">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Descripcion"}
-              value={selectedProduct ? selectedProduct.description : ""}
-              disabled={true}
-            />
-          </div>
-        </div>
-
         <div className="row justify-content-around align-items-center">
           <div className="col-sm-2">
             <TextField
               fullWidth
               required
-              style={{ marginTop: 20 }}
               variant="standard"
               label={"Cantidad"}
               value={cantidad}
@@ -325,13 +218,12 @@ const ProductDescription = ({
             />
           </div>
 
-          <div className="col-sm-3">
+          <div className="col-sm-2">
             <TextField
               fullWidth
               required
-              style={{ marginTop: 20 }}
               variant="standard"
-              label={"Monto de compra C$"}
+              label={"Monto C$"}
               value={precioCompra}
               onChange={(e) => funcPrecioCompra(e.target.value)}
             />
@@ -340,7 +232,6 @@ const ProductDescription = ({
           <div className="col-sm-2">
             <TextField
               fullWidth
-              style={{ marginTop: 20 }}
               variant="standard"
               label={"Descuento %"}
               value={descuento}
@@ -351,7 +242,6 @@ const ProductDescription = ({
           <div className="col-sm-2">
             <TextField
               fullWidth
-              style={{ marginTop: 20 }}
               variant="standard"
               label={"Impuesto %"}
               value={impuesto}
@@ -360,13 +250,16 @@ const ProductDescription = ({
           </div>
 
           <div className="col-sm-3">
-            <h6 style={{ marginTop: 20 }}>{`Costo = ${costo.toLocaleString(
-              "es-NI",
-              {
-                style: "currency",
-                currency: "NIO",
-              }
-            )}`}</h6>
+            <h6
+              style={{
+                // marginTop: 20,
+                color: "#e91e63",
+                fontWeight: "bold",
+              }}
+            >{`Costo = ${costo.toLocaleString("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            })}`}</h6>
           </div>
         </div>
       </Paper>
@@ -376,7 +269,8 @@ const ProductDescription = ({
         style={{
           borderRadius: 30,
           marginTop: 10,
-          padding: 15,
+          padding: 20,
+          // padding: 15,
         }}
       >
         <div
@@ -392,7 +286,7 @@ const ProductDescription = ({
         <Divider />
 
         <div className="row justify-content-around align-items-center">
-          <div className="col-sm-2">
+          <div className="col-sm-3">
             <TextField
               fullWidth
               variant="standard"
@@ -412,7 +306,7 @@ const ProductDescription = ({
             />
           </div>
 
-          <div className="col-sm-2">
+          <div className="col-sm-3">
             <TextField
               fullWidth
               variant="standard"
@@ -433,7 +327,7 @@ const ProductDescription = ({
             />
           </div>
 
-          <div className="col-sm-2">
+          <div className="col-sm-3">
             <TextField
               fullWidth
               variant="standard"
@@ -454,36 +348,27 @@ const ProductDescription = ({
             />
           </div>
 
-          <div className="col-sm-2">
-            <h5 style={{ marginTop: 20 }}>Mayor</h5>
-            <h5 style={{ marginTop: 30 }}>Detalle</h5>
-          </div>
-
           <div className="col-sm-3">
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              onClick={() => addToProductList()}
-            >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faClipboard}
-              />
-              Agregar al Detalle
-            </Button>
+            <h5 style={{ marginTop: 20 }}>Mayor</h5>
+            <h5 style={{ marginTop: 35 }}>Detalle</h5>
           </div>
         </div>
       </Paper>
 
-      <MediumModal
-        titulo={"Agregar Producto"}
-        isVisible={showProductModal}
-        setVisible={setShowProductModal}
+      <Button
+        variant="outlined"
+        fullWidth
+        style={{ borderRadius: 20, marginTop: 20 }}
+        onClick={() => setEditedDetail()}
       >
-        <Productsadd setShowModal={setShowProductModal} />
-      </MediumModal>
+        <FontAwesomeIcon
+          style={{ marginRight: 10, fontSize: 20 }}
+          icon={faSave}
+        />
+        Guardar Cambios
+      </Button>
     </div>
   );
 };
 
-export default ProductDescription;
+export default DetalleProductoComponent;

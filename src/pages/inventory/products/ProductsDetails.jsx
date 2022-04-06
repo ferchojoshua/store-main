@@ -66,7 +66,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         return;
       }
 
-      if (result.data === "eX01") {
+      if (resultTipoNegocio.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
         deleteToken();

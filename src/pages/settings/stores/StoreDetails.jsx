@@ -28,10 +28,10 @@ import {
   faCancel,
   faCircleArrowLeft,
   faCirclePlus,
-  faEdit,
   faExternalLinkAlt,
   faTrashAlt,
   faPaperPlane,
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -248,7 +248,7 @@ const StoreDetails = () => {
             >
               <FontAwesomeIcon
                 style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
-                icon={isEdit ? faCancel : faEdit}
+                icon={isEdit ? faCancel : faPenToSquare}
               />
             </IconButton>
           </div>
