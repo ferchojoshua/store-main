@@ -18,7 +18,7 @@ import {
   getUserAsync,
   updateMyAccountAsync,
 } from "../../services/Account";
-// import { updateMyAccountAsync } from "../../utils/AccountApi";
+
 
 const UpdateData = () => {
   const { user, setIsLoading, reload, setReload } = useContext(DataContext);
@@ -54,7 +54,7 @@ const UpdateData = () => {
       setSecondLastName(result.data.secondLastName);
       setAddress(result.data.address);
     })();
-  }, [reload]);
+  }, [reload]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setData = () => {
     const data = {

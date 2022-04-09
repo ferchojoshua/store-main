@@ -75,7 +75,7 @@ const Products = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar lista de productos");
+        toastError(result.error.message);
         return;
       }
 
@@ -115,7 +115,7 @@ const Products = () => {
               navigate("/unauthorized");
               return;
             }
-            toastError("No se pudo eliminar producto, intentelo de nuevo");
+            toastError(result.error.message);
             return;
           }
 

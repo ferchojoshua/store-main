@@ -27,8 +27,6 @@ import { toastError } from "../../../../helpers/Helpers";
 const DetallesDeEntrada = ({
   setNoFactura,
   noFactura,
-  tipoEntrada,
-  setTipoEntrada,
   tipoCompra,
   setTipoCompra,
   selectedProvider,
@@ -39,7 +37,7 @@ const DetallesDeEntrada = ({
   const [providerList, setProviderList] = useState([]);
   const [showProviderModal, setShowProvidermodal] = useState(false);
   let navigate = useNavigate();
-  
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -50,7 +48,7 @@ const DetallesDeEntrada = ({
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar lista de proveedores");
+        toastError(resultProviders.error.message);
         return;
       }
       if (resultProviders.data === "eX01") {
@@ -95,44 +93,7 @@ const DetallesDeEntrada = ({
           value={noFactura}
         />
 
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ marginTop: 20 }}
-          required
-        >
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione un tipo de entrada...
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={tipoEntrada}
-            onChange={(e) => setTipoEntrada(e.target.value)}
-            label="Unidad de Medida"
-            style={{ textAlign: "left" }}
-          >
-            <MenuItem key={0} value="">
-              <em>Seleccione un tipo de entrada...</em>
-            </MenuItem>
-
-            <MenuItem key={1} value={"Compra"}>
-              Compra
-            </MenuItem>
-            <MenuItem key={2} value={"Devolucion"}>
-              Devolucion
-            </MenuItem>
-            <MenuItem key={3} value={"Remision"}>
-              Remision
-            </MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ marginTop: 20 }}
-        >
+        <FormControl variant="standard" fullWidth style={{ marginTop: 20 }}>
           <InputLabel id="demo-simple-select-standard-label">
             Seleccione un tipo de pago...
           </InputLabel>

@@ -4,8 +4,9 @@ import "./App.css";
 import NavbarComponent from "./components/NavbarComponent";
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { LocalizationProvider } from "@mui/lab";
+import DateAdapter from "@mui/lab/AdapterMoment";
 import "react-toastify/dist/ReactToastify.min.css";
-import Home from "./pages/home/Home";
 
 import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";
 
@@ -28,14 +29,13 @@ import { simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
 
+import Home from "./pages/home/Home";
 import Page401 from "./components/errorPages/Page401.jsx";
 import NotFound from "./components/errorPages/NotFound.jsx";
 import TipoNegocio from "./pages/settings/tipoNegocio/TipoNegocio";
 import SetNewPasswordComponent from "./components/SetNewPasswordComponent";
 import InventoryContainer from "./pages/inventory/InventoryContainer";
 import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
-import DateAdapter from "@mui/lab/AdapterMoment";
-import { LocalizationProvider } from "@mui/lab";
 
 function App() {
   const {
@@ -64,6 +64,7 @@ function App() {
       setIsDefaultPass(false);
       return;
     }
+
     (async () => {
       const result = await getUserAsync(token);
       if (!result.statusResponse) {
@@ -90,7 +91,7 @@ function App() {
     setUser(user);
     setIsLogged(true);
     setIsLoading(false);
-  }, [isLogged]);
+  }, [isLogged]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLogged === null || isDefaultPass === null) {
     return <Loading />;

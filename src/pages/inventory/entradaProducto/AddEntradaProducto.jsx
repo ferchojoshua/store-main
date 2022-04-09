@@ -34,8 +34,6 @@ const AddEntradaProducto = () => {
   const { setIsLoading, setIsLogged, reload, setReload } =
     useContext(DataContext);
   let navigate = useNavigate();
-
-  const [tipoEntrada, setTipoEntrada] = useState("");
   const [tipoCompra, setTipoCompra] = useState("");
   const [noFactura, setNoFactura] = useState("");
 
@@ -144,8 +142,9 @@ const AddEntradaProducto = () => {
 
   const deleteFromProductDetailList = (item) => {
     const filtered = productDetailList.filter(
-      (p) => p.product.barCode !== item.product.barCode
+      (p) => p.product.id !== item.product.id
     );
+
     setMontoFactura(montoFactura - item.costoCompra);
     setProductDetailList(filtered);
   };
@@ -153,11 +152,6 @@ const AddEntradaProducto = () => {
   const addProdutInn = async () => {
     if (!noFactura) {
       simpleMessage("Ingrese numero de factura", "error");
-      return;
-    }
-
-    if (!tipoEntrada) {
-      simpleMessage("Ingrese tipo de entrada", "error");
       return;
     }
 
@@ -178,7 +172,6 @@ const AddEntradaProducto = () => {
 
     const data = {
       noFactura,
-      tipoEntrada,
       tipoPago: tipoCompra,
       providerId: selectedProvider.id,
       montoFactura,
@@ -193,7 +186,7 @@ const AddEntradaProducto = () => {
         navigate("/unauthorized");
         return;
       }
-      toastError(result.error);
+      toastError(result.error.message);
       return;
     }
 
@@ -206,7 +199,6 @@ const AddEntradaProducto = () => {
     }
     setReload(!reload);
     setNoFactura("");
-    setTipoEntrada("");
     setTipoCompra("");
     setSelectedProvider("");
     setMontoFactura(0);
@@ -256,8 +248,6 @@ const AddEntradaProducto = () => {
               <DetallesDeEntrada
                 setNoFactura={setNoFactura}
                 noFactura={noFactura}
-                tipoEntrada={tipoEntrada}
-                setTipoEntrada={setTipoEntrada}
                 tipoCompra={tipoCompra}
                 setTipoCompra={setTipoCompra}
                 selectedProvider={selectedProvider}
@@ -328,7 +318,7 @@ const AddEntradaProducto = () => {
               {productDetailList ? (
                 productDetailList.map((item) => {
                   return (
-                    <tr>
+                    <tr key={productDetailList.indexOf(item) + 1}>
                       <td>{productDetailList.indexOf(item) + 1}</td>
                       <td style={{ textAlign: "left", minWidth: 250 }}>
                         {item.product.description}

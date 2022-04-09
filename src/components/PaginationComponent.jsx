@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pagination } from "@mui/material";
 
 const PaginationComponent = ({ data, paginate, itemsperPage }) => {

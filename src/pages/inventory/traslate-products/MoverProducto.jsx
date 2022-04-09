@@ -1,32 +1,35 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Container, Table } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
 
-import moment from "moment/moment";
+// import moment from "moment/moment";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCircleCheck,
+  // faCircleCheck,
   faCirclePlus,
-  faCircleXmark,
-  faExternalLink,
+  // faCircleXmark,
+  // faExternalLink,
 } from "@fortawesome/free-solid-svg-icons";
-import { IconButton, Button } from "@mui/material";
-import PaginationComponent from "../../../components/PaginationComponent";
+import { Button } from "@mui/material";
+import MediumModal from "../../../components/modals/MediumModal";
+// import PaginationComponent from "../../../components/PaginationComponent";
+import MoverProductoAdd from "./MoverProductoAdd";
 
 const MoverProducto = () => {
   let navigate = useNavigate();
-  const [movimientosList, setmovimientosList] = useState([]);
+  // const [movimientosList, setmovimientosList] = useState([]);
   const { setIsLoading, reload } = useContext(DataContext);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(10);
   const indexLast = currentPage * itemsperPage;
   const indexFirst = indexLast - itemsperPage;
-  const currentItem = movimientosList.slice(indexFirst, indexLast);
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // const currentItem = movimientosList.slice(indexFirst, indexLast);
+  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -61,7 +64,7 @@ const MoverProducto = () => {
             style={{ borderRadius: 20 }}
             startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
             onClick={() => {
-              navigate(`/traslate-products/add`);
+              setShowModal(true);
             }}
           >
             Agregar Movimiento
@@ -70,6 +73,14 @@ const MoverProducto = () => {
 
         <hr />
       </Container>
+
+      <MediumModal
+        titulo={"Agregar Traslado de Productos"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <MoverProductoAdd setShowModal={setShowModal} />
+      </MediumModal>
     </div>
   );
 };

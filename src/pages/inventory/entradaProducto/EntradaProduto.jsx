@@ -44,7 +44,7 @@ const EntradaProduto = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError(result.error);
+        toastError(result.error.message);
         return;
       }
       if (result.data === "eX01") {

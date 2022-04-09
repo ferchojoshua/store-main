@@ -83,7 +83,7 @@ const Productsadd = ({ setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("No se pudo guardar producto, intente de nuevo!");
+      toastError(result.error.message);
       return;
     }
 

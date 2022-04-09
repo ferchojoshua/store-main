@@ -30,7 +30,6 @@ const ProductDetailInComponent = ({
   setNoFactura,
   noFactura,
   tipoEntrada,
-  setTipoEntrada,
   tipoCompra,
   setTipoCompra,
   selectedProvider,
@@ -59,7 +58,7 @@ const ProductDetailInComponent = ({
           navigate("/unauthorized");
           return;
         }
-        toastError(resultProviders.error);
+        toastError(resultProviders.error.message);
         return;
       }
       if (resultProviders.data === "eX01") {
@@ -78,7 +77,7 @@ const ProductDetailInComponent = ({
           navigate("/unauthorized");
           return;
         }
-        toastError(resultStore.error);
+        toastError(resultStore.error.message);
         return;
       }
       if (resultStore.data === "eX01") {
@@ -129,7 +128,7 @@ const ProductDetailInComponent = ({
             <DatePicker
               disabled={!isEdit}
               label="Fecha de Ingreso"
-              value={new Date(fechaIngreso)}
+              value={Date(fechaIngreso)}
               onChange={(newValue) => {
                 setFechaIngreso(newValue);
               }}
@@ -184,38 +183,15 @@ const ProductDetailInComponent = ({
               padding: 20,
             }}
           >
-            <FormControl
-              variant="standard"
+            <TextField
               fullWidth
               required
-              disabled={!isEdit}
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un tipo de entrada...
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={tipoEntrada}
-                onChange={(e) => setTipoEntrada(e.target.value)}
-                label="Unidad de Medida"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={0} value="">
-                  <em>Seleccione un tipo de entrada...</em>
-                </MenuItem>
-
-                <MenuItem key={1} value={"Compra"}>
-                  Compra
-                </MenuItem>
-                <MenuItem key={2} value={"Devolucion"}>
-                  Devolucion
-                </MenuItem>
-                <MenuItem key={3} value={"Remision"}>
-                  Remision
-                </MenuItem>
-              </Select>
-            </FormControl>
+              variant="standard"
+              onChange={(e) => setNoFactura(e.target.value.toUpperCase())}
+              label={"Tipo de Entrada"}
+              value={tipoEntrada}
+              disabled={true}
+            />
 
             <FormControl
               variant="standard"

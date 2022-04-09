@@ -5,9 +5,9 @@ import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter } from "react-router-dom";
 import { DataProvider } from "./context/DataContext";
-import * as bootstrap from "bootstrap";
+import  "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Login from "./pages/Login";
+
 
 ReactDOM.render(
   <BrowserRouter>

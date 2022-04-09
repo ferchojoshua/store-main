@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBoxesStacked,
   faCodeBranch,
-  faDollyBox,
   faEllipsisVertical,
   faHome,
   faPeopleCarryBox,
@@ -167,13 +166,7 @@ const NavbarComponent = () => {
                 />
                 Proveedores
               </NavDropdown.Item>
-              {/* <NavDropdown.Item as={Link} to="/products">
-                <FontAwesomeIcon
-                  icon={faDollyBox}
-                  style={{ marginRight: 10 }}
-                />
-                Productos
-              </NavDropdown.Item> */}
+
               <NavDropdown.Item as={Link} to="/tipo-negocio">
                 <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
                 Tipo Negocio
@@ -183,10 +176,13 @@ const NavbarComponent = () => {
 
           <div>
             <a
+              href="#"
+              onClick={myAccount}
               style={{
                 fontWeight: "bold",
-                color: "#9e9e9e",
+                color: "#a7ffeb",
                 fontSize: 15,
+                textDecoration: "none",
               }}
             >
               {user}

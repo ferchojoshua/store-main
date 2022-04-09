@@ -3,10 +3,10 @@ import {
   TextField,
   Tooltip,
   Paper,
-  Autocomplete,
   IconButton,
   Divider,
   Button,
+  Autocomplete,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faClipboard } from "@fortawesome/free-solid-svg-icons";
@@ -21,6 +21,7 @@ import { toastError } from "../../../../helpers/Helpers";
 import MediumModal from "../../../../components/modals/MediumModal";
 import Productsadd from "../../products/Productsadd";
 import { getProductsAsync } from "../../../../services/ProductsApi";
+import { getProducExistanceAsync } from "../../../../services/ExistanceApi";
 
 const ProductDescription = ({
   selectedProduct,
@@ -65,7 +66,7 @@ const ProductDescription = ({
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar lista de productos");
+        toastError(resultProducts.error.message);
         return;
       }
 
@@ -229,6 +230,33 @@ const ProductDescription = ({
     }
   };
 
+  const getExistencias = async (newValue) => {
+    if (!newValue) {
+      setSelectedProduct("");
+      return;
+    }
+    const result = await getProducExistanceAsync(token, newValue.id);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    let resultado = { ...newValue, ...result.data };
+    setSelectedProduct(resultado);
+  };
+
   return (
     <div>
       <Paper
@@ -267,9 +295,16 @@ const ProductDescription = ({
                 getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
                 value={selectedProduct}
                 onChange={(event, newValue) => {
-                  setSelectedProduct(newValue);
+                  getExistencias(newValue);
                 }}
                 noOptionsText="Producto no encontrado..."
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.id}>
+                      {option.description}
+                    </li>
+                  );
+                }}
                 renderInput={(params) => (
                   <TextField
                     variant="standard"

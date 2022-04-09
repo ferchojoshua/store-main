@@ -18,7 +18,6 @@ import {
   faCircleArrowLeft,
   faPenToSquare,
   faSave,
-  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -64,7 +63,7 @@ const EntradaProductoDetails = () => {
       const result = await getEntradaByIdAsync(token, id);
       if (!result.statusResponse) {
         setIsLoading(false);
-        toastError(result.error);
+        toastError(result.error.message);
         return;
       }
       setIsLoading(false);
@@ -125,7 +124,7 @@ const EntradaProductoDetails = () => {
         navigate("/unauthorized");
         return;
       }
-      toastError(result.error);
+      toastError(result.error.message);
       return;
     }
 

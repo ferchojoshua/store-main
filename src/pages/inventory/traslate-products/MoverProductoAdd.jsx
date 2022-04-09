@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Button, InputGroup, Form, Row, Table, Col } from "react-bootstrap";
+import { Row, Table, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage } from "../../../helpers/Helpers";
+import { toastError } from "../../../helpers/Helpers";
 import { getProductsAsync } from "../../../services/ProductsApi";
-import { getprovidersAsync } from "../../../services/ProviderApi";
 
-import Loading from "../../../components/Loading";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../services/Account";
 
 import {
   Autocomplete,
@@ -18,6 +21,9 @@ import {
   InputLabel,
   MenuItem,
   FormControl,
+  Grid,
+  Button,
+  Paper,
 } from "@mui/material";
 
 import SmallModal from "../../../components/modals/SmallModal";
@@ -34,7 +40,7 @@ import { addEntradaProductoAsync } from "../../../services/ProductIsApi";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const MoverProductoAdd = () => {
-  const { reload, setIsLoading } = useContext(DataContext);
+  const { reload, setIsLoading, setInventoryTab } = useContext(DataContext);
   let navigate = useNavigate();
 
   const [storeList, setStoreList] = useState([]);
@@ -47,30 +53,30 @@ const MoverProductoAdd = () => {
   const [cantidad, setCantidad] = useState("");
   const [precioCompra, setPrecioCompra] = useState("");
   const [descuento, setDescuento] = useState("");
-  const [impuesto, setImpuesto] = useState("");
+ 
 
   const [productDetailList, setProductDetailList] = useState([]);
+
+  const token = getToken();
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultStores = await getStoresAsync();
+      const resultStores = await getStoresAsync(token);
       if (!resultStores.statusResponse) {
         setIsLoading(false);
-        simpleMessage(resultStores.error, "error");
+        toastError(resultStores.error.message);
         return;
       }
       setStoreList(resultStores.data);
 
-      const resultProducts = await getProductsAsync();
+      const resultProducts = await getProductsAsync(token);
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
-        simpleMessage(resultProducts.error, "error");
+        toastError(resultProducts.error);
         return;
       }
-
       setProductList(resultProducts.data);
-
       setIsLoading(false);
     })();
   }, [reload]);
@@ -83,46 +89,60 @@ const MoverProductoAdd = () => {
     setSelectedDestino(event.target.value);
   };
 
-  console.log(selectedProduct);
-
   return (
     <div>
-      <Container maxWidth="xl">
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <Button
-            onClick={() => {
-              navigate("/traslate-products/");
-            }}
-            style={{ marginRight: 20, borderRadius: 20 }}
-            variant="outline-primary"
-          >
-            <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faCircleArrowLeft}
+      <Container style={{ width: 700 }}>
+        <Divider />
+
+        <Grid container spacing={2} style={{ marginTop: 1 }}>
+          <Grid item sm={6}>
+            <Autocomplete
+              fullWidth
+              options={productList}
+              getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
+              value={selectedProduct}
+              onChange={(event, newValue) => {
+                setSelectedProduct(newValue);
+              }}
+              noOptionsText="Producto no encontrado..."
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.id}>
+                    {option.description}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  variant="standard"
+                  {...params}
+                  label="Seleccione un producto..."
+                />
+              )}
             />
-            Regresar
-          </Button>
 
-          <h1>Agregar Traslado de Producto</h1>
-        </div>
+            <TextField
+              variant="standard"
+              style={{
+                marginTop: 20,
+              }}
+              fullWidth
+              value={selectedProduct ? selectedProduct.description : ""}
+              label="Descripcion"
+              InputLabelProps={{
+                shrink: selectedProduct ? true : false,
+              }}
+              disabled
+            />
+          </Grid>
 
-        <hr />
-
-        <Row>
-          <Col xs={12} md={4}>
+          <Grid item sm={6}>
             <FormControl
               variant="standard"
               fullWidth
               style={{ textAlign: "left" }}
             >
-              <InputLabel id="selProc">Procedencia</InputLabel>
+              <InputLabel id="selProc">Almacen Procedencia</InputLabel>
               <Select
                 labelId="selProc"
                 id="demo-simple-select-standard"
@@ -147,7 +167,7 @@ const MoverProductoAdd = () => {
               fullWidth
               style={{ textAlign: "left", marginTop: 20 }}
             >
-              <InputLabel id="selDestino">Destino</InputLabel>
+              <InputLabel id="selDestino">Almacen Destino</InputLabel>
               <Select
                 labelId="selDestino"
                 id="demo-simple-select-standard"
@@ -166,49 +186,66 @@ const MoverProductoAdd = () => {
                 })}
               </Select>
             </FormControl>
-          </Col>
-          <Col xs={12} md={8}>
-            <div className="row justify-content-around align-items-center">
-              <div className="col-sm-9 ">
-                <Autocomplete
-                  options={productList}
-                  getOptionLabel={(op) =>
-                    op ? `${op.barCode} - ${op.description}` || "" : ""
-                  }
-                  value={selectedProduct}
-                  onChange={(event, newValue) => {
-                    setSelectedProduct(newValue);
-                  }}
-                  noOptionsText="Producto no encontrado..."
-                  renderInput={(params) => (
-                    <TextField
-                      variant="standard"
-                      {...params}
-                      label="Seleccione un producto..."
-                    />
-                  )}
-                />
-              </div>
+          </Grid>
+        </Grid>
 
-              <div className="col-sm-3 ">
-                <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.id : ""}
-                  type="text"
-                  label="Existencia"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                />
-              </div>
+        <Paper
+          elevation={10}
+          style={{
+            marginTop: 30,
+            borderRadius: 30,
+            padding: 10,
+          }}
+        >
+          <div className="row justify-content-around align-items-center">
+            <div className="col-sm-4 ">
+              <TextField
+                variant="standard"
+                fullWidth
+                disabled
+              
+                value={selectedProduct ? selectedProduct.id : ""}
+                label="Exist. Almacen Procedencia"
+              />
             </div>
 
-            <div className="row justify-content-around align-items-center">
-              <div className="col-sm-2 ">
-                <TextField
+            <div className="col-sm-4 ">
+              <TextField
+                variant="standard"
+                fullWidth
+                disabled
+                // defaultValue={selectedProduct ? selectedProduct.id : ""}
+                value={selectedProduct ? selectedProduct.id : ""}
+                label="Existencias Almacen Destino"
+              />
+            </div>
+
+            <div className="col-sm-4 ">
+              <TextField
+                variant="standard"
+                fullWidth
+                // defaultValue={selectedProduct ? selectedProduct.id : ""}
+                value={selectedProduct ? selectedProduct.id : ""}
+                label="Cantidad a Trasladar"
+              />
+            </div>
+
+            <div className="col-sm-12">
+              <TextField
+                variant="standard"
+                fullWidth
+                multiline
+                // defaultValue={selectedProduct ? selectedProduct.id : ""}
+                value={selectedProduct ? selectedProduct.id : ""}
+                label="Concepto"
+                style={{ marginTop: 20, marginBottom: 20 }}
+              />
+            </div>
+          </div>
+
+          {/* <div className="row justify-content-around align-items-center">
+            <div className="col-sm-2 ">
+              {/* <TextField
                   variant="standard"
                   fullWidth
                   disabled
@@ -220,11 +257,10 @@ const MoverProductoAdd = () => {
                   InputLabelProps={{
                     shrink: selectedProduct ? true : false,
                   }}
-                />
-              </div>
-
-              <div className="col-sm-2 ">
-                <TextField
+                /> */}
+          {/* </div> */}
+          {/* <div className="col-sm-2 "> */}
+          {/* <TextField
                   variant="standard"
                   fullWidth
                   disabled
@@ -236,11 +272,10 @@ const MoverProductoAdd = () => {
                   InputLabelProps={{
                     shrink: selectedProduct ? true : false,
                   }}
-                />
-              </div>
-
-              <div className="col-sm-3 ">
-                <TextField
+                /> */}
+          {/* </div> */}
+          {/* <div className="col-sm-3 "> */}
+          {/* <TextField
                   variant="standard"
                   fullWidth
                   disabled
@@ -252,11 +287,10 @@ const MoverProductoAdd = () => {
                   InputLabelProps={{
                     shrink: selectedProduct ? true : false,
                   }}
-                />
-              </div>
-
-              <div className="col-sm-2 ">
-                <TextField
+                /> */}
+          {/* </div> */}
+          {/* <div className="col-sm-2 "> */}
+          {/* <TextField
                   variant="standard"
                   fullWidth
                   disabled
@@ -268,11 +302,10 @@ const MoverProductoAdd = () => {
                   InputLabelProps={{
                     shrink: selectedProduct ? true : false,
                   }}
-                />
-              </div>
-
-              <div className="col-sm-2 ">
-                <TextField
+                /> */}
+          {/* </div> */}
+          {/* <div className="col-sm-2 "> */}
+          {/* <TextField
                   variant="standard"
                   fullWidth
                   disabled
@@ -284,13 +317,24 @@ const MoverProductoAdd = () => {
                   InputLabelProps={{
                     shrink: selectedProduct ? true : false,
                   }}
-                />
-              </div>
-            </div>
-          </Col>
-        </Row>
+                /> */}
+          {/* </div> */}
+          {/* </div> */}
+        </Paper>
+
+        <Button
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 30 }}
+          fullWidth
+          // onClick={() => addProdutInn()}
+        >
+          <FontAwesomeIcon
+            style={{ marginRight: 10, fontSize: 20 }}
+            icon={faSave}
+          />
+          Mover Producto
+        </Button>
       </Container>
-      <Loading />
     </div>
   );
 };

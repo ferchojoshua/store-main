@@ -1,5 +1,4 @@
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBug, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
@@ -36,10 +35,10 @@ export const toastError = (message) => {
 
 export const oSVersion = () => {
   var OSName = "Unknown OS";
-  if (navigator.appVersion.indexOf("Win") != -1) OSName = "WINDOWS";
-  if (navigator.appVersion.indexOf("Mac") != -1) OSName = "MACOS";
-  if (navigator.appVersion.indexOf("X11") != -1) OSName = "UNIX";
-  if (navigator.appVersion.indexOf("Linux") != -1) OSName = "LINUX";
+  if (navigator.appVersion.indexOf("Win") !== -1) OSName = "WINDOWS";
+  if (navigator.appVersion.indexOf("Mac") !== -1) OSName = "MACOS";
+  if (navigator.appVersion.indexOf("X11") !== -1) OSName = "UNIX";
+  if (navigator.appVersion.indexOf("Linux") !== -1) OSName = "LINUX";
   return OSName;
 };
 

@@ -67,7 +67,7 @@ const SetNewPasswordComponent = () => {
       const result = await changePasswordAsync(data);
       if (!result.statusResponse) {
         setIsLoading(false);
-        toastError("No se pudo cambiar la contraseña");
+        toastError(result.error.message);
         return;
       }
       setIsDefaultPass(false);

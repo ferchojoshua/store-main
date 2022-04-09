@@ -1,6 +1,9 @@
 import * as React from "react";
+import { useContext } from "react";
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
+
+import { DataContext } from "../../context/DataContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -44,7 +47,8 @@ function a11yProps(index) {
 }
 
 const InventoryContainer = () => {
-  const [value, setValue] = React.useState(0);
+  const { inventoryTab } = useContext(DataContext);
+  const [value, setValue] = React.useState(inventoryTab);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -94,7 +98,7 @@ const InventoryContainer = () => {
           <EntradaProduto />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <MoverProducto />
+          <MoverProducto setValue={setValue} />
         </TabPanel>
 
         <TabPanel value={value} index={2}>
