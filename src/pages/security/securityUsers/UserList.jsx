@@ -53,12 +53,13 @@ const UserList = () => {
   const [userList, setUserList] = useState([]);
   let navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+
   const withSearch = userList.filter((val) => {
     if (searchTerm === "") {
       return val;
     } else if (
       val.fullName.toString().includes(searchTerm) ||
-      val.userName.toString().includes(searchTerm)
+      val.userName.toString().includes(searchTerm.toLowerCase())
     ) {
       return val;
     }
@@ -322,7 +323,7 @@ const UserList = () => {
         <TextField
           style={{ marginBottom: 20, width: 600 }}
           variant="standard"
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
           value={searchTerm}
           label={"Buscar usuario"}
           InputProps={{

@@ -10,7 +10,6 @@ export const DataProvider = ({ children }) => {
   const [reload, setReload] = useState(false);
   const [user, setUser] = useState([]);
   const [access, setAccess] = useState([]);
-  const [inventoryTab, setInventoryTab] = useState(0);
 
   return (
     <DataContext.Provider
@@ -29,8 +28,6 @@ export const DataProvider = ({ children }) => {
         setUser,
         isDefaultPass,
         setIsDefaultPass,
-        inventoryTab,
-        setInventoryTab,
       }}
     >
       {children}

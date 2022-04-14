@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Row, Table, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getProductsAsync } from "../../../services/ProductsApi";
 
 import {
@@ -15,7 +14,6 @@ import {
   Autocomplete,
   TextField,
   Container,
-  Typography,
   Divider,
   Select,
   InputLabel,
@@ -26,21 +24,18 @@ import {
   Paper,
 } from "@mui/material";
 
-import SmallModal from "../../../components/modals/SmallModal";
-
-import MediumModal from "../../../components/modals/MediumModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleArrowLeft,
-  faClipboard,
-  faL,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
-import { addEntradaProductoAsync } from "../../../services/ProductIsApi";
-import { getStoresAsync } from "../../../services/AlmacenApi";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-const MoverProductoAdd = () => {
-  const { reload, setIsLoading, setInventoryTab } = useContext(DataContext);
+import { getStoresAsync } from "../../../services/AlmacenApi";
+import {
+  addProductMoverAsync,
+  getProducExistanceAsync,
+} from "../../../services/ExistanceApi";
+
+const MoverProductoAdd = ({ setShowModal }) => {
+  const { reload, setReload, setIsLoading, setIsLogged } =
+    useContext(DataContext);
   let navigate = useNavigate();
 
   const [storeList, setStoreList] = useState([]);
@@ -51,11 +46,12 @@ const MoverProductoAdd = () => {
 
   const [selectedProduct, setSelectedProduct] = useState("");
   const [cantidad, setCantidad] = useState("");
-  const [precioCompra, setPrecioCompra] = useState("");
-  const [descuento, setDescuento] = useState("");
- 
 
-  const [productDetailList, setProductDetailList] = useState([]);
+  const [concepto, setConcepto] = useState("");
+
+  const [existenceProcedencia, setExistenceProcedencia] = useState("");
+
+  const [existenceDestino, setExistenceDestino] = useState([]);
 
   const token = getToken();
 
@@ -65,28 +61,251 @@ const MoverProductoAdd = () => {
       const resultStores = await getStoresAsync(token);
       if (!resultStores.statusResponse) {
         setIsLoading(false);
+        if (resultStores.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError(resultStores.error.message);
         return;
       }
+
+      if (resultStores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       setStoreList(resultStores.data);
 
       const resultProducts = await getProductsAsync(token);
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
+        if (resultProducts.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError(resultProducts.error);
         return;
       }
+
+      if (resultProducts.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       setProductList(resultProducts.data);
       setIsLoading(false);
     })();
   }, [reload]);
 
-  const handleChangeProcedencia = (event) => {
-    setSelectedProcedencia(event.target.value);
+  const handleChangeProduct = async (newValue) => {
+    if (existenceProcedencia === "") {
+      setSelectedProduct(newValue);
+      return;
+    } else {
+      setSelectedProduct(newValue);
+      const data = {
+        idProduct: newValue.id,
+        idAlmacen: selectedProcedencia,
+      };
+      setIsLoading(true);
+      const result = await getProducExistanceAsync(token, data);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error === 204) {
+          toastError(
+            "Almacen procedencia no tiene existencias de este producto"
+          );
+          setExistenceProcedencia(0);
+          return;
+        } else if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      setIsLoading(false);
+      if (result.data.existencia === 0) {
+        toastError("Almacen procedencia no este producto, seleccione otro");
+        setExistenceProcedencia(0);
+        return;
+      }
+      setExistenceProcedencia(result.data.existencia);
+    }
   };
 
-  const handleChangeDestino = (event) => {
+  const handleChangeProcedencia = async (event) => {
+    setSelectedProcedencia(event.target.value);
+    const data = {
+      idProduct: selectedProduct.id,
+      idAlmacen: event.target.value,
+    };
+    setIsLoading(true);
+    const result = await getProducExistanceAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error === 204) {
+        toastError("Almacen procedencia no tiene existencias de este producto");
+        setExistenceProcedencia(0);
+        return;
+      } else if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    setIsLoading(false);
+    if (result.data.existencia === 0) {
+      toastError(
+        "Este almacen no tiene existencias de este producto, seleccione otro"
+      );
+      setExistenceProcedencia(0);
+      return;
+    }
+
+    setExistenceProcedencia(result.data.existencia);
+  };
+
+  const handleChangeDestino = async (event) => {
+    if (selectedProcedencia === event.target.value) {
+      toastError("Almacen destino debe ser diferente del almacen origen");
+      setSelectedDestino("");
+      return;
+    }
     setSelectedDestino(event.target.value);
+
+    const data = {
+      idProduct: selectedProduct.id,
+      idAlmacen: event.target.value,
+    };
+
+    setIsLoading(true);
+    const result = await getProducExistanceAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error === 204) {
+        setExistenceDestino(0);
+        return;
+      } else if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    setIsLoading(false);
+    setExistenceDestino(result.data.existencia);
+  };
+
+  //Devuelve un entero positivo
+  const funcCantidad = (e) => {
+    if (/^[0-9]+$/.test(e.target.value.toString()) || e.target.value === "") {
+      if (e.target.value > existenceProcedencia) {
+        toastError(
+          "No puede mover mas de lo que hay en almacen de procedencia"
+        );
+        return;
+      }
+      setCantidad(e.target.value);
+      return;
+    }
+  };
+
+  //Validando campos ingresados
+  const validate = () => {
+    let isValid = true;
+    if (selectedProduct === null || selectedProduct === "") {
+      toastError("Debe seleccionar un producto");
+      return (isValid = false);
+    }
+
+    if (existenceProcedencia === "") {
+      toastError("Debe seleccionar almacen de procedencia");
+      return (isValid = false);
+    }
+
+    if (existenceProcedencia === 0) {
+      toastError("No hay existencias de este producto en este almacen");
+      return (isValid = false);
+    }
+
+    if (concepto === "") {
+      toastError("Debe ingresar un conceoto de traslado");
+      return (isValid = false);
+    }
+    return isValid;
+  };
+
+  //procedemos guradar en la base de datos
+  const addMoverProdut = async () => {
+    if (validate()) {
+      const data = {
+        IdProducto: selectedProduct.id,
+        AlmacenProcedenciaId: selectedProcedencia,
+        AlmacenDestinoId: selectedDestino,
+        cantidad,
+        concepto,
+      };
+
+      if (cantidad > existenceProcedencia) {
+        toastError("No puede mover mas de lo que hay en almacen procedencia");
+        return;
+      }
+
+      setIsLoading(true);
+      const result = await addProductMoverAsync(token, data);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error === 204) {
+          toastError("No se pudo realizar el traslado");
+          return;
+        } else if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      setIsLoading(false);
+      toastSuccess("Traslado realizado...!");
+      setReload(!reload);
+      setShowModal(false);
+    }
   };
 
   return (
@@ -102,7 +321,7 @@ const MoverProductoAdd = () => {
               getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
               value={selectedProduct}
               onChange={(event, newValue) => {
-                setSelectedProduct(newValue);
+                handleChangeProduct(newValue);
               }}
               noOptionsText="Producto no encontrado..."
               renderOption={(props, option) => {
@@ -194,7 +413,7 @@ const MoverProductoAdd = () => {
           style={{
             marginTop: 30,
             borderRadius: 30,
-            padding: 10,
+            padding: 20,
           }}
         >
           <div className="row justify-content-around align-items-center">
@@ -203,8 +422,7 @@ const MoverProductoAdd = () => {
                 variant="standard"
                 fullWidth
                 disabled
-              
-                value={selectedProduct ? selectedProduct.id : ""}
+                value={existenceProcedencia}
                 label="Exist. Almacen Procedencia"
               />
             </div>
@@ -214,8 +432,7 @@ const MoverProductoAdd = () => {
                 variant="standard"
                 fullWidth
                 disabled
-                // defaultValue={selectedProduct ? selectedProduct.id : ""}
-                value={selectedProduct ? selectedProduct.id : ""}
+                value={existenceDestino}
                 label="Existencias Almacen Destino"
               />
             </div>
@@ -224,8 +441,8 @@ const MoverProductoAdd = () => {
               <TextField
                 variant="standard"
                 fullWidth
-                // defaultValue={selectedProduct ? selectedProduct.id : ""}
-                value={selectedProduct ? selectedProduct.id : ""}
+                value={cantidad}
+                onChange={(e) => funcCantidad(e)}
                 label="Cantidad a Trasladar"
               />
             </div>
@@ -235,98 +452,20 @@ const MoverProductoAdd = () => {
                 variant="standard"
                 fullWidth
                 multiline
-                // defaultValue={selectedProduct ? selectedProduct.id : ""}
-                value={selectedProduct ? selectedProduct.id : ""}
+                value={concepto}
                 label="Concepto"
                 style={{ marginTop: 20, marginBottom: 20 }}
+                onChange={(e) => setConcepto(e.target.value.toUpperCase())}
               />
             </div>
           </div>
-
-          {/* <div className="row justify-content-around align-items-center">
-            <div className="col-sm-2 ">
-              {/* <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  style={{ marginTop: 20 }}
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.id : ""}
-                  type="text"
-                  label="Codigo"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                /> */}
-          {/* </div> */}
-          {/* <div className="col-sm-2 "> */}
-          {/* <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  style={{ marginTop: 20 }}
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.barCode : ""}
-                  type="text"
-                  label="Codigo de barras"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                /> */}
-          {/* </div> */}
-          {/* <div className="col-sm-3 "> */}
-          {/* <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  style={{ marginTop: 20 }}
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.description : ""}
-                  type="text"
-                  label="Descripcion"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                /> */}
-          {/* </div> */}
-          {/* <div className="col-sm-2 "> */}
-          {/* <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  style={{ marginTop: 20 }}
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.marca : ""}
-                  type="text"
-                  label="Marca"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                /> */}
-          {/* </div> */}
-          {/* <div className="col-sm-2 "> */}
-          {/* <TextField
-                  variant="standard"
-                  fullWidth
-                  disabled
-                  style={{ marginTop: 20 }}
-                  defaultValue={selectedProduct ? selectedProduct.id : ""}
-                  value={selectedProduct ? selectedProduct.modelo : ""}
-                  type="text"
-                  label="Modelo"
-                  InputLabelProps={{
-                    shrink: selectedProduct ? true : false,
-                  }}
-                /> */}
-          {/* </div> */}
-          {/* </div> */}
         </Paper>
 
         <Button
           variant="outlined"
           style={{ borderRadius: 20, marginTop: 30 }}
           fullWidth
-          // onClick={() => addProdutInn()}
+          onClick={() => addMoverProdut()}
         >
           <FontAwesomeIcon
             style={{ marginRight: 10, fontSize: 20 }}

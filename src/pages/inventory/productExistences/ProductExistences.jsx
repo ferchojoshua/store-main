@@ -10,7 +10,17 @@ import {
   deleteProductAsync,
   getProductsAsync,
 } from "../../../services/ProductsApi";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
@@ -27,26 +37,25 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import Productsadd from "./Productsadd";
-import ProductsDetails from "./ProductsDetails";
+import { getStoresAsync } from "../../../services/AlmacenApi";
+import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
+import ProductExistenceEdit from "./ProductExistenceEdit";
 
-const Products = () => {
+const ProductExistences = () => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
-  const [productList, setProductList] = useState([]);
 
+  const [storeList, setStoreList] = useState([]);
+  const [selectedStore, setSelectedStore] = useState(4);
+  const [productList, setProductList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
   const withSearch = productList.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (
-      // val.modelo.includes(searchTerm) ||
-      // val.marca.toString().includes(searchTerm) ||
-      // val.barCode.toString().includes(searchTerm) ||
-      val.description.toString().includes(searchTerm)
-    ) {
+    } else if (val.producto.description.toString().includes(searchTerm)) {
       return val;
     }
   });
@@ -61,14 +70,39 @@ const Products = () => {
 
   const token = getToken();
 
-  const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getProductsAsync(token);
+      //Traemos los Almacenes de la DB
+      const resultStores = await getStoresAsync(token);
+      if (!resultStores.statusResponse) {
+        setIsLoading(false);
+        if (resultStores.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(resultStores.error.message);
+        return;
+      }
+
+      if (resultStores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      setStoreList(resultStores.data);
+
+      //Traemoslos productos del almacen de la deb
+      const data = {
+        idAlmacen: selectedStore,
+      };
+      const result = await getExistencesByStoreAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -78,7 +112,6 @@ const Products = () => {
         toastError(result.error.message);
         return;
       }
-
       if (result.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
@@ -86,92 +119,90 @@ const Products = () => {
         setIsLogged(false);
         return;
       }
-
-      if (result.data.isDefaultPass) {
-        setIsDefaultPass(true);
-        return;
-      }
       setIsLoading(false);
+      //   console.log(result.data);
       setProductList(result.data);
     })();
   }, [reload]);
 
-  const deleteProduct = async (item) => {
-    MySwal.fire({
-      icon: "warning",
-      title: <p>Confirmar Eliminar</p>,
-      text: `Elimiar: ${item.description}!`,
-      showDenyButton: true,
-      confirmButtonText: "Aceptar",
-      denyButtonText: `Cancelar`,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        (async () => {
-          setIsLoading(true);
-          const result = await deleteProductAsync(token, item.id);
-          if (!result.statusResponse) {
-            setIsLoading(false);
-            if (result.error.request.status === 401) {
-              navigate("/unauthorized");
-              return;
-            }
-            toastError(result.error.message);
-            return;
-          }
-
-          if (result.data === "eX01") {
-            setIsLoading(false);
-            deleteUserData();
-            deleteToken();
-            setIsLogged(false);
-            return;
-          }
-
-          if (result.data.isDefaultPass) {
-            setIsDefaultPass(true);
-            return;
-          }
-        })();
-        setIsLoading(false);
-        setReload(!reload);
-        toastSuccess("Producto Eliminado");
+  const handleChangeStore = async (event) => {
+    setSelectedStore(event.target.value);
+    const data = {
+      idAlmacen: event.target.value,
+    };
+    setIsLoading(true);
+    const result = await getExistencesByStoreAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
       }
-    });
+      toastError(result.error.message);
+      return;
+    }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    setIsLoading(false);
+
+    setProductList(result.data);
   };
+
+  console.log(selectedProduct);
 
   return (
     <div>
       <Container>
         <div
           style={{
+            // marginTop: 10,
             display: "flex",
             flexDirection: "row",
             alignContent: "center",
             justifyContent: "space-between",
           }}
         >
-          <h1>Lista de Productos</h1>
+          <h1>Existencia de Productos</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              setShowModal(true);
-            }}
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ textAlign: "left", width: 250 }}
           >
-            Agregar Producto
-          </Button>
+            <InputLabel id="selProc">Almacen</InputLabel>
+            <Select
+              labelId="selProc"
+              id="demo-simple-select-standard"
+              value={selectedStore}
+              onChange={handleChangeStore}
+            >
+              <MenuItem value="">
+                <em>Seleccione un Almacen...</em>
+              </MenuItem>
+              {storeList.map((item) => {
+                return (
+                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                    {item.almacen.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </div>
 
-        <hr />
+        <Divider style={{ marginBottom: 10, marginTop: 10 }} />
 
         <TextField
           style={{ marginBottom: 20, width: 600 }}
           variant="standard"
           onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
           value={searchTerm}
-          label={"Buscar producto"}
+          label={"Buscar Producto"}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -193,13 +224,13 @@ const Products = () => {
             <thead>
               <tr>
                 <th>#</th>
-                <th style={{ textAlign: "left" }}>Tipo Negocio</th>
-                <th style={{ textAlign: "left" }}>Familia</th>
-                <th style={{ textAlign: "left" }}>Descripcion</th>
-                <th style={{ textAlign: "left" }}>Codigo de Barras</th>
+                <th style={{ textAlign: "left" }}>T.Negocio</th>
+                <th style={{ textAlign: "left" }}>Producto</th>
                 <th style={{ textAlign: "left" }}>Marca</th>
                 <th style={{ textAlign: "left" }}>Modelo</th>
-                <th style={{ textAlign: "left" }}>U/M</th>
+                <th style={{ textAlign: "center" }}>Existencias</th>
+                <th style={{ textAlign: "center" }}>PVM</th>
+                <th style={{ textAlign: "center" }}>PVD</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -209,16 +240,30 @@ const Products = () => {
                   <tr key={item.id}>
                     <td>{item.id}</td>
                     <td style={{ textAlign: "left" }}>
-                      {item.tipoNegocio.description}
+                      {item.producto.tipoNegocio.description}
                     </td>
                     <td style={{ textAlign: "left" }}>
-                      {item.familia ? item.familia.description : ""}
+                      {item.producto.description}
                     </td>
-                    <td style={{ textAlign: "left" }}>{item.description}</td>
-                    <td style={{ textAlign: "left" }}>{item.barCode}</td>
-                    <td style={{ textAlign: "left" }}>{item.marca}</td>
-                    <td style={{ textAlign: "left" }}>{item.modelo}</td>
-                    <td style={{ textAlign: "left" }}>{item.um}</td>
+                    <td style={{ textAlign: "left" }}>
+                      {item.producto.marca ? item.producto.marca : "S/M"}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {item.producto.modelo ? item.producto.modelo : "S/M"}
+                    </td>
+                    <td style={{ textAlign: "center" }}>{item.existencia}</td>
+                    <td style={{ textAlign: "center" }}>
+                      {item.precioVentaMayor.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      {item.precioVentaDetalle.toLocaleString("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      })}
+                    </td>
                     <td>
                       <IconButton
                         style={{ marginRight: 10, color: "#009688" }}
@@ -229,12 +274,6 @@ const Products = () => {
                       >
                         <FontAwesomeIcon icon={faExternalLinkAlt} />
                       </IconButton>
-                      <IconButton
-                        style={{ color: "#f50057" }}
-                        onClick={() => deleteProduct(item)}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </IconButton>
                     </td>
                   </tr>
                 );
@@ -242,6 +281,7 @@ const Products = () => {
             </tbody>
           </Table>
         )}
+
         <PaginationComponent
           data={withSearch}
           paginate={paginate}
@@ -250,19 +290,11 @@ const Products = () => {
       </Container>
 
       <MediumModal
-        titulo={"Agregar Producto"}
-        isVisible={showModal}
-        setVisible={setShowModal}
-      >
-        <Productsadd setShowModal={setShowModal} />
-      </MediumModal>
-
-      <MediumModal
-        titulo={`Editar: ${selectedProduct.description}`}
+        titulo={`Ajustar Producto: ${selectedProduct.producto.description}`}
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >
-        <ProductsDetails
+        <ProductExistenceEdit
           selectedProduct={selectedProduct}
           setShowModal={setShowEditModal}
         />
@@ -271,4 +303,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductExistences;
