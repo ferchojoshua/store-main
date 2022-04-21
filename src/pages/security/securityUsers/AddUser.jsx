@@ -25,7 +25,7 @@ import { createUserAsync } from "../../../services/UsersApi";
 import { useNavigate } from "react-router-dom";
 
 const AddUser = ({ setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsLogged } =
+  const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
@@ -52,7 +52,7 @@ const AddUser = ({ setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar los roles");
+        toastError(rolesResult.error.message);
         return;
       }
 
@@ -61,6 +61,12 @@ const AddUser = ({ setShowModal }) => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (rolesResult.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
       setIsLoading(false);
@@ -89,7 +95,7 @@ const AddUser = ({ setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error..., intente de nuevo");
+        toastError(result.error.message);
         return;
       }
 
@@ -98,6 +104,12 @@ const AddUser = ({ setShowModal }) => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 

@@ -53,7 +53,7 @@ const ProviderAdd = ({ setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("No se pudo guardar, intentelo de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -66,6 +66,7 @@ const ProviderAdd = ({ setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

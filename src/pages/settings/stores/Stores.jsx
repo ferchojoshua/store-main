@@ -47,7 +47,7 @@ const Stores = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al descargar la lista...");
+        toastError(result.error.message);
         return;
       }
 
@@ -60,6 +60,7 @@ const Stores = () => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }

@@ -50,7 +50,8 @@ const ProductDescription = ({
   setPrecioVentaDetalle,
   addToProductList,
 }) => {
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
   const [productList, setProductList] = useState([]);
@@ -77,6 +78,12 @@ const ProductDescription = ({
         setIsLogged(false);
         return;
       }
+
+      if (resultProducts.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+
       setProductList(resultProducts.data);
       setIsLoading(false);
     })();
@@ -460,8 +467,6 @@ const ProductDescription = ({
         >
           <h5>Precio de venta C$</h5>
         </div>
-
-        <Divider />
 
         <div className="row justify-content-around align-items-center">
           <div className="col-sm-2">

@@ -60,7 +60,7 @@ const Providers = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un problema al cargar los proveedores");
+        toastError(result.error.message);
         return;
       }
 
@@ -73,6 +73,7 @@ const Providers = () => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -101,7 +102,7 @@ const Providers = () => {
               navigate("/unauthorized");
               return;
             }
-            toastError("Ocurrio un error al eliminar, intentelo de nuevo");
+            toastError(result.error.message);
             return;
           }
 
@@ -114,6 +115,7 @@ const Providers = () => {
           }
 
           if (result.data.isDefaultPass) {
+            setIsLoading(false);
             setIsDefaultPass(true);
             return;
           }

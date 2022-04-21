@@ -41,12 +41,7 @@ const Products = () => {
   const withSearch = productList.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (
-      // val.modelo.includes(searchTerm) ||
-      // val.marca.toString().includes(searchTerm) ||
-      // val.barCode.toString().includes(searchTerm) ||
-      val.description.toString().includes(searchTerm)
-    ) {
+    } else if (val.description.toString().includes(searchTerm)) {
       return val;
     }
   });
@@ -88,6 +83,7 @@ const Products = () => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -128,6 +124,7 @@ const Products = () => {
           }
 
           if (result.data.isDefaultPass) {
+            setIsLoading(false);
             setIsDefaultPass(true);
             return;
           }

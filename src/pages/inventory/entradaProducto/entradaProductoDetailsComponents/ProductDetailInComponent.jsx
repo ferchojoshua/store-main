@@ -40,7 +40,8 @@ const ProductDetailInComponent = ({
   setSelectedStore,
   isEdit,
 }) => {
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
   const token = getToken();
   const [providerList, setProviderList] = useState([]);
   const [storesList, setStoresList] = useState([]);
@@ -68,6 +69,12 @@ const ProductDetailInComponent = ({
         setIsLogged(false);
         return;
       }
+
+      if (resultProviders.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+
       setProviderList(resultProviders.data);
 
       const resultStore = await getStoresAsync(token);
@@ -85,6 +92,11 @@ const ProductDetailInComponent = ({
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (resultStore.data.isDefaultPass) {
+        setIsDefaultPass(true);
         return;
       }
       setStoresList(resultStore.data);

@@ -34,7 +34,7 @@ import MediumModal from "../../../components/modals/MediumModal";
 import DetalleProductoComponent from "./entradaProductoDetailsComponents/DetalleProductoComponent";
 
 const EntradaProductoDetails = () => {
-  const { setIsLoading, setIsLogged, setReload, reload } =
+  const { setIsLoading, setIsLogged, setReload, reload, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
   const { id } = useParams();
@@ -63,7 +63,25 @@ const EntradaProductoDetails = () => {
       const result = await getEntradaByIdAsync(token, id);
       if (!result.statusResponse) {
         setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
       setIsLoading(false);
@@ -118,7 +136,6 @@ const EntradaProductoDetails = () => {
     setIsLoading(true);
     const result = await putProductInAsync(token, data);
     if (!result.statusResponse) {
-      console.log(result);
       setIsLoading(false);
       if (result.error.request.status === 401) {
         navigate("/unauthorized");
@@ -135,6 +152,13 @@ const EntradaProductoDetails = () => {
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
     setReload(!reload);
     setIsLoading(false);
     setIsEdit(false);

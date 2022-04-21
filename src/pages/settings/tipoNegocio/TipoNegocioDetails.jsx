@@ -94,6 +94,7 @@ const TipoNegocioDetails = () => {
         return;
       }
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -135,6 +136,7 @@ const TipoNegocioDetails = () => {
       return;
     }
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }
@@ -165,6 +167,7 @@ const TipoNegocioDetails = () => {
             return;
           }
           if (result.data.isDefaultPass) {
+            setIsLoading(false);
             setIsDefaultPass(true);
             return;
           }

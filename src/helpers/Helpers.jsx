@@ -61,3 +61,8 @@ export const navigatorVersion = () => {
 
   return sBrowser;
 };
+
+export function validateCedula(cedula) {
+  let re = new RegExp("^[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Za-z]$");
+  return re.test(cedula);
+}

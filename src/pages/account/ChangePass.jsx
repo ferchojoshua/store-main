@@ -13,10 +13,15 @@ import { DataContext } from "../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faSave } from "@fortawesome/free-solid-svg-icons";
 import { simpleMessage } from "../../helpers/Helpers";
-import { changePasswordAsync, getToken } from "../../services/Account";
+import {
+  changePasswordAsync,
+  getToken,
+  deleteToken,
+  deleteUserData,
+} from "../../services/Account";
 
 const ChangePass = ({ setShowModal }) => {
-  const { setIsLoading } = useContext(DataContext);
+  const { setIsLoading, setIsLogged } = useContext(DataContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPasword, setNewPasword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -66,6 +71,14 @@ const ChangePass = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         simpleMessage("No se pudo cambiar la contraseña", "error");
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
         return;
       }
       setIsLoading(false);

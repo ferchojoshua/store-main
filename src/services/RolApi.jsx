@@ -29,7 +29,7 @@ export const getRolesAsync = async (token) => {
 };
 
 export const createRolAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, error: null, data: [] };
   let service = `${controller}CreateRol`;
   const authAxios = axios.create({
     baseURL: service,
@@ -53,7 +53,7 @@ export const createRolAsync = async (token, data) => {
 };
 
 export const updateRolAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, error: null, data: [] };
   let service = `${controller}UpdateRol`;
   const authAxios = axios.create({
     baseURL: service,
@@ -77,7 +77,7 @@ export const updateRolAsync = async (token, data) => {
 };
 
 export const deleteRolAsync = async (token, roleName) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, error: null, data: [] };
   let service = `${controller}DeleteRol/`;
   const authAxios = axios.create({
     baseURL: service,

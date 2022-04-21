@@ -9,11 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {
-  simpleMessage,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import {
   faPenToSquare,
   faSave,
@@ -51,7 +47,7 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al cargar los datos");
+        toastError(result.error.message);
         return;
       }
 
@@ -64,13 +60,11 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
-      if (result.data.isDefaultPass) {
-        setIsDefaultPass(true);
-        return;
-      }
+
       setIsLoading(false);
       setDescription(result.data.description);
       setFamilia(result.data);
@@ -93,7 +87,7 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      simpleMessage(result.error, "error");
+      toastError(result.error.message);
       return;
     }
 
@@ -106,13 +100,11 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }
-    if (result.data.isDefaultPass) {
-      setIsDefaultPass(true);
-      return;
-    }
+
     setReload(!reload);
     setIsLoading(false);
     toastSuccess("Cambio realizado...!");

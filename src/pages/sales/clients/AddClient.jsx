@@ -1,0 +1,452 @@
+import React, { useState, useEffect, useContext } from "react";
+import { DataContext } from "../../../context/DataContext";
+import { useNavigate } from "react-router-dom";
+import {
+  toastError,
+  toastSuccess,
+  validateCedula,
+} from "../../../helpers/Helpers";
+import { addProductAsync } from "../../../services/ProductsApi";
+import {
+  getTipoNegocioAsync,
+  getFamiliasByTNAsync,
+} from "../../../services/TipoNegocioApi";
+import {
+  TextField,
+  Button,
+  Divider,
+  Grid,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  Container,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
+import SmallModal from "../../../components/modals/SmallModal";
+import FamiliaAdd from "../../settings/familia/FamiliaAdd";
+import { isEmpty } from "lodash";
+import {
+  getCommunitiesByMunAsync,
+  getDepartmentListAsync,
+  getMunicipalitiesByDeptoAsync,
+} from "../../../services/CommunitiesApi";
+import { addClientAsync } from "../../../services/ClientsApi";
+
+const AddClient = ({ setShowModal }) => {
+  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
+  let navigate = useNavigate();
+
+  const [nombreCliente, setNombreCliente] = useState("");
+  const [cedula, setCedula] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
+
+  const [departmentList, setDepartmentList] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+
+  const [municipalityList, setMunicipalityList] = useState([]);
+  const [selectedMunicipality, setSelectedMunicipality] = useState("");
+
+  const [CommunityList, setCommunityList] = useState([]);
+  const [selectedCommunity, setSelectedCommunity] = useState("");
+
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const token = getToken();
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(false);
+      const result = await getDepartmentListAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setDepartmentList(result.data);
+    })();
+  }, []);
+
+  const saveChangesAsync = async () => {
+    if (validate()) {
+      const data = {
+        nombreCliente,
+        cedula,
+        correo,
+        telefono,
+        idCommunity: selectedCommunity,
+        direccion,
+      };
+      setIsLoading(true);
+
+      const result = await addClientAsync(token, data);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setIsLoading(false);
+      setReload(!reload);
+      toastSuccess("Cliente Guardado...");
+      setShowModal(false);
+    }
+  };
+
+  //Validando campos ingresados
+  const validate = () => {
+    let isValid = true;
+    if (isEmpty(nombreCliente)) {
+      toastError("Debe ingresar un nombre");
+      return (isValid = false);
+    }
+
+    if (isEmpty(cedula)) {
+      toastError("Debe ingresar una cedula");
+      return (isValid = false);
+    }
+
+    if (!validateCedula(cedula)) {
+      toastError("Debe ingresar una cedula valida");
+      return (isValid = false);
+    }
+
+    if (isEmpty(telefono)) {
+      toastError("Debe ingresar un numero telefonico");
+      return (isValid = false);
+    }
+
+    if (selectedCommunity === "" || selectedCommunity === null) {
+      toastError("Debe seleccionar una comunidad");
+      return (isValid = false);
+    }
+
+    if (isEmpty(direccion)) {
+      toastError("Debe ingresar direccion del cliente");
+      return (isValid = false);
+    }
+
+    return isValid;
+  };
+
+  const handleChangeDepartment = async (event) => {
+    setMunicipalityList([]);
+    setCommunityList([]);
+    setSelectedDepartment(event.target.value);
+    setSelectedMunicipality("");
+    setSelectedCommunity("");
+    if (event.target.value !== "") {
+      setIsLoading(true);
+      const result = await getMunicipalitiesByDeptoAsync(
+        token,
+        event.target.value
+      );
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setMunicipalityList(result.data);
+    } else {
+      setMunicipalityList([]);
+    }
+  };
+
+  const handleChangeMunicipality = async (event) => {
+    setCommunityList([]);
+    setSelectedMunicipality(event.target.value);
+
+    if (event.target.value !== "") {
+      setIsLoading(true);
+      const result = await getCommunitiesByMunAsync(token, event.target.value);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setCommunityList(result.data);
+    } else {
+      setCommunityList([]);
+    }
+  };
+
+  return (
+    <div>
+      <Container style={{ width: 700 }}>
+        <Divider style={{ marginBottom: 10 }} />
+
+        <Grid container spacing={3}>
+          <Grid item sm={6}>
+            <TextField
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}
+              label={"Nombre Cliente"}
+              value={nombreCliente}
+            />
+
+            <TextField
+              style={{ marginTop: 20 }}
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setCedula(e.target.value.toUpperCase())}
+              label={"Cedula Cliente(000-000000-0000X)"}
+              value={cedula}
+            />
+
+            <TextField
+              style={{ marginTop: 20 }}
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setTelefono(e.target.value.toUpperCase())}
+              label={"Telefono Cliente"}
+              value={telefono}
+            />
+
+            <TextField
+              style={{ marginTop: 20 }}
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setCorreo(e.target.value.toLowerCase())}
+              label={"Correo Cliente"}
+              value={correo}
+            />
+          </Grid>
+          <Grid item sm={6}>
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20 }}
+              required
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione una Departamento
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedDepartment}
+                onChange={handleChangeDepartment}
+                label="Departamento"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un departamento</em>
+                </MenuItem>
+                {departmentList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20, marginTop: 20 }}
+              required
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Municipio
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedMunicipality}
+                onChange={handleChangeMunicipality}
+                label="Municipio"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un municipio</em>
+                </MenuItem>
+                {municipalityList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            <div
+              style={{
+                marginTop: 20,
+                display: "flex",
+                flexDirection: "row",
+                alignContent: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginRight: 20 }}
+                required
+              >
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione una Comunidad
+                </InputLabel>
+                <Select
+                  defaultValue=""
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedCommunity}
+                  onChange={(e) => setSelectedCommunity(e.target.value)}
+                  label="Municipio"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={-1} value="">
+                    <em> Seleccione una Comunidad</em>
+                  </MenuItem>
+                  {CommunityList.map((item) => {
+                    return (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+
+              <Tooltip title="Agregar Comunidad" style={{ marginTop: 5 }}>
+                <IconButton
+                  onClick={() => {
+                    selectedMunicipality
+                      ? setShowAddModal(!showAddModal)
+                      : toastError("Seleccione un municipio");
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{
+                      fontSize: 25,
+                      color: "#ff5722",
+                    }}
+                    icon={faCirclePlus}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
+
+            <TextField
+              style={{ marginTop: 20 }}
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+              label={"Direccion Cliente"}
+              value={direccion}
+            />
+          </Grid>
+
+          <Button
+            fullWidth
+            variant="outlined"
+            style={{ borderRadius: 20, marginTop: 31 }}
+            startIcon={<FontAwesomeIcon icon={faSave} />}
+            onClick={() => saveChangesAsync()}
+          >
+            Agregar Cliente
+          </Button>
+        </Grid>
+      </Container>
+    </div>
+  );
+};
+
+export default AddClient;

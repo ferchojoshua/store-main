@@ -37,7 +37,7 @@ const StoreAdd = ({ setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("Ocurrio un error..., Intente de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -50,6 +50,7 @@ const StoreAdd = ({ setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

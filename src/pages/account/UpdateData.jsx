@@ -17,11 +17,13 @@ import {
   getToken,
   getUserAsync,
   updateMyAccountAsync,
+  deleteUserData,
+  deleteToken,
 } from "../../services/Account";
 
-
 const UpdateData = () => {
-  const { user, setIsLoading, reload, setReload } = useContext(DataContext);
+  const { user, setIsLoading, reload, setReload, setIsLogged } =
+    useContext(DataContext);
 
   const token = getToken();
   const [userData, setUserData] = useState([]);
@@ -42,6 +44,15 @@ const UpdateData = () => {
         simpleMessage(result.error, "error");
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       setIsLoading(false);
 
       setUserData(result.data);

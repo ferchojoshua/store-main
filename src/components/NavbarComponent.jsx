@@ -16,6 +16,7 @@ import {
   faUserCircle,
   faUserCog,
   faWarehouse,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { getToken, logOutAsync } from "../services/Account";
@@ -107,14 +108,28 @@ const NavbarComponent = () => {
             </Nav.Link>
 
             <Nav.Link
-              eventKey="Inventario"
+              eventKey="ventas"
               style={{
-                fontWeight: active === "Inventario" ? "bold" : "",
-                color: active === "Inventario" ? "#bbdefb" : "#9e9e9e",
+                fontWeight: active === "ventas" ? "bold" : "",
+                color: active === "ventas" ? "#bbdefb" : "#9e9e9e",
                 fontSize: 17,
               }}
               as={Link}
-              to="/Inventory"
+              to="/sales"
+            >
+              <FontAwesomeIcon icon={faChartLine} style={{ marginRight: 10 }} />
+              Ventas
+            </Nav.Link>
+
+            <Nav.Link
+              eventKey="inventario"
+              style={{
+                fontWeight: active === "Inventario" ? "bold" : "",
+                color: active === "inventario" ? "#bbdefb" : "#9e9e9e",
+                fontSize: 17,
+              }}
+              as={Link}
+              to="/inventory"
             >
               <FontAwesomeIcon
                 icon={faBoxesStacked}

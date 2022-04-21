@@ -32,7 +32,8 @@ const DetallesDeEntrada = ({
   selectedProvider,
   setSelectedProvider,
 }) => {
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
   const token = getToken();
   const [providerList, setProviderList] = useState([]);
   const [showProviderModal, setShowProvidermodal] = useState(false);
@@ -56,6 +57,11 @@ const DetallesDeEntrada = ({
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (resultProviders.data.isDefaultPass) {
+        setIsDefaultPass(true);
         return;
       }
       setProviderList(resultProviders.data);

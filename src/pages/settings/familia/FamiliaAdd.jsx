@@ -13,7 +13,7 @@ import {
 import { addFamiliaToTipoNegocioAsync } from "../../../services/TipoNegocioApi";
 
 const FamiliaAdd = ({ setShowModal, idTN }) => {
-  const { reload, setReload, setIsLoading, setIsLogged } =
+  const { reload, setReload, setIsLoading, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [description, setDescription] = useState("");
@@ -37,7 +37,7 @@ const FamiliaAdd = ({ setShowModal, idTN }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("No se pudo agregar familia, intente de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -46,6 +46,12 @@ const FamiliaAdd = ({ setShowModal, idTN }) => {
       deleteUserData();
       deleteToken();
       setIsLogged(false);
+      return;
+    }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
       return;
     }
 

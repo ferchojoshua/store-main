@@ -18,13 +18,18 @@ import {
   faExternalLink,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { getToken } from "../../../services/Account";
+import {
+  getToken,
+  deleteUserData,
+  deleteToken,
+} from "../../../services/Account";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
 import SmallModal from "../../../components/modals/SmallModal";
 
 const TipoNegocio = () => {
-  const { reload, setIsLoading, setIsDefaultPass } = useContext(DataContext);
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [tipoNegocioList, setTpoNegocioList] = useState([]);
@@ -49,10 +54,20 @@ const TipoNegocio = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al descargar la lista");
+        toastError(result.error.message);
         return;
       }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -74,10 +89,25 @@ const TipoNegocio = () => {
         (async () => {
           const result = await deleteTipoNegocioAsync(item.id);
           if (!result.statusResponse) {
-            alert("Error");
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
+            toastError(result.error.message);
             return;
           }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
+
           if (result.data.isDefaultPass) {
+            setIsLoading(false);
             setIsDefaultPass(true);
             return;
           }

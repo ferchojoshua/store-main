@@ -5,17 +5,13 @@ import PropTypes from "prop-types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCartFlatbed,
-  faDollyBox,
-  faLeftRight,
+  faUserGroup,
   faTruckRampBox,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
-
-import EntradaProduto from "./entradaProducto/EntradaProduto";
-import MoverProducto from "./traslate-products/MoverProducto";
-import Products from "./products/Products";
-import ProductExistences from "./productExistences/ProductExistences";
+import SalesList from "./sale/SalesList";
+import ClientList from "./clients/ClientList";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -46,7 +42,7 @@ function a11yProps(index) {
   };
 }
 
-const InventoryContainer = () => {
+const SalesContainer = () => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -68,23 +64,26 @@ const InventoryContainer = () => {
         >
           <Tab
             icon={
-              <FontAwesomeIcon icon={faTruckRampBox} style={{ fontSize: 20 }} />
+              <FontAwesomeIcon
+                icon={faFileInvoiceDollar}
+                style={{ fontSize: 20 }}
+              />
             }
-            label="Entrada de Producto"
+            label="Ventas"
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
 
           <Tab
             icon={
-              <FontAwesomeIcon icon={faCartFlatbed} style={{ fontSize: 20 }} />
+              <FontAwesomeIcon icon={faUserGroup} style={{ fontSize: 20 }} />
             }
-            label="Existencias de Producto"
+            label="Clientes"
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
 
-          <Tab
+          {/*<Tab
             icon={
               <FontAwesomeIcon icon={faLeftRight} style={{ fontSize: 20 }} />
             }
@@ -100,29 +99,21 @@ const InventoryContainer = () => {
             label="Productos"
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
-          />
+          /> */}
         </Tabs>
 
         <Divider style={{ marginTop: 10 }} />
 
         <TabPanel value={value} index={0}>
-          <EntradaProduto />
+          <SalesList />
         </TabPanel>
 
         <TabPanel value={value} index={1}>
-          <ProductExistences />
-        </TabPanel>
-
-        <TabPanel value={value} index={2}>
-          <MoverProducto />
-        </TabPanel>
-
-        <TabPanel value={value} index={3}>
-          <Products />
+          <ClientList />
         </TabPanel>
       </Paper>
     </Container>
   );
 };
 
-export default InventoryContainer;
+export default SalesContainer;

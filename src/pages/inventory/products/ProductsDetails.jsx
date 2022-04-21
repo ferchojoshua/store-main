@@ -62,7 +62,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar Tipos de Negocio");
+        toastError(resultTipoNegocio.error.message);
         return;
       }
 
@@ -86,7 +86,11 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       );
       if (!result.statusResponse) {
         setIsLoading(false);
-        toastError("No se pudo cargar la lista de familias");
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
         return;
       }
 
@@ -99,6 +103,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -141,7 +146,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("No se pudieron guardar los cambios, intentelo de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -154,13 +159,13 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }
     setIsLoading(true);
     setReload(!reload);
     toastSuccess("Producto Actualizado...!");
-    setIsEdit(false);
     setIsEdit(false);
     setShowModal(false);
   };
@@ -175,7 +180,11 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       const result = await getFamiliasByTNAsync(token, value);
       if (!result.statusResponse) {
         setIsLoading(false);
-        toastError("No se pudo cargar la lista de familias");
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
         return;
       }
 
@@ -188,13 +197,11 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
-      if (result.data.isDefaultPass) {
-        setIsDefaultPass(true);
-        return;
-      }
+
       setIsLoading(false);
       setFamilia(result.data);
     } else {

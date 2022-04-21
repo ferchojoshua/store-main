@@ -47,7 +47,7 @@ import EditUser from "./EditUser";
 import NoData from "../../../components/NoData";
 
 const UserList = () => {
-  const { setReload, reload, setIsLoading, setIsLogged } =
+  const { setReload, reload, setIsLoading, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [userList, setUserList] = useState([]);
@@ -105,7 +105,7 @@ const UserList = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar lista de usuarios");
+        toastError(result.error.message);
         return;
       }
 
@@ -114,6 +114,12 @@ const UserList = () => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 
@@ -146,7 +152,7 @@ const UserList = () => {
               navigate("/unauthorized");
               return;
             }
-            toastError("No puedo desactivar usuario, Intentelo de nuevo!");
+            toastError(result.error.message);
             return;
           }
 
@@ -157,6 +163,13 @@ const UserList = () => {
             setIsLogged(false);
             return;
           }
+
+          if (result.data.isDefaultPass) {
+            setIsLoading(false);
+            setIsDefaultPass(true);
+            return;
+          }
+
           setReload(!reload);
         })();
         toastSuccess("Usuario desactivado!");

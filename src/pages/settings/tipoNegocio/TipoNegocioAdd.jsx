@@ -35,6 +35,7 @@ const TipoNegocioAdd = ({ setShowModal }) => {
       return;
     }
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

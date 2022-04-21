@@ -96,12 +96,19 @@ const ProductExistences = () => {
         return;
       }
 
+      if (resultStores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
       setStoreList(resultStores.data);
 
       //Traemoslos productos del almacen de la deb
       const data = {
         idAlmacen: selectedStore,
       };
+
       const result = await getExistencesByStoreAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
@@ -119,6 +126,13 @@ const ProductExistences = () => {
         setIsLogged(false);
         return;
       }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
       setIsLoading(false);
       //   console.log(result.data);
       setProductList(result.data);
@@ -148,12 +162,19 @@ const ProductExistences = () => {
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
     setIsLoading(false);
 
     setProductList(result.data);
   };
 
-  console.log(selectedProduct);
+  // console.log(selectedProduct);
 
   return (
     <div>
@@ -290,7 +311,11 @@ const ProductExistences = () => {
       </Container>
 
       <MediumModal
-        titulo={`Ajustar Producto: ${selectedProduct.producto.description}`}
+        titulo={
+          isEmpty(selectedProduct)
+            ? ""
+            : `Ajustar Existencias: ${selectedProduct.producto.description}`
+        }
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >

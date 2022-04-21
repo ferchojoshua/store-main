@@ -81,7 +81,7 @@ const StoreDetails = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al cargar almacenes");
+        toastError(result.error.message);
         return;
       }
 
@@ -94,6 +94,7 @@ const StoreDetails = () => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -107,11 +108,11 @@ const StoreDetails = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al cargar los racks");
+        toastError(resultRacks.error.message);
         return;
       }
 
-      if (result.data === "eX01") {
+      if (resultRacks.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
         deleteToken();
@@ -120,6 +121,7 @@ const StoreDetails = () => {
       }
 
       if (resultRacks.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -156,6 +158,7 @@ const StoreDetails = () => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }
@@ -196,6 +199,7 @@ const StoreDetails = () => {
           }
 
           if (result.data.isDefaultPass) {
+            setIsLoading(false);
             setIsDefaultPass(true);
             return;
           }

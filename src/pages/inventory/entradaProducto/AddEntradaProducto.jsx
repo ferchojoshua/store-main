@@ -31,7 +31,7 @@ import DetallesDeEntrada from "./entradaProductosComponents/DetallesDeEntrada";
 import ProductDescription from "./entradaProductosComponents/ProductDescription";
 
 const AddEntradaProducto = () => {
-  const { setIsLoading, setIsLogged, reload, setReload } =
+  const { setIsLoading, setIsLogged, reload, setReload, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [tipoCompra, setTipoCompra] = useState("");
@@ -197,6 +197,13 @@ const AddEntradaProducto = () => {
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
     setReload(!reload);
     setNoFactura("");
     setTipoCompra("");

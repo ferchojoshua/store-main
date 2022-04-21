@@ -6,11 +6,15 @@ import { addRackToStoreAsync } from "../../../../services/AlmacenApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../../../context/DataContext";
-import { deleteToken, deleteUserData, getToken } from "../../../../services/Account";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../../services/Account";
 import { useNavigate } from "react-router-dom";
 
 const RackAdd = ({ setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged} =
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const { id } = useParams();
   const [description, setDescription] = useState("");
@@ -35,7 +39,7 @@ const RackAdd = ({ setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("Ocurrio un error..., intente de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -48,6 +52,7 @@ const RackAdd = ({ setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

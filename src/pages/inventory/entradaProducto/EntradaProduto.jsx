@@ -23,7 +23,8 @@ import {
 const EntradaProduto = () => {
   let navigate = useNavigate();
   const [entradaList, setEntradaList] = useState([]);
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(10);
@@ -52,6 +53,12 @@ const EntradaProduto = () => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
       setIsLoading(false);

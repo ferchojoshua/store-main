@@ -31,7 +31,7 @@ import Loading from "../../../components/Loading";
 import { useNavigate } from "react-router-dom";
 
 const EditUser = ({ selectedUser, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsLogged } =
+  const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
@@ -60,7 +60,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
       const rolesResult = await getRolesAsync(token);
       if (!rolesResult.statusResponse) {
         setIsLoading(false);
-        toastError("No se pudo cargar los roles");
+        toastError(rolesResult.error.message);
         return;
       }
 
@@ -69,6 +69,12 @@ const EditUser = ({ selectedUser, setShowModal }) => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (rolesResult.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 
@@ -98,7 +104,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
           return;
         }
 
-        toastError("Ocurrio un error..., intente de nuevo");
+        toastError(result.error.message);
         return;
       }
 
@@ -107,6 +113,12 @@ const EditUser = ({ selectedUser, setShowModal }) => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 

@@ -40,20 +40,20 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
+        toastError(result.error.message);
+        return;
+      }
 
-        if (result.data === "eX01") {
-          setIsLoading(false);
-          deleteUserData();
-          deleteToken();
-          setIsLogged(false);
-          return;
-        }
-
-        toastError("No se pudieron cargar los datos del proveeedor");
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
         return;
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -96,7 +96,7 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("No se pudieron guardar los cambios, intentelo de nnuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -109,6 +109,7 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

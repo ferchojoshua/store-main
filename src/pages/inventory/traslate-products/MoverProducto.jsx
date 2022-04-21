@@ -22,7 +22,8 @@ import PaginationComponent from "../../../components/PaginationComponent";
 
 const MoverProducto = () => {
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
   const [movimientosList, setMovimientosList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,6 +56,12 @@ const MoverProducto = () => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 

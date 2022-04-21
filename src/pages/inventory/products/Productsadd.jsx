@@ -96,6 +96,7 @@ const Productsadd = ({ setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }
@@ -107,7 +108,7 @@ const Productsadd = ({ setShowModal }) => {
 
   useEffect(() => {
     (async () => {
-      setIsLoading(false);
+      setIsLoading(true);
       const resultTipoNegocio = await getTipoNegocioAsync(token);
       if (!resultTipoNegocio.statusResponse) {
         setIsLoading(false);
@@ -115,7 +116,7 @@ const Productsadd = ({ setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar la lista de tipos de negocio");
+        toastError(resultTipoNegocio.error.message);
         return;
       }
 
@@ -128,6 +129,7 @@ const Productsadd = ({ setShowModal }) => {
       }
 
       if (resultTipoNegocio.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -144,7 +146,11 @@ const Productsadd = ({ setShowModal }) => {
       const result = await getFamiliasByTNAsync(token, value);
       if (!result.statusResponse) {
         setIsLoading(false);
-        toastError("No se pudo cargar la lista de familias");
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
         return;
       }
 
@@ -157,6 +163,7 @@ const Productsadd = ({ setShowModal }) => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }

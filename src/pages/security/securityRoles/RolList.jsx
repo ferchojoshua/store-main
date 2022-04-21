@@ -28,7 +28,8 @@ import NoData from "../../../components/NoData";
 import { useNavigate } from "react-router-dom";
 
 const RolList = () => {
-  const { setReload, reload, setIsLoading, setIsLogged } = useContext(DataContext);
+  const { setReload, reload, setIsLoading, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [rolList, setRolList] = useState([]);
 
@@ -60,7 +61,21 @@ const RolList = () => {
           navigate("/unauthorized");
           return;
         }
-        toastError("No se pudo cargar los roles");
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
       setIsLoading(false);
@@ -193,7 +208,7 @@ const RolList = () => {
       </MediumModal>
 
       <MediumModal
-        titulo={`Rol ${selectedRol.roleName}`}
+        titulo={`Editar Rol: ${selectedRol.roleName}`}
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >

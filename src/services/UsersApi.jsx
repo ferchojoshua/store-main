@@ -79,7 +79,7 @@ export const getAllUsersAsync = async (token) => {
 };
 
 export const createUserAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, error: null, data: [] };
   let service = `${controller}CreateUser`;
   const authAxios = axios.create({
     baseURL: service,
@@ -103,7 +103,7 @@ export const createUserAsync = async (token, data) => {
 };
 
 export const updateUserAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}UpdateUser`;
   const authAxios = axios.create({
     baseURL: service,
@@ -127,7 +127,7 @@ export const updateUserAsync = async (token, data) => {
 };
 
 export const deactivateUserAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}DeactivateUser/`;
   const authAxios = axios.create({
     baseURL: service,
@@ -151,7 +151,7 @@ export const deactivateUserAsync = async (token, data) => {
 };
 
 export const resetPasswordAsync = async (token, data) => {
-  const result = { statusResponse: true, error: null };
+  const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}ResetPassword/`;
   const authAxios = axios.create({
     baseURL: service,

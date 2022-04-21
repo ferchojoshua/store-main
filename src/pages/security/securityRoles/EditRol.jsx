@@ -25,7 +25,7 @@ import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 
 const EditRol = ({ setShowModal, selectedRol }) => {
-  const { setIsLoading, reload, setReload, setIsLogged } =
+  const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
@@ -35,6 +35,26 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const editedRol = selectedRol;
 
   const [rolName, setRolName] = useState(selectedRol.roleName);
+
+  const [inProductsVer, setInProductsVer] = useState(false);
+  const [inProductsCreate, setInProductsCreate] = useState(false);
+  const [inProductsUpdate, setInProductsUpdate] = useState(false);
+  const [inProductsDelete, setInProductsDelete] = useState(false);
+
+  const [ProductExistenceVer, setExistenceProductsVer] = useState(false);
+  const [ProductExistenceCreate, setExistenceProductsCreate] = useState(false);
+  const [ProductExistenceUpdate, setExistenceProductsUpdate] = useState(false);
+  const [ProductExistenceDelete, setExistenceProductsDelete] = useState(false);
+
+  const [productTraslateVer, setProductTraslateVer] = useState(false);
+  const [productTraslateCreate, setProductTraslateCreate] = useState(false);
+  const [productTraslateUpdate, setProductTraslateUpdate] = useState(false);
+  const [productTraslateDelete, setProductTraslateDelete] = useState(false);
+
+  const [productsVer, setProductsVer] = useState(false);
+  const [productsCreate, setProductsCreate] = useState(false);
+  const [productsUpdate, setProductsUpdate] = useState(false);
+  const [productsDelete, setProductsDelete] = useState(false);
 
   const [userVer, setUserVer] = useState(false);
   const [userCreate, setUserCreate] = useState(false);
@@ -51,45 +71,52 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [miscelaneosUpdate, setMiscelaneosUpdate] = useState(false);
   const [miscelaneosDelete, setMiscelaneosDelete] = useState(false);
 
-  const [inProductsVer, setInProductsVer] = useState(false);
-  const [inProductsCreate, setInProductsCreate] = useState(false);
-  const [inProductsUpdate, setInProductsUpdate] = useState(false);
-  const [inProductsDelete, setInProductsDelete] = useState(false);
-
-  const [productsVer, setProductsVer] = useState(false);
-  const [productsCreate, setProductsCreate] = useState(false);
-  const [productsUpdate, setProductsUpdate] = useState(false);
-  const [productsDelete, setProductsDelete] = useState(false);
-
   useEffect(() => {
     selectedRol.permissions.map((item) => {
       switch (item.description) {
-        case "USER VER":
-          setUserVer(item.isEnable);
+        //Entrada Producto
+        case "ENTRADAPRODUCTOS VER":
+          setInProductsVer(item.isEnable);
           break;
-        case "USER CREATE":
-          setUserCreate(item.isEnable);
+        case "ENTRADAPRODUCTOS CREATE":
+          setInProductsCreate(item.isEnable);
           break;
-        case "USER UPDATE":
-          setUserUpdate(item.isEnable);
+        case "ENTRADAPRODUCTOS UPDATE":
+          setInProductsUpdate(item.isEnable);
           break;
-        case "USER DELETE":
-          setUserDelete(item.isEnable);
-          break;
-
-        case "ROLES VER":
-          setRolesVer(item.isEnable);
-          break;
-        case "ROLES CREATE":
-          setRolesCreate(item.isEnable);
-          break;
-        case "ROLES UPDATE":
-          setRolesUpdate(item.isEnable);
-          break;
-        case "ROLES DELETE":
-          setRolesDelete(item.isEnable);
+        case "ENTRADAPRODUCTOS DELETE":
+          setInProductsDelete(item.isEnable);
           break;
 
+        //Existencias de Producto
+        case "EXISTANCE VER":
+          setExistenceProductsVer(item.isEnable);
+          break;
+        case "EXISTANCE CREATE":
+          setExistenceProductsCreate(item.isEnable);
+          break;
+        case "EXISTANCE UPDATE":
+          setExistenceProductsUpdate(item.isEnable);
+          break;
+        case "EXISTANCE DELETE":
+          setExistenceProductsDelete(item.isEnable);
+          break;
+
+        //Traslado de Producto
+        case "PRODUCT TRANSLATE VER":
+          setProductTraslateVer(item.isEnable);
+          break;
+        case "PRODUCT TRANSLATE CREATE":
+          setProductTraslateCreate(item.isEnable);
+          break;
+        case "PRODUCT TRANSLATE UPDATE":
+          setProductTraslateUpdate(item.isEnable);
+          break;
+        case "PRODUCT TRANSLATE DELETE":
+          setProductTraslateDelete(item.isEnable);
+          break;
+
+        //Products
         case "PRODUCTS VER":
           setProductsVer(item.isEnable);
           break;
@@ -103,6 +130,35 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           setProductsDelete(item.isEnable);
           break;
 
+        //Usuario
+        case "USER VER":
+          setUserVer(item.isEnable);
+          break;
+        case "USER CREATE":
+          setUserCreate(item.isEnable);
+          break;
+        case "USER UPDATE":
+          setUserUpdate(item.isEnable);
+          break;
+        case "USER DELETE":
+          setUserDelete(item.isEnable);
+          break;
+
+        //Roles
+        case "ROLES VER":
+          setRolesVer(item.isEnable);
+          break;
+        case "ROLES CREATE":
+          setRolesCreate(item.isEnable);
+          break;
+        case "ROLES UPDATE":
+          setRolesUpdate(item.isEnable);
+          break;
+        case "ROLES DELETE":
+          setRolesDelete(item.isEnable);
+          break;
+
+        //Miscelaneos
         case "MISCELANEOS VER":
           setMiscelaneosVer(item.isEnable);
           break;
@@ -114,19 +170,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "MISCELANEOS DELETE":
           setMiscelaneosDelete(item.isEnable);
-          break;
-
-        case "ENTRADAPRODUCTOS VER":
-          setInProductsVer(item.isEnable);
-          break;
-        case "ENTRADAPRODUCTOS CREATE":
-          setInProductsCreate(item.isEnable);
-          break;
-        case "ENTRADAPRODUCTOS UPDATE":
-          setInProductsUpdate(item.isEnable);
-          break;
-        case "ENTRADAPRODUCTOS DELETE":
-          setInProductsDelete(item.isEnable);
           break;
 
         default:
@@ -143,58 +186,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     editedRol.roleName = rolName;
     editedRol.permissions.map((item) => {
       switch (item.description) {
-        case "USER VER":
-          item.isEnable = userVer;
-          break;
-        case "USER CREATE":
-          item.isEnable = userCreate;
-          break;
-        case "USER UPDATE":
-          item.isEnable = userUpdate;
-          break;
-        case "USER DELETE":
-          item.isEnable = userDelete;
-          break;
-
-        case "ROLES VER":
-          item.isEnable = rolesVer;
-          break;
-        case "ROLES CREATE":
-          item.isEnable = rolesCreate;
-          break;
-        case "ROLES UPDATE":
-          item.isEnable = rolesUpdate;
-          break;
-        case "ROLES DELETE":
-          item.isEnable = rolesDelete;
-          break;
-
-        case "PRODUCTS VER":
-          item.isEnable = productsVer;
-          break;
-        case "PRODUCTS CREATE":
-          item.isEnable = productsCreate;
-          break;
-        case "PRODUCTS UPDATE":
-          item.isEnable = productsUpdate;
-          break;
-        case "PRODUCTS DELETE":
-          item.isEnable = productsDelete;
-          break;
-
-        case "MISCELANEOS VER":
-          item.isEnable = miscelaneosVer;
-          break;
-        case "MISCELANEOS CREATE":
-          item.isEnable = miscelaneosCreate;
-          break;
-        case "MISCELANEOS UPDATE":
-          item.isEnable = miscelaneosUpdate;
-          break;
-        case "MISCELANEOS DELETE":
-          item.isEnable = miscelaneosDelete;
-          break;
-
+        //Entrada Producto
         case "ENTRADAPRODUCTOS VER":
           item.isEnable = inProductsVer;
           break;
@@ -208,11 +200,95 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = inProductsDelete;
           break;
 
+        //Existencias de Producto
+        case "EXISTANCE VER":
+          item.isEnable = ProductExistenceVer;
+          break;
+        case "EXISTANCE CREATE":
+          item.isEnable = ProductExistenceCreate;
+          break;
+        case "EXISTANCE UPDATE":
+          item.isEnable = ProductExistenceUpdate;
+          break;
+        case "EXISTANCE DELETE":
+          item.isEnable = ProductExistenceDelete;
+          break;
+
+        //Traslado de Producto
+        case "PRODUCT TRANSLATE VER":
+          item.isEnable = productTraslateVer;
+          break;
+        case "PRODUCT TRANSLATE CREATE":
+          item.isEnable = productTraslateCreate;
+          break;
+        case "PRODUCT TRANSLATE UPDATE":
+          item.isEnable = productTraslateUpdate;
+          break;
+        case "PRODUCT TRANSLATE DELETE":
+          item.isEnable = productTraslateDelete;
+          break;
+
+        //Products
+        case "PRODUCTS VER":
+          item.isEnable = productsVer;
+          break;
+        case "PRODUCTS CREATE":
+          item.isEnable = productsCreate;
+          break;
+        case "PRODUCTS UPDATE":
+          item.isEnable = productsUpdate;
+          break;
+        case "PRODUCTS DELETE":
+          item.isEnable = productsDelete;
+          break;
+
+        //Usuario
+        case "USER VER":
+          item.isEnable = userVer;
+          break;
+        case "USER CREATE":
+          item.isEnable = userCreate;
+          break;
+        case "USER UPDATE":
+          item.isEnable = userUpdate;
+          break;
+        case "USER DELETE":
+          item.isEnable = userDelete;
+          break;
+
+        //Roles
+        case "ROLES VER":
+          item.isEnable = rolesVer;
+          break;
+        case "ROLES CREATE":
+          item.isEnable = rolesCreate;
+          break;
+        case "ROLES UPDATE":
+          item.isEnable = rolesUpdate;
+          break;
+        case "ROLES DELETE":
+          item.isEnable = rolesDelete;
+          break;
+
+        //Miscelaneos
+        case "MISCELANEOS VER":
+          item.isEnable = miscelaneosVer;
+          break;
+        case "MISCELANEOS CREATE":
+          item.isEnable = miscelaneosCreate;
+          break;
+        case "MISCELANEOS UPDATE":
+          item.isEnable = miscelaneosUpdate;
+          break;
+        case "MISCELANEOS DELETE":
+          item.isEnable = miscelaneosDelete;
+          break;
+
         default:
           break;
       }
     });
-    
+
     setIsLoading(true);
     const result = await updateRolAsync(token, editedRol);
     if (!result.statusResponse) {
@@ -221,7 +297,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("Eror al actualizar, intente de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -230,6 +306,12 @@ const EditRol = ({ setShowModal, selectedRol }) => {
       deleteUserData();
       deleteToken();
       setIsLogged(false);
+      return;
+    }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
       return;
     }
 
@@ -284,411 +366,689 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         </div>
       </Paper>
 
-      {/* Modulo Miscelaneos  */}
-      <Paper
-        elevation={10}
+      <Typography
         style={{
-          borderRadius: 30,
-          padding: 10,
           marginTop: 20,
+          fontSize: 25,
+          color: "#4caf50",
+          fontWeight: 800,
+          textAlign: "center",
         }}
       >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5 ">
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 10,
-                color: "#2196f3",
-                fontWeight: 800,
-              }}
-            >
-              Modulo Miscelaneos
-            </Typography>
-          </div>
-          <div className="col-sm-7 ">
-            <div className="row justify-content-around align-items-center">
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={miscelaneosVer}
-                      onChange={() => setMiscelaneosVer(!miscelaneosVer)}
-                    />
-                  }
-                  label="Ver"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={miscelaneosCreate}
-                      onChange={() => setMiscelaneosCreate(!miscelaneosCreate)}
-                    />
-                  }
-                  label="Crear"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={miscelaneosUpdate}
-                      onChange={() => setMiscelaneosUpdate(!miscelaneosUpdate)}
-                    />
-                  }
-                  label="Editar"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={miscelaneosDelete}
-                      onChange={() => setMiscelaneosDelete(!miscelaneosDelete)}
-                    />
-                  }
-                  label="Eliminar"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Paper>
+        Accesos de modulo
+      </Typography>
+      <Divider />
 
-      {/* Modulo Productos */}
-      <Paper
-        elevation={10}
-        style={{
-          borderRadius: 30,
-          padding: 10,
-          marginTop: 20,
-        }}
-      >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5 ">
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 10,
-                color: "#2196f3",
-                fontWeight: 800,
-              }}
-            >
-              Modulo Productos
-            </Typography>
-          </div>
-          <div className="col-sm-7 ">
+      <div className="row justify-content-around align-items-center mt-3">
+        <div className="col-sm-6">
+          {/* Modulo Entrada de Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
             <div className="row justify-content-around align-items-center">
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={productsVer}
-                      onChange={() => setProductsVer(!productsVer)}
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Entrada de Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={inProductsVer}
+                          onChange={() => setInProductsVer(!inProductsCreate)}
+                        />
+                      }
+                      label="Ver"
                     />
-                  }
-                  label="Ver"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={productsCreate}
-                      onChange={() => setProductsCreate(!productsCreate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={inProductsCreate}
+                          onChange={() =>
+                            setInProductsCreate(!inProductsCreate)
+                          }
+                        />
+                      }
+                      label="Crear"
                     />
-                  }
-                  label="Crear"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={productsUpdate}
-                      onChange={() => setProductsUpdate(!productsUpdate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={inProductsUpdate}
+                          onChange={() =>
+                            setInProductsUpdate(!inProductsUpdate)
+                          }
+                        />
+                      }
+                      label="Editar"
                     />
-                  }
-                  label="Editar"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={productsDelete}
-                      onChange={() => setProductsDelete(!productsDelete)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={inProductsDelete}
+                          onChange={() =>
+                            setInProductsDelete(!inProductsDelete)
+                          }
+                        />
+                      }
+                      label="Eliminar"
                     />
-                  }
-                  label="Eliminar"
-                />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Paper>
+          </Paper>
 
-      {/* Modulo Entrada de Productos */}
-      <Paper
-        elevation={10}
-        style={{
-          borderRadius: 30,
-          padding: 10,
-          marginTop: 20,
-        }}
-      >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5 ">
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 10,
-                color: "#2196f3",
-                fontWeight: 800,
-                // textAlign: "left",
-              }}
-            >
-              Modulo Entrada de Productos
-            </Typography>
-          </div>
-          <div className="col-sm-7 ">
+          {/* Modulo Traslado de Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
             <div className="row justify-content-around align-items-center">
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={inProductsVer}
-                      onChange={() => setInProductsVer(!inProductsVer)}
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Traslado de Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productTraslateVer}
+                          onChange={() =>
+                            setProductTraslateVer(!productTraslateVer)
+                          }
+                        />
+                      }
+                      label="Ver"
                     />
-                  }
-                  label="Ver"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={inProductsCreate}
-                      onChange={() => setInProductsCreate(!inProductsCreate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productTraslateCreate}
+                          onChange={() =>
+                            setProductTraslateCreate(!productTraslateCreate)
+                          }
+                        />
+                      }
+                      label="Crear"
                     />
-                  }
-                  label="Crear"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={inProductsUpdate}
-                      onChange={() => setInProductsUpdate(!inProductsUpdate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productTraslateUpdate}
+                          onChange={() =>
+                            setProductTraslateUpdate(!productTraslateUpdate)
+                          }
+                        />
+                      }
+                      label="Editar"
                     />
-                  }
-                  label="Editar"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={inProductsDelete}
-                      onChange={() => setInProductsDelete(!inProductsDelete)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productTraslateDelete}
+                          onChange={() =>
+                            setProductTraslateDelete(!productTraslateDelete)
+                          }
+                        />
+                      }
+                      label="Eliminar"
                     />
-                  }
-                  label="Eliminar"
-                />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Paper>
+          </Paper>
 
-      {/* Modulo Seguridad de Usuarios */}
-      <Paper
-        elevation={10}
-        style={{
-          borderRadius: 30,
-          padding: 10,
-          marginTop: 20,
-        }}
-      >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5">
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 10,
-                color: "#2196f3",
-                fontWeight: 800,
-              }}
-            >
-              Modulo Seguridad de Usuarios
-            </Typography>
-          </div>
-          <div className="col-sm-7">
+          {/* Modulo Seguridad de Usuarios */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
             <div className="row justify-content-around align-items-center">
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={userVer}
-                      onChange={() => setUserVer(!userVer)}
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Seguridad de Usuarios
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userVer}
+                          onChange={() => setUserVer(!userVer)}
+                        />
+                      }
+                      label="Ver"
                     />
-                  }
-                  label="Ver"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={userCreate}
-                      onChange={() => setUserCreate(!userCreate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userCreate}
+                          onChange={() => setUserCreate(!userCreate)}
+                        />
+                      }
+                      label="Crear"
                     />
-                  }
-                  label="Crear"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={userUpdate}
-                      onChange={() => setUserUpdate(!userUpdate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userUpdate}
+                          onChange={() => setUserUpdate(!userUpdate)}
+                        />
+                      }
+                      label="Editar"
                     />
-                  }
-                  label="Editar"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={userDelete}
-                      onChange={() => setUserDelete(!userDelete)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userDelete}
+                          onChange={() => setUserDelete(!userDelete)}
+                        />
+                      }
+                      label="Eliminar"
                     />
-                  }
-                  label="Eliminar"
-                />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Paper>
+          </Paper>
 
-      {/* Modulo Seguridad de Roles */}
-      <Paper
-        elevation={10}
-        style={{
-          borderRadius: 30,
-          padding: 10,
-          marginTop: 20,
-        }}
-      >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-5">
-            <Typography
-              style={{
-                fontSize: 17,
-                marginTop: 10,
-                color: "#2196f3",
-                fontWeight: 800,
-              }}
-            >
-              Modulo Seguridad de Roles
-            </Typography>
-          </div>
-          <div className="col-sm-7">
+          {/* Modulo miscelaneos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
             <div className="row justify-content-around align-items-center">
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={rolesVer}
-                      onChange={() => setRolesVer(!rolesVer)}
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Miscelaneos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={miscelaneosVer}
+                          onChange={() => setMiscelaneosVer(!miscelaneosVer)}
+                        />
+                      }
+                      label="Ver"
                     />
-                  }
-                  label="Ver"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={rolesCreate}
-                      onChange={() => setRolesCreate(!rolesCreate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={miscelaneosCreate}
+                          onChange={() =>
+                            setMiscelaneosCreate(!miscelaneosCreate)
+                          }
+                        />
+                      }
+                      label="Crear"
                     />
-                  }
-                  label="Crear"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={rolesUpdate}
-                      onChange={() => setRolesUpdate(!rolesUpdate)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={miscelaneosUpdate}
+                          onChange={() =>
+                            setMiscelaneosUpdate(!miscelaneosUpdate)
+                          }
+                        />
+                      }
+                      label="Editar"
                     />
-                  }
-                  label="Editar"
-                />
-              </div>
-              <div className="col-sm-3 ">
-                <FormControlLabel
-                  labelPlacement="top"
-                  control={
-                    <Checkbox
-                      disabled={!isEdit}
-                      checked={rolesDelete}
-                      onChange={() => setRolesDelete(!rolesDelete)}
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={miscelaneosDelete}
+                          onChange={() =>
+                            setMiscelaneosDelete(!miscelaneosDelete)
+                          }
+                        />
+                      }
+                      label="Eliminar"
                     />
-                  }
-                  label="Eliminar"
-                />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </Paper>
         </div>
-      </Paper>
+        <div className="col-sm-6">
+          {/* Modulo Existencia de Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Existencia de Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ProductExistenceVer}
+                          onChange={() =>
+                            setExistenceProductsVer(!ProductExistenceVer)
+                          }
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ProductExistenceCreate}
+                          onChange={() =>
+                            setExistenceProductsCreate(!ProductExistenceCreate)
+                          }
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ProductExistenceUpdate}
+                          onChange={() =>
+                            setExistenceProductsUpdate(!ProductExistenceUpdate)
+                          }
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ProductExistenceDelete}
+                          onChange={() =>
+                            setExistenceProductsDelete(!ProductExistenceDelete)
+                          }
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsVer}
+                          onChange={() => setProductsVer(!productsVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsCreate}
+                          onChange={() => setProductsCreate(!productsCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsUpdate}
+                          onChange={() => setProductsUpdate(!productsUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsDelete}
+                          onChange={() => setProductsDelete(!productsDelete)}
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Seguridad de Roles */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Seguridad de Roles
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userVer}
+                          onChange={() => setRolesVer(!rolesVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userCreate}
+                          onChange={() => setRolesCreate(!rolesCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userUpdate}
+                          onChange={() => setRolesUpdate(!rolesUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={userDelete}
+                          onChange={() => setRolesDelete(!rolesDelete)}
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Disponible
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsVer}
+                          onChange={() => setProductsVer(!productsVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsCreate}
+                          onChange={() => setProductsCreate(!productsCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsUpdate}
+                          onChange={() => setProductsUpdate(!productsUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={productsDelete}
+                          onChange={() => setProductsDelete(!productsDelete)}
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+        </div>
+      </div>
 
       <Button
         fullWidth

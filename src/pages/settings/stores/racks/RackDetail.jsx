@@ -47,7 +47,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
           navigate("/unauthorized");
           return;
         }
-        toastError("Ocurrio un error al cargar los datos");
+        toastError(result.error.message);
         return;
       }
 
@@ -60,6 +60,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
       }
 
       if (result.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -87,7 +88,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
         navigate("/unauthorized");
         return;
       }
-      toastError("Ocurrio un error al guardar los cambios, intente de nuevo");
+      toastError(result.error.message);
       return;
     }
 
@@ -100,6 +101,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
     }
 
     if (result.data.isDefaultPass) {
+      setIsLoading(false);
       setIsDefaultPass(true);
       return;
     }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Divider, Typography, Paper } from "@mui/material";
-import { getToken } from "../../../../services/Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
@@ -28,8 +27,6 @@ const DetalleProductoComponent = ({ selectedDetail, editDetail }) => {
     funcPrecioVentaDetalle(selectedDetail.precioVentaDetalle);
     funcPrecioVenta(selectedDetail.precioVentaMayor);
   }, []);
-
-  const token = getToken();
 
   const funcCantidad = (value) => {
     if (/^[0-9]+$/.test(value.toString()) || value === "") {

@@ -36,6 +36,7 @@ import TipoNegocio from "./pages/settings/tipoNegocio/TipoNegocio";
 import SetNewPasswordComponent from "./components/SetNewPasswordComponent";
 import InventoryContainer from "./pages/inventory/InventoryContainer";
 import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
+import SalesContainer from "./pages/sales/SalesContainer";
 
 function App() {
   const {
@@ -108,6 +109,9 @@ function App() {
             <Route path="/" element={<Home />} />
             {/* Rutas Account */}
             <Route path="/account" element={<MyAccount />} />
+
+             {/* Ruta Inventario */}
+             <Route path="/sales" element={<SalesContainer />} />
 
             {/* Ruta Inventario */}
             <Route path="/inventory" element={<InventoryContainer />} />

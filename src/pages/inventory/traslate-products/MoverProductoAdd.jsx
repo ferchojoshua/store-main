@@ -34,7 +34,7 @@ import {
 } from "../../../services/ExistanceApi";
 
 const MoverProductoAdd = ({ setShowModal }) => {
-  const { reload, setReload, setIsLoading, setIsLogged } =
+  const { reload, setReload, setIsLoading, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
 
@@ -77,6 +77,12 @@ const MoverProductoAdd = ({ setShowModal }) => {
         return;
       }
 
+      if (resultStores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
       setStoreList(resultStores.data);
 
       const resultProducts = await getProductsAsync(token);
@@ -95,6 +101,12 @@ const MoverProductoAdd = ({ setShowModal }) => {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
+        return;
+      }
+
+      if (resultProducts.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
         return;
       }
 
@@ -137,6 +149,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
         setIsLogged(false);
         return;
       }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
       setIsLoading(false);
       if (result.data.existencia === 0) {
         toastError("Almacen procedencia no este producto, seleccione otro");
@@ -175,6 +194,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
     setIsLoading(false);
     if (result.data.existencia === 0) {
       toastError(
@@ -221,6 +247,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
     setIsLoading(false);
     setExistenceDestino(result.data.existencia);
   };
@@ -301,6 +334,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
         setIsLogged(false);
         return;
       }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
       setIsLoading(false);
       toastSuccess("Traslado realizado...!");
       setReload(!reload);
