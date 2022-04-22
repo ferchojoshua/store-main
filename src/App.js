@@ -37,6 +37,9 @@ import SetNewPasswordComponent from "./components/SetNewPasswordComponent";
 import InventoryContainer from "./pages/inventory/InventoryContainer";
 import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
 import SalesContainer from "./pages/sales/SalesContainer";
+import Departments from "./pages/settings/locations/Departments";
+import Municipalities from "./pages/settings/locations/municipalities/Municipalities";
+import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
 
 function App() {
   const {
@@ -110,8 +113,8 @@ function App() {
             {/* Rutas Account */}
             <Route path="/account" element={<MyAccount />} />
 
-             {/* Ruta Inventario */}
-             <Route path="/sales" element={<SalesContainer />} />
+            {/* Ruta Inventario */}
+            <Route path="/sales" element={<SalesContainer />} />
 
             {/* Ruta Inventario */}
             <Route path="/inventory" element={<InventoryContainer />} />
@@ -130,6 +133,13 @@ function App() {
             {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
             <Route path="/tipo-negocio" element={<TipoNegocio />} />
             <Route path="/tipo-negocio/:id" element={<TipoNegocioDetails />} />
+
+            <Route path="/departments" element={<Departments />} />
+            <Route path="/departments/:id" element={<Municipalities />} />
+            <Route
+              path="/departments/municipalities/:id"
+              element={<MunicipalityDetails />}
+            />
 
             {/* Rutas Error */}
             <Route path="/unauthorized" element={<Page401 />} />

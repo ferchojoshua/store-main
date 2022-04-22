@@ -25,6 +25,7 @@ import {
 import MediumModal from "../../../components/modals/MediumModal";
 import { getClientsAsync } from "../../../services/ClientsApi";
 import AddClient from "./AddClient";
+import ClientDetails from "./ClientDetails";
 
 const ClientList = () => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -192,13 +193,6 @@ const ClientList = () => {
                 <th style={{ textAlign: "left" }}>Comunidad</th>
                 <th style={{ textAlign: "left" }}>Direccion</th>
                 <th style={{ textAlign: "left" }}>Correo</th>
-                {/* 
-                <th style={{ textAlign: "left" }}>Familia</th>
-                <th style={{ textAlign: "left" }}>Descripcion</th>
-                <th style={{ textAlign: "left" }}>Codigo de Barras</th>
-                <th style={{ textAlign: "left" }}>Marca</th>
-                <th style={{ textAlign: "left" }}>Modelo</th>
-                <th style={{ textAlign: "left" }}>U/M</th> */}
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -251,6 +245,17 @@ const ClientList = () => {
         setVisible={setShowModal}
       >
         <AddClient setShowModal={setShowModal} />
+      </MediumModal>
+
+      <MediumModal
+        titulo={`Editar: ${selectedClient.nombreCliente}`}
+        isVisible={showEditModal}
+        setVisible={setShowEditModal}
+      >
+        <ClientDetails
+          selectedClient={selectedClient}
+          setShowModal={setShowEditModal}
+        />
       </MediumModal>
     </div>
   );

@@ -2,17 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import {
-  simpleMessage,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
-import {
-  deleteFamiliaAsync,
-  getFamiliasByTNAsync,
-  getTipoNegocioByIdAsync,
-  updateTipoNegocioByIdAsync,
-} from "../../../services/TipoNegocioApi";
+import { toastError, toastSuccess } from "../../../../helpers/Helpers";
 
 import {
   TextField,
@@ -24,12 +14,9 @@ import {
   Paper,
 } from "@mui/material";
 import {
-  faCancel,
   faCircleArrowLeft,
   faCirclePlus,
-  faEdit,
   faExternalLinkAlt,
-  faPaperPlane,
   faSearch,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
@@ -38,40 +25,43 @@ import {
   getToken,
   deleteUserData,
   deleteToken,
-} from "../../../services/Account";
-import { DataContext } from "../../../context/DataContext";
-import NoData from "../../../components/NoData";
+} from "../../../../services/Account";
+import {
+  deleteCommunityAsync,
+  getCommunitiesByMunAsync,
+  getMunicipalityByIdAsync,
+} from "../../../../services/CommunitiesApi";
+import { DataContext } from "../../../../context/DataContext";
+import NoData from "../../../../components/NoData";
 import { isEmpty } from "lodash";
-import PaginationComponent from "../../../components/PaginationComponent";
-import SmallModal from "../../../components/modals/SmallModal";
-import FamiliaAdd from "../familia/FamiliaAdd";
-import FamiliaDetails from "../familia/FamiliaDetails";
-
+import PaginationComponent from "../../../../components/PaginationComponent";
+import SmallModal from "../../../../components/modals/SmallModal";
+import CommunityAdd from "./communities/CommunityAdd";
+import CommunityDetail from "./communities/CommunityDetail";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-const TipoNegocioDetails = () => {
+const MunicipalityDetails = () => {
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
+
   const token = getToken();
   let navigate = useNavigate();
   const { id } = useParams();
+
   const MySwal = withReactContent(Swal);
 
-  const [tipoNegocio, setTipoNegocio] = useState([]);
-  const [isEdit, setIsEdit] = useState(false);
-  const [description, setDescription] = useState("");
-
-  const [familiaList, setFamiliaList] = useState([]);
+  const [municipality, setMunicipality] = useState([]);
+  const [communityList, setCommunityList] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedFamilia, setSelectedFamilia] = useState([]);
+  const [selectedCommunity, setSelectedCommunity] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const withSearch = familiaList.filter((val) => {
+  const withSearch = communityList.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (val.description.toString().includes(searchTerm)) {
+    } else if (val.name.toString().includes(searchTerm)) {
       return val;
     }
   });
@@ -87,7 +77,7 @@ const TipoNegocioDetails = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getTipoNegocioByIdAsync(token, id);
+      const result = await getMunicipalityByIdAsync(token, id);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -97,6 +87,7 @@ const TipoNegocioDetails = () => {
         toastError(result.error.message);
         return;
       }
+
       if (result.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
@@ -110,21 +101,21 @@ const TipoNegocioDetails = () => {
         setIsDefaultPass(true);
         return;
       }
-      setDescription(result.data.description);
-      setTipoNegocio(result.data);
 
-      const resultFamilias = await getFamiliasByTNAsync(token, id);
-      if (!resultFamilias.statusResponse) {
+      setMunicipality(result.data);
+
+      const resultComms = await getCommunitiesByMunAsync(token, id);
+      if (!resultComms.statusResponse) {
         setIsLoading(false);
-        if (resultFamilias.error.request.status === 401) {
+        if (resultComms.error.request.status === 401) {
           navigate("/unauthorized");
           return;
         }
-        toastError(result.error.message);
+        toastError(resultComms.error.message);
         return;
       }
 
-      if (result.data === "eX01") {
+      if (resultComms.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
         deleteToken();
@@ -132,52 +123,22 @@ const TipoNegocioDetails = () => {
         return;
       }
 
-      if (resultFamilias.data.isDefaultPass) {
+      if (resultComms.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
+
+      setCommunityList(resultComms.data);
       setIsLoading(false);
-      setFamiliaList(resultFamilias.data);
     })();
   }, [reload]);
 
-  const saveChangesAsync = async () => {
-    const data = {
-      id: id,
-      description: description,
-    };
-    if (description === tipoNegocio.description) {
-      simpleMessage("Ingrese una descripcion diferente...", "error");
-      return;
-    }
-    const result = await updateTipoNegocioByIdAsync(data);
-    if (!result.statusResponse) {
-      simpleMessage(result.error, "error");
-      return;
-    }
-
-    if (result.data === "eX01") {
-      setIsLoading(false);
-      deleteUserData();
-      deleteToken();
-      setIsLogged(false);
-      return;
-    }
-
-    if (result.data.isDefaultPass) {
-      setIsLoading(false);
-      setIsDefaultPass(true);
-      return;
-    }
-    toastSuccess("Tipo de negocio Actualizado...!");
-    setIsEdit(false);
-  };
-
-  const deleteFamilia = async (item) => {
+  const deleteCommunity = async (item) => {
     MySwal.fire({
       icon: "warning",
       title: <p>Confirmar Eliminar</p>,
-      text: `Elimiar: ${item.description}!`,
+      text: `Elimiar: ${item.name}!`,
       showDenyButton: true,
       confirmButtonText: "Aceptar",
       denyButtonText: `Cancelar`,
@@ -185,14 +146,14 @@ const TipoNegocioDetails = () => {
       if (result.isConfirmed) {
         (async () => {
           setIsLoading(true);
-          const result = await deleteFamiliaAsync(token, item.id);
+          const result = await deleteCommunityAsync(token, item.id);
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
               navigate("/unauthorized");
               return;
             }
-            toastError("Ocurrio un error al eliminar rack");
+            toastError(result.error.message);
             return;
           }
 
@@ -212,7 +173,7 @@ const TipoNegocioDetails = () => {
         })();
         setIsLoading(false);
         setReload(!reload);
-        toastSuccess("Familia eliminada...");
+        toastSuccess("Comunidad eliminada...!");
       }
     });
   };
@@ -232,12 +193,11 @@ const TipoNegocioDetails = () => {
               display: "flex",
               flexDirection: "row",
               alignContent: "center",
-              justifyContent: "space-between",
             }}
           >
             <Button
               onClick={() => {
-                navigate("/tipo-negocio/");
+                navigate(`/departments/${municipality.department.id}`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"
@@ -249,52 +209,10 @@ const TipoNegocioDetails = () => {
               Regresar
             </Button>
 
-            <h2>Detalle Tipo Negocio # {id}</h2>
-
-            <IconButton
-              onClick={() => {
-                setIsEdit(!isEdit);
-              }}
-            >
-              <FontAwesomeIcon
-                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
-                icon={isEdit ? faCancel : faEdit}
-              />
-            </IconButton>
+            <h2>Comunidades Municipio: {municipality.name}</h2>
           </div>
 
           <hr />
-
-          <TextField
-            fullWidth
-            variant="standard"
-            onChange={(e) => setDescription(e.target.value.toUpperCase())}
-            value={description}
-            label={"Descripcion"}
-            disabled={!isEdit}
-            placeholder={"Ingrese descripcion"}
-            InputProps={
-              isEdit
-                ? {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          style={{ marginRight: 10 }}
-                          onClick={() => saveChangesAsync()}
-                        >
-                          <FontAwesomeIcon
-                            style={{ color: "#ff5722" }}
-                            icon={faPaperPlane}
-                          />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }
-                : {}
-            }
-          />
-
-          <Divider />
 
           <div
             style={{
@@ -306,7 +224,7 @@ const TipoNegocioDetails = () => {
               justifyContent: "space-between",
             }}
           >
-            <h4>Lista de Familias</h4>
+            <h4>Lista de Comunidades</h4>
 
             <Button
               onClick={() => {
@@ -316,18 +234,18 @@ const TipoNegocioDetails = () => {
               style={{ borderRadius: 20 }}
               variant="outlined"
             >
-              Agregar Familia
+              Agregar Comunidad
             </Button>
           </div>
 
           <Divider />
 
           <TextField
-           style={{ marginBottom: 20, width: 600, marginTop: 20 }}
+            style={{ marginBottom: 20, width: 600, marginTop: 20 }}
             variant="standard"
             onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
             value={searchTerm}
-            label={"Buscar familia"}
+            label={"Buscar Comunidad"}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -349,7 +267,7 @@ const TipoNegocioDetails = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th style={{ textAlign: "left" }}>Descripcion</th>
+                  <th style={{ textAlign: "left" }}>Nombre Comunidad</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -358,12 +276,12 @@ const TipoNegocioDetails = () => {
                   return (
                     <tr key={item.id}>
                       <td>{item.id}</td>
-                      <td style={{ textAlign: "left" }}>{item.description}</td>
+                      <td style={{ textAlign: "left" }}>{item.name}</td>
                       <td>
                         <IconButton
                           style={{ marginRight: 10, color: "#009688" }}
                           onClick={() => {
-                            setSelectedFamilia(item);
+                            setSelectedCommunity(item);
                             setShowEditModal(true);
                           }}
                         >
@@ -371,7 +289,7 @@ const TipoNegocioDetails = () => {
                         </IconButton>
                         <IconButton
                           style={{ color: "#f50057" }}
-                          onClick={() => deleteFamilia(item)}
+                          onClick={() => deleteCommunity(item)}
                         >
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </IconButton>
@@ -391,20 +309,20 @@ const TipoNegocioDetails = () => {
       </Container>
 
       <SmallModal
-        titulo={"Agregar Familia"}
+        titulo={"Agregar Comunidad"}
         isVisible={showModal}
         setVisible={setShowModal}
       >
-        <FamiliaAdd setShowModal={setShowModal} idTN={id} />
+        <CommunityAdd setShowModal={setShowModal} idMunicipality={id} />
       </SmallModal>
 
       <SmallModal
-        titulo={`Editar: ${selectedFamilia.description}`}
+        titulo={`Editar: ${selectedCommunity.name}`}
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >
-        <FamiliaDetails
-          selectedFamilia={selectedFamilia}
+        <CommunityDetail
+          selectedCommunity={selectedCommunity}
           setShowModal={setShowEditModal}
         />
       </SmallModal>
@@ -412,4 +330,4 @@ const TipoNegocioDetails = () => {
   );
 };
 
-export default TipoNegocioDetails;
+export default MunicipalityDetails;

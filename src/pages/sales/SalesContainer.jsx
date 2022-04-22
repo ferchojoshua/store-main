@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserGroup,
-  faTruckRampBox,
   faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
@@ -82,24 +81,6 @@ const SalesContainer = () => {
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
-
-          {/*<Tab
-            icon={
-              <FontAwesomeIcon icon={faLeftRight} style={{ fontSize: 20 }} />
-            }
-            label="Traslado de Producto"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
-
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faDollyBox} style={{ fontSize: 20 }} />
-            }
-            label="Productos"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          /> */}
         </Tabs>
 
         <Divider style={{ marginTop: 10 }} />

@@ -1,11 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DataContext } from "../../../context/DataContext";
-import { useNavigate } from "react-router-dom";
-import {
-  toastError,
-  toastSuccess,
-  validateCedula,
-} from "../../../helpers/Helpers";
 import {
   TextField,
   Button,
@@ -19,36 +12,54 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+import { DataContext } from "../../../context/DataContext";
+import {
+  toastError,
+  toastSuccess,
+  validateCedula,
+} from "../../../helpers/Helpers";
 import {
   getToken,
-  deleteUserData,
   deleteToken,
+  deleteUserData,
 } from "../../../services/Account";
-import SmallModal from "../../../components/modals/SmallModal";
-import { isEmpty } from "lodash";
+
+import {
+  faCirclePlus,
+  faSave,
+  faCircleXmark,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   getCommunitiesByMunAsync,
   getDepartmentListAsync,
   getMunicipalitiesByDeptoAsync,
 } from "../../../services/CommunitiesApi";
-import { addClientAsync } from "../../../services/ClientsApi";
-import CommunityAdd from "../../settings/locations/municipalities/communities/CommunityAdd";
+import { isEmpty } from "lodash";
+import { getClientByIdAsync } from "../../../services/ClientsApi";
 
-const AddClient = ({ setShowModal }) => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
+const ClientDetails = ({ selectedClient, setShowModal }) => {
+  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
+  const [isEdit, setIsEdit] = useState(false);
 
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [cedula, setCedula] = useState("");
-  const [correo, setCorreo] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
+  const token = getToken();
+
+  const [Cliente, setCliente] = useState([]);
+
+  const [nombreCliente, setNombreCliente] = useState(
+    selectedClient.nombreCliente
+  );
+  const [cedula, setCedula] = useState(selectedClient.cedula);
+  const [correo, setCorreo] = useState(selectedClient.correo);
+  const [telefono, setTelefono] = useState(selectedClient.telefono);
+  const [direccion, setDireccion] = useState(selectedClient.direccion);
 
   const [departmentList, setDepartmentList] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState();
 
   const [municipalityList, setMunicipalityList] = useState([]);
   const [selectedMunicipality, setSelectedMunicipality] = useState("");
@@ -58,11 +69,36 @@ const AddClient = ({ setShowModal }) => {
 
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const token = getToken();
-
   useEffect(() => {
     (async () => {
-      setIsLoading(false);
+      setIsLoading(true);
+      const resultClient = await getClientByIdAsync(token, selectedClient.id);
+      if (!resultClient.statusResponse) {
+        setIsLoading(false);
+        if (resultClient.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(resultClient.error.message);
+        return;
+      }
+
+      if (resultClient.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultClient.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setCliente(resultClient.data);
+
       const result = await getDepartmentListAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
@@ -87,6 +123,7 @@ const AddClient = ({ setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
+      setIsLoading(false);
       setDepartmentList(result.data);
     })();
   }, []);
@@ -101,37 +138,37 @@ const AddClient = ({ setShowModal }) => {
         idCommunity: selectedCommunity,
         direccion,
       };
-      setIsLoading(true);
+      //   setIsLoading(true);
 
-      const result = await addClientAsync(token, data);
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate("/unauthorized");
-          return;
-        }
-        toastError(result.error.message);
-        return;
-      }
+      //   const result = await addClientAsync(token, data);
+      //   if (!result.statusResponse) {
+      //     setIsLoading(false);
+      //     if (result.error.request.status === 401) {
+      //       navigate("/unauthorized");
+      //       return;
+      //     }
+      //     toastError(result.error.message);
+      //     return;
+      //   }
 
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
+      //   if (result.data === "eX01") {
+      //     setIsLoading(false);
+      //     deleteUserData();
+      //     deleteToken();
+      //     setIsLogged(false);
+      //     return;
+      //   }
 
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
+      //   if (result.data.isDefaultPass) {
+      //     setIsLoading(false);
+      //     setIsDefaultPass(true);
+      //     return;
+      //   }
 
-      setIsLoading(false);
-      setReload(!reload);
-      toastSuccess("Cliente Guardado...");
-      setShowModal(false);
+      //   setIsLoading(false);
+      //   setReload(!reload);
+      //   toastSuccess("Cliente Guardado...");
+      //   setShowModal(false);
     }
   };
 
@@ -264,6 +301,7 @@ const AddClient = ({ setShowModal }) => {
               onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}
               label={"Nombre Cliente"}
               value={nombreCliente}
+              disabled={!isEdit}
             />
 
             <TextField
@@ -274,6 +312,7 @@ const AddClient = ({ setShowModal }) => {
               onChange={(e) => setCedula(e.target.value.toUpperCase())}
               label={"Cedula Cliente(000-000000-0000X)"}
               value={cedula}
+              disabled={!isEdit}
             />
 
             <TextField
@@ -284,6 +323,7 @@ const AddClient = ({ setShowModal }) => {
               onChange={(e) => setTelefono(e.target.value.toUpperCase())}
               label={"Telefono Cliente"}
               value={telefono}
+              disabled={!isEdit}
             />
 
             <TextField
@@ -294,6 +334,7 @@ const AddClient = ({ setShowModal }) => {
               onChange={(e) => setCorreo(e.target.value.toLowerCase())}
               label={"Correo Cliente"}
               value={correo}
+              disabled={!isEdit}
             />
           </Grid>
           <Grid item sm={6}>
@@ -302,6 +343,7 @@ const AddClient = ({ setShowModal }) => {
               fullWidth
               style={{ marginRight: 20 }}
               required
+              disabled={!isEdit}
             >
               <InputLabel id="demo-simple-select-standard-label">
                 Seleccione una Departamento
@@ -333,6 +375,7 @@ const AddClient = ({ setShowModal }) => {
               fullWidth
               style={{ marginRight: 20, marginTop: 20 }}
               required
+              disabled={!isEdit}
             >
               <InputLabel id="demo-simple-select-standard-label">
                 Seleccione un Municipio
@@ -373,6 +416,7 @@ const AddClient = ({ setShowModal }) => {
                 fullWidth
                 style={{ marginRight: 20 }}
                 required
+                disabled={!isEdit}
               >
                 <InputLabel id="demo-simple-select-standard-label">
                   Seleccione una Comunidad
@@ -399,23 +443,28 @@ const AddClient = ({ setShowModal }) => {
                 </Select>
               </FormControl>
 
-              <Tooltip title="Agregar Comunidad" style={{ marginTop: 5 }}>
-                <IconButton
-                  onClick={() => {
-                    selectedMunicipality
-                      ? setShowAddModal(!showAddModal)
-                      : toastError("Seleccione un municipio");
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
+              {isEdit ? (
+                <Tooltip title="Agregar Comunidad" style={{ marginTop: 5 }}>
+                  <IconButton
+                    disabled={!isEdit}
+                    onClick={() => {
+                      selectedMunicipality
+                        ? setShowAddModal(!showAddModal)
+                        : toastError("Seleccione un municipio");
                     }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
+                  >
+                    <FontAwesomeIcon
+                      style={{
+                        fontSize: 25,
+                        color: "#ff5722",
+                      }}
+                      icon={faCirclePlus}
+                    />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <></>
+              )}
             </div>
 
             <TextField
@@ -426,33 +475,51 @@ const AddClient = ({ setShowModal }) => {
               onChange={(e) => setDireccion(e.target.value.toUpperCase())}
               label={"Direccion Cliente"}
               value={direccion}
+              disabled={!isEdit}
             />
           </Grid>
+        </Grid>
+
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button
+            fullWidth
+            variant="outlined"
+            style={{
+              borderRadius: 20,
+              borderColor: isEdit ? "#9c27b0" : "#ff9800",
+              color: isEdit ? "#9c27b0" : "#ff9800",
+              marginRight: 10,
+            }}
+            startIcon={
+              <FontAwesomeIcon icon={isEdit ? faCircleXmark : faPenToSquare} />
+            }
+            onClick={() => setIsEdit(!isEdit)}
+          >
+            {isEdit ? "Cancelar" : " Editar Cliente"}
+          </Button>
 
           <Button
             fullWidth
             variant="outlined"
-            style={{ borderRadius: 20, marginTop: 31 }}
+            style={{ borderRadius: 20, marginLeft: 10 }}
             startIcon={<FontAwesomeIcon icon={faSave} />}
             onClick={() => saveChangesAsync()}
+            disabled={!isEdit}
           >
-            Agregar Cliente
+            Actualizar Cliente
           </Button>
-        </Grid>
+        </div>
       </Container>
-
-      <SmallModal
-        titulo={"Agregar Comunidad"}
-        isVisible={showAddModal}
-        setVisible={setShowAddModal}
-      >
-        <CommunityAdd
-          setShowModal={setShowAddModal}
-          idMunicipality={selectedMunicipality}
-        />
-      </SmallModal>
     </div>
   );
 };
 
-export default AddClient;
+export default ClientDetails;

@@ -17,6 +17,7 @@ import {
   faUserCog,
   faWarehouse,
   faChartLine,
+  faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { getToken, logOutAsync } from "../services/Account";
@@ -185,6 +186,14 @@ const NavbarComponent = () => {
               <NavDropdown.Item as={Link} to="/tipo-negocio">
                 <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
                 Tipo Negocio
+              </NavDropdown.Item>
+
+              <NavDropdown.Item as={Link} to="/departments">
+                <FontAwesomeIcon
+                  icon={faLocationDot}
+                  style={{ marginRight: 10, marginRight: 15 }}
+                />
+                Ubicaciones
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
