@@ -275,9 +275,9 @@ const AddClient = ({ setShowModal }) => {
               label={"Cedula Cliente(000-000000-0000X)"}
               value={cedula}
             />
-
+          </Grid>
+          <Grid item sm={6}>
             <TextField
-              style={{ marginTop: 20 }}
               fullWidth
               required
               variant="standard"
@@ -296,15 +296,18 @@ const AddClient = ({ setShowModal }) => {
               value={correo}
             />
           </Grid>
-          <Grid item sm={6}>
+        </Grid>
+
+        <Grid container spacing={3}>
+          <Grid item sm={4}>
             <FormControl
               variant="standard"
               fullWidth
-              style={{ marginRight: 20 }}
+              style={{ marginRight: 20, marginTop: 20 }}
               required
             >
               <InputLabel id="demo-simple-select-standard-label">
-                Seleccione una Departamento
+                Seleccione un Depto
               </InputLabel>
               <Select
                 defaultValue=""
@@ -327,7 +330,8 @@ const AddClient = ({ setShowModal }) => {
                 })}
               </Select>
             </FormControl>
-
+          </Grid>
+          <Grid item sm={4}>
             <FormControl
               variant="standard"
               fullWidth
@@ -335,7 +339,7 @@ const AddClient = ({ setShowModal }) => {
               required
             >
               <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un Municipio
+                Seleccione un Municip.
               </InputLabel>
               <Select
                 defaultValue=""
@@ -358,7 +362,8 @@ const AddClient = ({ setShowModal }) => {
                 })}
               </Select>
             </FormControl>
-
+          </Grid>
+          <Grid item sm={4}>
             <div
               style={{
                 marginTop: 20,
@@ -371,11 +376,11 @@ const AddClient = ({ setShowModal }) => {
               <FormControl
                 variant="standard"
                 fullWidth
-                style={{ marginRight: 20 }}
+                style={{ marginRight: 10 }}
                 required
               >
                 <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione una Comunidad
+                  Seleccione una Com.
                 </InputLabel>
                 <Select
                   defaultValue=""
@@ -417,28 +422,28 @@ const AddClient = ({ setShowModal }) => {
                 </IconButton>
               </Tooltip>
             </div>
-
-            <TextField
-              style={{ marginTop: 20 }}
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-              label={"Direccion Cliente"}
-              value={direccion}
-            />
           </Grid>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            style={{ borderRadius: 20, marginTop: 31 }}
-            startIcon={<FontAwesomeIcon icon={faSave} />}
-            onClick={() => saveChangesAsync()}
-          >
-            Agregar Cliente
-          </Button>
         </Grid>
+
+        <TextField
+          style={{ marginTop: 20 }}
+          fullWidth
+          required
+          variant="standard"
+          onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+          label={"Direccion Cliente"}
+          value={direccion}
+        />
+
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 31 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveChangesAsync()}
+        >
+          Agregar Cliente
+        </Button>
       </Container>
 
       <SmallModal

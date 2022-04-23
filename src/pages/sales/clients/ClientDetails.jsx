@@ -38,7 +38,10 @@ import {
   getMunicipalitiesByDeptoAsync,
 } from "../../../services/CommunitiesApi";
 import { isEmpty } from "lodash";
-import { getClientByIdAsync } from "../../../services/ClientsApi";
+import {
+  getClientByIdAsync,
+  updateClientAsync,
+} from "../../../services/ClientsApi";
 
 const ClientDetails = ({ selectedClient, setShowModal }) => {
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -50,16 +53,14 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
 
   const [Cliente, setCliente] = useState([]);
 
-  const [nombreCliente, setNombreCliente] = useState(
-    selectedClient.nombreCliente
-  );
-  const [cedula, setCedula] = useState(selectedClient.cedula);
-  const [correo, setCorreo] = useState(selectedClient.correo);
-  const [telefono, setTelefono] = useState(selectedClient.telefono);
-  const [direccion, setDireccion] = useState(selectedClient.direccion);
+  const [nombreCliente, setNombreCliente] = useState("");
+  const [cedula, setCedula] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
 
   const [departmentList, setDepartmentList] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState();
+  const [selectedDepartment, setSelectedDepartment] = useState("");
 
   const [municipalityList, setMunicipalityList] = useState([]);
   const [selectedMunicipality, setSelectedMunicipality] = useState("");
@@ -72,6 +73,32 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
+      const result = await getDepartmentListAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setDepartmentList(result.data);
+
       const resultClient = await getClientByIdAsync(token, selectedClient.id);
       if (!resultClient.statusResponse) {
         setIsLoading(false);
@@ -99,7 +126,97 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
 
       setCliente(resultClient.data);
 
-      const result = await getDepartmentListAsync(token);
+      setNombreCliente(resultClient.data.nombreCliente);
+      setCedula(resultClient.data.cedula);
+      setTelefono(resultClient.data.telefono);
+      setCorreo(resultClient.data.correo);
+      setSelectedDepartment(
+        resultClient.data.community.municipality.department.id
+      );
+
+      //Definiendo el municipio seleccionado
+      const resultMunicipality = await getMunicipalitiesByDeptoAsync(
+        token,
+        resultClient.data.community.municipality.department.id
+      );
+      if (!resultMunicipality.statusResponse) {
+        setIsLoading(false);
+        if (resultMunicipality.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(resultMunicipality.error.message);
+        return;
+      }
+
+      if (resultMunicipality.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultMunicipality.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setMunicipalityList(resultMunicipality.data);
+      setSelectedMunicipality(resultClient.data.community.municipality.id);
+
+      //Definiendo la comunidad seleccionada
+      const resulCommunity = await getCommunitiesByMunAsync(
+        token,
+        resultClient.data.community.municipality.id
+      );
+
+      if (!resulCommunity.statusResponse) {
+        setIsLoading(false);
+        if (resulCommunity.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(resulCommunity.error.message);
+        return;
+      }
+
+      if (resulCommunity.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resulCommunity.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setCommunityList(resulCommunity.data);
+      setSelectedCommunity(resultClient.data.community.id);
+      setIsLoading(false);
+      setDireccion(resultClient.data.direccion);
+    })();
+  }, []);
+
+  const saveChangesAsync = async () => {
+    if (validate()) {
+      const data = {
+        id: selectedClient.id,
+        nombreCliente,
+        cedula,
+        correo,
+        telefono,
+        idCommunity: selectedCommunity,
+        direccion,
+      };
+      setIsLoading(true);
+
+      const result = await updateClientAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -123,52 +240,17 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
+
+      if (!result.data) {
+        setIsLoading(false);
+        toastError("Cliente no encontrado...!");
+        return;
+      }
+
       setIsLoading(false);
-      setDepartmentList(result.data);
-    })();
-  }, []);
-
-  const saveChangesAsync = async () => {
-    if (validate()) {
-      const data = {
-        nombreCliente,
-        cedula,
-        correo,
-        telefono,
-        idCommunity: selectedCommunity,
-        direccion,
-      };
-      //   setIsLoading(true);
-
-      //   const result = await addClientAsync(token, data);
-      //   if (!result.statusResponse) {
-      //     setIsLoading(false);
-      //     if (result.error.request.status === 401) {
-      //       navigate("/unauthorized");
-      //       return;
-      //     }
-      //     toastError(result.error.message);
-      //     return;
-      //   }
-
-      //   if (result.data === "eX01") {
-      //     setIsLoading(false);
-      //     deleteUserData();
-      //     deleteToken();
-      //     setIsLogged(false);
-      //     return;
-      //   }
-
-      //   if (result.data.isDefaultPass) {
-      //     setIsLoading(false);
-      //     setIsDefaultPass(true);
-      //     return;
-      //   }
-
-      //   setIsLoading(false);
-      //   setReload(!reload);
-      //   toastSuccess("Cliente Guardado...");
-      //   setShowModal(false);
+      setReload(!reload);
+      toastSuccess("Datos de Cliente Actualizado...");
+      setShowModal(false);
     }
   };
 
@@ -314,9 +396,9 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
               value={cedula}
               disabled={!isEdit}
             />
-
+          </Grid>
+          <Grid item sm={6}>
             <TextField
-              style={{ marginTop: 20 }}
               fullWidth
               required
               variant="standard"
@@ -337,11 +419,14 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
               disabled={!isEdit}
             />
           </Grid>
-          <Grid item sm={6}>
+        </Grid>
+
+        <Grid container spacing={3}>
+          <Grid item sm={4}>
             <FormControl
               variant="standard"
               fullWidth
-              style={{ marginRight: 20 }}
+              style={{ marginRight: 20, marginTop: 20 }}
               required
               disabled={!isEdit}
             >
@@ -369,7 +454,8 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
                 })}
               </Select>
             </FormControl>
-
+          </Grid>
+          <Grid item sm={4}>
             <FormControl
               variant="standard"
               fullWidth
@@ -401,7 +487,8 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
                 })}
               </Select>
             </FormControl>
-
+          </Grid>
+          <Grid item sm={4}>
             <div
               style={{
                 marginTop: 20,
@@ -466,19 +553,19 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
                 <></>
               )}
             </div>
-
-            <TextField
-              style={{ marginTop: 20 }}
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-              label={"Direccion Cliente"}
-              value={direccion}
-              disabled={!isEdit}
-            />
           </Grid>
         </Grid>
+
+        <TextField
+          style={{ marginTop: 20 }}
+          fullWidth
+          required
+          variant="standard"
+          onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+          label={"Direccion Cliente"}
+          value={direccion}
+          disabled={!isEdit}
+        />
 
         <div
           style={{

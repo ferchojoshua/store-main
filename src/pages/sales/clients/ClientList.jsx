@@ -23,7 +23,7 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import { getClientsAsync } from "../../../services/ClientsApi";
+import { deleteClientAsync, getClientsAsync } from "../../../services/ClientsApi";
 import AddClient from "./AddClient";
 import ClientDetails from "./ClientDetails";
 
@@ -94,39 +94,39 @@ const ClientList = () => {
     MySwal.fire({
       icon: "warning",
       title: <p>Confirmar Eliminar</p>,
-      text: `Elimiar: ${item.description}!`,
+      text: `Elimiar: ${item.nombreCliente}!`,
       showDenyButton: true,
       confirmButtonText: "Aceptar",
       denyButtonText: `Cancelar`,
     }).then((result) => {
       if (result.isConfirmed) {
-        // (async () => {
-        //   setIsLoading(true);
-        //   const result = await deleteProductAsync(token, item.id);
-        //   if (!result.statusResponse) {
-        //     setIsLoading(false);
-        //     if (result.error.request.status === 401) {
-        //       navigate("/unauthorized");
-        //       return;
-        //     }
-        //     toastError(result.error.message);
-        //     return;
-        //   }
+        (async () => {
+          setIsLoading(true);
+          const result = await deleteClientAsync(token, item.id);
+          if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
+            toastError(result.error.message);
+            return;
+          }
 
-        //   if (result.data === "eX01") {
-        //     setIsLoading(false);
-        //     deleteUserData();
-        //     deleteToken();
-        //     setIsLogged(false);
-        //     return;
-        //   }
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
 
-        //   if (result.data.isDefaultPass) {
-        //     setIsLoading(false);
-        //     setIsDefaultPass(true);
-        //     return;
-        //   }
-        // })();
+          if (result.data.isDefaultPass) {
+            setIsLoading(false);
+            setIsDefaultPass(true);
+            return;
+          }
+        })();
         setIsLoading(false);
         setReload(!reload);
         toastSuccess("Cliente Eliminado!");
