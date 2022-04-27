@@ -4,7 +4,6 @@ import {
   Tooltip,
   Paper,
   IconButton,
-  Divider,
   Button,
   Autocomplete,
 } from "@mui/material";
@@ -80,6 +79,7 @@ const ProductDescription = ({
       }
 
       if (resultProducts.data.isDefaultPass) {
+        setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
@@ -242,7 +242,12 @@ const ProductDescription = ({
       setSelectedProduct("");
       return;
     }
-    const result = await getProducExistanceAsync(token, newValue.id);
+    const data = {
+      IdProduct: newValue.id,
+      IdAlmacen: 4,
+    };
+    setIsLoading(true);
+    const result = await getProducExistanceAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
@@ -260,6 +265,13 @@ const ProductDescription = ({
       setIsLogged(false);
       return;
     }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+    setIsLoading(false);
     let resultado = { ...newValue, ...result.data };
     setSelectedProduct(resultado);
   };

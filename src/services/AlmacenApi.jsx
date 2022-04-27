@@ -1,7 +1,7 @@
 import { url } from "../helpers/Helpers";
 import axios from "axios";
 
-const controller = `${url}Almacens/`;
+const controller = `${url}Almacens`;
 
 export const getStoresAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
@@ -13,7 +13,7 @@ export const getStoresAsync = async (token) => {
   });
   try {
     await authAxios.get(controller).then((resp) => {
-      if (resp.status !== 200) {
+      if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
       } else {
@@ -22,6 +22,7 @@ export const getStoresAsync = async (token) => {
       }
     });
   } catch (error) {
+    console.log(error);
     result.statusResponse = false;
     result.error = error;
   }
@@ -49,7 +50,7 @@ export const addStoreAsync = async (token, data) => {
   } catch (error) {
     result.statusResponse = false;
     result.error = error;
-  }  
+  }
   return result;
 };
 
@@ -101,6 +102,7 @@ export const updateStoreAsync = async (token, data) => {
     result.statusResponse = false;
     result.error = error;
   }
+
   return result;
 };
 

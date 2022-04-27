@@ -10,6 +10,8 @@ import {
   Select,
   MenuItem,
   Container,
+  Autocomplete,
+  Chip,
 } from "@mui/material";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,6 +25,7 @@ import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty } from "lodash";
 import { createUserAsync } from "../../../services/UsersApi";
 import { useNavigate } from "react-router-dom";
+import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const AddUser = ({ setShowModal }) => {
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
@@ -41,6 +44,11 @@ const AddUser = ({ setShowModal }) => {
 
   const [userName, setUserName] = useState("");
   const [selectedRol, setSelectedRol] = useState("");
+
+  const [storeList, setStoreList] = useState([]);
+
+  const fixedOptions = [storeList];
+  const [value, setValue] = useState([...fixedOptions, storeList]);
 
   useEffect(() => {
     (async () => {
@@ -71,10 +79,43 @@ const AddUser = ({ setShowModal }) => {
       }
       setIsLoading(false);
       setRolesList(rolesResult.data);
+
+      const result = await getStoresAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setStoreList(
+        result.data.map((item) => {
+          return item.almacen;
+        })
+      );
     })();
   }, []);
 
   const addNewUser = async () => {
+    const filtered = value.filter((s) => s.id !== undefined);
+
     if (validate()) {
       const data = {
         firstName,
@@ -85,6 +126,7 @@ const AddUser = ({ setShowModal }) => {
         address,
         userName,
         rolId: selectedRol,
+        Stores: filtered,
       };
 
       setIsLoading(true);
@@ -147,8 +189,15 @@ const AddUser = ({ setShowModal }) => {
       return (isValid = false);
     }
 
+    if (value.filter((s) => s.id !== undefined).length === 0) {
+      toastError("Debe seleccionar al menos un almacen");
+      return (isValid = false);
+    }
+
     return isValid;
   };
+
+  // console.log(value);
 
   return (
     <div>
@@ -197,7 +246,7 @@ const AddUser = ({ setShowModal }) => {
           <Grid item sm={6}>
             <TextField
               fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
+              style={{ marginBottom: 10 }}
               variant="standard"
               onChange={(e) => setPhoneNumber(e.target.value)}
               label={"Telefono"}
@@ -207,7 +256,7 @@ const AddUser = ({ setShowModal }) => {
             <TextField
               fullWidth
               required
-              style={{ marginBottom: 10 }}
+              style={{ marginBottom: 10, marginTop: 10 }}
               variant="standard"
               onChange={(e) => setAddress(e.target.value.toUpperCase())}
               label={"Direccion"}
@@ -223,72 +272,6 @@ const AddUser = ({ setShowModal }) => {
               label={"Usuario"}
               value={userName}
             />
-
-            {/* <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setPassword(e.target.value)}
-              label={"Contraseña"}
-              value={password}
-              type={showPassword ? "text" : "password"}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label="toggle password visivility"
-                    >
-                      {showPassword ? (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          style={{ color: "#3f51b5" }}
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          style={{ color: "#3f51b5" }}
-                        />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            /> */}
-            {/* 
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              label={"Confirmar Contraseña"}
-              value={passwordConfirm}
-              type={showPassword ? "text" : "password"}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label="toggle password visivility"
-                    >
-                      {showPassword ? (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          style={{ color: "#3f51b5" }}
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          style={{ color: "#3f51b5" }}
-                        />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            /> */}
 
             <FormControl
               variant="standard"
@@ -321,6 +304,39 @@ const AddUser = ({ setShowModal }) => {
             </FormControl>
           </Grid>
         </Grid>
+
+        <Autocomplete
+          multiple
+          style={{ marginTop: 20, marginBottom: 20 }}
+          fullWidth
+          id="fixed-tags-demo"
+          value={value.name}
+          onChange={(event, newValue) => {
+            setValue([
+              ...fixedOptions,
+              ...newValue.filter(
+                (option) => fixedOptions.indexOf(option) === -1
+              ),
+            ]);
+          }}
+          options={storeList}
+          getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
+          renderOption={(props, option) => {
+            return (
+              <li {...props} key={option.id}>
+                {option.name}
+              </li>
+            );
+          }}
+          renderInput={(params) => (
+            <TextField
+              variant="standard"
+              {...params}
+              label="Seleccione uno o mas almacenes..."
+            />
+          )}
+        />
+
         <Button
           fullWidth
           variant="outlined"

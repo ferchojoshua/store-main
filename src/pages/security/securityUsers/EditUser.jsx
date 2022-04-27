@@ -9,6 +9,7 @@ import {
   FormControl,
   Select,
   MenuItem,
+  Autocomplete,
 } from "@mui/material";
 import { Container } from "react-bootstrap";
 import {
@@ -24,11 +25,11 @@ import {
 } from "../../../services/Account";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
-import { isEmpty } from "lodash";
+import { isEmpty, uniqBy } from "lodash";
 import { updateUserAsync } from "../../../services/UsersApi";
 
-import Loading from "../../../components/Loading";
 import { useNavigate } from "react-router-dom";
+import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const EditUser = ({ selectedUser, setShowModal }) => {
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
@@ -54,6 +55,12 @@ const EditUser = ({ selectedUser, setShowModal }) => {
     selectedUser.rol ? selectedUser.rol.id : ""
   );
 
+  const [storeList, setStoreList] = useState([]);
+
+  const [value, setValue] = useState([]);
+
+  // console.log(value);
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -77,13 +84,45 @@ const EditUser = ({ selectedUser, setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-
-      setIsLoading(false);
       setRolesList(rolesResult.data);
+
+      const result = await getStoresAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setStoreList(
+        result.data.map((item) => {
+          return item.almacen;
+        })
+      );
     })();
+    setValue(selectedUser.storeAccess);
   }, []);
 
   const updateUser = async () => {
+    const filtered = value.filter((s) => s.id !== undefined);
+
     if (validate()) {
       const data = {
         userName,
@@ -94,6 +133,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
         phoneNumber,
         address,
         rolId: selectedRol,
+        Stores: filtered,
       };
       setIsLoading(true);
       const result = await updateUserAsync(token, data);
@@ -156,8 +196,16 @@ const EditUser = ({ selectedUser, setShowModal }) => {
       return (isValid = false);
     }
 
+    if (value.filter((s) => s.id !== undefined).length === 0) {
+      toastError("Debe seleccionar al menos un almacen");
+      return (isValid = false);
+    }
+
     return isValid;
   };
+
+  // console.log(selectedUser.storeAccess);
+  // console.log(storeList);
 
   return (
     <div>
@@ -206,24 +254,6 @@ const EditUser = ({ selectedUser, setShowModal }) => {
               value={secondLastName}
               disabled={isEdit ? false : true}
             />
-
-            <Button
-              fullWidth
-              variant="outlined"
-              style={{
-                borderRadius: 20,
-                borderColor: isEdit ? "#9c27b0" : "#ff9800",
-                color: isEdit ? "#9c27b0" : "#ff9800",
-              }}
-              startIcon={
-                <FontAwesomeIcon
-                  icon={isEdit ? faCircleXmark : faPenToSquare}
-                />
-              }
-              onClick={() => setIsEdit(!isEdit)}
-            >
-              {isEdit ? "Cancelar" : " Editar Usuario"}
-            </Button>
           </Grid>
           <Grid item sm={6}>
             <TextField
@@ -288,11 +318,64 @@ const EditUser = ({ selectedUser, setShowModal }) => {
                 })}
               </Select>
             </FormControl>
+          </Grid>
+        </Grid>
 
+        <Autocomplete
+          multiple
+          disabled={isEdit ? false : true}
+          style={{ marginTop: 20, marginBottom: 20 }}
+          fullWidth
+          id="fixed-tags-demo"
+          value={value}
+          onChange={(event, newValue) => {
+            let result = uniqBy(newValue, "id");
+
+            setValue(result);
+          }}
+          options={storeList}
+          getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
+          renderOption={(props, option) => {
+            return (
+              <li {...props} key={option.id}>
+                {option.name}
+              </li>
+            );
+          }}
+          renderInput={(params) => (
+            <TextField
+              variant="standard"
+              {...params}
+              label="Seleccione uno o mas almacenes..."
+            />
+          )}
+        />
+
+        <Grid container spacing={3} style={{ marginTop: 5 }}>
+          <Grid item sm={6}>
             <Button
               fullWidth
               variant="outlined"
-              style={{ borderRadius: 20, marginTop: 10 }}
+              style={{
+                borderRadius: 20,
+                borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                color: isEdit ? "#9c27b0" : "#ff9800",
+              }}
+              startIcon={
+                <FontAwesomeIcon
+                  icon={isEdit ? faCircleXmark : faPenToSquare}
+                />
+              }
+              onClick={() => setIsEdit(!isEdit)}
+            >
+              {isEdit ? "Cancelar" : " Editar Usuario"}
+            </Button>
+          </Grid>
+          <Grid item sm={6}>
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{ borderRadius: 20 }}
               startIcon={<FontAwesomeIcon icon={faSave} />}
               onClick={() => updateUser()}
               disabled={!isEdit}
@@ -302,7 +385,6 @@ const EditUser = ({ selectedUser, setShowModal }) => {
           </Grid>
         </Grid>
       </Container>
-      <Loading />
     </div>
   );
 };

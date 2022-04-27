@@ -7,10 +7,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserGroup,
   faFileInvoiceDollar,
+  faHandHoldingDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 import SalesList from "./sale/SalesList";
 import ClientList from "./clients/ClientList";
+import NewSale from "./sale/NewSale";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -64,11 +66,23 @@ const SalesContainer = () => {
           <Tab
             icon={
               <FontAwesomeIcon
+                icon={faHandHoldingDollar}
+                style={{ fontSize: 20 }}
+              />
+            }
+            label="Nueva Venta"
+            {...a11yProps(0)}
+            style={{ fontSize: 12 }}
+          />
+
+          <Tab
+            icon={
+              <FontAwesomeIcon
                 icon={faFileInvoiceDollar}
                 style={{ fontSize: 20 }}
               />
             }
-            label="Ventas"
+            label="Estado de Cuenta"
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
@@ -86,10 +100,14 @@ const SalesContainer = () => {
         <Divider style={{ marginTop: 10 }} />
 
         <TabPanel value={value} index={0}>
-          <SalesList />
+          <NewSale />
         </TabPanel>
 
         <TabPanel value={value} index={1}>
+          <SalesList />
+        </TabPanel>
+
+        <TabPanel value={value} index={2}>
           <ClientList />
         </TabPanel>
       </Paper>
