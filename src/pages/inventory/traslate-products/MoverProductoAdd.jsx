@@ -359,7 +359,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
               fullWidth
               options={productList}
               getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-              value={selectedProduct}
+              value={selectedProduct === "" ? null : selectedProduct}
               onChange={(event, newValue) => {
                 handleChangeProduct(newValue);
               }}

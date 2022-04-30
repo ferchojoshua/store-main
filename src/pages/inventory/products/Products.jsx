@@ -168,7 +168,7 @@ const Products = () => {
           variant="standard"
           onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
           value={searchTerm}
-          label={"Buscar producto"}
+          label={"Buscar Producto"}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

@@ -137,8 +137,8 @@ const DetallesDeEntrada = ({
             id="combo-box-demo"
             fullWidth
             options={providerList}
-            getOptionLabel={(op) => (op ? `${op.nombre}` || "" : "")}
-            value={selectedProvider}
+            getOptionLabel={(op) => (op ? `${op.nombre}` : "")}
+            value={selectedProvider === "" ? null : selectedProvider}
             onChange={(event, newValue) => {
               setSelectedProvider(newValue);
             }}

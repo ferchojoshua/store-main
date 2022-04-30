@@ -22,7 +22,6 @@ export const getStoresAsync = async (token) => {
       }
     });
   } catch (error) {
-    console.log(error);
     result.statusResponse = false;
     result.error = error;
   }

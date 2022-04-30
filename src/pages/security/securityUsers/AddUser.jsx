@@ -197,8 +197,6 @@ const AddUser = ({ setShowModal }) => {
     return isValid;
   };
 
-  // console.log(value);
-
   return (
     <div>
       <Container style={{ width: 800 }}>

@@ -47,8 +47,6 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
       newPVM,
     };
 
-    console.log(data);
-
     if (newExistencias === "" || newExistencias === null) {
       toastError("Debe establecer una existencia...");
       return;

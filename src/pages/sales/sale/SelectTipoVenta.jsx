@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { FormLabel } from "react-bootstrap";
 
-const SelectTipoVenta = ({ typeVenta, setTypeVenta }) => {
+const SelectTipoVenta = ({ typeVenta, setTypeVenta, typeClient }) => {
   const handleChange = (event) => {
     setTypeVenta(event.target.value);
   };
@@ -16,7 +16,11 @@ const SelectTipoVenta = ({ typeVenta, setTypeVenta }) => {
     <div>
       <FormControl style={{ marginTop: 20 }}>
         <FormLabel
-          style={{ textDecoration: "underline", fontWeight: "bold", fontSize:20 }}
+          style={{
+            textDecoration: "underline",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
           id="demo-radio-buttons-group-label"
         >
           Tipo de Venta
@@ -38,6 +42,7 @@ const SelectTipoVenta = ({ typeVenta, setTypeVenta }) => {
           <FormControlLabel
             value="credito"
             control={<Radio />}
+            disabled={typeClient}
             label="Venta de Credito"
           />
         </RadioGroup>

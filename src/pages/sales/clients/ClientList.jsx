@@ -23,7 +23,10 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import { deleteClientAsync, getClientsAsync } from "../../../services/ClientsApi";
+import {
+  deleteClientAsync,
+  getClientsAsync,
+} from "../../../services/ClientsApi";
 import AddClient from "./AddClient";
 import ClientDetails from "./ClientDetails";
 
@@ -85,7 +88,7 @@ const ClientList = () => {
         return;
       }
       setIsLoading(false);
-      // console.log(result.data)
+
       setClientList(result.data);
     })();
   }, [reload]);

@@ -3,20 +3,13 @@ import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Paper,
   TextField,
   Autocomplete,
-  FormControlLabel,
-  Checkbox,
-  Tooltip,
-  IconButton,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from "@mui/material";
-
-import { getClientsAsync } from "../../../services/ClientsApi";
 
 import {
   deleteToken,
@@ -26,18 +19,10 @@ import {
 } from "../../../services/Account";
 import { toastError } from "../../../helpers/Helpers";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import MediumModal from "../../../components/modals/MediumModal";
-import { getProductsAsync } from "../../../services/ProductsApi";
 import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
 
-const SelectProduct = ({
-  selectedProduct,
-  setSelectedProduct,
-  
-}) => {
-  const { setIsLoading, setIsLogged, reload, setReload, setIsDefaultPass } =
+const SelectProduct = ({ selectedProduct, setSelectedProduct }) => {
+  const { setIsLoading, setIsLogged, setIsDefaultPass, reload } =
     useContext(DataContext);
   let navigate = useNavigate();
 
@@ -45,7 +30,6 @@ const SelectProduct = ({
 
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("");
-
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {
@@ -76,9 +60,40 @@ const SelectProduct = ({
         return;
       }
       setStoreList(result.data.storeAccess);
+
+      if (selectedStore !== "") {
+        const data = {
+          idAlmacen: selectedStore,
+        };
+        setIsLoading(true);
+        const result = await getExistencesByStoreAsync(token, data);
+        if (!result.statusResponse) {
+          setIsLoading(false);
+          if (result.error.request.status === 401) {
+            navigate("/unauthorized");
+            return;
+          }
+          toastError(result.error.message);
+          return;
+        }
+        if (result.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+
+        if (result.data.isDefaultPass) {
+          setIsLoading(false);
+          setIsDefaultPass(true);
+          return;
+        }
+        setProductList(result.data);
+      }
       setIsLoading(false);
     })();
-  }, []);
+  }, [reload]);
 
   const handleChangeStore = async (event) => {
     setSelectedStore(event.target.value);
@@ -113,8 +128,6 @@ const SelectProduct = ({
     setProductList(result.data);
   };
 
-
-
   return (
     <div>
       <FormControl
@@ -147,14 +160,13 @@ const SelectProduct = ({
         id="combo-box-demo"
         fullWidth
         options={productList}
-        getOptionLabel={(op) => (op ? `${op.producto.description}` || "" : "")}
-        value={selectedProduct}
+        getOptionLabel={(op) => (op ? `${op.producto.description}` : "")}
+        value={selectedProduct === "" ? null : selectedProduct}
         onChange={(event, newValue) => {
           setSelectedProduct(newValue);
         }}
         noOptionsText="Producto no encontrado..."
         renderOption={(props, option) => {
-          console.log(option);
           return (
             <li
               {...props}
@@ -173,8 +185,6 @@ const SelectProduct = ({
           />
         )}
       />
-
-   
     </div>
   );
 };

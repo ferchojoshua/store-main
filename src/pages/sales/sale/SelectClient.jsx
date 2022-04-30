@@ -10,7 +10,6 @@ import {
   Tooltip,
   IconButton,
   FormGroup,
-  Divider,
 } from "@mui/material";
 
 import { getClientsAsync } from "../../../services/ClientsApi";
@@ -35,7 +34,7 @@ const SelectClient = ({
   typeClient,
   setTypeClient,
 }) => {
-  const { setIsLoading, setIsLogged, reload, setReload, setIsDefaultPass } =
+  const { setIsLoading, setIsLogged, reload, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
 
@@ -80,12 +79,13 @@ const SelectClient = ({
 
   return (
     <div>
-      <div style={{ textAlign: "left",  }}>
+      <div style={{ textAlign: "left" }}>
         <FormGroup>
           <FormControlLabel
             control={
               <Checkbox
                 size="medium"
+                checked={typeClient}
                 onChange={() => setTypeClient(!typeClient)}
               />
             }
@@ -117,7 +117,7 @@ const SelectClient = ({
             fullWidth
             options={clientList}
             getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
-            value={selectedClient}
+            value={selectedClient === "" ? null : selectedClient}
             onChange={(event, newValue) => {
               setSelectedClient(newValue);
             }}

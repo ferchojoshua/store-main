@@ -59,8 +59,6 @@ const EditUser = ({ selectedUser, setShowModal }) => {
 
   const [value, setValue] = useState([]);
 
-  // console.log(value);
-
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -204,9 +202,6 @@ const EditUser = ({ selectedUser, setShowModal }) => {
     return isValid;
   };
 
-  // console.log(selectedUser.storeAccess);
-  // console.log(storeList);
-
   return (
     <div>
       <Container style={{ width: 800 }}>
@@ -330,7 +325,6 @@ const EditUser = ({ selectedUser, setShowModal }) => {
           value={value}
           onChange={(event, newValue) => {
             let result = uniqBy(newValue, "id");
-
             setValue(result);
           }}
           options={storeList}

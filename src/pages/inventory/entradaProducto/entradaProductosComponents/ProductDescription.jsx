@@ -311,8 +311,8 @@ const ProductDescription = ({
                 id="combo-box-demo"
                 fullWidth
                 options={productList}
-                getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-                value={selectedProduct}
+                getOptionLabel={(op) => (op ? `${op.description}` : "")}
+                value={selectedProduct === "" ? null : selectedProduct}
                 onChange={(event, newValue) => {
                   getExistencias(newValue);
                 }}

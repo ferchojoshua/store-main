@@ -134,7 +134,6 @@ const ProductExistences = () => {
       }
 
       setIsLoading(false);
-      //   console.log(result.data);
       setProductList(result.data);
     })();
   }, [reload]);
@@ -174,7 +173,6 @@ const ProductExistences = () => {
     setProductList(result.data);
   };
 
-  // console.log(selectedProduct);
 
   return (
     <div>

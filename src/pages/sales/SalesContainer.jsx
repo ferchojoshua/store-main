@@ -10,9 +10,10 @@ import {
   faHandHoldingDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
-import SalesList from "./sale/SalesList";
+
 import ClientList from "./clients/ClientList";
 import NewSale from "./sale/NewSale";
+import SalesList from "./accountStatus/SalesList";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
