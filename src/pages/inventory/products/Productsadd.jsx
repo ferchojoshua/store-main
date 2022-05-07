@@ -133,6 +133,7 @@ const Productsadd = ({ setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
+      setIsLoading(false);
       setTipoNegocio(resultTipoNegocio.data);
     })();
   }, []);

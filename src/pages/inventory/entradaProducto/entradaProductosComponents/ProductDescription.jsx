@@ -246,6 +246,7 @@ const ProductDescription = ({
       IdProduct: newValue.id,
       IdAlmacen: 4,
     };
+
     setIsLoading(true);
     const result = await getProducExistanceAsync(token, data);
     if (!result.statusResponse) {
@@ -273,6 +274,7 @@ const ProductDescription = ({
     }
     setIsLoading(false);
     let resultado = { ...newValue, ...result.data };
+
     setSelectedProduct(resultado);
   };
 
@@ -356,7 +358,7 @@ const ProductDescription = ({
                       color: "#2979ff",
                       fontWeight: "bold",
                     }}
-                  >{`Codigo: ${selectedProduct.id}`}</p>
+                  >{`Codigo: ${selectedProduct.producto.id}`}</p>
                 </div>
                 <div className="col-sm-2">
                   <p

@@ -115,7 +115,7 @@ const AddEntradaProducto = () => {
     }
 
     const data = {
-      product: selectedProduct,
+      product: selectedProduct.producto,
       cantidad,
       costoUnitario: costo,
       descuento: descuento ? descuento : 0,
@@ -124,6 +124,7 @@ const AddEntradaProducto = () => {
       precioVentaMayor: parseFloat(precioVenta),
       precioVentaDetalle: parseFloat(precioVentaDetalle),
     };
+
     setMontoFactura(montoFactura + cantidad * costo);
     setSelectedProduct("");
     setCantidad("");

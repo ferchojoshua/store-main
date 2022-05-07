@@ -257,7 +257,7 @@ const ProductExistences = () => {
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
+                    <td>{item.producto.id}</td>
                     <td style={{ textAlign: "left" }}>
                       {item.producto.tipoNegocio.description}
                     </td>

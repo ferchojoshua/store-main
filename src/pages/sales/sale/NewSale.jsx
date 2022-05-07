@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -172,7 +172,6 @@ const NewSale = () => {
               <SelectProduct
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
-              
               />
 
               <SelectTipoVenta

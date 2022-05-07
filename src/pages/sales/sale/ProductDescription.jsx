@@ -23,8 +23,8 @@ const ProductDescription = ({
   setcostoXProducto,
   addToProductList,
 }) => {
-  const { precioVentaDetalle, precioVentaMayor, existencia } = selectedProduct;
- 
+  const { precioVentaDetalle, precioVentaMayor, existencia, producto } =
+    selectedProduct;
 
   const funcCantidad = (value) => {
     if (value === 0 || value === "0") {
@@ -111,7 +111,7 @@ const ProductDescription = ({
                   color: "#2979ff",
                   fontWeight: "bold",
                 }}
-              >{`Codigo: ${selectedProduct.id}`}</p>
+              >{`Codigo: ${producto.id}`}</p>
             </div>
             <div className="col-sm-3">
               <p

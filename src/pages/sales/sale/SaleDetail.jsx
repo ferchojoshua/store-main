@@ -67,7 +67,8 @@ const SaleDetail = ({
                     <td style={{ textAlign: "left" }}>
                       {item.product.description}
                     </td>
-                    <td>{item.cantidad}</td>
+                    <td>{item.cantidad}
+                    </td>
                     <td>{`${item.descuento}%`}</td>
                     <td>
                       {item.costoUnitario.toLocaleString("es-NI", {
