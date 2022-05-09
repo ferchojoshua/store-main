@@ -18,6 +18,7 @@ import {
   faCircleXmark,
   faExternalLinkAlt,
   faHandHoldingDollar,
+  faReplyAll,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
@@ -94,7 +95,6 @@ const SalesList = () => {
       setIsLoading(false);
       setListaVentas(result.data);
     })();
-    console.log(reload);
   }, [reload]);
 
   return (
@@ -250,7 +250,7 @@ const SalesList = () => {
                           setShowReturnModal(true);
                         }}
                       >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        <FontAwesomeIcon icon={faReplyAll} />
                       </IconButton>
                     </td>
                   </tr>

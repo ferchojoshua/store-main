@@ -1,22 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import { toastError, toastSuccess } from "../../../../helpers/Helpers";
 import {
-  TextField,
   Button,
   Divider,
   Container,
   Typography,
-  Paper,
-  InputAdornment,
   Tooltip,
   IconButton,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleMinus,
-  faCirclePlus,
   faSave,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
@@ -27,16 +23,13 @@ import {
 } from "../../../../services/Account";
 import moment from "moment";
 import {
-  addAbonoAsync,
   anularSaleAsync,
-  getQuotesBySaleAsync,
+  AnularVentaParcialAsync,
 } from "../../../../services/SalesApi";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isEmpty } from "lodash";
-import NoData from "../../../../components/NoData";
+
 import { Table } from "react-bootstrap";
-import { width } from "@mui/system";
 
 const SaleReturn = ({ selectedVenta, setVisible }) => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -45,13 +38,19 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     id,
     fechaVencimiento,
     fechaVenta,
-    facturedBy,
     saldo,
     montoVenta,
     client,
     saleDetails,
     nombreCliente,
+    isCanceled,
   } = selectedVenta;
+
+  const totalAbonado = montoVenta - saldo;
+  const [detalleVenta, setDetalleVenta] = useState(saleDetails);
+
+  const [saleMount, setSaleMount] = useState(montoVenta);
+  const [saldoVenta, setSaldoVenta] = useState(saldo);
 
   const MySwal = withReactContent(Swal);
   let navigate = useNavigate();
@@ -103,6 +102,117 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     });
   };
 
+  const cantidadUpdate = async (item) => {
+    const {
+      cantidad,
+      costoTotal,
+      costoUnitario,
+      descuento,
+      id,
+      isAnulado,
+      product,
+      pvd,
+      pvm,
+      store,
+    } = item;
+
+    let newCantidad = cantidad;
+    let totalCost = costoTotal;
+
+    if (cantidad - 1 === 0) {
+      toastError("Cantidad no puede ser cero(0)");
+      return;
+    }
+    newCantidad = newCantidad - 1;
+
+    totalCost = costoUnitario * newCantidad;
+
+    const editedItem = detalleVenta.map((item) =>
+      item.id === id
+        ? {
+            cantidad: newCantidad,
+            costoTotal: totalCost,
+            costoUnitario,
+            descuento,
+            id,
+            isAnulado,
+            product,
+            pvd,
+            pvm,
+            store,
+          }
+        : item
+    );
+    let suma = 0;
+    editedItem.map((item) => (suma += item.costoTotal));
+    setSaldoVenta(suma - totalAbonado);
+    setSaleMount(suma);
+    setDetalleVenta(editedItem);
+  };
+
+  const devolucionParcial = async (item) => {
+    if (detalleVenta.length === 1) {
+      toastError("La factura no puede quedar vacia...");
+      return;
+    }
+    const filtered = detalleVenta.filter((i) => i.id !== item.id);
+    setDetalleVenta(filtered);
+    let suma = 0;
+    filtered.map((item) => (suma += item.costoTotal));
+    setSaleMount(suma);
+  };
+
+  const saveChanges = async () => {
+    MySwal.fire({
+      icon: "question",
+      title: <p>Editar Venta</p>,
+      text: `Esta seguro de editar esta venta?`,
+      showDenyButton: true,
+      confirmButtonText: "Aceptar",
+      denyButtonText: `Cancelar`,
+      iconColor: "#f50057",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        (async () => {
+          setIsLoading(true);
+          const data = {
+            idSale: id,
+            monto: saleMount,
+            saldo: saldoVenta,
+            saleDetails: detalleVenta,
+          };
+          const result = await AnularVentaParcialAsync(token, data);
+          if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate("/unauthorized");
+              return;
+            }
+            toastError(result.error.message);
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
+
+          if (result.data.isDefaultPass) {
+            setIsLoading(false);
+            setIsDefaultPass(true);
+            return;
+          }
+        })();
+        setIsLoading(false);
+        toastSuccess("Venta Actualizada...");
+        setReload(!reload);
+        setVisible(false);
+      }
+    });
+  };
   return (
     <div>
       <Container style={{ width: 700 }}>
@@ -197,24 +307,93 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
 
         <div
           style={{
-            marginTop: 20,
             display: "flex",
             flexDirection: "row",
             alignContent: "center",
+            justifyContent: "space-between",
           }}
         >
-          <h4>Detalle de Venta</h4>
-        </div>
-
-        <Table hover size="sm">
-          <caption style={{ color: "#4caf50", paddingRight: 75 }}>
-            <Typography variant="body1" style={{ textAlign: "right" }}>
-              {`Monto de Venta: ${new Intl.NumberFormat("es-NI", {
+          <h4
+            style={{
+              marginTop: 20,
+            }}
+          >
+            Detalle de Venta
+          </h4>
+          {isCanceled ? (
+            <Typography
+              variant="body2"
+              style={{
+                color: "#4caf50",
+                fontWeight: "bold",
+                marginTop: 20,
+              }}
+            >
+              {`Saldo: ${new Intl.NumberFormat("es-NI", {
                 style: "currency",
                 currency: "NIO",
-              }).format(montoVenta)}`}
+              }).format(0)}`}
             </Typography>
-          </caption>
+          ) : (
+            <div>
+              <Typography
+                variant="body2"
+                style={{
+                  textAlign: "right",
+                  fontWeight: "bold",
+                  color: "#ff9800",
+                }}
+              >
+                {`Monto de Venta: ${new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(saleMount)}`}
+              </Typography>
+              <Typography
+                variant="body2"
+                style={{
+                  color: "#4caf50",
+                  fontWeight: "bold",
+                  textAlign: "right",
+                }}
+              >
+                {`Total Abonado: ${new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(totalAbonado)}`}
+              </Typography>
+              <Divider />
+              <Typography
+                variant="body2"
+                style={{
+                  color: saldoVenta > 0 ? "#f50057" : "#4caf50",
+                  fontWeight: "bold",
+                  textAlign: "right",
+                }}
+              >
+                {`Saldo: ${new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(saldoVenta)}`}
+              </Typography>
+            </div>
+          )}
+        </div>
+        <Divider />
+
+        <Table hover size="sm">
+          {isCanceled ? (
+            <caption style={{ color: "#4caf50", paddingRight: 75 }}>
+              <Typography variant="body1" style={{ textAlign: "right" }}>
+                {`Monto de Venta: ${new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(saleMount)}`}
+              </Typography>
+            </caption>
+          ) : (
+            <></>
+          )}
           <thead>
             <tr>
               <th>#</th>
@@ -227,7 +406,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
             </tr>
           </thead>
           <tbody>
-            {saleDetails.map((item) => {
+            {detalleVenta.map((item) => {
               return (
                 <tr key={item.id}>
                   <td>{item.id}</td>
@@ -237,29 +416,16 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                   </td>
 
                   <td style={{ textAlign: "center", width: 90 }}>
+                    {item.cantidad}
                     <Tooltip title="Quitar">
                       <IconButton
                         size="small"
                         style={{ marginRight: 5, color: "#ff9800" }}
-                        // onClick={() => {
-                        //   setSelectedVenta(item);
-                        //   setShowModal(true);
-                        // }}
+                        onClick={() => {
+                          cantidadUpdate(item);
+                        }}
                       >
                         <FontAwesomeIcon icon={faCircleMinus} />
-                      </IconButton>
-                    </Tooltip>
-                    {item.cantidad}
-                    <Tooltip title="Agregar">
-                      <IconButton
-                        size="small"
-                        style={{ marginLeft: 5, color: "#ff9800" }}
-                        // onClick={() => {
-                        //   setSelectedVenta(item);
-                        //   setShowModal(true);
-                        // }}
-                      >
-                        <FontAwesomeIcon icon={faCirclePlus} />
                       </IconButton>
                     </Tooltip>
                   </td>
@@ -284,10 +450,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                     <Tooltip title="Eliminar">
                       <IconButton
                         style={{ marginRight: 10, color: "#f50057" }}
-                        // onClick={() => {
-                        //   setSelectedVenta(item);
-                        //   setShowModal(true);
-                        // }}
+                        onClick={() => {
+                          devolucionParcial(item);
+                        }}
                       >
                         <FontAwesomeIcon icon={faTrashAlt} />
                       </IconButton>
@@ -330,9 +495,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           </div>
           <div className="col-sm-5">
             <Button
-              // onClick={() => {
-              //   addAbono();
-              // }}
+              onClick={() => {
+                saveChanges();
+              }}
               style={{ borderRadius: 20 }}
               variant="outlined"
               fullWidth
