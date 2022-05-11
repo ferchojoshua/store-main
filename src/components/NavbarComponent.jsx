@@ -25,6 +25,14 @@ import { simpleMessage } from "../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 
 const NavbarComponent = () => {
+  const { REACT_APP_ROUTE, REACT_APP_PROD_ROUTE } = process.env;
+  let rout = "";
+  if (process.env.NODE_ENV === "production") {
+    rout = `${REACT_APP_PROD_ROUTE}`;
+  } else {
+    rout = `${REACT_APP_ROUTE}`;
+  }
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [active, setActive] = useState("home");
 
@@ -72,7 +80,7 @@ const NavbarComponent = () => {
             fontSize: 20,
           }}
           as={Link}
-          to="/"
+          to={rout}
           onClick={() => setActive("home")}
         >
           <img
@@ -102,7 +110,7 @@ const NavbarComponent = () => {
                 fontSize: 17,
               }}
               as={Link}
-              to="/"
+              to={rout}
             >
               <FontAwesomeIcon icon={faHome} style={{ marginRight: 10 }} />
               Inicio
@@ -116,7 +124,7 @@ const NavbarComponent = () => {
                 fontSize: 17,
               }}
               as={Link}
-              to="/sales"
+              to={`${rout}/sales`}
             >
               <FontAwesomeIcon icon={faChartLine} style={{ marginRight: 10 }} />
               Ventas
@@ -130,7 +138,7 @@ const NavbarComponent = () => {
                 fontSize: 17,
               }}
               as={Link}
-              to="/inventory"
+              to={`${rout}/inventory`}
             >
               <FontAwesomeIcon
                 icon={faBoxesStacked}
@@ -147,7 +155,7 @@ const NavbarComponent = () => {
               }}
               eventKey="security"
               as={Link}
-              to="/security"
+              to={`${rout}/security`}
             >
               <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
               Seguridad
@@ -168,14 +176,14 @@ const NavbarComponent = () => {
                 Miscelaneos
               </NavDropdown.Header>
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/stores">
+              <NavDropdown.Item as={Link} to={`${rout}/stores`}>
                 <FontAwesomeIcon
                   icon={faWarehouse}
                   style={{ marginRight: 10 }}
                 />
                 Almacenes
               </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/providers">
+              <NavDropdown.Item as={Link} to={`${rout}/providers`}>
                 <FontAwesomeIcon
                   icon={faPeopleCarryBox}
                   style={{ marginRight: 10 }}
@@ -183,12 +191,12 @@ const NavbarComponent = () => {
                 Proveedores
               </NavDropdown.Item>
 
-              <NavDropdown.Item as={Link} to="/tipo-negocio">
+              <NavDropdown.Item as={Link} to={`${rout}/tipo-negocio`}>
                 <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
                 Tipo Negocio
               </NavDropdown.Item>
 
-              <NavDropdown.Item as={Link} to="/departments">
+              <NavDropdown.Item as={Link} to={`${rout}/departments`}>
                 <FontAwesomeIcon
                   icon={faLocationDot}
                   style={{ marginRight: 10, marginRight: 15 }}

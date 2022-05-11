@@ -364,7 +364,7 @@ const UserList = () => {
                 <th style={{ textAlign: "left" }}>Correo</th>
                 <th style={{ textAlign: "left" }}>Telefono</th>
                 <th style={{ textAlign: "left" }}>rol</th>
-                <th>Acciones</th>
+                <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -378,9 +378,9 @@ const UserList = () => {
                     <td style={{ textAlign: "left" }}>
                       {item.rol ? item.rol.roleName : ""}
                     </td>
-                    <td>
+                    <td style={{ width: 150 }}>
                       <IconButton
-                        style={{ marginRight: 10, color: "#009688" }}
+                        style={{ marginRight: 5, color: "#009688" }}
                         onClick={() => {
                           userEdit(item);
                         }}
@@ -390,7 +390,7 @@ const UserList = () => {
 
                       {item.isActive ? (
                         <IconButton
-                          style={{ marginRight: 10, color: "#f44336" }}
+                          style={{ marginRight: 5, color: "#f44336" }}
                           onClick={() => {
                             resetPassword(item);
                           }}

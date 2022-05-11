@@ -23,6 +23,7 @@ import {
 import { updateRolAsync } from "../../../services/RolApi";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
+import "./style.css";
 
 const EditRol = ({ setShowModal, selectedRol }) => {
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
@@ -36,20 +37,24 @@ const EditRol = ({ setShowModal, selectedRol }) => {
 
   const [rolName, setRolName] = useState(selectedRol.roleName);
 
+  const [ventasVer, setVentasVer] = useState(false);
+  const [ventasCreate, setVentasCreate] = useState(false);
+  const [ventasDelete, setVentasDelete] = useState(false);
+
+  const [clientsVer, setClientsVer] = useState(false);
+  const [clientsCreate, setClientsCreate] = useState(false);
+  const [clientsUpdate, setClientsUpdate] = useState(false);
+  const [clientsDelete, setClientsDelete] = useState(false);
+
   const [inProductsVer, setInProductsVer] = useState(false);
   const [inProductsCreate, setInProductsCreate] = useState(false);
   const [inProductsUpdate, setInProductsUpdate] = useState(false);
-  const [inProductsDelete, setInProductsDelete] = useState(false);
 
   const [ProductExistenceVer, setExistenceProductsVer] = useState(false);
-  const [ProductExistenceCreate, setExistenceProductsCreate] = useState(false);
   const [ProductExistenceUpdate, setExistenceProductsUpdate] = useState(false);
-  const [ProductExistenceDelete, setExistenceProductsDelete] = useState(false);
 
   const [productTraslateVer, setProductTraslateVer] = useState(false);
   const [productTraslateCreate, setProductTraslateCreate] = useState(false);
-  const [productTraslateUpdate, setProductTraslateUpdate] = useState(false);
-  const [productTraslateDelete, setProductTraslateDelete] = useState(false);
 
   const [productsVer, setProductsVer] = useState(false);
   const [productsCreate, setProductsCreate] = useState(false);
@@ -71,9 +76,39 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [miscelaneosUpdate, setMiscelaneosUpdate] = useState(false);
   const [miscelaneosDelete, setMiscelaneosDelete] = useState(false);
 
+  const [communitiesVer, setCommunitiesVer] = useState(false);
+  const [communitiesCreate, setCommunitiesCreate] = useState(false);
+  const [communitiesUpdate, setCommunitiesUpdate] = useState(false);
+  const [communitiesDelete, setCommunitiesDelete] = useState(false);
+
   useEffect(() => {
     selectedRol.permissions.map((item) => {
       switch (item.description) {
+        //Ventas Producto
+        case "SALES VER":
+          setVentasVer(item.isEnable);
+          break;
+        case "SALES CREATE":
+          setVentasCreate(item.isEnable);
+          break;
+        case "SALES DELETE":
+          setVentasDelete(item.isEnable);
+          break;
+
+        //Clientes
+        case "CLIENTS VER":
+          setClientsVer(item.isEnable);
+          break;
+        case "CLIENTS CREATE":
+          setClientsCreate(item.isEnable);
+          break;
+        case "CLIENTS UPDATE":
+          setClientsUpdate(item.isEnable);
+          break;
+        case "CLIENTS DELETE":
+          setClientsDelete(item.isEnable);
+          break;
+
         //Entrada Producto
         case "ENTRADAPRODUCTOS VER":
           setInProductsVer(item.isEnable);
@@ -84,22 +119,13 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         case "ENTRADAPRODUCTOS UPDATE":
           setInProductsUpdate(item.isEnable);
           break;
-        case "ENTRADAPRODUCTOS DELETE":
-          setInProductsDelete(item.isEnable);
-          break;
 
         //Existencias de Producto
         case "EXISTANCE VER":
           setExistenceProductsVer(item.isEnable);
           break;
-        case "EXISTANCE CREATE":
-          setExistenceProductsCreate(item.isEnable);
-          break;
         case "EXISTANCE UPDATE":
           setExistenceProductsUpdate(item.isEnable);
-          break;
-        case "EXISTANCE DELETE":
-          setExistenceProductsDelete(item.isEnable);
           break;
 
         //Traslado de Producto
@@ -108,12 +134,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "PRODUCT TRANSLATE CREATE":
           setProductTraslateCreate(item.isEnable);
-          break;
-        case "PRODUCT TRANSLATE UPDATE":
-          setProductTraslateUpdate(item.isEnable);
-          break;
-        case "PRODUCT TRANSLATE DELETE":
-          setProductTraslateDelete(item.isEnable);
           break;
 
         //Products
@@ -172,6 +192,20 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           setMiscelaneosDelete(item.isEnable);
           break;
 
+        //Communities
+        case "COMMUNITIES VER":
+          setCommunitiesVer(item.isEnable);
+          break;
+        case "COMMUNITIES CREATE":
+          setCommunitiesCreate(item.isEnable);
+          break;
+        case "COMMUNITIES UPDATE":
+          setCommunitiesUpdate(item.isEnable);
+          break;
+        case "COMMUNITIES DELETE":
+          setCommunitiesDelete(item.isEnable);
+          break;
+
         default:
           break;
       }
@@ -186,6 +220,31 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     editedRol.roleName = rolName;
     editedRol.permissions.map((item) => {
       switch (item.description) {
+        //Ventas Producto
+        case "SALES VER":
+          item.isEnable = ventasVer;
+          break;
+        case "SALES CREATE":
+          item.isEnable = ventasCreate;
+          break;
+        case "SALES DELETE":
+          item.isEnable = ventasDelete;
+          break;
+
+        //Clientes
+        case "CLIENTS VER":
+          item.isEnable = clientsVer;
+          break;
+        case "CLIENTS CREATE":
+          item.isEnable = clientsCreate;
+          break;
+        case "CLIENTS UPDATE":
+          item.isEnable = clientsUpdate;
+          break;
+        case "CLIENTS DELETE":
+          item.isEnable = clientsDelete;
+          break;
+
         //Entrada Producto
         case "ENTRADAPRODUCTOS VER":
           item.isEnable = inProductsVer;
@@ -196,22 +255,14 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         case "ENTRADAPRODUCTOS UPDATE":
           item.isEnable = inProductsUpdate;
           break;
-        case "ENTRADAPRODUCTOS DELETE":
-          item.isEnable = inProductsDelete;
-          break;
 
         //Existencias de Producto
         case "EXISTANCE VER":
           item.isEnable = ProductExistenceVer;
           break;
-        case "EXISTANCE CREATE":
-          item.isEnable = ProductExistenceCreate;
-          break;
+
         case "EXISTANCE UPDATE":
           item.isEnable = ProductExistenceUpdate;
-          break;
-        case "EXISTANCE DELETE":
-          item.isEnable = ProductExistenceDelete;
           break;
 
         //Traslado de Producto
@@ -220,12 +271,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "PRODUCT TRANSLATE CREATE":
           item.isEnable = productTraslateCreate;
-          break;
-        case "PRODUCT TRANSLATE UPDATE":
-          item.isEnable = productTraslateUpdate;
-          break;
-        case "PRODUCT TRANSLATE DELETE":
-          item.isEnable = productTraslateDelete;
           break;
 
         //Products
@@ -284,6 +329,20 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = miscelaneosDelete;
           break;
 
+        //Comunidades
+        case "COMMUNITIES VER":
+          item.isEnable = communitiesVer;
+          break;
+        case "COMMUNITIES CREATE":
+          item.isEnable = communitiesCreate;
+          break;
+        case "COMMUNITIES UPDATE":
+          item.isEnable = communitiesUpdate;
+          break;
+        case "COMMUNITIES DELETE":
+          item.isEnable = communitiesDelete;
+          break;
+
         default:
           break;
       }
@@ -322,7 +381,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   };
 
   return (
-    <div style={{ width: 800 }}>
+    <div className="contenedor">
       <Divider />
 
       <Paper
@@ -381,7 +440,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
 
       <div className="row justify-content-around align-items-center mt-3">
         <div className="col-sm-6">
-          {/* Modulo Entrada de Productos */}
+          {/* Modulo Ventas */}
           <Paper
             elevation={10}
             style={{
@@ -399,11 +458,81 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                     textAlign: "center",
                   }}
                 >
+                  Modulo Venta de Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ventasVer}
+                          onChange={() => setVentasVer(!ventasVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ventasCreate}
+                          onChange={() => setVentasCreate(!ventasCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      style={{
+                        textAlign: "center",
+                      }}
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={ventasDelete}
+                          onChange={() => setVentasDelete(!ventasDelete)}
+                        />
+                      }
+                      label="Anular"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Entrada de Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
                   Modulo Entrada de Productos
                 </Typography>
                 <Divider />
                 <div className="row justify-content-around align-items-center">
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
@@ -416,7 +545,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       label="Ver"
                     />
                   </div>
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
@@ -431,7 +560,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       label="Crear"
                     />
                   </div>
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
@@ -444,21 +573,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         />
                       }
                       label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          disabled={!isEdit}
-                          checked={inProductsDelete}
-                          onChange={() =>
-                            setInProductsDelete(!inProductsDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -517,36 +631,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         />
                       }
                       label="Crear"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          disabled={!isEdit}
-                          checked={productTraslateUpdate}
-                          onChange={() =>
-                            setProductTraslateUpdate(!productTraslateUpdate)
-                          }
-                        />
-                      }
-                      label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          disabled={!isEdit}
-                          checked={productTraslateDelete}
-                          onChange={() =>
-                            setProductTraslateDelete(!productTraslateDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -720,13 +804,94 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             </div>
           </Paper>
         </div>
+
         <div className="col-sm-6">
+          {/* Modulo Clientes */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Clientes
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={clientsVer}
+                          onChange={() => setClientsVer(!clientsVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={clientsCreate}
+                          onChange={() => setClientsCreate(!clientsCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={clientsUpdate}
+                          onChange={() => setClientsUpdate(!clientsUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={clientsDelete}
+                          onChange={() => setClientsDelete(!clientsDelete)}
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
           {/* Modulo Existencia de Productos */}
           <Paper
             elevation={10}
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <div className="row justify-content-around align-items-center">
@@ -758,21 +923,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       label="Ver"
                     />
                   </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          disabled={!isEdit}
-                          checked={ProductExistenceCreate}
-                          onChange={() =>
-                            setExistenceProductsCreate(!ProductExistenceCreate)
-                          }
-                        />
-                      }
-                      label="Crear"
-                    />
-                  </div>
+
                   <div className="col-sm-3 ">
                     <FormControlLabel
                       labelPlacement="top"
@@ -786,21 +937,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         />
                       }
                       label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          disabled={!isEdit}
-                          checked={ProductExistenceDelete}
-                          onChange={() =>
-                            setExistenceProductsDelete(!ProductExistenceDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -968,7 +1104,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             </div>
           </Paper>
 
-          {/* Modulo Productos */}
+          {/* Modulo Ubicaciones */}
           <Paper
             elevation={10}
             style={{
@@ -987,7 +1123,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                     textAlign: "center",
                   }}
                 >
-                  Modulo Disponible
+                  Modulo Ubicaciones
                 </Typography>
                 <Divider />
                 <div className="row justify-content-around align-items-center">
@@ -997,8 +1133,8 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={productsVer}
-                          onChange={() => setProductsVer(!productsVer)}
+                          checked={communitiesVer}
+                          onChange={() => setCommunitiesVer(!communitiesVer)}
                         />
                       }
                       label="Ver"
@@ -1010,8 +1146,10 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={productsCreate}
-                          onChange={() => setProductsCreate(!productsCreate)}
+                          checked={communitiesCreate}
+                          onChange={() =>
+                            setCommunitiesCreate(!communitiesCreate)
+                          }
                         />
                       }
                       label="Crear"
@@ -1023,8 +1161,10 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={productsUpdate}
-                          onChange={() => setProductsUpdate(!productsUpdate)}
+                          checked={communitiesUpdate}
+                          onChange={() =>
+                            setCommunitiesUpdate(!communitiesUpdate)
+                          }
                         />
                       }
                       label="Editar"
@@ -1036,8 +1176,10 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={productsDelete}
-                          onChange={() => setProductsDelete(!productsDelete)}
+                          checked={communitiesDelete}
+                          onChange={() =>
+                            setCommunitiesDelete(!communitiesDelete)
+                          }
                         />
                       }
                       label="Eliminar"

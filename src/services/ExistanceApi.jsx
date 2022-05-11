@@ -1,7 +1,12 @@
-import { url } from "../helpers/Helpers";
 import axios from "axios";
+const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
-const controller = `${url}Existence/`;
+let controller = "";
+if (process.env.NODE_ENV === "production") {
+  controller = `${REACT_APP_PRODURL}Existence/`;
+} else {
+  controller = `${REACT_APP_URL}Existence/`;
+}
 
 export const getProducExistanceAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
@@ -122,4 +127,3 @@ export const updateProductExistenceAsync = async (token, data) => {
   }
   return result;
 };
-

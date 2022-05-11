@@ -1,7 +1,12 @@
-import { url } from "../helpers/Helpers";
 import axios from "axios";
+const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
-const controller = `${url}TipoNegocios/`;
+let controller = "";
+if (process.env.NODE_ENV === "production") {
+  controller = `${REACT_APP_PRODURL}TipoNegocios/`;
+} else {
+  controller = `${REACT_APP_URL}TipoNegocios/`;
+}
 
 export const getTipoNegocioAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
@@ -261,4 +266,3 @@ export const deleteFamiliaAsync = async (token, id) => {
   }
   return result;
 };
-

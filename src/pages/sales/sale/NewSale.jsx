@@ -1,37 +1,16 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import {
-  simpleMessage,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { toastError, toastSuccess } from "../../../helpers/Helpers";
 
-import {
-  Button,
-  Divider,
-  Container,
-  Paper,
-  Typography,
-  Grid,
-  IconButton,
-  FormControl,
-} from "@mui/material";
+import { Container, Paper, Grid } from "@mui/material";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleArrowLeft,
-  faSave,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import { addEntradaProductoAsync } from "../../../services/ProductIsApi";
 import {
   deleteToken,
   deleteUserData,
   getToken,
 } from "../../../services/Account";
-import { constant, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import SelectClient from "./SelectClient";
 import SelectProduct from "./SelectProduct";
 import SelectTipoVenta from "./SelectTipoVenta";

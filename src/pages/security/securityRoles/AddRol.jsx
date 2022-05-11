@@ -20,6 +20,7 @@ import {
 import { createRolAsync } from "../../../services/RolApi";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
+import "./style.css";
 
 const AddRol = ({ setShowModal }) => {
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
@@ -30,20 +31,24 @@ const AddRol = ({ setShowModal }) => {
 
   const [isFullAccess, setIsFullAccess] = useState(false);
 
+  const [ventasVer, setVentasVer] = useState(false);
+  const [ventasCreate, setVentasCreate] = useState(false);
+  const [ventasDelete, setVentasDelete] = useState(false);
+
+  const [clientsVer, setClientsVer] = useState(false);
+  const [clientsCreate, setClientsCreate] = useState(false);
+  const [clientsUpdate, setClientsUpdate] = useState(false);
+  const [clientsDelete, setClientsDelete] = useState(false);
+
   const [inProductsVer, setInProductsVer] = useState(false);
   const [inProductsCreate, setInProductsCreate] = useState(false);
   const [inProductsUpdate, setInProductsUpdate] = useState(false);
-  const [inProductsDelete, setInProductsDelete] = useState(false);
 
   const [ProductExistenceVer, setExistenceProductsVer] = useState(false);
-  const [ProductExistenceCreate, setExistenceProductsCreate] = useState(false);
   const [ProductExistenceUpdate, setExistenceProductsUpdate] = useState(false);
-  const [ProductExistenceDelete, setExistenceProductsDelete] = useState(false);
 
   const [productTraslateVer, setProductTraslateVer] = useState(false);
   const [productTraslateCreate, setProductTraslateCreate] = useState(false);
-  const [productTraslateUpdate, setProductTraslateUpdate] = useState(false);
-  const [productTraslateDelete, setProductTraslateDelete] = useState(false);
 
   const [productsVer, setProductsVer] = useState(false);
   const [productsCreate, setProductsCreate] = useState(false);
@@ -65,23 +70,32 @@ const AddRol = ({ setShowModal }) => {
   const [miscelaneosUpdate, setMiscelaneosUpdate] = useState(false);
   const [miscelaneosDelete, setMiscelaneosDelete] = useState(false);
 
+  const [communitiesVer, setCommunitiesVer] = useState(false);
+  const [communitiesCreate, setCommunitiesCreate] = useState(false);
+  const [communitiesUpdate, setCommunitiesUpdate] = useState(false);
+  const [communitiesDelete, setCommunitiesDelete] = useState(false);
+
   const handleChangeFullAccess = () => {
     setIsFullAccess(!isFullAccess);
+
+    setVentasVer(!isFullAccess);
+    setVentasCreate(!isFullAccess);
+    setVentasDelete(!isFullAccess);
+
+    setClientsVer(!clientsVer);
+    setClientsCreate(!clientsCreate);
+    setClientsUpdate(!clientsUpdate);
+    setClientsDelete(!clientsDelete);
 
     setInProductsVer(!isFullAccess);
     setInProductsCreate(!isFullAccess);
     setInProductsUpdate(!isFullAccess);
-    setInProductsDelete(!isFullAccess);
 
     setExistenceProductsVer(!isFullAccess);
-    setExistenceProductsCreate(!isFullAccess);
     setExistenceProductsUpdate(!isFullAccess);
-    setExistenceProductsDelete(!isFullAccess);
 
     setProductTraslateVer(!isFullAccess);
     setProductTraslateCreate(!isFullAccess);
-    setProductTraslateUpdate(!isFullAccess);
-    setProductTraslateDelete(!isFullAccess);
 
     setProductsVer(!isFullAccess);
     setProductsCreate(!isFullAccess);
@@ -93,10 +107,20 @@ const AddRol = ({ setShowModal }) => {
     setUserUpdate(!isFullAccess);
     setUserDelete(!isFullAccess);
 
+    setRolesVer(!isFullAccess);
+    setRolesCreate(!isFullAccess);
+    setRolesUpdate(!isFullAccess);
+    setRolesDelete(!isFullAccess);
+
     setMiscelaneosVer(!isFullAccess);
     setMiscelaneosCreate(!isFullAccess);
     setMiscelaneosUpdate(!isFullAccess);
     setMiscelaneosDelete(!isFullAccess);
+
+    setCommunitiesVer(!isFullAccess);
+    setCommunitiesCreate(!isFullAccess);
+    setCommunitiesUpdate(!isFullAccess);
+    setCommunitiesDelete(!isFullAccess);
   };
 
   const saveRol = async () => {
@@ -106,6 +130,36 @@ const AddRol = ({ setShowModal }) => {
     }
     const data = {
       permissions: [
+        //Venta Producto
+        {
+          description: "SALES VER",
+          IsEnable: ventasVer,
+        },
+        {
+          description: "SALES CREATE",
+          IsEnable: ventasCreate,
+        },
+        {
+          description: "SALES DELETE",
+          IsEnable: ventasDelete,
+        },
+        //Modulo Clientes
+        {
+          description: "CLIENTS VER",
+          IsEnable: clientsVer,
+        },
+        {
+          description: "CLIENTS CREATE",
+          IsEnable: clientsCreate,
+        },
+        {
+          description: "CLIENTS UPDATE",
+          IsEnable: clientsUpdate,
+        },
+        {
+          description: "CLIENTS DELETE",
+          IsEnable: clientsDelete,
+        },
         //Entrada Producto
         {
           description: "ENTRADAPRODUCTOS VER",
@@ -119,26 +173,14 @@ const AddRol = ({ setShowModal }) => {
           description: "ENTRADAPRODUCTOS UPDATE",
           IsEnable: inProductsUpdate,
         },
-        {
-          description: "ENTRADAPRODUCTOS DELETE",
-          IsEnable: inProductsDelete,
-        },
         //Existencias de Producto
         {
           description: "EXISTANCE VER",
           IsEnable: ProductExistenceVer,
         },
         {
-          description: "EXISTANCE CREATE",
-          IsEnable: ProductExistenceCreate,
-        },
-        {
           description: "EXISTANCE UPDATE",
           IsEnable: ProductExistenceUpdate,
-        },
-        {
-          description: "EXISTANCE DELETE",
-          IsEnable: ProductExistenceDelete,
         },
         //Traslado de Producto
         {
@@ -148,14 +190,6 @@ const AddRol = ({ setShowModal }) => {
         {
           description: "PRODUCT TRANSLATE CREATE",
           IsEnable: productTraslateCreate,
-        },
-        {
-          description: "PRODUCT TRANSLATE UPDATE",
-          IsEnable: productTraslateUpdate,
-        },
-        {
-          description: "PRODUCT TRANSLATE DELETE",
-          IsEnable: productTraslateDelete,
         },
         //Products
         {
@@ -225,6 +259,23 @@ const AddRol = ({ setShowModal }) => {
           description: "MISCELANEOS DELETE",
           IsEnable: miscelaneosDelete,
         },
+        //Comunidades
+        {
+          description: "COMMUNITIES VER",
+          IsEnable: miscelaneosVer,
+        },
+        {
+          description: "COMMUNITIES CREATE",
+          IsEnable: miscelaneosCreate,
+        },
+        {
+          description: "COMMUNITIES UPDATE",
+          IsEnable: miscelaneosUpdate,
+        },
+        {
+          description: "COMMUNITIES DELETE",
+          IsEnable: miscelaneosDelete,
+        },
       ],
       roleName: rolName,
     };
@@ -262,7 +313,7 @@ const AddRol = ({ setShowModal }) => {
   };
 
   return (
-    <div style={{ width: 800 }}>
+    <div className="contenedor">
       <Divider />
 
       <Paper
@@ -322,7 +373,7 @@ const AddRol = ({ setShowModal }) => {
 
       <div className="row justify-content-around align-items-center">
         <div className="col-sm-6">
-          {/* Modulo Entrada de Productos */}
+          {/* Modulo Ventas */}
           <Paper
             elevation={10}
             style={{
@@ -340,23 +391,90 @@ const AddRol = ({ setShowModal }) => {
                     textAlign: "center",
                   }}
                 >
-                  Modulo Entrada de Productos
+                  Modulo Venta de Productos
                 </Typography>
                 <Divider />
                 <div className="row justify-content-around align-items-center">
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={inProductsVer}
-                          onChange={() => setInProductsVer(!inProductsCreate)}
+                          checked={ventasVer}
+                          onChange={() => setVentasVer(!ventasVer)}
                         />
                       }
                       label="Ver"
                     />
                   </div>
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={ventasCreate}
+                          onChange={() => setVentasCreate(!ventasCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      style={{
+                        textAlign: "center",
+                      }}
+                      control={
+                        <Checkbox
+                          checked={ventasDelete}
+                          onChange={() => setVentasDelete(!ventasDelete)}
+                        />
+                      }
+                      label="Anular"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Entrada de Productos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Entrada de Productos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={inProductsVer}
+                          onChange={() => setInProductsVer(!inProductsVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
@@ -370,7 +488,7 @@ const AddRol = ({ setShowModal }) => {
                       label="Crear"
                     />
                   </div>
-                  <div className="col-sm-3 ">
+                  <div className="col-sm-4 ">
                     <FormControlLabel
                       labelPlacement="top"
                       control={
@@ -382,20 +500,6 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          checked={inProductsDelete}
-                          onChange={() =>
-                            setInProductsDelete(!inProductsDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -452,34 +556,6 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Crear"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          checked={productTraslateUpdate}
-                          onChange={() =>
-                            setProductTraslateUpdate(!productTraslateUpdate)
-                          }
-                        />
-                      }
-                      label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          checked={productTraslateDelete}
-                          onChange={() =>
-                            setProductTraslateDelete(!productTraslateDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -647,12 +723,88 @@ const AddRol = ({ setShowModal }) => {
         </div>
 
         <div className="col-sm-6">
+          {/* Modulo Clientes */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Clientes
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={clientsVer}
+                          onChange={() => setClientsVer(!clientsVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={clientsCreate}
+                          onChange={() => setClientsCreate(!clientsCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={clientsUpdate}
+                          onChange={() => setClientsUpdate(!clientsUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={clientsDelete}
+                          onChange={() => setClientsDelete(!clientsDelete)}
+                        />
+                      }
+                      label="Eliminar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
           {/* Modulo Existencia de Productos */}
           <Paper
             elevation={10}
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <div className="row justify-content-around align-items-center">
@@ -688,20 +840,6 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={ProductExistenceCreate}
-                          onChange={() =>
-                            setExistenceProductsCreate(!ProductExistenceCreate)
-                          }
-                        />
-                      }
-                      label="Crear"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
                           checked={ProductExistenceUpdate}
                           onChange={() =>
                             setExistenceProductsUpdate(!ProductExistenceUpdate)
@@ -709,20 +847,6 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Editar"
-                    />
-                  </div>
-                  <div className="col-sm-3 ">
-                    <FormControlLabel
-                      labelPlacement="top"
-                      control={
-                        <Checkbox
-                          checked={ProductExistenceDelete}
-                          onChange={() =>
-                            setExistenceProductsDelete(!ProductExistenceDelete)
-                          }
-                        />
-                      }
-                      label="Eliminar"
                     />
                   </div>
                 </div>
@@ -834,7 +958,7 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={userVer}
+                          checked={rolesVer}
                           onChange={() => setRolesVer(!rolesVer)}
                         />
                       }
@@ -846,7 +970,7 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={userCreate}
+                          checked={rolesCreate}
                           onChange={() => setRolesCreate(!rolesCreate)}
                         />
                       }
@@ -858,7 +982,7 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={userUpdate}
+                          checked={rolesUpdate}
                           onChange={() => setRolesUpdate(!rolesUpdate)}
                         />
                       }
@@ -870,7 +994,7 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={userDelete}
+                          checked={rolesDelete}
                           onChange={() => setRolesDelete(!rolesDelete)}
                         />
                       }
@@ -882,7 +1006,7 @@ const AddRol = ({ setShowModal }) => {
             </div>
           </Paper>
 
-          {/* Modulo Productos */}
+          {/* Modulo Ubicaciones */}
           <Paper
             elevation={10}
             style={{
@@ -901,7 +1025,7 @@ const AddRol = ({ setShowModal }) => {
                     textAlign: "center",
                   }}
                 >
-                  Modulo Disponible
+                  Modulo Ubicaciones
                 </Typography>
                 <Divider />
                 <div className="row justify-content-around align-items-center">
@@ -910,8 +1034,8 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={productsVer}
-                          onChange={() => setProductsVer(!productsVer)}
+                          checked={communitiesVer}
+                          onChange={() => setCommunitiesVer(!communitiesVer)}
                         />
                       }
                       label="Ver"
@@ -922,8 +1046,10 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={productsCreate}
-                          onChange={() => setProductsCreate(!productsCreate)}
+                          checked={communitiesCreate}
+                          onChange={() =>
+                            setCommunitiesCreate(!communitiesCreate)
+                          }
                         />
                       }
                       label="Crear"
@@ -934,8 +1060,10 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={productsUpdate}
-                          onChange={() => setProductsUpdate(!productsUpdate)}
+                          checked={communitiesUpdate}
+                          onChange={() =>
+                            setCommunitiesUpdate(!communitiesUpdate)
+                          }
                         />
                       }
                       label="Editar"
@@ -946,8 +1074,10 @@ const AddRol = ({ setShowModal }) => {
                       labelPlacement="top"
                       control={
                         <Checkbox
-                          checked={productsDelete}
-                          onChange={() => setProductsDelete(!productsDelete)}
+                          checked={communitiesDelete}
+                          onChange={() =>
+                            setCommunitiesDelete(!communitiesDelete)
+                          }
                         />
                       }
                       label="Eliminar"

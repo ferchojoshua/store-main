@@ -56,7 +56,6 @@ const Login = () => {
       simpleMessage("Usuario o contraseña incorrecto", "error");
       return;
     }
-    alert(result);
     actionLog();
     setIsLoading(false);
     navigate("/");

@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBug, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
-export const url = "https://localhost:7015/api/";
+// export const url = "https://localhost:7015/api/";
 
 export const simpleMessage = (text, icon) => {
   Swal.fire(text, "", icon);

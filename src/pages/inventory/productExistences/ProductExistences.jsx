@@ -3,15 +3,9 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { toastError } from "../../../helpers/Helpers";
+
 import {
-  deleteProductAsync,
-  getProductsAsync,
-} from "../../../services/ProductsApi";
-import {
-  Button,
   IconButton,
   InputAdornment,
   TextField,
@@ -22,12 +16,7 @@ import {
   Divider,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCirclePlus,
-  faExternalLinkAlt,
-  faSearch,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faExternalLinkAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
@@ -42,10 +31,9 @@ import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
 import ProductExistenceEdit from "./ProductExistenceEdit";
 
 const ProductExistences = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
-  const MySwal = withReactContent(Swal);
 
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState(4);
@@ -172,7 +160,6 @@ const ProductExistences = () => {
 
     setProductList(result.data);
   };
-
 
   return (
     <div>

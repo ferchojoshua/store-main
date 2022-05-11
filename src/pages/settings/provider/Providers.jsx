@@ -38,7 +38,7 @@ const Providers = () => {
   const [providerList, setProviderList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsperPage] = useState(5);
+  const [itemsperPage] = useState(10);
   const indexLast = currentPage * itemsperPage;
   const indexFirst = indexLast - itemsperPage;
   const currentItem = providerList.slice(indexFirst, indexLast);
@@ -184,7 +184,7 @@ const Providers = () => {
                       <td style={{ textAlign: "left" }}>{item.address}</td>
                       <td style={{ textAlign: "left" }}>{item.phone}</td>
                       <td style={{ textAlign: "left" }}>{item.email}</td>
-                      <td>
+                      <td style={{ width: 150 }}>
                         <IconButton
                           style={{ marginRight: 10, color: "#009688" }}
                           onClick={() => {

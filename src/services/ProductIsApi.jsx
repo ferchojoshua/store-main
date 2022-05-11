@@ -1,7 +1,12 @@
-import { url } from "../helpers/Helpers";
 import axios from "axios";
+const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
-const controller = `${url}ProductIns/`;
+let controller = "";
+if (process.env.NODE_ENV === "production") {
+  controller = `${REACT_APP_PRODURL}ProductIns/`;
+} else {
+  controller = `${REACT_APP_URL}ProductIns/`;
+}
 
 export const getEntradasAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };

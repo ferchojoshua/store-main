@@ -51,8 +51,6 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
 
   const token = getToken();
 
-  const [Cliente, setCliente] = useState([]);
-
   const [nombreCliente, setNombreCliente] = useState("");
   const [cedula, setCedula] = useState("");
   const [correo, setCorreo] = useState("");
@@ -123,8 +121,6 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-
-      setCliente(resultClient.data);
 
       setNombreCliente(resultClient.data.nombreCliente);
       setCedula(resultClient.data.cedula);

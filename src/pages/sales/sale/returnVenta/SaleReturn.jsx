@@ -165,8 +165,8 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
   const saveChanges = async () => {
     MySwal.fire({
       icon: "question",
-      title: <p>Editar Venta</p>,
-      text: `Esta seguro de editar esta venta?`,
+      title: <p>Actualizar Venta</p>,
+      text: `Esta seguro de aplicar cambios?`,
       showDenyButton: true,
       confirmButtonText: "Aceptar",
       denyButtonText: `Cancelar`,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -30,7 +30,6 @@ const CommunityDetail = ({ selectedCommunity, setShowModal }) => {
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
-  const [community, setCommunity] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [newName, setNewName] = useState(name);
 
@@ -96,14 +95,17 @@ const CommunityDetail = ({ selectedCommunity, setShowModal }) => {
           value={newName}
           label={"Nombre Comunidad"}
           disabled={!isEdit}
-          placeholder={"Ingrese Nombre"}
+          placeholder={"Ingrese Nuevo Nombre"}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={"editar"}>
                   <IconButton
                     style={{ marginRight: 10 }}
-                    onClick={() => setIsEdit(!isEdit)}
+                    onClick={() => {
+                      setNewName(isEdit ? name : "");
+                      setIsEdit(!isEdit);
+                    }}
                   >
                     <FontAwesomeIcon
                       style={{ color: "#ff5722" }}

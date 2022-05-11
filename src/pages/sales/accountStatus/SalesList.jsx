@@ -16,7 +16,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleCheck,
   faCircleXmark,
-  faExternalLinkAlt,
   faHandHoldingDollar,
   faReplyAll,
   faSearch,

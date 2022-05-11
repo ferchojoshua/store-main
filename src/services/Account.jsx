@@ -1,7 +1,14 @@
-import { url } from "../helpers/Helpers";
 import axios from "axios";
+const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
-const controller = `${url}Account/`;
+let controller = "";
+if (process.env.NODE_ENV === "production") {
+  controller = `${REACT_APP_PRODURL}Account/`;
+} else {
+  controller = `${REACT_APP_URL}Account/`;
+}
+
+// const controller = `${url}Account/`;
 
 export const getToken = () => {
   return localStorage.getItem("token");

@@ -291,7 +291,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
     }
 
     if (concepto === "") {
-      toastError("Debe ingresar un conceoto de traslado");
+      toastError("Debe ingresar un concepto de traslado");
       return (isValid = false);
     }
     return isValid;

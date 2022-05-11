@@ -19,9 +19,6 @@ import { DataContext } from "../../../../context/DataContext";
 import NoData from "../../../../components/NoData";
 import { isEmpty } from "lodash";
 import PaginationComponent from "../../../../components/PaginationComponent";
-
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import {
   getDepartmentByIdAsync,
   getMunsWithCommsCountAsync,
