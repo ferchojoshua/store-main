@@ -4,7 +4,7 @@ import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 import {
   deleteTipoNegocioAsync,
   getTipoNegocioAsync,
@@ -28,7 +28,7 @@ import NoData from "../../../components/NoData";
 import SmallModal from "../../../components/modals/SmallModal";
 
 const TipoNegocio = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
     useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
@@ -137,16 +137,20 @@ const TipoNegocio = () => {
           >
             <h1>Lista de Tipo de Negocio</h1>
 
-            <Button
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              style={{ borderRadius: 20 }}
-              onClick={() => {
-                setShowModal(true);
-              }}
-              variant="outlined"
-            >
-              Agregar Tipo de Negocio
-            </Button>
+            {isAccess(access, "MISCELANEOS CREATE") ? (
+              <Button
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                style={{ borderRadius: 20 }}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                variant="outlined"
+              >
+                Agregar Tipo de Negocio
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <hr />
@@ -182,12 +186,16 @@ const TipoNegocio = () => {
                         >
                           <FontAwesomeIcon icon={faExternalLink} />
                         </IconButton>
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteTipoNegocio(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
+                        {isAccess(access, "MISCELANEOS DELETE") ? (
+                          <IconButton
+                            style={{ color: "#f50057" }}
+                            onClick={() => deleteTipoNegocio(item)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
                       </td>
                     </tr>
                   );

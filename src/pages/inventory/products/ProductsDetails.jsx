@@ -283,7 +283,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
           variant="standard"
           onChange={(e) => setDescription(e.target.value.toUpperCase())}
           label={"Descripcion"}
-          value={description}
+          value={description ? description : ""}
           disabled={!isEdit}
         />
 
@@ -294,7 +294,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
           variant="standard"
           onChange={(e) => setBarCode(e.target.value)}
           label={"Codigo de barras"}
-          value={barCode}
+          value={barCode ? barCode : ""}
           disabled={!isEdit}
         />
 
@@ -304,7 +304,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
           variant="standard"
           onChange={(e) => setMarca(e.target.value.toUpperCase())}
           label={"Marca"}
-          value={marca}
+          value={marca ? marca : ""}
           style={{ marginTop: 20 }}
           disabled={!isEdit}
         />
@@ -316,7 +316,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
           variant="standard"
           onChange={(e) => setModelo(e.target.value.toUpperCase())}
           label={"Modelo"}
-          value={modelo}
+          value={modelo ? modelo : ""}
           disabled={!isEdit}
         />
 

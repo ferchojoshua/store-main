@@ -45,10 +45,17 @@ import { isEmpty } from "lodash";
 import PaginationComponent from "../../../components/PaginationComponent";
 import RackDetail from "./racks/RackDetail";
 import NoData from "../../../components/NoData";
+import { isAccess } from "../../../helpers/Helpers";
 
 const StoreDetails = () => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
@@ -245,16 +252,23 @@ const StoreDetails = () => {
 
             <h1>Detalle Almacen # {id}</h1>
 
-            <IconButton
-              onClick={() => {
-                setIsEdit(!isEdit);
-              }}
-            >
-              <FontAwesomeIcon
-                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
-                icon={isEdit ? faCancel : faPenToSquare}
-              />
-            </IconButton>
+            {isAccess(access, "MISCELANEOS UPDATE") ? (
+              <IconButton
+                onClick={() => {
+                  setIsEdit(!isEdit);
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 30,
+                    color: isEdit ? "#4caf50" : "#ff5722",
+                  }}
+                  icon={isEdit ? faCancel : faPenToSquare}
+                />
+              </IconButton>
+            ) : (
+              <div />
+            )}
           </div>
 
           <hr />
@@ -301,16 +315,20 @@ const StoreDetails = () => {
           >
             <h4>Lista de Raks</h4>
 
-            <Button
-              onClick={() => {
-                setShowModal(true);
-              }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              style={{ borderRadius: 20 }}
-              variant="outlined"
-            >
-              Agregar Rack
-            </Button>
+            {isAccess(access, "MISCELANEOS CREATE") ? (
+              <Button
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                style={{ borderRadius: 20 }}
+                variant="outlined"
+              >
+                Agregar Rack
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <hr />

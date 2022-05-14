@@ -9,7 +9,7 @@ import MediumModal from "../../../components/modals/MediumModal";
 
 import MoverProductoAdd from "./MoverProductoAdd";
 import { getProdMovmtsAsync } from "../../../services/ProductMovementsApi";
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 import {
   deleteToken,
   deleteUserData,
@@ -22,7 +22,7 @@ import PaginationComponent from "../../../components/PaginationComponent";
 
 const MoverProducto = () => {
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass, access } =
     useContext(DataContext);
   const [movimientosList, setMovimientosList] = useState([]);
 
@@ -84,16 +84,20 @@ const MoverProducto = () => {
         >
           <h1>Lista de Movimientos</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Agregar Movimiento
-          </Button>
+          {isAccess(access, "PRODUCT TRANSLATE CREATE") ? (
+            <Button
+              variant="outlined"
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                setShowModal(true);
+              }}
+            >
+              Agregar Movimiento
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <hr />

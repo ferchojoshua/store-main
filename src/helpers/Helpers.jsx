@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBug, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { find } from "lodash";
 
 // export const url = "https://localhost:7015/api/";
 
@@ -65,4 +66,9 @@ export const navigatorVersion = () => {
 export function validateCedula(cedula) {
   let re = new RegExp("^[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Za-z]$");
   return re.test(cedula);
+}
+
+export function isAccess(access, permiso) {
+  let result = find(access, { description: permiso }, "isEnable");
+  return result.isEnable;
 }

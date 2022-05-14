@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
@@ -14,6 +14,8 @@ import { Container } from "react-bootstrap";
 import ClientList from "./clients/ClientList";
 import NewSale from "./sale/NewSale";
 import SalesList from "./accountStatus/SalesList";
+import { isAccess } from "../../helpers/Helpers";
+import { DataContext } from "../../context/DataContext";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -45,6 +47,7 @@ function a11yProps(index) {
 }
 
 const SalesContainer = () => {
+  const { access } = React.useContext(DataContext);
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -64,29 +67,37 @@ const SalesContainer = () => {
           aria-label="icon label tabs example"
           centered
         >
-          <Tab
-            icon={
-              <FontAwesomeIcon
-                icon={faHandHoldingDollar}
-                style={{ fontSize: 20 }}
-              />
-            }
-            label="Nueva Venta"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "SALES CREATE") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faHandHoldingDollar}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Nueva Venta"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
-          <Tab
-            icon={
-              <FontAwesomeIcon
-                icon={faFileInvoiceDollar}
-                style={{ fontSize: 20 }}
-              />
-            }
-            label="Estado de Cuenta"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "SALES VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faFileInvoiceDollar}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Estado de Cuenta"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
           <Tab
             icon={
@@ -100,17 +111,43 @@ const SalesContainer = () => {
 
         <Divider style={{ marginTop: 10 }} />
 
-        <TabPanel value={value} index={0}>
-          <NewSale />
-        </TabPanel>
+        {isAccess(access, "SALES CREATE") ? (
+          <TabPanel value={value} index={0}>
+            <NewSale />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
 
-        <TabPanel value={value} index={1}>
-          <SalesList />
-        </TabPanel>
+        {isAccess(access, "SALES VER") ? (
+          <TabPanel
+            value={value}
+            index={isAccess(access, "SALES CREATE") ? 1 : 0}
+          >
+            <SalesList />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
 
-        <TabPanel value={value} index={2}>
-          <ClientList />
-        </TabPanel>
+        {isAccess(access, "CLIENTS VER") ? (
+          <TabPanel
+            value={value}
+            index={
+              isAccess(access, "SALES CREATE") && isAccess(access, "SALES VER")
+                ? 2
+                : isAccess(access, "SALES CREATE")
+                ? 1
+                : isAccess(access, "SALES VER")
+                ? 1
+                : 0
+            }
+          >
+            <ClientList />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
       </Paper>
     </Container>
   );

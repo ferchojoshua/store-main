@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
@@ -16,6 +16,8 @@ import EntradaProduto from "./entradaProducto/EntradaProduto";
 import MoverProducto from "./traslate-products/MoverProducto";
 import Products from "./products/Products";
 import ProductExistences from "./productExistences/ProductExistences";
+import { isAccess } from "../../helpers/Helpers";
+import { DataContext } from "../../context/DataContext";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -47,6 +49,7 @@ function a11yProps(index) {
 }
 
 const InventoryContainer = () => {
+  const { access } = React.useContext(DataContext);
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -66,60 +69,137 @@ const InventoryContainer = () => {
           aria-label="icon label tabs example"
           centered
         >
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faTruckRampBox} style={{ fontSize: 20 }} />
-            }
-            label="Entrada de Producto"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "ENTRADAPRODUCTOS VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faTruckRampBox}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Entrada de Producto"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faCartFlatbed} style={{ fontSize: 20 }} />
-            }
-            label="Existencias de Producto"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "EXISTANCE VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faCartFlatbed}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Existencias de Producto"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faLeftRight} style={{ fontSize: 20 }} />
-            }
-            label="Traslado de Producto"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "PRODUCT TRANSLATE VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faLeftRight} style={{ fontSize: 20 }} />
+              }
+              label="Traslado de Producto"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faDollyBox} style={{ fontSize: 20 }} />
-            }
-            label="Productos"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "PRODUCTS VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faDollyBox} style={{ fontSize: 20 }} />
+              }
+              label="Productos"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
         </Tabs>
 
         <Divider style={{ marginTop: 10 }} />
 
-        <TabPanel value={value} index={0}>
-          <EntradaProduto />
-        </TabPanel>
+        {isAccess(access, "ENTRADAPRODUCTOS VER") ? (
+          <TabPanel value={value} index={0}>
+            <EntradaProduto />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
 
-        <TabPanel value={value} index={1}>
-          <ProductExistences />
-        </TabPanel>
+        {isAccess(access, "EXISTANCE VER") ? (
+          <TabPanel
+            value={value}
+            index={isAccess(access, "ENTRADAPRODUCTOS VER") ? 1 : 0}
+          >
+            <ProductExistences />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
 
-        <TabPanel value={value} index={2}>
-          <MoverProducto />
-        </TabPanel>
+        {isAccess(access, "PRODUCT TRANSLATE VER") ? (
+          <TabPanel
+            value={value}
+            index={
+              isAccess(access, "ENTRADAPRODUCTOS VER") ||
+              isAccess(access, "EXISTANCE VER")
+                ? 2
+                : isAccess(access, "ENTRADAPRODUCTOS VER")
+                ? 1
+                : isAccess(access, "EXISTANCE VER")
+                ? 1
+                : 0
+            }
+          >
+            <MoverProducto />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
 
-        <TabPanel value={value} index={3}>
-          <Products />
-        </TabPanel>
+        {isAccess(access, "PRODUCTS VER") ? (
+          <TabPanel
+            value={value}
+            index={
+              isAccess(access, "ENTRADAPRODUCTOS VER") &&
+              isAccess(access, "EXISTANCE VER") &&
+              isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 3
+                : isAccess(access, "ENTRADAPRODUCTOS VER") &&
+                  isAccess(access, "EXISTANCE VER")
+                ? 2
+                : isAccess(access, "ENTRADAPRODUCTOS VER") &&
+                  isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 2
+                : isAccess(access, "EXISTANCE VER") &&
+                  isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 2
+                : isAccess(access, "ENTRADAPRODUCTOS VER")
+                ? 1
+                : isAccess(access, "EXISTANCE VER")
+                ? 1
+                : isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 1
+                : 0
+            }
+          >
+            <Products />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
       </Paper>
     </Container>
   );

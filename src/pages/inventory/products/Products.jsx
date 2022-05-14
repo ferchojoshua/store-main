@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import {
   deleteProductAsync,
   getProductsAsync,
@@ -31,8 +31,14 @@ import Productsadd from "./Productsadd";
 import ProductsDetails from "./ProductsDetails";
 
 const Products = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    reload,
+    setReload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [productList, setProductList] = useState([]);
@@ -149,16 +155,20 @@ const Products = () => {
         >
           <h1>Lista de Productos</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Agregar Producto
-          </Button>
+          {isAccess(access, "PRODUCTS CREATE") ? (
+            <Button
+              variant="outlined"
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                setShowModal(true);
+              }}
+            >
+              Agregar Producto
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <hr />
@@ -197,7 +207,12 @@ const Products = () => {
                 <th style={{ textAlign: "left" }}>Marca</th>
                 <th style={{ textAlign: "left" }}>Modelo</th>
                 <th style={{ textAlign: "left" }}>U/M</th>
-                <th>Acciones</th>
+                {isAccess(access, "PRODUCTS UPDATE") ||
+                isAccess(access, "PRODUCTS DELETE") ? (
+                  <th>Acciones</th>
+                ) : (
+                  <></>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -217,21 +232,30 @@ const Products = () => {
                     <td style={{ textAlign: "left" }}>{item.modelo}</td>
                     <td style={{ textAlign: "left" }}>{item.um}</td>
                     <td>
-                      <IconButton
-                        style={{ marginRight: 10, color: "#009688" }}
-                        onClick={() => {
-                          setSelectedProduct(item);
-                          setShowEditModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                      </IconButton>
-                      <IconButton
-                        style={{ color: "#f50057" }}
-                        onClick={() => deleteProduct(item)}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </IconButton>
+                      {isAccess(access, "PRODUCTS UPDATE") ? (
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            setSelectedProduct(item);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
+
+                      {isAccess(access, "PRODUCTS DELETE") ? (
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deleteProduct(item)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                   </tr>
                 );

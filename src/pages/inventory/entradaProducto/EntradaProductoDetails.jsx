@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import ProductDetailInComponent from "./entradaProductoDetailsComponents/ProductDetailInComponent";
 import {
   Button,
@@ -34,8 +34,14 @@ import MediumModal from "../../../components/modals/MediumModal";
 import DetalleProductoComponent from "./entradaProductoDetailsComponents/DetalleProductoComponent";
 
 const EntradaProductoDetails = () => {
-  const { setIsLoading, setIsLogged, setReload, reload, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    setIsLogged,
+    setReload,
+    reload,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const { id } = useParams();
   const [isEdit, setIsEdit] = useState(false);
@@ -235,16 +241,23 @@ const EntradaProductoDetails = () => {
 
             <h1>Detalle Orden # {id}</h1>
 
-            <IconButton
-              onClick={() => {
-                setIsEdit(!isEdit);
-              }}
-            >
-              <FontAwesomeIcon
-                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
-                icon={isEdit ? faCancel : faPenToSquare}
-              />
-            </IconButton>
+            {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+              <IconButton
+                onClick={() => {
+                  setIsEdit(!isEdit);
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 30,
+                    color: isEdit ? "#4caf50" : "#ff5722",
+                  }}
+                  icon={isEdit ? faCancel : faPenToSquare}
+                />
+              </IconButton>
+            ) : (
+              <div></div>
+            )}
           </div>
 
           <hr />
@@ -290,7 +303,11 @@ const EntradaProductoDetails = () => {
                 <th>Costo de Compra</th>
                 <th>P.V. Mayor</th>
                 <th>P.V. Detalle</th>
-                <th>Acciones</th>
+                {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+                  <th>Acciones</th>
+                ) : (
+                  <></>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -329,17 +346,21 @@ const EntradaProductoDetails = () => {
                       })}
                     </td>
 
-                    <td>
-                      <IconButton
-                        style={{ color: "#2196f3" }}
-                        onClick={() => {
-                          setSelectedDetail(item);
-                          setShowModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faPenToSquare} />
-                      </IconButton>
-                    </td>
+                    {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+                      <td>
+                        <IconButton
+                          style={{ color: "#2196f3" }}
+                          onClick={() => {
+                            setSelectedDetail(item);
+                            setShowModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPenToSquare} />
+                        </IconButton>
+                      </td>
+                    ) : (
+                      <></>
+                    )}
                   </tr>
                 );
               })}
@@ -406,19 +427,23 @@ const EntradaProductoDetails = () => {
               </Typography>
             </div>
 
-            <div className="col-sm-4 ">
-              <Button
-                variant="outlined"
-                style={{ borderRadius: 20 }}
-                onClick={() => saveChanges()}
-              >
-                <FontAwesomeIcon
-                  style={{ marginRight: 10, fontSize: 20 }}
-                  icon={faSave}
-                />
-                Guardar Cambios
-              </Button>
-            </div>
+            {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+              <div className="col-sm-4 ">
+                <Button
+                  variant="outlined"
+                  style={{ borderRadius: 20 }}
+                  onClick={() => saveChanges()}
+                >
+                  <FontAwesomeIcon
+                    style={{ marginRight: 10, fontSize: 20 }}
+                    icon={faSave}
+                  />
+                  Guardar Cambios
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </Paper>
       </Container>

@@ -4,7 +4,7 @@ import { Container, Table } from "react-bootstrap";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -47,8 +47,14 @@ import EditUser from "./EditUser";
 import NoData from "../../../components/NoData";
 
 const UserList = () => {
-  const { setReload, reload, setIsLoading, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    setReload,
+    reload,
+    setIsLoading,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [userList, setUserList] = useState([]);
   let navigate = useNavigate();
@@ -169,7 +175,6 @@ const UserList = () => {
             setIsDefaultPass(true);
             return;
           }
-
           setReload(!reload);
         })();
         toastSuccess("Usuario desactivado!");
@@ -318,16 +323,20 @@ const UserList = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20, marginLeft: 20, padding: 10 }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-            >
-              Agregar Usuario
-            </Button>
+            {isAccess(access, "USER CREATE") ? (
+              <Button
+                variant="outlined"
+                style={{ borderRadius: 20, marginLeft: 20, padding: 10 }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Agregar Usuario
+              </Button>
+            ) : (
+              <div />
+            )}
           </div>
         </div>
 
@@ -363,7 +372,7 @@ const UserList = () => {
                 <th style={{ textAlign: "left" }}>Nombre</th>
                 <th style={{ textAlign: "left" }}>Correo</th>
                 <th style={{ textAlign: "left" }}>Telefono</th>
-                <th style={{ textAlign: "left" }}>rol</th>
+                <th style={{ textAlign: "left" }}>Rol</th>
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
@@ -388,27 +397,35 @@ const UserList = () => {
                         <FontAwesomeIcon icon={faExternalLinkAlt} />
                       </IconButton>
 
-                      {item.isActive ? (
-                        <IconButton
-                          style={{ marginRight: 5, color: "#f44336" }}
-                          onClick={() => {
-                            resetPassword(item);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faKey} />
-                        </IconButton>
+                      {isAccess(access, "USER UPDATE") ? (
+                        item.isActive ? (
+                          <IconButton
+                            style={{ marginRight: 5, color: "#f44336" }}
+                            onClick={() => {
+                              resetPassword(item);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faKey} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )
                       ) : (
                         <></>
                       )}
 
-                      <IconButton
-                        style={{ color: "#f50057" }}
-                        onClick={() => deactivateUser(item)}
-                      >
-                        <FontAwesomeIcon
-                          icon={item.isActive ? faTrashAlt : faUserCheck}
-                        />
-                      </IconButton>
+                      {isAccess(access, "USER DELETE") ? (
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deactivateUser(item)}
+                        >
+                          <FontAwesomeIcon
+                            icon={item.isActive ? faTrashAlt : faUserCheck}
+                          />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                   </tr>
                 );

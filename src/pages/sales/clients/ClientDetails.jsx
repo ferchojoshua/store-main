@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DataContext } from "../../../context/DataContext";
 import {
+  isAccess,
   toastError,
   toastSuccess,
   validateCedula,
@@ -44,8 +45,14 @@ import {
 } from "../../../services/ClientsApi";
 
 const ClientDetails = ({ selectedClient, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
 
@@ -563,43 +570,49 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
           disabled={!isEdit}
         />
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button
-            fullWidth
-            variant="outlined"
+        {isAccess(access, "SALES UPDATE") ? (
+          <div
             style={{
-              borderRadius: 20,
-              borderColor: isEdit ? "#9c27b0" : "#ff9800",
-              color: isEdit ? "#9c27b0" : "#ff9800",
-              marginRight: 10,
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
-            startIcon={
-              <FontAwesomeIcon icon={isEdit ? faCircleXmark : faPenToSquare} />
-            }
-            onClick={() => setIsEdit(!isEdit)}
           >
-            {isEdit ? "Cancelar" : " Editar Cliente"}
-          </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{
+                borderRadius: 20,
+                borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                color: isEdit ? "#9c27b0" : "#ff9800",
+                marginRight: 10,
+              }}
+              startIcon={
+                <FontAwesomeIcon
+                  icon={isEdit ? faCircleXmark : faPenToSquare}
+                />
+              }
+              onClick={() => setIsEdit(!isEdit)}
+            >
+              {isEdit ? "Cancelar" : " Editar Cliente"}
+            </Button>
 
-          <Button
-            fullWidth
-            variant="outlined"
-            style={{ borderRadius: 20, marginLeft: 10 }}
-            startIcon={<FontAwesomeIcon icon={faSave} />}
-            onClick={() => saveChangesAsync()}
-            disabled={!isEdit}
-          >
-            Actualizar Cliente
-          </Button>
-        </div>
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{ borderRadius: 20, marginLeft: 10 }}
+              startIcon={<FontAwesomeIcon icon={faSave} />}
+              onClick={() => saveChangesAsync()}
+              disabled={!isEdit}
+            >
+              Actualizar Cliente
+            </Button>
+          </div>
+        ) : (
+          <></>
+        )}
       </Container>
     </div>
   );

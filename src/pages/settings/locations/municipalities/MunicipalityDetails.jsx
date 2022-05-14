@@ -2,7 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import {
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../../helpers/Helpers";
 
 import {
   TextField,
@@ -42,8 +46,14 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 const MunicipalityDetails = () => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
 
   const token = getToken();
   let navigate = useNavigate();
@@ -226,16 +236,20 @@ const MunicipalityDetails = () => {
           >
             <h4>Lista de Comunidades</h4>
 
-            <Button
-              onClick={() => {
-                setShowModal(true);
-              }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              style={{ borderRadius: 20 }}
-              variant="outlined"
-            >
-              Agregar Comunidad
-            </Button>
+            {isAccess(access, "COMMUNITIES CREATE") ? (
+              <Button
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                style={{ borderRadius: 20 }}
+                variant="outlined"
+              >
+                Agregar Comunidad
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <Divider />
@@ -268,7 +282,12 @@ const MunicipalityDetails = () => {
                 <tr>
                   <th>#</th>
                   <th style={{ textAlign: "left" }}>Nombre Comunidad</th>
-                  <th>Acciones</th>
+                  {isAccess(access, "COMMUNITIES UPDATE") ||
+                  isAccess(access, "COMMUNITIES DELETE") ? (
+                    <th>Acciones</th>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -277,23 +296,37 @@ const MunicipalityDetails = () => {
                     <tr key={item.id}>
                       <td>{item.id}</td>
                       <td style={{ textAlign: "left" }}>{item.name}</td>
-                      <td>
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedCommunity(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteCommunity(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      </td>
+                      {isAccess(access, "COMMUNITIES UPDATE") ||
+                      isAccess(access, "COMMUNITIES DELETE") ? (
+                        <td>
+                          {isAccess(access, "COMMUNITIES UPDATE") ? (
+                            <IconButton
+                              style={{ marginRight: 10, color: "#009688" }}
+                              onClick={() => {
+                                setSelectedCommunity(item);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faExternalLinkAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+
+                          {isAccess(access, "COMMUNITIES DELETE") ? (
+                            <IconButton
+                              style={{ color: "#f50057" }}
+                              onClick={() => deleteCommunity(item)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+                        </td>
+                      ) : (
+                        <></>
+                      )}
                     </tr>
                   );
                 })}

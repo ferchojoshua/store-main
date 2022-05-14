@@ -4,7 +4,7 @@ import { Container, Table } from "react-bootstrap";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 
 import { Button, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,8 +28,14 @@ import NoData from "../../../components/NoData";
 import { useNavigate } from "react-router-dom";
 
 const RolList = () => {
-  const { setReload, reload, setIsLoading, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    setReload,
+    reload,
+    setIsLoading,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [rolList, setRolList] = useState([]);
 
@@ -137,16 +143,20 @@ const RolList = () => {
         >
           <h1>Lista de Roles</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Agregar Rol
-          </Button>
+          {isAccess(access, "ROLES CREATE") ? (
+            <Button
+              variant="outlined"
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                setShowModal(true);
+              }}
+            >
+              Agregar Rol
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <hr />
@@ -178,12 +188,16 @@ const RolList = () => {
                       >
                         <FontAwesomeIcon icon={faExternalLinkAlt} />
                       </IconButton>
-                      <IconButton
-                        style={{ color: "#f50057" }}
-                        onClick={() => deleteRol(item)}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </IconButton>
+                      {isAccess(access, "ROLES DELETE") ? (
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deleteRol(item)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                   </tr>
                 );

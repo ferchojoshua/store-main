@@ -21,13 +21,19 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import { updateRolAsync } from "../../../services/RolApi";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
 
 const EditRol = ({ setShowModal, selectedRol }) => {
-  const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
 
@@ -384,46 +390,54 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     <div className="contenedor">
       <Divider />
 
-      <Paper
-        elevation={10}
-        style={{
-          borderRadius: 30,
-          padding: 20,
-          marginTop: 20,
-        }}
-      >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-9 ">
-            <TextField
-              fullWidth
-              variant="standard"
-              onChange={(e) => setRolName(e.target.value.toUpperCase())}
-              label={"Nombre rol"}
-              value={rolName}
-              disabled={isEdit ? false : true}
-            />
+      {isAccess(access, "ROLES UPDATE") ? (
+        <Paper
+          elevation={10}
+          style={{
+            borderRadius: 30,
+            padding: 20,
+            marginTop: 20,
+          }}
+        >
+          <div className="row justify-content-around align-items-center">
+            <div className="col-sm-9 ">
+              <TextField
+                fullWidth
+                variant="standard"
+                onChange={(e) => setRolName(e.target.value.toUpperCase())}
+                label={"Nombre rol"}
+                value={rolName}
+                disabled={isEdit ? false : true}
+              />
+            </div>
+            {isAccess(access, "ROLES UPDATE") ? (
+              <div className="col-sm-3 ">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  style={{
+                    borderRadius: 20,
+                    borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                    color: isEdit ? "#9c27b0" : "#ff9800",
+                  }}
+                  startIcon={
+                    <FontAwesomeIcon
+                      icon={isEdit ? faCircleXmark : faPenToSquare}
+                    />
+                  }
+                  onClick={() => setIsEdit(!isEdit)}
+                >
+                  {isEdit ? "Cancelar" : " Editar Rol"}
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
-          <div className="col-sm-3 ">
-            <Button
-              fullWidth
-              variant="outlined"
-              style={{
-                borderRadius: 20,
-                borderColor: isEdit ? "#9c27b0" : "#ff9800",
-                color: isEdit ? "#9c27b0" : "#ff9800",
-              }}
-              startIcon={
-                <FontAwesomeIcon
-                  icon={isEdit ? faCircleXmark : faPenToSquare}
-                />
-              }
-              onClick={() => setIsEdit(!isEdit)}
-            >
-              {isEdit ? "Cancelar" : " Editar Rol"}
-            </Button>
-          </div>
-        </div>
-      </Paper>
+        </Paper>
+      ) : (
+        <></>
+      )}
 
       <Typography
         style={{
@@ -539,7 +553,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         <Checkbox
                           disabled={!isEdit}
                           checked={inProductsVer}
-                          onChange={() => setInProductsVer(!inProductsCreate)}
+                          onChange={() => setInProductsVer(!inProductsVer)}
                         />
                       }
                       label="Ver"
@@ -1053,7 +1067,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={userVer}
+                          checked={rolesVer}
                           onChange={() => setRolesVer(!rolesVer)}
                         />
                       }
@@ -1066,7 +1080,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={userCreate}
+                          checked={rolesCreate}
                           onChange={() => setRolesCreate(!rolesCreate)}
                         />
                       }
@@ -1079,7 +1093,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={userUpdate}
+                          checked={rolesUpdate}
                           onChange={() => setRolesUpdate(!rolesUpdate)}
                         />
                       }
@@ -1092,7 +1106,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                       control={
                         <Checkbox
                           disabled={!isEdit}
-                          checked={userDelete}
+                          checked={rolesDelete}
                           onChange={() => setRolesDelete(!rolesDelete)}
                         />
                       }
@@ -1192,16 +1206,20 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         </div>
       </div>
 
-      <Button
-        fullWidth
-        variant="outlined"
-        style={{ borderRadius: 20, marginTop: 20 }}
-        startIcon={<FontAwesomeIcon icon={faSave} />}
-        onClick={() => saveRol()}
-        disabled={!isEdit}
-      >
-        Guardar Cambios
-      </Button>
+      {isAccess(access, "ROLES UPDATE") ? (
+        <Button
+          fullWidth
+          variant="outlined"
+          style={{ borderRadius: 20, marginTop: 20 }}
+          startIcon={<FontAwesomeIcon icon={faSave} />}
+          onClick={() => saveRol()}
+          disabled={!isEdit}
+        >
+          Guardar Cambios
+        </Button>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

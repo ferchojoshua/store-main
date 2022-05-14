@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import ProviderAdd from "./ProviderAdd";
 import {
   deleteProviderAsync,
@@ -31,8 +31,14 @@ import ProviderDetails from "./ProviderDetails";
 import NoData from "../../../components/NoData";
 
 const Providers = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    reload,
+    setReload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [providerList, setProviderList] = useState([]);
@@ -147,16 +153,20 @@ const Providers = () => {
           >
             <h1>Lista de Proveedores</h1>
 
-            <Button
-              style={{ borderRadius: 20 }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-              variant="outlined"
-            >
-              Agregar Proveedor
-            </Button>
+            {isAccess(access, "MISCELANEOS UPDATE") ? (
+              <Button
+                style={{ borderRadius: 20 }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                variant="outlined"
+              >
+                Agregar Proveedor
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <hr />
@@ -172,7 +182,12 @@ const Providers = () => {
                   <th style={{ textAlign: "left" }}>Direccion</th>
                   <th style={{ textAlign: "left" }}>Telefono</th>
                   <th style={{ textAlign: "left" }}>Correo</th>
-                  <th>Acciones</th>
+                  {isAccess(access, "MISCELANEOS UPDATE") ||
+                  isAccess(access, "MISCELANEOS DELETE") ? (
+                    <th>Acciones</th>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -184,23 +199,36 @@ const Providers = () => {
                       <td style={{ textAlign: "left" }}>{item.address}</td>
                       <td style={{ textAlign: "left" }}>{item.phone}</td>
                       <td style={{ textAlign: "left" }}>{item.email}</td>
-                      <td style={{ width: 150 }}>
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedProvider(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteProvider(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      </td>
+                      {isAccess(access, "MISCELANEOS UPDATE") ||
+                      isAccess(access, "MISCELANEOS DELETE") ? (
+                        <td style={{ width: 150 }}>
+                          {isAccess(access, "MISCELANEOS UPDATE") ? (
+                            <IconButton
+                              style={{ marginRight: 10, color: "#009688" }}
+                              onClick={() => {
+                                setSelectedProvider(item);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faExternalLinkAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+                          {isAccess(access, "MISCELANEOS DELETE") ? (
+                            <IconButton
+                              style={{ color: "#f50057" }}
+                              onClick={() => deleteProvider(item)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+                        </td>
+                      ) : (
+                        <></>
+                      )}
                     </tr>
                   );
                 })}

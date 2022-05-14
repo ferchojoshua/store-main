@@ -23,7 +23,7 @@ import {
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty, uniqBy } from "lodash";
 import { updateUserAsync } from "../../../services/UsersApi";
@@ -32,8 +32,14 @@ import { useNavigate } from "react-router-dom";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const EditUser = ({ selectedUser, setShowModal }) => {
-  const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
   const [rolesList, setRolesList] = useState([]);
@@ -344,40 +350,44 @@ const EditUser = ({ selectedUser, setShowModal }) => {
             />
           )}
         />
+        {isAccess(access, "USER UPDATE") ? (
+          <Grid container spacing={3} style={{ marginTop: 5 }}>
+            <Grid item sm={6}>
+              <Button
+                fullWidth
+                variant="outlined"
+                style={{
+                  borderRadius: 20,
+                  borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                  color: isEdit ? "#9c27b0" : "#ff9800",
+                }}
+                startIcon={
+                  <FontAwesomeIcon
+                    icon={isEdit ? faCircleXmark : faPenToSquare}
+                  />
+                }
+                onClick={() => setIsEdit(!isEdit)}
+              >
+                {isEdit ? "Cancelar" : " Editar Usuario"}
+              </Button>
+            </Grid>
 
-        <Grid container spacing={3} style={{ marginTop: 5 }}>
-          <Grid item sm={6}>
-            <Button
-              fullWidth
-              variant="outlined"
-              style={{
-                borderRadius: 20,
-                borderColor: isEdit ? "#9c27b0" : "#ff9800",
-                color: isEdit ? "#9c27b0" : "#ff9800",
-              }}
-              startIcon={
-                <FontAwesomeIcon
-                  icon={isEdit ? faCircleXmark : faPenToSquare}
-                />
-              }
-              onClick={() => setIsEdit(!isEdit)}
-            >
-              {isEdit ? "Cancelar" : " Editar Usuario"}
-            </Button>
+            <Grid item sm={6}>
+              <Button
+                fullWidth
+                variant="outlined"
+                style={{ borderRadius: 20 }}
+                startIcon={<FontAwesomeIcon icon={faSave} />}
+                onClick={() => updateUser()}
+                disabled={!isEdit}
+              >
+                Actualizar datos de Usuario
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item sm={6}>
-            <Button
-              fullWidth
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              startIcon={<FontAwesomeIcon icon={faSave} />}
-              onClick={() => updateUser()}
-              disabled={!isEdit}
-            >
-              Actualizar datos de Usuario
-            </Button>
-          </Grid>
-        </Grid>
+        ) : (
+          <></>
+        )}
       </Container>
     </div>
   );

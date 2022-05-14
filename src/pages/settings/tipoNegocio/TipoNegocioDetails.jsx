@@ -3,6 +3,7 @@ import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
+  isAccess,
   simpleMessage,
   toastError,
   toastSuccess,
@@ -51,8 +52,14 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 const TipoNegocioDetails = () => {
-  const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    reload,
+    setReload,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
   const { id } = useParams();
@@ -251,16 +258,23 @@ const TipoNegocioDetails = () => {
 
             <h2>Detalle Tipo Negocio # {id}</h2>
 
-            <IconButton
-              onClick={() => {
-                setIsEdit(!isEdit);
-              }}
-            >
-              <FontAwesomeIcon
-                style={{ fontSize: 30, color: isEdit ? "#4caf50" : "#ff5722" }}
-                icon={isEdit ? faCancel : faEdit}
-              />
-            </IconButton>
+            {isAccess(access, "MISCELANEOS UPDATE") ? (
+              <IconButton
+                onClick={() => {
+                  setIsEdit(!isEdit);
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 30,
+                    color: isEdit ? "#4caf50" : "#ff5722",
+                  }}
+                  icon={isEdit ? faCancel : faEdit}
+                />
+              </IconButton>
+            ) : (
+              <div />
+            )}
           </div>
 
           <hr />
@@ -308,22 +322,26 @@ const TipoNegocioDetails = () => {
           >
             <h4>Lista de Familias</h4>
 
-            <Button
-              onClick={() => {
-                setShowModal(true);
-              }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              style={{ borderRadius: 20 }}
-              variant="outlined"
-            >
-              Agregar Familia
-            </Button>
+            {isAccess(access, "MISCELANEOS CREATE") ? (
+              <Button
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                style={{ borderRadius: 20 }}
+                variant="outlined"
+              >
+                Agregar Familia
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <Divider />
 
           <TextField
-           style={{ marginBottom: 20, width: 600, marginTop: 20 }}
+            style={{ marginBottom: 20, width: 600, marginTop: 20 }}
             variant="standard"
             onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
             value={searchTerm}
@@ -350,7 +368,12 @@ const TipoNegocioDetails = () => {
                 <tr>
                   <th>#</th>
                   <th style={{ textAlign: "left" }}>Descripcion</th>
-                  <th>Acciones</th>
+                  {isAccess(access, "MISCELANEOS UPDATE") ||
+                  isAccess(access, "MISCELANEOS DELETE") ? (
+                    <th>Acciones</th>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -359,23 +382,37 @@ const TipoNegocioDetails = () => {
                     <tr key={item.id}>
                       <td>{item.id}</td>
                       <td style={{ textAlign: "left" }}>{item.description}</td>
-                      <td>
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedFamilia(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteFamilia(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      </td>
+                      {isAccess(access, "MISCELANEOS UPDATE") ||
+                      isAccess(access, "MISCELANEOS DELETE") ? (
+                        <td>
+                          {isAccess(access, "MISCELANEOS UPDATE") ? (
+                            <IconButton
+                              style={{ marginRight: 10, color: "#009688" }}
+                              onClick={() => {
+                                setSelectedFamilia(item);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faExternalLinkAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+
+                          {isAccess(access, "MISCELANEOS DELETE") ? (
+                            <IconButton
+                              style={{ color: "#f50057" }}
+                              onClick={() => deleteFamilia(item)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </IconButton>
+                          ) : (
+                            <></>
+                          )}
+                        </td>
+                      ) : (
+                        <></>
+                      )}
                     </tr>
                   );
                 })}

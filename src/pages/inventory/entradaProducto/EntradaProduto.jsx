@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 import { getEntradasAsync } from "../../../services/ProductIsApi";
 import moment from "moment/moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,7 +23,7 @@ import {
 const EntradaProduto = () => {
   let navigate = useNavigate();
   const [entradaList, setEntradaList] = useState([]);
-  const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
+  const { setIsLoading, reload, setIsLogged, setIsDefaultPass, access } =
     useContext(DataContext);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,7 +71,6 @@ const EntradaProduto = () => {
       <Container>
         <div
           style={{
-            // marginTop: 20,
             display: "flex",
             flexDirection: "row",
             alignContent: "center",
@@ -80,16 +79,20 @@ const EntradaProduto = () => {
         >
           <h1>Lista de Entrada de Productos</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              navigate(`/entrada/add`);
-            }}
-          >
-            Agregar Entrada
-          </Button>
+          {isAccess(access, "ENTRADAPRODUCTOS CREATE") ? (
+            <Button
+              variant="outlined"
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                navigate(`/entrada/add`);
+              }}
+            >
+              Agregar Entrada
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <hr />

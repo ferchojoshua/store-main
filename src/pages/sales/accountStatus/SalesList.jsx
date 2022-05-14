@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 
 import {
   IconButton,
@@ -34,7 +34,7 @@ import NewAbono from "../sale/abonoComponents/NewAbono";
 import SaleReturn from "../sale/returnVenta/SaleReturn";
 
 const SalesList = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [listaVentas, setListaVentas] = useState([]);
@@ -226,13 +226,14 @@ const SalesList = () => {
                         </Typography>
                       )}
                     </td>
-                    <td>
+
+                    <td style={{ width: 150 }}>
                       {item.isCanceled ? (
                         <></>
-                      ) : (
+                      ) : isAccess(access, "SALES CREATE") ? (
                         <Tooltip title="Abonar">
                           <IconButton
-                            style={{ marginRight: 10, color: "#ff9100" }}
+                            style={{ color: "#ff9100" }}
                             onClick={() => {
                               setSelectedVenta(item);
                               setShowModal(true);
@@ -241,6 +242,8 @@ const SalesList = () => {
                             <FontAwesomeIcon icon={faHandHoldingDollar} />
                           </IconButton>
                         </Tooltip>
+                      ) : (
+                        <></>
                       )}
                       <IconButton
                         style={{ color: "#009688" }}

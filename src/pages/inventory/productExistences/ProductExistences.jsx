@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 
 import {
   IconButton,
@@ -31,7 +31,7 @@ import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
 import ProductExistenceEdit from "./ProductExistenceEdit";
 
 const ProductExistences = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
     useContext(DataContext);
   let navigate = useNavigate();
 
@@ -166,7 +166,6 @@ const ProductExistences = () => {
       <Container>
         <div
           style={{
-            // marginTop: 10,
             display: "flex",
             flexDirection: "row",
             alignContent: "center",
@@ -237,7 +236,11 @@ const ProductExistences = () => {
                 <th style={{ textAlign: "center" }}>Existencias</th>
                 <th style={{ textAlign: "center" }}>PVM</th>
                 <th style={{ textAlign: "center" }}>PVD</th>
-                <th>Acciones</th>
+                {isAccess(access, "EXISTANCE UPDATE") ? (
+                  <th>Acciones</th>
+                ) : (
+                  <></>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -270,17 +273,21 @@ const ProductExistences = () => {
                         currency: "NIO",
                       })}
                     </td>
-                    <td>
-                      <IconButton
-                        style={{ marginRight: 10, color: "#009688" }}
-                        onClick={() => {
-                          setSelectedProduct(item);
-                          setShowEditModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                      </IconButton>
-                    </td>
+                    {isAccess(access, "EXISTANCE UPDATE") ? (
+                      <td>
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            setSelectedProduct(item);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      </td>
+                    ) : (
+                      <></>
+                    )}
                   </tr>
                 );
               })}

@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../../../components/PaginationComponent";
-import { toastError } from "../../../helpers/Helpers";
+import { isAccess, toastError } from "../../../helpers/Helpers";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 import { Button, IconButton, Paper } from "@mui/material";
 import {
@@ -23,7 +23,7 @@ import NoData from "../../../components/NoData";
 
 const Stores = () => {
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsDefaultPass, setIsLogged } =
+  const { setIsLoading, reload, setIsDefaultPass, setIsLogged, access } =
     useContext(DataContext);
   const [storesList, setStoresList] = useState([]);
 
@@ -89,16 +89,20 @@ const Stores = () => {
           >
             <h1>Almacenes</h1>
 
-            <Button
-              style={{ borderRadius: 20 }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-              variant="outlined"
-            >
-              Agregar Almacen
-            </Button>
+            {isAccess(access, "MISCELANEOS CREATE") ? (
+              <Button
+                style={{ borderRadius: 20 }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+                variant="outlined"
+              >
+                Agregar Almacen
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
 
           <hr />

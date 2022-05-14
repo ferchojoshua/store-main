@@ -8,7 +8,6 @@ import { LocalizationProvider } from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
 import "react-toastify/dist/ReactToastify.min.css";
 
-
 import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";
 
 import Stores from "./pages/settings/stores/Stores";
@@ -29,7 +28,7 @@ import {
 import { simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
-
+import { useNavigate } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Page401 from "./components/errorPages/Page401.jsx";
 import NotFound from "./components/errorPages/NotFound.jsx";
@@ -50,20 +49,17 @@ function App() {
     setUser,
     isDefaultPass,
     setIsDefaultPass,
+    setAccess,
   } = useContext(DataContext);
+
+  let navigate = useNavigate();
 
   const user = getUser();
   const token = getToken();
 
   useEffect(() => {
     setIsLoading(true);
-    if (!user) {
-      setIsLoading(false);
-      setIsLogged(false);
-      setIsDefaultPass(false);
-      return;
-    }
-    if (!token) {
+    if (!user || !token) {
       setIsLoading(false);
       setIsLogged(false);
       setIsDefaultPass(false);
@@ -74,6 +70,10 @@ function App() {
       const result = await getUserAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
         simpleMessage(result.error, "error");
         return;
       }
@@ -89,6 +89,7 @@ function App() {
         setIsDefaultPass(true);
         return;
       }
+      setAccess(result.data.rol.permissions);
       setIsDefaultPass(false);
       setIsLogged(true);
       setIsLoading(false);

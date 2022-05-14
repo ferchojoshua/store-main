@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -31,8 +31,14 @@ import AddClient from "./AddClient";
 import ClientDetails from "./ClientDetails";
 
 const ClientList = () => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    reload,
+    setReload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [clientList, setClientList] = useState([]);
@@ -63,6 +69,7 @@ const ClientList = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
+
       const result = await getClientsAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
@@ -87,8 +94,8 @@ const ClientList = () => {
         setIsDefaultPass(true);
         return;
       }
-      setIsLoading(false);
 
+      setIsLoading(false);
       setClientList(result.data);
     })();
   }, [reload]);
@@ -150,16 +157,20 @@ const ClientList = () => {
         >
           <h1>Lista de Clientes</h1>
 
-          <Button
-            variant="outlined"
-            style={{ borderRadius: 20 }}
-            startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Agregar Cliente
-          </Button>
+          {isAccess(access, "CLIENTS CREATE") ? (
+            <Button
+              variant="outlined"
+              style={{ borderRadius: 20 }}
+              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+              onClick={() => {
+                setShowModal(true);
+              }}
+            >
+              Agregar Cliente
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <hr />
@@ -196,7 +207,7 @@ const ClientList = () => {
                 <th style={{ textAlign: "left" }}>Comunidad</th>
                 <th style={{ textAlign: "left" }}>Direccion</th>
                 <th style={{ textAlign: "left" }}>Correo</th>
-                <th>Acciones</th>
+                <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -212,22 +223,30 @@ const ClientList = () => {
                     <td style={{ textAlign: "left" }}>{item.direccion}</td>
                     <td style={{ textAlign: "left" }}>{item.correo}</td>
 
-                    <td>
-                      <IconButton
-                        style={{ marginRight: 10, color: "#009688" }}
-                        onClick={() => {
-                          setSelectedClient(item);
-                          setShowEditModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                      </IconButton>
-                      <IconButton
-                        style={{ color: "#f50057" }}
-                        onClick={() => deleteClient(item)}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </IconButton>
+                    <td style={{ width: 150 }}>
+                      {isAccess(access, "CLIENTS VER") ? (
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            setSelectedClient(item);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
+                      {isAccess(access, "CLIENTS DELETE") ? (
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deleteClient(item)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                   </tr>
                 );

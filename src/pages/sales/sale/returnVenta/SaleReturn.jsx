@@ -1,7 +1,11 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import {
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../../helpers/Helpers";
 import {
   Button,
   Divider,
@@ -32,8 +36,14 @@ import withReactContent from "sweetalert2-react-content";
 import { Table } from "react-bootstrap";
 
 const SaleReturn = ({ selectedVenta, setVisible }) => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const {
+    reload,
+    setReload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   const {
     id,
     fechaVencimiento,
@@ -402,7 +412,11 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
               <th style={{ textAlign: "center" }}>Descuento</th>
               <th style={{ textAlign: "center" }}>Costo Unitario</th>
               <th style={{ textAlign: "center" }}>Costo Total</th>
-              <th style={{ textAlign: "center" }}>Eliminar</th>
+              {isAccess(access, "SALES DELETE") ? (
+                <th style={{ textAlign: "center" }}>Eliminar</th>
+              ) : (
+                <></>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -417,17 +431,21 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
 
                   <td style={{ textAlign: "center", width: 90 }}>
                     {item.cantidad}
-                    <Tooltip title="Quitar">
-                      <IconButton
-                        size="small"
-                        style={{ marginRight: 5, color: "#ff9800" }}
-                        onClick={() => {
-                          cantidadUpdate(item);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faCircleMinus} />
-                      </IconButton>
-                    </Tooltip>
+                    {isAccess(access, "SALES DELETE") ? (
+                      <Tooltip title="Quitar">
+                        <IconButton
+                          size="small"
+                          style={{ marginRight: 5, color: "#ff9800" }}
+                          onClick={() => {
+                            cantidadUpdate(item);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faCircleMinus} />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <></>
+                    )}
                   </td>
 
                   <td
@@ -440,76 +458,85 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                       currency: "NIO",
                     }).format(item.costoUnitario)}
                   </td>
+
                   <td style={{ textAlign: "center" }}>
                     {new Intl.NumberFormat("es-NI", {
                       style: "currency",
                       currency: "NIO",
                     }).format(item.costoTotal)}
                   </td>
-                  <td style={{ textAlign: "center" }}>
-                    <Tooltip title="Eliminar">
-                      <IconButton
-                        style={{ marginRight: 10, color: "#f50057" }}
-                        onClick={() => {
-                          devolucionParcial(item);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </IconButton>
-                    </Tooltip>
-                  </td>
+                  {isAccess(access, "SALES DELETE") ? (
+                    <td style={{ textAlign: "center" }}>
+                      <Tooltip title="Eliminar">
+                        <IconButton
+                          style={{ marginRight: 10, color: "#f50057" }}
+                          onClick={() => {
+                            devolucionParcial(item);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      </Tooltip>
+                    </td>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               );
             })}
           </tbody>
         </Table>
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div className="col-sm-5">
-            <Button
-              onClick={() => {
-                devolucionTotal();
-              }}
-              style={{
-                borderRadius: 20,
-                color: "#f50057",
-                borderColor: "#f50057",
-              }}
-              variant="outlined"
-              fullWidth
-            >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faSave}
-              />
-              Devolucion Total
-            </Button>
+        {isAccess(access, "SALES DELETE") ? (
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div className="col-sm-5">
+              <Button
+                onClick={() => {
+                  devolucionTotal();
+                }}
+                style={{
+                  borderRadius: 20,
+                  color: "#f50057",
+                  borderColor: "#f50057",
+                }}
+                variant="outlined"
+                fullWidth
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 10, fontSize: 20 }}
+                  icon={faSave}
+                />
+                Devolucion Total
+              </Button>
+            </div>
+            <div className="col-sm-5">
+              <Button
+                onClick={() => {
+                  saveChanges();
+                }}
+                style={{ borderRadius: 20 }}
+                variant="outlined"
+                fullWidth
+              >
+                <FontAwesomeIcon
+                  style={{ marginRight: 10, fontSize: 20 }}
+                  icon={faSave}
+                />
+                Guardar Cambios
+              </Button>
+            </div>
           </div>
-          <div className="col-sm-5">
-            <Button
-              onClick={() => {
-                saveChanges();
-              }}
-              style={{ borderRadius: 20 }}
-              variant="outlined"
-              fullWidth
-            >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faSave}
-              />
-              Guardar Cambios
-            </Button>
-          </div>
-        </div>
+        ) : (
+          <></>
+        )}
       </Container>
     </div>
   );

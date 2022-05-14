@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
 
@@ -7,7 +7,8 @@ import { faIdCardClip, faUsersGear } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 import UserList from "./securityUsers/UserList";
 import RolList from "./securityRoles/RolList";
-
+import { DataContext } from "../../context/DataContext";
+import { isAccess } from "../../helpers/Helpers";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,6 +40,7 @@ function a11yProps(index) {
 }
 
 const SecurityContiner = () => {
+  const { access } = React.useContext(DataContext);
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -58,32 +60,49 @@ const SecurityContiner = () => {
           aria-label="icon label tabs example"
           centered
         >
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faUsersGear} style={{ fontSize: 20 }} />
-            }
-            label="Usuarios"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "USER VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faUsersGear} style={{ fontSize: 20 }} />
+              }
+              label="Usuarios"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
 
-          <Tab
-            icon={
-              <FontAwesomeIcon icon={faIdCardClip} style={{ fontSize: 20 }} />
-            }
-            label="Roles"
-            {...a11yProps(0)}
-            style={{ fontSize: 12 }}
-          />
+          {isAccess(access, "ROLES VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faIdCardClip} style={{ fontSize: 20 }} />
+              }
+              label="Roles"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
         </Tabs>
         <Divider style={{ marginTop: 10 }} />
 
-        <TabPanel value={value} index={0}>
-          <UserList />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <RolList />
-        </TabPanel>
+        {isAccess(access, "USER VER") ? (
+          <TabPanel value={value} index={0}>
+            <UserList />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
+
+        {isAccess(access, "ROLES VER") ? (
+          <TabPanel value={value} index={isAccess(access, "USER VER") ? 1 : 0}>
+            <RolList />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
       </Paper>
     </Container>
   );

@@ -21,7 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { getToken, logOutAsync } from "../services/Account";
-import { simpleMessage } from "../helpers/Helpers";
+import { isAccess, simpleMessage } from "../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 
 const NavbarComponent = () => {
@@ -36,7 +36,10 @@ const NavbarComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [active, setActive] = useState("home");
 
-  const { user, setIsLogged, setTitle } = useContext(DataContext);
+  const { user, setIsLogged, setTitle, access } = useContext(DataContext);
+
+  // console.log(isAccess(access, "CLIENTS VER"));
+
   let navigate = useNavigate();
 
   const handleMenu = (event) => {
@@ -116,50 +119,70 @@ const NavbarComponent = () => {
               Inicio
             </Nav.Link>
 
-            <Nav.Link
-              eventKey="ventas"
-              style={{
-                fontWeight: active === "ventas" ? "bold" : "",
-                color: active === "ventas" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              as={Link}
-              to={`${rout}/sales`}
-            >
-              <FontAwesomeIcon icon={faChartLine} style={{ marginRight: 10 }} />
-              Ventas
-            </Nav.Link>
+            {isAccess(access, "SALES VER") ||
+            isAccess(access, "SALES CREATE") ||
+            isAccess(access, "CLIENTS VER") ? (
+              <Nav.Link
+                eventKey="ventas"
+                style={{
+                  fontWeight: active === "ventas" ? "bold" : "",
+                  color: active === "ventas" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                as={Link}
+                to={`${rout}/sales`}
+              >
+                <FontAwesomeIcon
+                  icon={faChartLine}
+                  style={{ marginRight: 10 }}
+                />
+                Ventas
+              </Nav.Link>
+            ) : (
+              <></>
+            )}
 
-            <Nav.Link
-              eventKey="inventario"
-              style={{
-                fontWeight: active === "Inventario" ? "bold" : "",
-                color: active === "inventario" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              as={Link}
-              to={`${rout}/inventory`}
-            >
-              <FontAwesomeIcon
-                icon={faBoxesStacked}
-                style={{ marginRight: 10 }}
-              />
-              Inventario
-            </Nav.Link>
+            {isAccess(access, "ENTRADAPRODUCTOS VER") ||
+            isAccess(access, "EXISTANCE VER") ||
+            isAccess(access, "PRODUCT TRANSLATE VER") ||
+            isAccess(access, "PRODUCTS VER") ? (
+              <Nav.Link
+                eventKey="inventario"
+                style={{
+                  fontWeight: active === "Inventario" ? "bold" : "",
+                  color: active === "inventario" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                as={Link}
+                to={`${rout}/inventory`}
+              >
+                <FontAwesomeIcon
+                  icon={faBoxesStacked}
+                  style={{ marginRight: 10 }}
+                />
+                Inventario
+              </Nav.Link>
+            ) : (
+              <></>
+            )}
 
-            <Nav.Link
-              style={{
-                fontWeight: active === "traslate-products" ? "bold" : "",
-                color: active === "security" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              eventKey="security"
-              as={Link}
-              to={`${rout}/security`}
-            >
-              <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
-              Seguridad
-            </Nav.Link>
+            {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+              <Nav.Link
+                style={{
+                  fontWeight: active === "traslate-products" ? "bold" : "",
+                  color: active === "security" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                eventKey="security"
+                as={Link}
+                to={`${rout}/security`}
+              >
+                <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
+                Seguridad
+              </Nav.Link>
+            ) : (
+              <></>
+            )}
 
             <NavDropdown
               drop="start"
@@ -176,33 +199,54 @@ const NavbarComponent = () => {
                 Miscelaneos
               </NavDropdown.Header>
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to={`${rout}/stores`}>
-                <FontAwesomeIcon
-                  icon={faWarehouse}
-                  style={{ marginRight: 10 }}
-                />
-                Almacenes
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to={`${rout}/providers`}>
-                <FontAwesomeIcon
-                  icon={faPeopleCarryBox}
-                  style={{ marginRight: 10 }}
-                />
-                Proveedores
-              </NavDropdown.Item>
 
-              <NavDropdown.Item as={Link} to={`${rout}/tipo-negocio`}>
-                <FontAwesomeIcon icon={faSitemap} style={{ marginRight: 10 }} />
-                Tipo Negocio
-              </NavDropdown.Item>
+              {isAccess(access, "MISCELANEOS VER") ? (
+                <NavDropdown.Item as={Link} to={`${rout}/stores`}>
+                  <FontAwesomeIcon
+                    icon={faWarehouse}
+                    style={{ marginRight: 10 }}
+                  />
+                  Almacenes
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
 
-              <NavDropdown.Item as={Link} to={`${rout}/departments`}>
-                <FontAwesomeIcon
-                  icon={faLocationDot}
-                  style={{ marginRight: 10, marginRight: 15 }}
-                />
-                Ubicaciones
-              </NavDropdown.Item>
+              {isAccess(access, "MISCELANEOS VER") ? (
+                <NavDropdown.Item as={Link} to={`${rout}/providers`}>
+                  <FontAwesomeIcon
+                    icon={faPeopleCarryBox}
+                    style={{ marginRight: 10 }}
+                  />
+                  Proveedores
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
+
+              {isAccess(access, "MISCELANEOS VER") ? (
+                <NavDropdown.Item as={Link} to={`${rout}/tipo-negocio`}>
+                  <FontAwesomeIcon
+                    icon={faSitemap}
+                    style={{ marginRight: 10 }}
+                  />
+                  Tipo Negocio
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
+
+              {isAccess(access, "COMMUNITIES VER") ? (
+                <NavDropdown.Item as={Link} to={`${rout}/departments`}>
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    style={{ marginRight: 10, marginRight: 15 }}
+                  />
+                  Ubicaciones
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
             </NavDropdown>
           </Nav>
 
