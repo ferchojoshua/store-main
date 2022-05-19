@@ -35,6 +35,7 @@ import {
 } from "../../../services/CommunitiesApi";
 import { addClientAsync } from "../../../services/ClientsApi";
 import CommunityAdd from "../../settings/locations/municipalities/communities/CommunityAdd";
+import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const AddClient = ({ setShowModal }) => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -57,6 +58,9 @@ const AddClient = ({ setShowModal }) => {
   const [selectedCommunity, setSelectedCommunity] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const [storeList, setStoreList] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("");
 
   const token = getToken();
 
@@ -87,7 +91,34 @@ const AddClient = ({ setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-      setDepartmentList(result.data);
+
+      setDepartmentList(result.data)
+
+      const resultSrores = await getStoresAsync(token);
+      if (!resultSrores.statusResponse) {
+        setIsLoading(false);
+        if (resultSrores.error.request.status === 401) {
+          navigate("/unauthorized");
+          return;
+        }
+        toastError(resultSrores.error.message);
+        return;
+      }
+
+      if (resultSrores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultSrores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setStoreList(resultSrores.data);
     })();
   }, []);
 
@@ -100,6 +131,7 @@ const AddClient = ({ setShowModal }) => {
         telefono,
         idCommunity: selectedCommunity,
         direccion,
+        idStore: selectedStore,
       };
       setIsLoading(true);
 
@@ -434,6 +466,37 @@ const AddClient = ({ setShowModal }) => {
           label={"Direccion Cliente"}
           value={direccion}
         />
+
+        <FormControl
+          variant="standard"
+          fullWidth
+          style={{ marginRight: 20, marginTop: 20 }}
+          required
+        >
+          <InputLabel id="demo-simple-select-standard-label">
+            Seleccione un Almacen
+          </InputLabel>
+          <Select
+            defaultValue=""
+            labelId="demo-simple-select-standard-label"
+            id="demo-simple-select-standard"
+            value={selectedStore}
+            onChange={(e) => setSelectedStore(e.target.value)}
+            label="Almacen"
+            style={{ textAlign: "left" }}
+          >
+            <MenuItem key={-1} value="">
+              <em> Seleccione un Almacen</em>
+            </MenuItem>
+            {storeList.map((item) => {
+              return (
+                <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                  {item.almacen.name}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
 
         <Button
           fullWidth

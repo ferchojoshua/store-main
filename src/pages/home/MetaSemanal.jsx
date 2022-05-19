@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Typography, Grid } from "@mui/material";
 
-import { CircularProgressbar } from "react-circular-progressbar";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { getSalesMensualAsync } from "../../services/DashboardApi";
+import { getSalesWeekByStoreAsync } from "../../services/DashboardApi";
 import { DataContext } from "../../context/DataContext";
 import { getToken } from "../../services/Account";
 import { toastError } from "../../helpers/Helpers";
 
-export const MetaMensual = ({ selectedStore }) => {
+export const MetaSemanal = ({ selectedStore }) => {
   const { setIsLoading } = useContext(DataContext);
   const [meta, setMeta] = useState(0);
   const [falta, setFalta] = useState(0);
   const [percent, setPercent] = useState(0);
 
   const metas = [
-    { id: 1, meta: 260000 },
-    { id: 2, meta: 360000 },
-    { id: 3, meta: 460000 },
-    { id: 4, meta: 560000 },
+    { id: 1, meta: 65000 },
+    { id: 2, meta: 90000 },
+    { id: 3, meta: 115000 },
+    { id: 4, meta: 140000 },
   ];
 
   const [totalVendido, setTotalVendido] = useState(0);
@@ -28,7 +28,7 @@ export const MetaMensual = ({ selectedStore }) => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getSalesMensualAsync(token, selectedStore);
+      const result = await getSalesWeekByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         toastError(result.error.message);
@@ -42,14 +42,13 @@ export const MetaMensual = ({ selectedStore }) => {
       setPercent((result.data / res[0].meta) * 100);
     })();
   }, [selectedStore]);
-
   return (
     <div
       style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
     >
-      <Typography variant="h6">Meta Mensual</Typography>
+      <Typography variant="h6">Meta Semanal</Typography>
 
-      <Typography variant="h5" style={{ color: "#2196f3", fontWeight: "bold" }}>
+      <Typography variant="h5" style={{ color: "#4caf50", fontWeight: "bold" }}>
         {new Intl.NumberFormat("es-NI", {
           style: "currency",
           currency: "NIO",
@@ -64,15 +63,19 @@ export const MetaMensual = ({ selectedStore }) => {
             <CircularProgressbar
               value={percent}
               text={`${Math.round(percent)}%`}
+              styles={buildStyles({
+                pathColor: "#4caf50",
+                textColor: "#4caf50",
+              })}
             />
           </div>
         </Grid>
         <Grid item xs={6}>
           <div style={{ marginTop: 20 }}>
-            <Typography variant="body1">Venta Mensual</Typography>
+            <Typography variant="body1">Venta Semanal</Typography>
             <Typography
               variant="body2"
-              style={{ color: "#2196f3", fontWeight: "bold" }}
+              style={{ color: "#4caf50", fontWeight: "bold" }}
             >
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",

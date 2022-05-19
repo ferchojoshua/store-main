@@ -43,7 +43,6 @@ const NewAbono = ({ selectedVenta }) => {
   const token = getToken();
 
   const [quoteList, setQuoteList] = useState([]);
-
   const [newAbono, setNewAbono] = useState("");
   const [newSaldo, setNewSaldo] = useState(saldo);
 

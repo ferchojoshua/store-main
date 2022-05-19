@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Typography, Grid } from "@mui/material";
 
-import { CircularProgressbar } from "react-circular-progressbar";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { getSalesMensualAsync } from "../../services/DashboardApi";
+import { getNewClientsByStoreAsync } from "../../services/DashboardApi";
 import { DataContext } from "../../context/DataContext";
 import { getToken } from "../../services/Account";
 import { toastError } from "../../helpers/Helpers";
 
-export const MetaMensual = ({ selectedStore }) => {
+export const MetaClientes = ({ selectedStore }) => {
   const { setIsLoading } = useContext(DataContext);
   const [meta, setMeta] = useState(0);
   const [falta, setFalta] = useState(0);
   const [percent, setPercent] = useState(0);
 
   const metas = [
-    { id: 1, meta: 260000 },
-    { id: 2, meta: 360000 },
-    { id: 3, meta: 460000 },
-    { id: 4, meta: 560000 },
+    { id: 1, meta: 15 },
+    { id: 2, meta: 16 },
+    { id: 3, meta: 17 },
+    { id: 4, meta: 18 },
   ];
 
-  const [totalVendido, setTotalVendido] = useState(0);
-
   const token = getToken();
+
+  const [newClients, setNewClients] = useState(0);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getSalesMensualAsync(token, selectedStore);
+      const result = await getNewClientsByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         toastError(result.error.message);
@@ -38,7 +38,7 @@ export const MetaMensual = ({ selectedStore }) => {
       let res = metas.filter((e) => e.id === selectedStore);
       setMeta(res[0].meta);
       setFalta(res[0].meta - result.data);
-      setTotalVendido(result.data);
+      setNewClients(result.data);
       setPercent((result.data / res[0].meta) * 100);
     })();
   }, [selectedStore]);
@@ -48,12 +48,8 @@ export const MetaMensual = ({ selectedStore }) => {
       style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
     >
       <Typography variant="h6">Meta Mensual</Typography>
-
-      <Typography variant="h5" style={{ color: "#2196f3", fontWeight: "bold" }}>
-        {new Intl.NumberFormat("es-NI", {
-          style: "currency",
-          currency: "NIO",
-        }).format(meta)}
+      <Typography variant="h5" style={{ color: "#d500f9", fontWeight: "bold" }}>
+        {`${meta} Clientes Nuevos`}
       </Typography>
 
       <hr />
@@ -64,20 +60,21 @@ export const MetaMensual = ({ selectedStore }) => {
             <CircularProgressbar
               value={percent}
               text={`${Math.round(percent)}%`}
+              styles={buildStyles({
+                pathColor: "#d500f9",
+                textColor: "#d500f9",
+              })}
             />
           </div>
         </Grid>
         <Grid item xs={6}>
           <div style={{ marginTop: 20 }}>
-            <Typography variant="body1">Venta Mensual</Typography>
+            <Typography variant="body1">Clientes Nuevos</Typography>
             <Typography
               variant="body2"
-              style={{ color: "#2196f3", fontWeight: "bold" }}
+              style={{ color: "#d500f9", fontWeight: "bold" }}
             >
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(totalVendido)}
+              {newClients}
             </Typography>
 
             <Typography variant="body1">Falta</Typography>
@@ -85,10 +82,7 @@ export const MetaMensual = ({ selectedStore }) => {
               variant="body2"
               style={{ color: "#f50057", fontWeight: "bold" }}
             >
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(falta < 0 ? 0 : falta)}
+              {falta < 0 ? 0 : falta}
             </Typography>
           </div>
         </Grid>

@@ -35,6 +35,32 @@ export const getStoresAsync = async (token) => {
   return result;
 };
 
+export const getStoresByUserAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetStoresByUser`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
 export const addStoreAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   const authAxios = axios.create({
