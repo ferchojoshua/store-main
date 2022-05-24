@@ -29,6 +29,8 @@ const NewSale = () => {
   const [selectedClient, setSelectedClient] = useState("");
   const [eventualClient, setEventualClient] = useState("");
 
+  const [selectedStore, setSelectedStore] = useState("");
+
   const [typeVenta, setTypeVenta] = useState("contado");
 
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -80,6 +82,7 @@ const NewSale = () => {
       montoVenta,
       saleDetails: selectedProductList,
       isContado: typeVenta === "contado" ? true : false,
+      storeid: selectedStore,
     };
 
     setIsLoading(true);
@@ -149,6 +152,9 @@ const NewSale = () => {
               />
 
               <SelectProduct
+                selectedProductList={selectedProductList}
+                selectedStore={selectedStore}
+                setSelectedStore={setSelectedStore}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
               />

@@ -137,3 +137,81 @@ export const GetSalesByDateAsync = async (token, id) => {
   }
   return result;
 };
+
+export const getVisitedClientsByStoreAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetVisitedClientsByStore/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getClientsByLocationAndStoreAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetClientsByLocationAndStore/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getSalesByTNAndStore = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetSalesByTNAndStore/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};

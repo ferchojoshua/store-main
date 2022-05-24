@@ -24,6 +24,9 @@ import {
   faChartPie,
 } from "@fortawesome/free-solid-svg-icons";
 import { VentaSemanal } from "./VentaSemanal";
+import VisitedClients from "./clientsChart/VisitedClients";
+import { Especialidad } from "./clientsChart/Especialidad";
+import { LocationClients } from "./clientsChart/LocationClients";
 
 const Home = () => {
   const { setIsLoading, setIsLogged, setIsDefaultPass } =
@@ -130,8 +133,8 @@ const Home = () => {
             Ventas y Clientes Nuevos
           </Typography>
         </div>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Grid container spacing={1}>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <Paper
               elevation={10}
               style={{
@@ -145,7 +148,7 @@ const Home = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <Paper
               elevation={10}
               style={{
@@ -159,7 +162,7 @@ const Home = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <Paper
               elevation={10}
               style={{
@@ -173,7 +176,7 @@ const Home = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={6} lg={3}>
             <Paper
               elevation={10}
               style={{
@@ -184,6 +187,48 @@ const Home = () => {
               }}
             >
               <MetaClientes selectedStore={selectedStore} />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={6} lg={3}>
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 20,
+                minWidth: 280,
+                maxHeight: 280,
+              }}
+            >
+              <VisitedClients selectedStore={selectedStore} />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 20,
+                minWidth: 280,
+                maxHeight: 280,
+              }}
+            >
+              <Especialidad selectedStore={selectedStore} />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={8} lg={6}>
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 20,
+                minWidth: 280,
+                maxHeight: 280,
+              }}
+            >
+              <LocationClients selectedStore={selectedStore} />
             </Paper>
           </Grid>
         </Grid>

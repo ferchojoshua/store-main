@@ -20,8 +20,15 @@ import {
 import { toastError } from "../../../helpers/Helpers";
 
 import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
+import { isEmpty } from "lodash";
 
-const SelectProduct = ({ selectedProduct, setSelectedProduct }) => {
+const SelectProduct = ({
+  selectedProductList,
+  selectedProduct,
+  setSelectedProduct,
+  selectedStore,
+  setSelectedStore,
+}) => {
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -29,7 +36,7 @@ const SelectProduct = ({ selectedProduct, setSelectedProduct }) => {
   const token = getToken();
 
   const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState("");
+
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {
@@ -96,6 +103,11 @@ const SelectProduct = ({ selectedProduct, setSelectedProduct }) => {
   }, [reload]);
 
   const handleChangeStore = async (event) => {
+    setSelectedProduct("");
+    if (!isEmpty(selectedProductList)) {
+      toastError("No puede haber dos almacenes en la misma factura");
+      return;
+    }
     setSelectedStore(event.target.value);
     const data = {
       idAlmacen: event.target.value,

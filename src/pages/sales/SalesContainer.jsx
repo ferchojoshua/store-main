@@ -8,6 +8,7 @@ import {
   faUserGroup,
   faFileInvoiceDollar,
   faHandHoldingDollar,
+  faRoute,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 
@@ -16,6 +17,7 @@ import NewSale from "./sale/NewSale";
 import SalesList from "./accountStatus/SalesList";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
+import { Itinerario } from "./itinerario/Itinerario";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -107,6 +109,13 @@ const SalesContainer = () => {
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
+
+          {/* <Tab
+            icon={<FontAwesomeIcon icon={faRoute} style={{ fontSize: 20 }} />}
+            label="Itinerario"
+            {...a11yProps(0)}
+            style={{ fontSize: 12 }}
+          /> */}
         </Tabs>
 
         <Divider style={{ marginTop: 10 }} />
@@ -148,6 +157,10 @@ const SalesContainer = () => {
         ) : (
           <></>
         )}
+
+        {/* <TabPanel value={value} index={3}>
+          <Itinerario />
+        </TabPanel> */}
       </Paper>
     </Container>
   );

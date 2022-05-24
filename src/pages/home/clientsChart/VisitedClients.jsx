@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Typography, Grid } from "@mui/material";
-
-import { getSalesRecupMonthAsync } from "../../services/DashboardApi";
-import { DataContext } from "../../context/DataContext";
-import { getToken } from "../../services/Account";
-import { toastError } from "../../helpers/Helpers";
+import { DataContext } from "../../../context/DataContext";
+import { getToken } from "../../../services/Account";
+import { toastError } from "../../../helpers/Helpers";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { sum } from "lodash";
-import NoData from "../../components/NoData";
+import NoData from "../../../components/NoData";
+import { getVisitedClientsByStoreAsync } from "../../../services/DashboardApi";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export const VentasRecupercionMensual = ({ selectedStore }) => {
+const VisitedClients = ({ selectedStore }) => {
   const { setIsLoading } = useContext(DataContext);
 
   const token = getToken();
@@ -24,34 +23,37 @@ export const VentasRecupercionMensual = ({ selectedStore }) => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getSalesRecupMonthAsync(token, selectedStore);
+      const result = await getVisitedClientsByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         toastError(result.error.message);
         return;
       }
       setIsLoading(false);
-
       setData(result.data);
       setTotal(sum(result.data));
+
+      // console.log(sum(data));
+      // console.log(sum(data));
+      // console.log(result.data[1] /);
     })();
   }, [selectedStore]);
 
   const graphicData = {
-    labels: ["Contado", "Credito", "Recuperacion"],
+    labels: ["Existente", "Nuevo", "Potencial"],
     datasets: [
       {
         label: "# of Votes",
         data,
         backgroundColor: [
           "rgba(75, 192, 192, 0.2)",
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)",
         ],
         borderColor: [
           "rgba(75, 192, 192, 1)",
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
         ],
         borderWidth: 1,
       },
@@ -60,62 +62,48 @@ export const VentasRecupercionMensual = ({ selectedStore }) => {
 
   return (
     <div>
-      <Typography variant="h6">Ventas y Recuperacion Mensual</Typography>
+      <Typography variant="h6">Clientes Visitados Esta Semana</Typography>
       {sum(data) === 0 ? (
         <div style={{ marginTop: 20 }}>
           <NoData />
         </div>
       ) : (
         <Grid container spacing={2} style={{ marginTop: 3 }}>
-          <Grid item xs={4} sm={7} md={7}>
+          <Grid item xs={4} sm={7} md={5} lg={7}>
             <Doughnut
               data={graphicData}
               options={{
                 plugins: {
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        let label = context.label || "";
-                        if (label) {
-                          label += ": ";
-                        }
-                        if (context.parsed !== null) {
-                          label += new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(context.parsed);
-                        }
-                        return label;
-                      },
-                    },
-                  },
                   legend: { display: false },
+                  labels: {
+                    position: "outside",
+                  },
                 },
               }}
             />
           </Grid>
-          <Grid item xs={8} sm={5} md={5}>
+          <Grid item xs={8} sm={5} md={7} lg={5}>
             <div style={{ marginTop: 20 }}>
-              <Typography variant="body1">Contado</Typography>
+              <Typography variant="body1">Recurrente</Typography>
               <Typography
                 variant="body2"
                 style={{ color: "rgba(75, 192, 192, 1)", fontWeight: "bold" }}
               >
-                {`${Math.round((data[0] / total) * 100)}%`}
+                {`${Math.round((data[0] / total) * 100)} %`}
               </Typography>
 
-              <Typography variant="body1">Credito</Typography>
+              <Typography variant="body1">Nuevo</Typography>
               <Typography
                 variant="body2"
-                style={{ color: "rgba(255, 99, 132, 1)", fontWeight: "bold" }}
+                style={{ color: "rgba(153, 102, 255, 1)", fontWeight: "bold" }}
               >
                 {`${Math.round((data[1] / total) * 100)}%`}
               </Typography>
 
-              <Typography variant="body1">Recuperacion</Typography>
+              <Typography variant="body1">Potencial</Typography>
               <Typography
                 variant="body2"
-                style={{ color: "rgba(54, 162, 235, 1)", fontWeight: "bold" }}
+                style={{ color: "rgba(255, 159, 64, 1)", fontWeight: "bold" }}
               >
                 {`${Math.round((data[2] / total) * 100)}%`}
               </Typography>
@@ -126,3 +114,5 @@ export const VentasRecupercionMensual = ({ selectedStore }) => {
     </div>
   );
 };
+
+export default VisitedClients;
