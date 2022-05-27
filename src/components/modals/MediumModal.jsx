@@ -15,6 +15,7 @@ const MediumModal = ({ titulo, isVisible, setVisible, children }) => {
         open={isVisible}
         onClose={() => setVisible(false)}
         maxWidth="md"
+        fullWidth
       >
         <DialogTitle style={{ alignSelf: "center" }}>{titulo}</DialogTitle>
         <DialogContent>{children}</DialogContent>

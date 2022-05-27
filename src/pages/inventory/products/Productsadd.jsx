@@ -19,6 +19,7 @@ import {
   Container,
   IconButton,
   Tooltip,
+  Paper,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
@@ -177,65 +178,33 @@ const Productsadd = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 700 }}>
-        <Divider />
-        <Grid container spacing={3} style={{ marginTop: 5 }}>
-          <Grid item sm={6}>
-            <FormControl variant="standard" fullWidth required>
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un tipo de negocio
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedTipoNegocio}
-                onChange={(e) => handleChangeTN(e.target.value)}
-                label="Tipo de Negocio"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={0} value="">
-                  <em> Seleccione un tipo de negocio</em>
-                </MenuItem>
-                {tipoNegocio.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.description}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-
-            <div
-              style={{
-                marginTop: 20,
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <FormControl
-                variant="standard"
-                fullWidth
-                style={{ marginRight: 20 }}
-                required
-              >
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container>
+          <Grid container spacing={3} style={{ marginTop: 5 }}>
+            <Grid item sm={6}>
+              <FormControl variant="standard" fullWidth required>
                 <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione una familia
+                  Seleccione un tipo de negocio
                 </InputLabel>
                 <Select
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
-                  value={selectedFamilia}
-                  onChange={(e) => setSelectedFamilia(e.target.value)}
-                  label="Familia"
+                  value={selectedTipoNegocio}
+                  onChange={(e) => handleChangeTN(e.target.value)}
+                  label="Tipo de Negocio"
                   style={{ textAlign: "left" }}
                 >
                   <MenuItem key={0} value="">
-                    <em> Seleccione una familia</em>
+                    <em> Seleccione un tipo de negocio</em>
                   </MenuItem>
-                  {familia.map((item) => {
+                  {tipoNegocio.map((item) => {
                     return (
                       <MenuItem key={item.id} value={item.id}>
                         {item.description}
@@ -245,111 +214,151 @@ const Productsadd = ({ setShowModal }) => {
                 </Select>
               </FormControl>
 
-              <Tooltip title="Agregar Familia" style={{ marginTop: 5 }}>
-                <IconButton
-                  onClick={() => {
-                    selectedTipoNegocio
-                      ? setShowAddModal(!showAddModal)
-                      : toastError("Seleccione un tipo de negocio");
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
-                    }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
-            </div>
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginTop: 20 }}
-              variant="standard"
-              onChange={(e) => setDescription(e.target.value.toUpperCase())}
-              label={"Descripcion"}
-              value={description}
-            />
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginTop: 20 }}
-              variant="standard"
-              onChange={(e) => setBarCode(e.target.value)}
-              label={"Codigo de barras"}
-              value={barCode}
-            />
-          </Grid>
-
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setMarca(e.target.value.toUpperCase())}
-              label={"Marca"}
-              value={marca}
-            />
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginTop: 20 }}
-              variant="standard"
-              onChange={(e) => setModelo(e.target.value.toUpperCase())}
-              label={"Modelo"}
-              value={modelo}
-            />
-
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginTop: 20 }}
-              required
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione una U/M...
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={uM}
-                onChange={(e) => setUM(e.target.value)}
-                label="Unidad de Medida"
-                style={{ textAlign: "left" }}
+              <div
+                style={{
+                  marginTop: 20,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignContent: "center",
+                  justifyContent: "space-between",
+                }}
               >
-                <MenuItem key={0} value="">
-                  <em>Seleccione una U/M...</em>
-                </MenuItem>
+                <FormControl
+                  variant="standard"
+                  fullWidth
+                  style={{ marginRight: 20 }}
+                  required
+                >
+                  <InputLabel id="demo-simple-select-standard-label">
+                    Seleccione una familia
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={selectedFamilia}
+                    onChange={(e) => setSelectedFamilia(e.target.value)}
+                    label="Familia"
+                    style={{ textAlign: "left" }}
+                  >
+                    <MenuItem key={0} value="">
+                      <em> Seleccione una familia</em>
+                    </MenuItem>
+                    {familia.map((item) => {
+                      return (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.description}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
 
-                <MenuItem key={1} value={"PIEZA"}>
-                  PIEZA
-                </MenuItem>
-                <MenuItem key={2} value={"SET"}>
-                  SET
-                </MenuItem>
-                <MenuItem key={3} value={"PAR"}>
-                  PAR
-                </MenuItem>
-              </Select>
-            </FormControl>
+                <Tooltip title="Agregar Familia" style={{ marginTop: 5 }}>
+                  <IconButton
+                    onClick={() => {
+                      selectedTipoNegocio
+                        ? setShowAddModal(!showAddModal)
+                        : toastError("Seleccione un tipo de negocio");
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{
+                        fontSize: 25,
+                        color: "#ff5722",
+                      }}
+                      icon={faCirclePlus}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
 
-            <Button
-              fullWidth
-              variant="outlined"
-              style={{ borderRadius: 20, marginTop: 31 }}
-              startIcon={<FontAwesomeIcon icon={faSave} />}
-              onClick={() => saveChangesAsync()}
-            >
-              Agregar Producto
-            </Button>
+              <TextField
+                fullWidth
+                required
+                style={{ marginTop: 20 }}
+                variant="standard"
+                onChange={(e) => setDescription(e.target.value.toUpperCase())}
+                label={"Descripcion"}
+                value={description}
+              />
+
+              <TextField
+                fullWidth
+                required
+                style={{ marginTop: 20 }}
+                variant="standard"
+                onChange={(e) => setBarCode(e.target.value)}
+                label={"Codigo de barras"}
+                value={barCode}
+              />
+            </Grid>
+
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setMarca(e.target.value.toUpperCase())}
+                label={"Marca"}
+                value={marca}
+              />
+
+              <TextField
+                fullWidth
+                required
+                style={{ marginTop: 20 }}
+                variant="standard"
+                onChange={(e) => setModelo(e.target.value.toUpperCase())}
+                label={"Modelo"}
+                value={modelo}
+              />
+
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginTop: 20 }}
+                required
+              >
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione una U/M...
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={uM}
+                  onChange={(e) => setUM(e.target.value)}
+                  label="Unidad de Medida"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={0} value="">
+                    <em>Seleccione una U/M...</em>
+                  </MenuItem>
+
+                  <MenuItem key={1} value={"PIEZA"}>
+                    PIEZA
+                  </MenuItem>
+                  <MenuItem key={2} value={"SET"}>
+                    SET
+                  </MenuItem>
+                  <MenuItem key={3} value={"PAR"}>
+                    PAR
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                style={{ borderRadius: 20, marginTop: 31 }}
+                startIcon={<FontAwesomeIcon icon={faSave} />}
+                onClick={() => saveChangesAsync()}
+              >
+                Agregar Producto
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </Paper>
 
       <SmallModal
         titulo={"Agregar Familia"}

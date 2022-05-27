@@ -35,6 +35,9 @@ const AddRol = ({ setShowModal }) => {
   const [ventasCreate, setVentasCreate] = useState(false);
   const [ventasDelete, setVentasDelete] = useState(false);
 
+  const [pagoCreate, setPagoCreate] = useState(false);
+  const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
+
   const [clientsVer, setClientsVer] = useState(false);
   const [clientsCreate, setClientsCreate] = useState(false);
   const [clientsUpdate, setClientsUpdate] = useState(false);
@@ -45,6 +48,7 @@ const AddRol = ({ setShowModal }) => {
   const [inProductsUpdate, setInProductsUpdate] = useState(false);
 
   const [ProductExistenceVer, setExistenceProductsVer] = useState(false);
+  const [kardexVer, setKardexVer] = useState(false);
   const [ProductExistenceUpdate, setExistenceProductsUpdate] = useState(false);
 
   const [productTraslateVer, setProductTraslateVer] = useState(false);
@@ -82,6 +86,9 @@ const AddRol = ({ setShowModal }) => {
     setVentasCreate(!isFullAccess);
     setVentasDelete(!isFullAccess);
 
+    setPagoCreate(!pagoCreate);
+    setPagoEspecificoCreate(!pagoEspecificoCreate);
+
     setClientsVer(!clientsVer);
     setClientsCreate(!clientsCreate);
     setClientsUpdate(!clientsUpdate);
@@ -92,6 +99,7 @@ const AddRol = ({ setShowModal }) => {
     setInProductsUpdate(!isFullAccess);
 
     setExistenceProductsVer(!isFullAccess);
+    setKardexVer(!isFullAccess);
     setExistenceProductsUpdate(!isFullAccess);
 
     setProductTraslateVer(!isFullAccess);
@@ -143,6 +151,18 @@ const AddRol = ({ setShowModal }) => {
           description: "SALES DELETE",
           IsEnable: ventasDelete,
         },
+
+        //Modulo Pagos
+        {
+          description: "PAGO CREATE",
+          IsEnable: pagoCreate,
+        },
+
+        {
+          description: "PAGO ESPECIFICO CREATE",
+          IsEnable: pagoEspecificoCreate,
+        },
+
         //Modulo Clientes
         {
           description: "CLIENTS VER",
@@ -177,6 +197,10 @@ const AddRol = ({ setShowModal }) => {
         {
           description: "EXISTANCE VER",
           IsEnable: ProductExistenceVer,
+        },
+        {
+          description: "KARDEX VER",
+          IsEnable: kardexVer,
         },
         {
           description: "EXISTANCE UPDATE",
@@ -313,7 +337,7 @@ const AddRol = ({ setShowModal }) => {
   };
 
   return (
-    <div className="contenedor">
+    <div>
       <Divider />
 
       <Paper
@@ -345,7 +369,9 @@ const AddRol = ({ setShowModal }) => {
       >
         Accesos de modulo
       </Typography>
+
       <Divider />
+
       <Typography
         style={{
           fontSize: 17,
@@ -371,7 +397,7 @@ const AddRol = ({ setShowModal }) => {
         />
       </div>
 
-      <div className="row justify-content-around align-items-center">
+      <div className="row justify-content-around ">
         <div className="col-sm-6">
           {/* Modulo Ventas */}
           <Paper
@@ -723,12 +749,67 @@ const AddRol = ({ setShowModal }) => {
         </div>
 
         <div className="col-sm-6">
+          {/* Modulo Abonos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Abonos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={pagoCreate}
+                          onChange={() => setPagoCreate(!pagoCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={pagoEspecificoCreate}
+                          onChange={() =>
+                            setPagoEspecificoCreate(!pagoEspecificoCreate)
+                          }
+                        />
+                      }
+                      label="Especifico"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
           {/* Modulo Clientes */}
           <Paper
             elevation={10}
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <div className="row justify-content-around align-items-center">
@@ -833,6 +914,18 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={kardexVer}
+                          onChange={() => setKardexVer(!kardexVer)}
+                        />
+                      }
+                      label="Kardex"
                     />
                   </div>
                   <div className="col-sm-3 ">

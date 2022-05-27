@@ -26,7 +26,7 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import { getStoresAsync } from "../../../services/AlmacenApi";
+import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
 import ProductExistenceEdit from "./ProductExistenceEdit";
 
@@ -59,13 +59,14 @@ const ProductExistences = () => {
   const token = getToken();
 
   const [showEditModal, setShowEditModal] = useState(false);
+
   const [selectedProduct, setSelectedProduct] = useState([]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       //Traemos los Almacenes de la DB
-      const resultStores = await getStoresAsync(token);
+      const resultStores = await getStoresByUserAsync(token);
       if (!resultStores.statusResponse) {
         setIsLoading(false);
         if (resultStores.error.request.status === 401) {
@@ -191,8 +192,8 @@ const ProductExistences = () => {
               </MenuItem>
               {storeList.map((item) => {
                 return (
-                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                    {item.almacen.name}
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
                   </MenuItem>
                 );
               })}
@@ -236,11 +237,7 @@ const ProductExistences = () => {
                 <th style={{ textAlign: "center" }}>Existencias</th>
                 <th style={{ textAlign: "center" }}>PVM</th>
                 <th style={{ textAlign: "center" }}>PVD</th>
-                {isAccess(access, "EXISTANCE UPDATE") ? (
-                  <th>Acciones</th>
-                ) : (
-                  <></>
-                )}
+                {isAccess(access, "EXISTANCE UPDATE") ? <th>Ver</th> : <></>}
               </tr>
             </thead>
             <tbody>
@@ -273,8 +270,9 @@ const ProductExistences = () => {
                         currency: "NIO",
                       })}
                     </td>
-                    {isAccess(access, "EXISTANCE UPDATE") ? (
-                      <td>
+
+                    <td>
+                      {isAccess(access, "EXISTANCE UPDATE") ? (
                         <IconButton
                           style={{ marginRight: 10, color: "#009688" }}
                           onClick={() => {
@@ -284,10 +282,10 @@ const ProductExistences = () => {
                         >
                           <FontAwesomeIcon icon={faExternalLinkAlt} />
                         </IconButton>
-                      </td>
-                    ) : (
-                      <></>
-                    )}
+                      ) : (
+                        <></>
+                      )}
+                    </td>
                   </tr>
                 );
               })}

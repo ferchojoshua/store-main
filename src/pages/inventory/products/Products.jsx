@@ -13,6 +13,7 @@ import {
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBoxesPacking,
   faCirclePlus,
   faExternalLinkAlt,
   faSearch,
@@ -29,6 +30,7 @@ import {
 import MediumModal from "../../../components/modals/MediumModal";
 import Productsadd from "./Productsadd";
 import ProductsDetails from "./ProductsDetails";
+import { ProductKardex } from "../productExistences/ProductKardex";
 
 const Products = () => {
   const {
@@ -65,6 +67,8 @@ const Products = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
+
+  const [showKardexModal, setShowKardexModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -151,24 +155,62 @@ const Products = () => {
             flexDirection: "row",
             alignContent: "center",
             justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <h1>Lista de Productos</h1>
 
-          {isAccess(access, "PRODUCTS CREATE") ? (
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-            >
-              Agregar Producto
-            </Button>
-          ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            {isAccess(access, "PRODUCTS CREATE") ? (
+              <Button
+                variant="outlined"
+                style={{ borderRadius: 20 }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Agregar Producto
+              </Button>
+            ) : (
+              <></>
+            )}
             <></>
-          )}
+
+            {isAccess(access, "KARDEX VER") ? (
+              <Button
+                variant="outlined"
+                style={{
+                  borderRadius: 20,
+                  color: "#ff5722",
+                  borderColor: "#ff5722",
+                  marginLeft: 10,
+                }}
+                startIcon={
+                  <FontAwesomeIcon
+                    icon={faBoxesPacking}
+                    style={{
+                      color: "#ff5722",
+                    }}
+                  />
+                }
+                onClick={() => {
+                  setShowKardexModal(true);
+                }}
+              >
+                Consultar Kardex
+              </Button>
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
 
         <hr />
@@ -287,6 +329,14 @@ const Products = () => {
           selectedProduct={selectedProduct}
           setShowModal={setShowEditModal}
         />
+      </MediumModal>
+
+      <MediumModal
+        titulo="Consultar Cardex"
+        isVisible={showKardexModal}
+        setVisible={setShowKardexModal}
+      >
+        <ProductKardex productList={productList} />
       </MediumModal>
     </div>
   );

@@ -47,6 +47,9 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [ventasCreate, setVentasCreate] = useState(false);
   const [ventasDelete, setVentasDelete] = useState(false);
 
+  const [pagoCreate, setPagoCreate] = useState(false);
+  const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
+
   const [clientsVer, setClientsVer] = useState(false);
   const [clientsCreate, setClientsCreate] = useState(false);
   const [clientsUpdate, setClientsUpdate] = useState(false);
@@ -57,6 +60,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [inProductsUpdate, setInProductsUpdate] = useState(false);
 
   const [ProductExistenceVer, setExistenceProductsVer] = useState(false);
+  const [kardexVer, setKardexVer] = useState(false);
   const [ProductExistenceUpdate, setExistenceProductsUpdate] = useState(false);
 
   const [productTraslateVer, setProductTraslateVer] = useState(false);
@@ -101,6 +105,15 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           setVentasDelete(item.isEnable);
           break;
 
+        //Ventas Producto
+        case "PAGO CREATE":
+          setPagoCreate(item.isEnable);
+          break;
+
+        case "PAGO ESPECIFICO CREATE":
+          setPagoEspecificoCreate(item.isEnable);
+          break;
+
         //Clientes
         case "CLIENTS VER":
           setClientsVer(item.isEnable);
@@ -129,6 +142,9 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         //Existencias de Producto
         case "EXISTANCE VER":
           setExistenceProductsVer(item.isEnable);
+          break;
+        case "KARDEX VER":
+          setKardexVer(item.isEnable);
           break;
         case "EXISTANCE UPDATE":
           setExistenceProductsUpdate(item.isEnable);
@@ -237,6 +253,15 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = ventasDelete;
           break;
 
+        //Ventas Producto
+        case "PAGO CREATE":
+          item.isEnable = pagoCreate;
+          break;
+
+        case "PAGO ESPECIFICO CREATE":
+          item.isEnable = pagoEspecificoCreate;
+          break;
+
         //Clientes
         case "CLIENTS VER":
           item.isEnable = clientsVer;
@@ -265,6 +290,10 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         //Existencias de Producto
         case "EXISTANCE VER":
           item.isEnable = ProductExistenceVer;
+          break;
+
+        case "KARDEX VER":
+          item.isEnable = kardexVer;
           break;
 
         case "EXISTANCE UPDATE":
@@ -387,7 +416,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   };
 
   return (
-    <div className="contenedor">
+    <div>
       <Divider />
 
       {isAccess(access, "ROLES UPDATE") ? (
@@ -452,7 +481,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
       </Typography>
       <Divider />
 
-      <div className="row justify-content-around align-items-center mt-3">
+      <div className="row justify-content-around mt-3">
         <div className="col-sm-6">
           {/* Modulo Ventas */}
           <Paper
@@ -820,12 +849,69 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         </div>
 
         <div className="col-sm-6">
+          {/* Modulo Abonos */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Abonos
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={pagoCreate}
+                          onChange={() => setPagoCreate(!pagoCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={pagoEspecificoCreate}
+                          onChange={() =>
+                            setPagoEspecificoCreate(!pagoEspecificoCreate)
+                          }
+                        />
+                      }
+                      label="Especifico"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
           {/* Modulo Clientes */}
           <Paper
             elevation={10}
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <div className="row justify-content-around align-items-center">
@@ -935,6 +1021,20 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         />
                       }
                       label="Ver"
+                    />
+                  </div>
+
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={kardexVer}
+                          onChange={() => setKardexVer(!kardexVer)}
+                        />
+                      }
+                      label="Kardex"
                     />
                   </div>
 

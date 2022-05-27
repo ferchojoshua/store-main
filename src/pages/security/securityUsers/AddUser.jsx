@@ -11,6 +11,7 @@ import {
   MenuItem,
   Container,
   Autocomplete,
+  Paper,
 } from "@mui/material";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -198,152 +199,162 @@ const AddUser = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 800 }}>
-        <Divider />
-        <Grid container spacing={3} style={{ marginTop: 5 }}>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10 }}
-              variant="standard"
-              onChange={(e) => setFirstName(e.target.value.toUpperCase())}
-              label={"Nombre"}
-              value={firstName}
-            />
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container style={{ width: 800 }}>
+          <Grid container spacing={3} style={{ marginTop: 5 }}>
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10 }}
+                variant="standard"
+                onChange={(e) => setFirstName(e.target.value.toUpperCase())}
+                label={"Nombre"}
+                value={firstName}
+              />
 
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setSecondName(e.target.value.toUpperCase())}
-              label={"Segundo Nombre"}
-              value={secondName}
-            />
+              <TextField
+                fullWidth
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setSecondName(e.target.value.toUpperCase())}
+                label={"Segundo Nombre"}
+                value={secondName}
+              />
 
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setLastName(e.target.value.toUpperCase())}
-              label={"Apellido"}
-              value={lastName}
-            />
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setLastName(e.target.value.toUpperCase())}
+                label={"Apellido"}
+                value={lastName}
+              />
 
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setSecondLastName(e.target.value.toUpperCase())}
-              label={"Segundo Apellido"}
-              value={secondLastName}
-            />
-          </Grid>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10 }}
-              variant="standard"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              label={"Telefono"}
-              value={phoneNumber}
-            />
+              <TextField
+                fullWidth
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) =>
+                  setSecondLastName(e.target.value.toUpperCase())
+                }
+                label={"Segundo Apellido"}
+                value={secondLastName}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                style={{ marginBottom: 10 }}
+                variant="standard"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                label={"Telefono"}
+                value={phoneNumber}
+              />
 
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setAddress(e.target.value.toUpperCase())}
-              label={"Direccion"}
-              value={address}
-            />
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setAddress(e.target.value.toUpperCase())}
+                label={"Direccion"}
+                value={address}
+              />
 
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setUserName(e.target.value)}
-              label={"Usuario"}
-              value={userName}
-            />
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setUserName(e.target.value)}
+                label={"Usuario"}
+                value={userName}
+              />
 
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginTop: 10 }}
-              required
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un rol de usuario
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedRol}
-                onChange={(e) => setSelectedRol(e.target.value)}
-                label="Rol de usuario"
-                style={{ textAlign: "left" }}
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginTop: 10 }}
+                required
               >
-                <MenuItem key={0} value="">
-                  <em>Seleccione un rol de usuario</em>
-                </MenuItem>
-                {rolesList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.roleName}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un rol de usuario
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedRol}
+                  onChange={(e) => setSelectedRol(e.target.value)}
+                  label="Rol de usuario"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={0} value="">
+                    <em>Seleccione un rol de usuario</em>
+                  </MenuItem>
+                  {rolesList.map((item) => {
+                    return (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.roleName}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Autocomplete
-          multiple
-          style={{ marginTop: 20, marginBottom: 20 }}
-          fullWidth
-          id="fixed-tags-demo"
-          value={value.name}
-          onChange={(event, newValue) => {
-            setValue([
-              ...fixedOptions,
-              ...newValue.filter(
-                (option) => fixedOptions.indexOf(option) === -1
-              ),
-            ]);
-          }}
-          options={storeList}
-          getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
-          renderOption={(props, option) => {
-            return (
-              <li {...props} key={option.id}>
-                {option.name}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              variant="standard"
-              {...params}
-              label="Seleccione uno o mas almacenes..."
-            />
-          )}
-        />
+          <Autocomplete
+            multiple
+            style={{ marginTop: 20, marginBottom: 20 }}
+            fullWidth
+            id="fixed-tags-demo"
+            value={value.name}
+            onChange={(event, newValue) => {
+              setValue([
+                ...fixedOptions,
+                ...newValue.filter(
+                  (option) => fixedOptions.indexOf(option) === -1
+                ),
+              ]);
+            }}
+            options={storeList}
+            getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
+            renderOption={(props, option) => {
+              return (
+                <li {...props} key={option.id}>
+                  {option.name}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                variant="standard"
+                {...params}
+                label="Seleccione uno o mas almacenes..."
+              />
+            )}
+          />
 
-        <Button
-          fullWidth
-          variant="outlined"
-          style={{ borderRadius: 20, marginTop: 10 }}
-          startIcon={<FontAwesomeIcon icon={faSave} />}
-          onClick={() => addNewUser()}
-        >
-          Agregar Usuario
-        </Button>
-      </Container>
+          <Button
+            fullWidth
+            variant="outlined"
+            style={{ borderRadius: 20, marginTop: 10 }}
+            startIcon={<FontAwesomeIcon icon={faSave} />}
+            onClick={() => addNewUser()}
+          >
+            Agregar Usuario
+          </Button>
+        </Container>
+      </Paper>
     </div>
   );
 };

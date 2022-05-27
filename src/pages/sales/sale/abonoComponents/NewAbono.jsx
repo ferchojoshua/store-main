@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import {
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../../helpers/Helpers";
 import {
   TextField,
   Button,
@@ -10,9 +14,10 @@ import {
   Typography,
   Paper,
   InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faHandHoldingDollar } from "@fortawesome/free-solid-svg-icons";
 import {
   getToken,
   deleteUserData,
@@ -21,35 +26,52 @@ import {
 import moment from "moment";
 import {
   addAbonoAsync,
-  getQuotesBySaleAsync,
+  getSalesUncanceledByClient,
 } from "../../../../services/SalesApi";
-import { isEmpty } from "lodash";
+import { isEmpty, sum } from "lodash";
 import NoData from "../../../../components/NoData";
 import { Table } from "react-bootstrap";
+import SmallModal from "../../../../components/modals/SmallModal";
+import { NewAbonoEspecifico } from "./NewAbonoEspecifico";
 
-const NewAbono = ({ selectedVenta }) => {
-  const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+const NewAbono = ({
+  selectedVenta,
+  active,
+  setActive,
+  selectedStore,
+  setSelectedStore,
+}) => {
   const {
-    id,
-    fechaVencimiento,
-    fechaVenta,
-    facturedBy,
-    saldo,
-    montoVenta,
-    client,
-  } = selectedVenta;
+    reload,
+    setReload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
+
+  const { client, store } = selectedVenta;
+
   let navigate = useNavigate();
   const token = getToken();
 
   const [quoteList, setQuoteList] = useState([]);
   const [newAbono, setNewAbono] = useState("");
-  const [newSaldo, setNewSaldo] = useState(saldo);
+
+  const [saldo, setSaldo] = useState(0);
+  const [newSaldo, setNewSaldo] = useState(0);
+
+  const [montoVenta, setMontoVenta] = useState(0);
+
+  const [uncanceledSales, setUncanceledSales] = useState([]);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSale, setSelectedSale] = useState([]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const result = await getQuotesBySaleAsync(token, id);
+      const result = await getSalesUncanceledByClient(token, client.id);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -74,7 +96,26 @@ const NewAbono = ({ selectedVenta }) => {
         return;
       }
       setIsLoading(false);
-      setQuoteList(result.data);
+
+      let s = result.data.map((item) => item.sale);
+      setUncanceledSales(s);
+      setSaldo(sum(s.map((item) => item.saldo)));
+
+      setMontoVenta(sum(s.map((item) => item.montoVenta)));
+
+      let abonoList = [];
+
+      result.data.map((item) => {
+        if (!isEmpty(item.abonos)) {
+          item.abonos.map((i) => {
+            abonoList.push(i);
+          });
+        }
+      });
+
+      setQuoteList(abonoList);
+
+      setIsLoading(false);
     })();
   }, [reload]);
 
@@ -96,7 +137,8 @@ const NewAbono = ({ selectedVenta }) => {
       return;
     }
     const data = {
-      IdSale: id,
+      idClient: client.id,
+      idStore: store.id,
       monto: newAbono,
     };
     setIsLoading(true);
@@ -125,6 +167,8 @@ const NewAbono = ({ selectedVenta }) => {
       return;
     }
     setIsLoading(false);
+    setActive(active);
+    setSelectedStore(selectedStore);
     setReload(!reload);
     setNewAbono("");
     toastSuccess("Abono Agregado...");
@@ -140,69 +184,14 @@ const NewAbono = ({ selectedVenta }) => {
 
   return (
     <div>
-      <Container style={{ width: 700 }}>
+      <Container>
         <Divider />
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Id Venta:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#2196f3", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {id}
-            </Typography>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Fecha Venta</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#4caf50", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {moment(fechaVenta).format("L")}
-            </Typography>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Fecha Vencimiento:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#f50057", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {moment(fechaVencimiento).format("L")}
-            </Typography>
-          </div>
-        </div>
 
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-around",
-            // textAlign: "center",
           }}
         >
           <div
@@ -225,6 +214,27 @@ const NewAbono = ({ selectedVenta }) => {
               {client.nombreCliente}
             </Typography>
           </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              // justifyContent: "space-around",
+              // textAlign: "center",
+            }}
+          >
+            <Typography variant="body1">Facturas Pendientes:</Typography>
+            <Typography
+              variant="body1"
+              style={{
+                color: "#2196f3",
+                fontWeight: "bold",
+                marginLeft: 10,
+              }}
+            >
+              {uncanceledSales.length}
+            </Typography>
+          </div>
         </div>
 
         <Paper
@@ -236,6 +246,144 @@ const NewAbono = ({ selectedVenta }) => {
             marginBottom: 10,
           }}
         >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+            }}
+          >
+            <h6>Facturas Pendientes</h6>
+          </div>
+
+          {isEmpty(uncanceledSales) ? (
+            <div
+              style={{
+                textAlign: "center",
+              }}
+            >
+              <hr />
+              <NoData />
+            </div>
+          ) : (
+            <Table hover size="sm">
+              <caption>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography variant="body1">Monto Venta:</Typography>
+                    <Typography
+                      variant="body1"
+                      style={{
+                        color: "#4caf50",
+                        fontWeight: "bold",
+                        marginLeft: 10,
+                      }}
+                    >
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(montoVenta)}
+                    </Typography>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography variant="body1">Saldo:</Typography>
+                    <Typography
+                      variant="body1"
+                      style={{
+                        color: "#f50057",
+                        fontWeight: "bold",
+                        marginLeft: 10,
+                      }}
+                    >
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(saldo)}
+                    </Typography>
+                  </div>
+                </div>
+              </caption>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th style={{ textAlign: "center" }}>Fecha Venta</th>
+                  <th style={{ textAlign: "center" }}>Monto Venta</th>
+                  <th style={{ textAlign: "center" }}>Saldo</th>
+                  <th style={{ textAlign: "center" }}>Fecha Venc.</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
+                  {isAccess(access, "PAGO ESPECIFICO CREATE") ? (
+                    <th style={{ textAlign: "center" }}>Pagar</th>
+                  ) : (
+                    <></>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {uncanceledSales.map((item) => {
+                  return (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(item.fechaVenta).format("L")}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.montoVenta)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.saldo)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(item.fechaVencimiento).format("L")}
+                      </td>
+                      <td style={{ textAlign: "center" }}>{item.store.name}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {isAccess(access, "PAGO ESPECIFICO CREATE") ? (
+                          <IconButton
+                            style={{ color: "#ff9100" }}
+                            onClick={() => {
+                              setSelectedSale(item);
+                              setShowModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faHandHoldingDollar} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          )}
+
+          <hr />
+
           <div
             style={{
               display: "flex",
@@ -270,12 +418,12 @@ const NewAbono = ({ selectedVenta }) => {
                   <th>#</th>
                   <th style={{ textAlign: "center" }}>Fecha Abono</th>
                   <th style={{ textAlign: "center" }}>Monto Abono</th>
+                  <th style={{ textAlign: "center" }}># Factura</th>
                   <th style={{ textAlign: "left" }}>Realizado por</th>
                 </tr>
               </thead>
               <tbody>
                 {quoteList.map((item) => {
-                  // setTotalAbonado(totalAbonado + item.monto);
                   return (
                     <tr key={item.id}>
                       <td>{item.id}</td>
@@ -288,8 +436,9 @@ const NewAbono = ({ selectedVenta }) => {
                           currency: "NIO",
                         }).format(item.monto)}
                       </td>
+                      <td style={{ textAlign: "center" }}>{item.sale.id}</td>
                       <td style={{ textAlign: "left" }}>
-                        {item.realizedBy.fullName}
+                        {item.realizedBy ? item.realizedBy.fullName : ""}
                       </td>
                     </tr>
                   );
@@ -297,6 +446,8 @@ const NewAbono = ({ selectedVenta }) => {
               </tbody>
             </Table>
           )}
+
+          <hr />
 
           <TextField
             fullWidth
@@ -325,69 +476,36 @@ const NewAbono = ({ selectedVenta }) => {
               icon={faSave}
             />
             Agregar Abono
+            {newAbono !== "" ? (
+              <Typography
+                style={{
+                  marginLeft: 5,
+                  color: newSaldo === 0 ? "#4caf50" : "#f50057",
+                  fontWeight: "bold",
+                }}
+              >
+                {`Nuevo Saldo:  ${new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(newSaldo)}`}
+              </Typography>
+            ) : (
+              ""
+            )}
           </Button>
         </Paper>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Facturado por:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#2196f3", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {facturedBy.fullName}
-            </Typography>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Monto Venta:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#4caf50", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(montoVenta)}
-            </Typography>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Saldo:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#f50057", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(newSaldo)}
-            </Typography>
-          </div>
-        </div>
       </Container>
+
+      <SmallModal
+        titulo={"Abonar"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <NewAbonoEspecifico
+          setVisible={setShowModal}
+          selectedVenta={selectedSale}
+        />
+      </SmallModal>
     </div>
   );
 };

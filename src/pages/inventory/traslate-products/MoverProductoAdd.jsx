@@ -350,7 +350,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 700 }}>
+      <Container >
         <Divider />
 
         <Grid container spacing={2} style={{ marginTop: 1 }}>

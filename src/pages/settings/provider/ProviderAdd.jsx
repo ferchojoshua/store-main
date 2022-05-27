@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
-import { TextField, Button, Divider, Container } from "@mui/material";
+import { TextField, Button, Divider, Container, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
 import { addProviderAsync } from "../../../services/ProviderApi";
@@ -79,61 +79,68 @@ const ProviderAdd = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 550 }}>
-        <Divider />
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container style={{ width: 550 }}>
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: 10, marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setName(e.target.value.toUpperCase())}
+            label={"Nombre Proveedor"}
+            value={name}
+          />
 
-        <TextField
-          fullWidth
-          required
-          style={{ marginBottom: 10, marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setName(e.target.value.toUpperCase())}
-          label={"Nombre Proveedor"}
-          value={name}
-        />
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: 10, marginTop: 20 }}
+            variant="standard"
+            type="tel"
+            onChange={(e) => setPhone(e.target.value)}
+            label={"Telefono Proveedor"}
+            value={phone}
+          />
 
-        <TextField
-          fullWidth
-          required
-          style={{ marginBottom: 10, marginTop: 20 }}
-          variant="standard"
-          type="tel"
-          onChange={(e) => setPhone(e.target.value)}
-          label={"Telefono Proveedor"}
-          value={phone}
-        />
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: 10, marginTop: 20 }}
+            variant="standard"
+            type="email"
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
+            label={"Correo Proveedor"}
+            value={email}
+          />
 
-        <TextField
-          fullWidth
-          required
-          style={{ marginBottom: 10, marginTop: 20 }}
-          variant="standard"
-          type="email"
-          onChange={(e) => setEmail(e.target.value.toLowerCase())}
-          label={"Correo Proveedor"}
-          value={email}
-        />
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: 10, marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setAddress(e.target.value.toUpperCase())}
+            label={"Direccion Proveedor"}
+            value={address}
+          />
 
-        <TextField
-          fullWidth
-          required
-          style={{ marginBottom: 10, marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setAddress(e.target.value.toUpperCase())}
-          label={"Direccion Proveedor"}
-          value={address}
-        />
-
-        <Button
-          fullWidth
-          variant="outlined"
-          style={{ borderRadius: 20, marginTop: 25 }}
-          onClick={() => saveChangesAsync()}
-          startIcon={<FontAwesomeIcon icon={faSave} />}
-        >
-          Agregar Proveedor
-        </Button>
-      </Container>
+          <Button
+            fullWidth
+            variant="outlined"
+            style={{ borderRadius: 20, marginTop: 25 }}
+            onClick={() => saveChangesAsync()}
+            startIcon={<FontAwesomeIcon icon={faSave} />}
+          >
+            Agregar Proveedor
+          </Button>
+        </Container>
+      </Paper>
     </div>
   );
 };

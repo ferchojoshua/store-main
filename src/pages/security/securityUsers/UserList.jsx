@@ -11,7 +11,6 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
@@ -271,17 +270,15 @@ const UserList = () => {
             flexDirection: "row",
             alignContent: "center",
             justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <h1>Lista de Usuarios</h1>
           <div>
             <FormControl
               variant="standard"
-              style={{ textAlign: "left", width: 200, height: 5 }}
+              style={{ textAlign: "left", width: 200, marginTop:10 }}
             >
-              <InputLabel id="demo-simple-select-standard-label">
-                Estado
-              </InputLabel>
               <Select
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"

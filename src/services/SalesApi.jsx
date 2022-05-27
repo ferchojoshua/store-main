@@ -8,16 +8,69 @@ if (process.env.NODE_ENV === "production") {
   controller = `${REACT_APP_URL}Sales/`;
 }
 
-export const getSalesAsync = async (token) => {
+export const getContadoSalesByStoreAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetContadoSalesByStore/`;
   const authAxios = axios.create({
-    baseURL: controller,
+    baseURL: service,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
   try {
-    await authAxios.get(controller).then((resp) => {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getCreditoSalesByStoreAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetCreditoSalesByStore/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getAnulatedSalesByStoreAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetAnulatedSalesByStore/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -36,6 +89,32 @@ export const getSalesAsync = async (token) => {
 export const getQuotesBySaleAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetPaysBySaleId/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getSalesUncanceledByClient = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetSalesUncanceledByClient/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -87,6 +166,32 @@ export const addSaleAsync = async (token, data) => {
 export const addAbonoAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}AddAbono/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const addAbonoEspecificoAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}AddAbonoEspecifico/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {

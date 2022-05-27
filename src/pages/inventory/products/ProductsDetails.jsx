@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -211,187 +212,196 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 550 }}>
-        <Divider />
-
-        <FormControl
-          variant="standard"
-          fullWidth
-          required
-          style={{ marginTop: 20 }}
-          disabled={!isEdit}
-        >
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione un tipo de negocio
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={selectedTipoNegocio}
-            onChange={(e) => handleChangeTN(e.target.value)}
-            label="Tipo de Negocio"
-            style={{ textAlign: "left" }}
-          >
-            <MenuItem key={0} value="">
-              <em> Seleccione un tipo de negocio</em>
-            </MenuItem>
-            {tipoNegocio.map((item) => {
-              return (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.description}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ marginTop: 20 }}
-          disabled={!isEdit}
-          required
-        >
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione una familia
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={selectedFamilia}
-            onChange={(e) => setSelectedFamilia(e.target.value)}
-            label="Familia"
-            style={{ textAlign: "left" }}
-          >
-            <MenuItem key={0} value="">
-              <em> Seleccione una familia</em>
-            </MenuItem>
-            {familia.map((item) => {
-              return (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.description}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-
-        <TextField
-          fullWidth
-          required
-          style={{ marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setDescription(e.target.value.toUpperCase())}
-          label={"Descripcion"}
-          value={description ? description : ""}
-          disabled={!isEdit}
-        />
-
-        <TextField
-          fullWidth
-          required
-          style={{ marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setBarCode(e.target.value)}
-          label={"Codigo de barras"}
-          value={barCode ? barCode : ""}
-          disabled={!isEdit}
-        />
-
-        <TextField
-          fullWidth
-          required
-          variant="standard"
-          onChange={(e) => setMarca(e.target.value.toUpperCase())}
-          label={"Marca"}
-          value={marca ? marca : ""}
-          style={{ marginTop: 20 }}
-          disabled={!isEdit}
-        />
-
-        <TextField
-          fullWidth
-          required
-          style={{ marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setModelo(e.target.value.toUpperCase())}
-          label={"Modelo"}
-          value={modelo ? modelo : ""}
-          disabled={!isEdit}
-        />
-
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ marginTop: 20 }}
-          required
-          disabled={!isEdit}
-        >
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione una U/M...
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={uM}
-            onChange={(e) => setUM(e.target.value)}
-            label="Unidad de Medida"
-            style={{ textAlign: "left" }}
-          >
-            <MenuItem key={0} value="">
-              <em>Seleccione una U/M...</em>
-            </MenuItem>
-
-            <MenuItem key={1} value={"PIEZA"}>
-              PIEZA
-            </MenuItem>
-            <MenuItem key={2} value={"SET"}>
-              SET
-            </MenuItem>
-            <MenuItem key={3} value={"PAR"}>
-              PAR
-            </MenuItem>
-          </Select>
-        </FormControl>
-
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container>
+          <FormControl
+            variant="standard"
             fullWidth
-            variant="outlined"
-            style={{
-              borderRadius: 20,
-              borderColor: isEdit ? "#9c27b0" : "#ff9800",
-              color: isEdit ? "#9c27b0" : "#ff9800",
-              marginRight: 10,
-            }}
-            startIcon={
-              <FontAwesomeIcon icon={isEdit ? faCircleXmark : faPenToSquare} />
-            }
-            onClick={() => setIsEdit(!isEdit)}
-          >
-            {isEdit ? "Cancelar" : " Editar Producto"}
-          </Button>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            style={{ borderRadius: 20, marginLeft: 10 }}
-            startIcon={<FontAwesomeIcon icon={faSave} />}
-            onClick={() => saveChangesAsync()}
+            required
+            style={{ marginTop: 20 }}
             disabled={!isEdit}
           >
-            Actualizar Producto
-          </Button>
-        </div>
-      </Container>
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione un tipo de negocio
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedTipoNegocio}
+              onChange={(e) => handleChangeTN(e.target.value)}
+              label="Tipo de Negocio"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={0} value="">
+                <em> Seleccione un tipo de negocio</em>
+              </MenuItem>
+              {tipoNegocio.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.description}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            disabled={!isEdit}
+            required
+          >
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione una familia
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedFamilia}
+              onChange={(e) => setSelectedFamilia(e.target.value)}
+              label="Familia"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={0} value="">
+                <em> Seleccione una familia</em>
+              </MenuItem>
+              {familia.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.description}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setDescription(e.target.value.toUpperCase())}
+            label={"Descripcion"}
+            value={description ? description : ""}
+            disabled={!isEdit}
+          />
+
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setBarCode(e.target.value)}
+            label={"Codigo de barras"}
+            value={barCode ? barCode : ""}
+            disabled={!isEdit}
+          />
+
+          <TextField
+            fullWidth
+            required
+            variant="standard"
+            onChange={(e) => setMarca(e.target.value.toUpperCase())}
+            label={"Marca"}
+            value={marca ? marca : ""}
+            style={{ marginTop: 20 }}
+            disabled={!isEdit}
+          />
+
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setModelo(e.target.value.toUpperCase())}
+            label={"Modelo"}
+            value={modelo ? modelo : ""}
+            disabled={!isEdit}
+          />
+
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            required
+            disabled={!isEdit}
+          >
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione una U/M...
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={uM}
+              onChange={(e) => setUM(e.target.value)}
+              label="Unidad de Medida"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={0} value="">
+                <em>Seleccione una U/M...</em>
+              </MenuItem>
+
+              <MenuItem key={1} value={"PIEZA"}>
+                PIEZA
+              </MenuItem>
+              <MenuItem key={2} value={"SET"}>
+                SET
+              </MenuItem>
+              <MenuItem key={3} value={"PAR"}>
+                PAR
+              </MenuItem>
+            </Select>
+          </FormControl>
+
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{
+                borderRadius: 20,
+                borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                color: isEdit ? "#9c27b0" : "#ff9800",
+                marginRight: 10,
+              }}
+              startIcon={
+                <FontAwesomeIcon
+                  icon={isEdit ? faCircleXmark : faPenToSquare}
+                />
+              }
+              onClick={() => setIsEdit(!isEdit)}
+            >
+              {isEdit ? "Cancelar" : " Editar Producto"}
+            </Button>
+
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{ borderRadius: 20, marginLeft: 10 }}
+              startIcon={<FontAwesomeIcon icon={faSave} />}
+              onClick={() => saveChangesAsync()}
+              disabled={!isEdit}
+            >
+              Actualizar Producto
+            </Button>
+          </div>
+        </Container>
+      </Paper>
     </div>
   );
 };

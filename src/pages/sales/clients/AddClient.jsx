@@ -9,7 +9,6 @@ import {
 import {
   TextField,
   Button,
-  Divider,
   Grid,
   InputLabel,
   FormControl,
@@ -18,6 +17,7 @@ import {
   Container,
   IconButton,
   Tooltip,
+  Paper,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
@@ -92,7 +92,7 @@ const AddClient = ({ setShowModal }) => {
         return;
       }
 
-      setDepartmentList(result.data)
+      setDepartmentList(result.data);
 
       const resultSrores = await getStoresAsync(token);
       if (!resultSrores.statusResponse) {
@@ -284,149 +284,82 @@ const AddClient = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 700 }}>
-        <Divider style={{ marginBottom: 10 }} />
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container>
+          <Grid container spacing={3}>
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}
+                label={"Nombre Cliente"}
+                value={nombreCliente}
+              />
 
-        <Grid container spacing={3}>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}
-              label={"Nombre Cliente"}
-              value={nombreCliente}
-            />
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setCedula(e.target.value.toUpperCase())}
+                label={"Cedula Cliente(000-000000-0000X)"}
+                value={cedula}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setTelefono(e.target.value.toUpperCase())}
+                label={"Telefono Cliente"}
+                value={telefono}
+              />
 
-            <TextField
-              style={{ marginTop: 20 }}
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setCedula(e.target.value.toUpperCase())}
-              label={"Cedula Cliente(000-000000-0000X)"}
-              value={cedula}
-            />
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setCorreo(e.target.value.toLowerCase())}
+                label={"Correo Cliente"}
+                value={correo}
+              />
+            </Grid>
           </Grid>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setTelefono(e.target.value.toUpperCase())}
-              label={"Telefono Cliente"}
-              value={telefono}
-            />
 
-            <TextField
-              style={{ marginTop: 20 }}
-              fullWidth
-              required
-              variant="standard"
-              onChange={(e) => setCorreo(e.target.value.toLowerCase())}
-              label={"Correo Cliente"}
-              value={correo}
-            />
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={3}>
-          <Grid item sm={4}>
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginRight: 20, marginTop: 20 }}
-              required
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un Depto
-              </InputLabel>
-              <Select
-                defaultValue=""
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedDepartment}
-                onChange={handleChangeDepartment}
-                label="Departamento"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={-1} value="">
-                  <em> Seleccione un departamento</em>
-                </MenuItem>
-                {departmentList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={4}>
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginRight: 20, marginTop: 20 }}
-              required
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un Municip.
-              </InputLabel>
-              <Select
-                defaultValue=""
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedMunicipality}
-                onChange={handleChangeMunicipality}
-                label="Municipio"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={-1} value="">
-                  <em> Seleccione un municipio</em>
-                </MenuItem>
-                {municipalityList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={4}>
-            <div
-              style={{
-                marginTop: 20,
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
-            >
+          <Grid container spacing={3}>
+            <Grid item sm={4}>
               <FormControl
                 variant="standard"
                 fullWidth
-                style={{ marginRight: 10 }}
+                style={{ marginRight: 20, marginTop: 20 }}
                 required
               >
                 <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione una Com.
+                  Seleccione un Depto
                 </InputLabel>
                 <Select
                   defaultValue=""
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
-                  value={selectedCommunity}
-                  onChange={(e) => setSelectedCommunity(e.target.value)}
-                  label="Municipio"
+                  value={selectedDepartment}
+                  onChange={handleChangeDepartment}
+                  label="Departamento"
                   style={{ textAlign: "left" }}
                 >
                   <MenuItem key={-1} value="">
-                    <em> Seleccione una Comunidad</em>
+                    <em> Seleccione un departamento</em>
                   </MenuItem>
-                  {CommunityList.map((item) => {
+                  {departmentList.map((item) => {
                     return (
                       <MenuItem key={item.id} value={item.id}>
                         {item.name}
@@ -435,79 +368,153 @@ const AddClient = ({ setShowModal }) => {
                   })}
                 </Select>
               </FormControl>
-
-              <Tooltip title="Agregar Comunidad" style={{ marginTop: 5 }}>
-                <IconButton
-                  onClick={() => {
-                    selectedMunicipality
-                      ? setShowAddModal(!showAddModal)
-                      : toastError("Seleccione un municipio");
-                  }}
+            </Grid>
+            <Grid item sm={4}>
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginRight: 20, marginTop: 20 }}
+                required
+              >
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un Municip.
+                </InputLabel>
+                <Select
+                  defaultValue=""
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedMunicipality}
+                  onChange={handleChangeMunicipality}
+                  label="Municipio"
+                  style={{ textAlign: "left" }}
                 >
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
+                  <MenuItem key={-1} value="">
+                    <em> Seleccione un municipio</em>
+                  </MenuItem>
+                  {municipalityList.map((item) => {
+                    return (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item sm={4}>
+              <div
+                style={{
+                  marginTop: 20,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignContent: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <FormControl
+                  variant="standard"
+                  fullWidth
+                  style={{ marginRight: 10 }}
+                  required
+                >
+                  <InputLabel id="demo-simple-select-standard-label">
+                    Seleccione una Com.
+                  </InputLabel>
+                  <Select
+                    defaultValue=""
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={selectedCommunity}
+                    onChange={(e) => setSelectedCommunity(e.target.value)}
+                    label="Municipio"
+                    style={{ textAlign: "left" }}
+                  >
+                    <MenuItem key={-1} value="">
+                      <em> Seleccione una Comunidad</em>
+                    </MenuItem>
+                    {CommunityList.map((item) => {
+                      return (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.name}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+
+                <Tooltip title="Agregar Comunidad" style={{ marginTop: 5 }}>
+                  <IconButton
+                    onClick={() => {
+                      selectedMunicipality
+                        ? setShowAddModal(!showAddModal)
+                        : toastError("Seleccione un municipio");
                     }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
-            </div>
+                  >
+                    <FontAwesomeIcon
+                      style={{
+                        fontSize: 25,
+                        color: "#ff5722",
+                      }}
+                      icon={faCirclePlus}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <TextField
-          style={{ marginTop: 20 }}
-          fullWidth
-          required
-          variant="standard"
-          onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-          label={"Direccion Cliente"}
-          value={direccion}
-        />
+          <TextField
+            style={{ marginTop: 20 }}
+            fullWidth
+            required
+            variant="standard"
+            onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+            label={"Direccion Cliente"}
+            value={direccion}
+          />
 
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ marginRight: 20, marginTop: 20 }}
-          required
-        >
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione un Almacen
-          </InputLabel>
-          <Select
-            defaultValue=""
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={selectedStore}
-            onChange={(e) => setSelectedStore(e.target.value)}
-            label="Almacen"
-            style={{ textAlign: "left" }}
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginRight: 20, marginTop: 20 }}
+            required
           >
-            <MenuItem key={-1} value="">
-              <em> Seleccione un Almacen</em>
-            </MenuItem>
-            {storeList.map((item) => {
-              return (
-                <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                  {item.almacen.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione un Almacen
+            </InputLabel>
+            <Select
+              defaultValue=""
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedStore}
+              onChange={(e) => setSelectedStore(e.target.value)}
+              label="Almacen"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={-1} value="">
+                <em> Seleccione un Almacen</em>
+              </MenuItem>
+              {storeList.map((item) => {
+                return (
+                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                    {item.almacen.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
 
-        <Button
-          fullWidth
-          variant="outlined"
-          style={{ borderRadius: 20, marginTop: 31 }}
-          startIcon={<FontAwesomeIcon icon={faSave} />}
-          onClick={() => saveChangesAsync()}
-        >
-          Agregar Cliente
-        </Button>
-      </Container>
+          <Button
+            fullWidth
+            variant="outlined"
+            style={{ borderRadius: 20, marginTop: 31 }}
+            startIcon={<FontAwesomeIcon icon={faSave} />}
+            onClick={() => saveChangesAsync()}
+          >
+            Agregar Cliente
+          </Button>
+        </Container>
+      </Paper>
 
       <SmallModal
         titulo={"Agregar Comunidad"}

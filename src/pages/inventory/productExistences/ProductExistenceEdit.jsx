@@ -5,8 +5,8 @@ import {
   Divider,
   Container,
   Typography,
-  Paper,
   InputAdornment,
+  Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -124,154 +124,189 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 550 }}>
-        <Divider />
-
-        <div
-          style={{ marginTop: 20 }}
-          className="row justify-content-around align-items-center"
-        >
-          <div className="col-sm-2">
-            <Typography variant="h6">Exist:</Typography>
-          </div>
-
-          <div className="col-sm-2">
-            <Typography variant="h6" style={{ color: "#2196f3" }}>
-              {existencia}
-            </Typography>
-          </div>
-
-          <div className="col-sm-2">
-            <Typography variant="h6">PVD:</Typography>
-          </div>
-
-          <div className="col-sm-2">
-            <Typography variant="h6" style={{ color: "#2196f3" }}>
-              {precioVentaDetalle}
-            </Typography>
-          </div>
-
-          <div className="col-sm-2">
-            <Typography variant="h6">PVM:</Typography>
-          </div>
-          <div className="col-sm-2">
-            <Typography variant="h6" style={{ color: "#2196f3" }}>
-              {precioVentaMayor}
-            </Typography>
-          </div>
-        </div>
-
-        {isEdit ? (
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container>
           <Paper
             elevation={10}
             style={{
               borderRadius: 30,
-              marginTop: 10,
               padding: 20,
+              marginBottom: 10,
             }}
           >
-            <div>
-              <div
-                className="justify-content-around"
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignContent: "center",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  textAlign="center"
+            <div
+              style={{ marginTop: 20 }}
+              className="row justify-content-around"
+            >
+              <div className="col-sm-3">
+                <div
                   style={{
-                    fontWeight: "bold",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
                   }}
                 >
-                  Ajuste de Existencia y Precio de Venta
-                </Typography>
+                  <Typography variant="h6">Exist:</Typography>
+
+                  <Typography variant="h6" style={{ color: "#2196f3" }}>
+                    {existencia}
+                  </Typography>
+                </div>
               </div>
 
-              <Divider />
+              <div className="col-sm-3">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  <Typography variant="h6">PVD:</Typography>
+                  <Typography variant="h6" style={{ color: "#2196f3" }}>
+                    {precioVentaDetalle}
+                  </Typography>
+                </div>
+              </div>
 
-              <TextField
-                fullWidth
-                style={{ marginTop: 20 }}
-                variant="standard"
-                label="Nueva Existencia"
-                value={newExistencias}
-                onChange={(e) => funcCantidad(e.target.value)}
-              />
-
-              <TextField
-                fullWidth
-                style={{ marginTop: 20 }}
-                variant="standard"
-                label="Nuevo Precio Venta Detalle"
-                value={newPVD}
-                onChange={(e) => funcPrecioVentaDetalle(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">C$</InputAdornment>
-                  ),
-                }}
-              />
-
-              <TextField
-                fullWidth
-                style={{ marginTop: 20 }}
-                variant="standard"
-                label="Nuevo Precio Venta Mayor"
-                value={newPVM}
-                onChange={(e) => funcPrecioVentaMayor(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">C$</InputAdornment>
-                  ),
-                }}
-              />
+              <div className="col-sm-3">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  <Typography variant="h6">PVM:</Typography>
+                  <Typography variant="h6" style={{ color: "#2196f3" }}>
+                    {precioVentaMayor}
+                  </Typography>
+                </div>
+              </div>
             </div>
           </Paper>
-        ) : (
-          <Divider style={{ marginTop: 20 }} />
-        )}
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button
-            fullWidth
-            variant="outlined"
+          {isEdit ? (
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                marginTop: 10,
+                padding: 20,
+              }}
+            >
+              <div>
+                <div
+                  className="justify-content-around"
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignContent: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    textAlign="center"
+                    style={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Ajuste de Existencia y Precio de Venta
+                  </Typography>
+                </div>
+
+                <Divider />
+
+                <TextField
+                  fullWidth
+                  style={{ marginTop: 20 }}
+                  variant="standard"
+                  label="Nueva Existencia"
+                  value={newExistencias}
+                  onChange={(e) => funcCantidad(e.target.value)}
+                />
+
+                <TextField
+                  fullWidth
+                  style={{ marginTop: 20 }}
+                  variant="standard"
+                  label="Nuevo Precio Venta Detalle"
+                  value={newPVD}
+                  onChange={(e) => funcPrecioVentaDetalle(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">C$</InputAdornment>
+                    ),
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  style={{ marginTop: 20 }}
+                  variant="standard"
+                  label="Nuevo Precio Venta Mayor"
+                  value={newPVM}
+                  onChange={(e) => funcPrecioVentaMayor(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">C$</InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
+            </Paper>
+          ) : (
+            <Divider style={{ marginTop: 20 }} />
+          )}
+
+          <div
             style={{
-              borderRadius: 20,
-              borderColor: isEdit ? "#9c27b0" : "#ff9800",
-              color: isEdit ? "#9c27b0" : "#ff9800",
-              marginRight: 10,
+              marginTop: 20,
+              display: "flex",
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "space-between",
             }}
-            startIcon={
-              <FontAwesomeIcon icon={isEdit ? faCircleXmark : faPenToSquare} />
-            }
-            onClick={() => setIsEdit(!isEdit)}
           >
-            {isEdit ? "Cancelar" : " Editar Datos"}
-          </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{
+                borderRadius: 20,
+                borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                color: isEdit ? "#9c27b0" : "#ff9800",
+                marginRight: 10,
+              }}
+              startIcon={
+                <FontAwesomeIcon
+                  icon={isEdit ? faCircleXmark : faPenToSquare}
+                />
+              }
+              onClick={() => setIsEdit(!isEdit)}
+            >
+              {isEdit ? "Cancelar" : " Editar Datos"}
+            </Button>
 
-          <Button
-            fullWidth
-            variant="outlined"
-            style={{ borderRadius: 20, marginLeft: 10 }}
-            startIcon={<FontAwesomeIcon icon={faSave} />}
-            onClick={() => saveChangesAsync()}
-            disabled={!isEdit}
-          >
-            Actualizar Datos
-          </Button>
-        </div>
-      </Container>
+            <Button
+              fullWidth
+              variant="outlined"
+              style={{ borderRadius: 20, marginLeft: 10 }}
+              startIcon={<FontAwesomeIcon icon={faSave} />}
+              onClick={() => saveChangesAsync()}
+              disabled={!isEdit}
+            >
+              Actualizar Datos
+            </Button>
+          </div>
+        </Container>
+      </Paper>
     </div>
   );
 };

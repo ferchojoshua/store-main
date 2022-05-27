@@ -3,13 +3,13 @@ import { DataContext } from "../../../context/DataContext";
 import {
   TextField,
   Button,
-  Divider,
   Grid,
   InputLabel,
   FormControl,
   Select,
   MenuItem,
   Autocomplete,
+  Paper,
 } from "@mui/material";
 import { Container } from "react-bootstrap";
 import {
@@ -210,185 +210,195 @@ const EditUser = ({ selectedUser, setShowModal }) => {
 
   return (
     <div>
-      <Container style={{ width: 800 }}>
-        <Divider />
-        <Grid container spacing={3} style={{ marginTop: 5 }}>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10 }}
-              variant="standard"
-              onChange={(e) => setFirstName(e.target.value.toUpperCase())}
-              label={"Nombre"}
-              value={firstName}
-              disabled={isEdit ? false : true}
-            />
-
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setSecondName(e.target.value.toUpperCase())}
-              label={"Segundo Nombre"}
-              value={secondName}
-              disabled={isEdit ? false : true}
-            />
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setLastName(e.target.value.toUpperCase())}
-              label={"Apellido"}
-              value={lastName}
-              disabled={isEdit ? false : true}
-            />
-
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setSecondLastName(e.target.value.toUpperCase())}
-              label={"Agundo Apellido"}
-              value={secondLastName}
-              disabled={isEdit ? false : true}
-            />
-          </Grid>
-          <Grid item sm={6}>
-            <TextField
-              fullWidth
-              style={{ marginBottom: 10 }}
-              variant="standard"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              label={"Telefono"}
-              value={phoneNumber}
-              disabled={isEdit ? false : true}
-            />
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setAddress(e.target.value.toUpperCase())}
-              label={"Direccion"}
-              value={address}
-              disabled={isEdit ? false : true}
-            />
-
-            <TextField
-              fullWidth
-              required
-              style={{ marginBottom: 10, marginTop: 10 }}
-              variant="standard"
-              onChange={(e) => setUserName(e.target.value)}
-              label={"Usuario"}
-              value={userName}
-              disabled
-            />
-
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginTop: 10 }}
-              required
-              disabled={isEdit ? false : true}
-            >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un rol de usuario
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedRol}
-                onChange={(e) => setSelectedRol(e.target.value)}
-                label="Rol de usuario"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={0} value="">
-                  <em>Seleccione un rol de usuario</em>
-                </MenuItem>
-                {rolesList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.roleName}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-
-        <Autocomplete
-          multiple
-          disabled={isEdit ? false : true}
-          style={{ marginTop: 20, marginBottom: 20 }}
-          fullWidth
-          id="fixed-tags-demo"
-          value={value}
-          onChange={(event, newValue) => {
-            let result = uniqBy(newValue, "id");
-            setValue(result);
-          }}
-          options={storeList}
-          getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
-          renderOption={(props, option) => {
-            return (
-              <li {...props} key={option.id}>
-                {option.name}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              variant="standard"
-              {...params}
-              label="Seleccione uno o mas almacenes..."
-            />
-          )}
-        />
-        {isAccess(access, "USER UPDATE") ? (
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        <Container>
           <Grid container spacing={3} style={{ marginTop: 5 }}>
             <Grid item sm={6}>
-              <Button
+              <TextField
                 fullWidth
-                variant="outlined"
-                style={{
-                  borderRadius: 20,
-                  borderColor: isEdit ? "#9c27b0" : "#ff9800",
-                  color: isEdit ? "#9c27b0" : "#ff9800",
-                }}
-                startIcon={
-                  <FontAwesomeIcon
-                    icon={isEdit ? faCircleXmark : faPenToSquare}
-                  />
-                }
-                onClick={() => setIsEdit(!isEdit)}
-              >
-                {isEdit ? "Cancelar" : " Editar Usuario"}
-              </Button>
-            </Grid>
+                required
+                style={{ marginBottom: 10 }}
+                variant="standard"
+                onChange={(e) => setFirstName(e.target.value.toUpperCase())}
+                label={"Nombre"}
+                value={firstName}
+                disabled={isEdit ? false : true}
+              />
 
-            <Grid item sm={6}>
-              <Button
+              <TextField
                 fullWidth
-                variant="outlined"
-                style={{ borderRadius: 20 }}
-                startIcon={<FontAwesomeIcon icon={faSave} />}
-                onClick={() => updateUser()}
-                disabled={!isEdit}
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setSecondName(e.target.value.toUpperCase())}
+                label={"Segundo Nombre"}
+                value={secondName}
+                disabled={isEdit ? false : true}
+              />
+
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setLastName(e.target.value.toUpperCase())}
+                label={"Apellido"}
+                value={lastName}
+                disabled={isEdit ? false : true}
+              />
+
+              <TextField
+                fullWidth
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) =>
+                  setSecondLastName(e.target.value.toUpperCase())
+                }
+                label={"Agundo Apellido"}
+                value={secondLastName}
+                disabled={isEdit ? false : true}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                fullWidth
+                style={{ marginBottom: 10 }}
+                variant="standard"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                label={"Telefono"}
+                value={phoneNumber}
+                disabled={isEdit ? false : true}
+              />
+
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setAddress(e.target.value.toUpperCase())}
+                label={"Direccion"}
+                value={address}
+                disabled={isEdit ? false : true}
+              />
+
+              <TextField
+                fullWidth
+                required
+                style={{ marginBottom: 10, marginTop: 10 }}
+                variant="standard"
+                onChange={(e) => setUserName(e.target.value)}
+                label={"Usuario"}
+                value={userName}
+                disabled
+              />
+
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginTop: 10 }}
+                required
+                disabled={isEdit ? false : true}
               >
-                Actualizar datos de Usuario
-              </Button>
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un rol de usuario
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedRol}
+                  onChange={(e) => setSelectedRol(e.target.value)}
+                  label="Rol de usuario"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={0} value="">
+                    <em>Seleccione un rol de usuario</em>
+                  </MenuItem>
+                  {rolesList.map((item) => {
+                    return (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.roleName}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
-        ) : (
-          <></>
-        )}
-      </Container>
+
+          <Autocomplete
+            multiple
+            disabled={isEdit ? false : true}
+            style={{ marginTop: 20, marginBottom: 20 }}
+            fullWidth
+            id="fixed-tags-demo"
+            value={value}
+            onChange={(event, newValue) => {
+              let result = uniqBy(newValue, "id");
+              setValue(result);
+            }}
+            options={storeList}
+            getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
+            renderOption={(props, option) => {
+              return (
+                <li {...props} key={option.id}>
+                  {option.name}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                variant="standard"
+                {...params}
+                label="Seleccione uno o mas almacenes..."
+              />
+            )}
+          />
+          {isAccess(access, "USER UPDATE") ? (
+            <Grid container spacing={3} style={{ marginTop: 5 }}>
+              <Grid item sm={6}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  style={{
+                    borderRadius: 20,
+                    borderColor: isEdit ? "#9c27b0" : "#ff9800",
+                    color: isEdit ? "#9c27b0" : "#ff9800",
+                  }}
+                  startIcon={
+                    <FontAwesomeIcon
+                      icon={isEdit ? faCircleXmark : faPenToSquare}
+                    />
+                  }
+                  onClick={() => setIsEdit(!isEdit)}
+                >
+                  {isEdit ? "Cancelar" : " Editar Usuario"}
+                </Button>
+              </Grid>
+
+              <Grid item sm={6}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  style={{ borderRadius: 20 }}
+                  startIcon={<FontAwesomeIcon icon={faSave} />}
+                  onClick={() => updateUser()}
+                  disabled={!isEdit}
+                >
+                  Actualizar datos de Usuario
+                </Button>
+              </Grid>
+            </Grid>
+          ) : (
+            <></>
+          )}
+        </Container>
+      </Paper>
     </div>
   );
 };

@@ -225,7 +225,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
   };
   return (
     <div>
-      <Container style={{ width: 700 }}>
+      <Container>
         <Divider />
         <div
           style={{

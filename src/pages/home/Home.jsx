@@ -18,11 +18,7 @@ import { MetaSemanal } from "./MetaSemanal";
 import { MetaClientes } from "./MetaClientes";
 import { toastError } from "../../helpers/Helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChartColumn,
-  faChartLine,
-  faChartPie,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChartColumn, faChartLine } from "@fortawesome/free-solid-svg-icons";
 import { VentaSemanal } from "./VentaSemanal";
 import VisitedClients from "./clientsChart/VisitedClients";
 import { Especialidad } from "./clientsChart/Especialidad";
@@ -92,16 +88,13 @@ const Home = () => {
             variant="standard"
             style={{ textAlign: "left", marginTop: 20, width: 300 }}
           >
-            <InputLabel id="selProc">Almacen</InputLabel>
+            <InputLabel id="selProc">Seleccione un Almacen</InputLabel>
             <Select
               labelId="selProc"
               id="demo-simple-select-standard"
               value={selectedStore}
               onChange={(e) => handleChangeStore(e.target.value)}
             >
-              <MenuItem value="">
-                <em>Seleccione un Almacen...</em>
-              </MenuItem>
               {storeList.map((item) => {
                 return (
                   <MenuItem key={item.id} value={item.id}>
