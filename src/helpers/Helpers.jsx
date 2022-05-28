@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBug, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import { find } from "lodash";
+import { find, reject } from "lodash";
 
 // export const url = "https://localhost:7015/api/";
 
@@ -72,3 +72,18 @@ export function isAccess(access, permiso) {
   let result = find(access, { description: permiso }, "isEnable");
   return result.isEnable;
 }
+
+export const getUserLocation = async () => {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        resolve([coords.longitude, coords.latitude]);
+      },
+      (err) => {
+        console.log("No se pudo obtener Localizacion");
+        console.log(err);
+        reject();
+      }
+    );
+  });
+};

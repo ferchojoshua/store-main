@@ -162,3 +162,29 @@ export const getKardexAsync = async (token, data) => {
   }
   return result;
 };
+
+export const getAllStoresKardexAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetAllStoresKardex`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};

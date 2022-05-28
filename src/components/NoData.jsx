@@ -5,7 +5,13 @@ import { Typography } from "@mui/material";
 
 const NoData = () => {
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
       <Typography style={{ color: "#ff5722", marginBottom: 20 }} variant="h6">
         No hay nada que mostrar
       </Typography>

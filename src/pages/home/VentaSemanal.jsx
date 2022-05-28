@@ -61,6 +61,7 @@ export const VentaSemanal = ({ selectedStore }) => {
         borderColor: ["rgba(75, 192, 192, 1)"],
         pointStyle: "circle",
         pointRadius: 8,
+        tension: 0.3,
       },
       {
         label: "Credito",
@@ -69,6 +70,7 @@ export const VentaSemanal = ({ selectedStore }) => {
         borderColor: ["rgba(255, 99, 132, 1)"],
         pointStyle: "circle",
         pointRadius: 8,
+        tension: 0.3,
       },
       {
         label: "Recuperacion",
@@ -77,6 +79,7 @@ export const VentaSemanal = ({ selectedStore }) => {
         borderColor: ["rgba(54, 162, 235, 1)"],
         pointStyle: "circle",
         pointRadius: 8,
+        tension: 0.3,
       },
     ],
   };

@@ -29,7 +29,10 @@ import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import DatePicker from "@mui/lab/DatePicker";
 
 import NoData from "../../../components/NoData";
-import { getKardexAsync } from "../../../services/ProductsApi";
+import {
+  getAllStoresKardexAsync,
+  getKardexAsync,
+} from "../../../services/ProductsApi";
 import { Table } from "react-bootstrap";
 import moment from "moment";
 
@@ -121,7 +124,44 @@ export const ProductKardex = ({ productList }) => {
     }
 
     setKardex(result.data);
-    console.log(result.data);
+    setIsLoading(false);
+    setIsVisible(true);
+  };
+
+  const generarAllStoreKardex = async () => {
+    const data = {
+      desde,
+      hasta,
+      productId: selectedProduct.id,
+    };
+
+    setIsLoading(true);
+    const result = await getAllStoresKardexAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate("/unauthorized");
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
+    setKardex(result.data);
     setIsLoading(false);
     setIsVisible(true);
   };
@@ -233,7 +273,7 @@ export const ProductKardex = ({ productList }) => {
             style={{ borderRadius: 20, marginTop: 20 }}
             startIcon={<FontAwesomeIcon icon={faList} />}
             onClick={() => {
-              generarKardex();
+              selectedStore === -1 ? generarAllStoreKardex() : generarKardex();
             }}
           >
             Ver Kardex
@@ -281,7 +321,15 @@ export const ProductKardex = ({ productList }) => {
           <hr />
 
           {isEmpty(kardex) ? (
-            <NoData />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <NoData />
+            </div>
           ) : (
             <Table hover size="sm">
               <thead>

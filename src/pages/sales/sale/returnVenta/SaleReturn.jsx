@@ -54,6 +54,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     saleDetails,
     nombreCliente,
     isCanceled,
+    isAnulado,
   } = selectedVenta;
 
   const totalAbonado = montoVenta - saldo;
@@ -326,11 +327,14 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           <h4
             style={{
               marginTop: 20,
+              color: isAnulado ? "#f50057" : "#4caf50",
             }}
           >
-            Detalle de Venta
+            {isAnulado ? "Detalle de Venta Anulada" : "Detalle de Venta"}
           </h4>
-          {isCanceled ? (
+          {isAnulado ? (
+            <></>
+          ) : isCanceled ? (
             <Typography
               variant="body2"
               style={{
@@ -412,7 +416,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
               <th style={{ textAlign: "center" }}>Descuento</th>
               <th style={{ textAlign: "center" }}>Costo Unitario</th>
               <th style={{ textAlign: "center" }}>Costo Total</th>
-              {isAccess(access, "SALES DELETE") ? (
+              {isAnulado ? (
+                <></>
+              ) : isAccess(access, "SALES DELETE") ? (
                 <th style={{ textAlign: "center" }}>Eliminar</th>
               ) : (
                 <></>
@@ -431,7 +437,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
 
                   <td style={{ textAlign: "center", width: 90 }}>
                     {item.cantidad}
-                    {isAccess(access, "SALES DELETE") ? (
+                    {isAnulado ? (
+                      <></>
+                    ) : isAccess(access, "SALES DELETE") ? (
                       <Tooltip title="Quitar">
                         <IconButton
                           size="small"
@@ -465,7 +473,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                       currency: "NIO",
                     }).format(item.costoTotal)}
                   </td>
-                  {isAccess(access, "SALES DELETE") ? (
+                  {isAnulado ? (
+                    <></>
+                  ) : isAccess(access, "SALES DELETE") ? (
                     <td style={{ textAlign: "center" }}>
                       <Tooltip title="Eliminar">
                         <IconButton
@@ -487,7 +497,9 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           </tbody>
         </Table>
 
-        {isAccess(access, "SALES DELETE") ? (
+        {isAnulado ? (
+          <></>
+        ) : isAccess(access, "SALES DELETE") ? (
           <div
             style={{
               marginTop: 20,

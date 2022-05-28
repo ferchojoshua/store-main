@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import {
+  getUserLocation,
   toastError,
   toastSuccess,
   validateCedula,
@@ -47,6 +48,7 @@ const AddClient = ({ setShowModal }) => {
   const [correo, setCorreo] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [comercialName, setComercialName] = useState("");
 
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -120,6 +122,12 @@ const AddClient = ({ setShowModal }) => {
       }
       setStoreList(resultSrores.data);
     })();
+
+    if (navigator.geolocation) {
+      getUserLocation().then((coords) => {
+        console.log(coords);
+      });
+    }
   }, []);
 
   const saveChangesAsync = async () => {
@@ -305,6 +313,16 @@ const AddClient = ({ setShowModal }) => {
               />
 
               <TextField
+                fullWidth
+                style={{ marginTop: 20 }}
+                required
+                variant="standard"
+                onChange={(e) => setComercialName(e.target.value.toUpperCase())}
+                label={"Nombre Comercial"}
+                value={comercialName}
+              />
+
+              <TextField
                 style={{ marginTop: 20 }}
                 fullWidth
                 required
@@ -314,6 +332,7 @@ const AddClient = ({ setShowModal }) => {
                 value={cedula}
               />
             </Grid>
+
             <Grid item sm={6}>
               <TextField
                 fullWidth
@@ -333,6 +352,37 @@ const AddClient = ({ setShowModal }) => {
                 label={"Correo Cliente"}
                 value={correo}
               />
+
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ marginRight: 20, marginTop: 20 }}
+                required
+              >
+                <InputLabel id="demo-simple-select-standard-label">
+                  Seleccione un Almacen
+                </InputLabel>
+                <Select
+                  defaultValue=""
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={selectedStore}
+                  onChange={(e) => setSelectedStore(e.target.value)}
+                  label="Almacen"
+                  style={{ textAlign: "left" }}
+                >
+                  <MenuItem key={-1} value="">
+                    <em> Seleccione un Almacen</em>
+                  </MenuItem>
+                  {storeList.map((item) => {
+                    return (
+                      <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                        {item.almacen.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
 
@@ -473,37 +523,6 @@ const AddClient = ({ setShowModal }) => {
             value={direccion}
           />
 
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ marginRight: 20, marginTop: 20 }}
-            required
-          >
-            <InputLabel id="demo-simple-select-standard-label">
-              Seleccione un Almacen
-            </InputLabel>
-            <Select
-              defaultValue=""
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={selectedStore}
-              onChange={(e) => setSelectedStore(e.target.value)}
-              label="Almacen"
-              style={{ textAlign: "left" }}
-            >
-              <MenuItem key={-1} value="">
-                <em> Seleccione un Almacen</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                    {item.almacen.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-
           <Button
             fullWidth
             variant="outlined"
@@ -514,6 +533,17 @@ const AddClient = ({ setShowModal }) => {
             Agregar Cliente
           </Button>
         </Container>
+      </Paper>
+
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 20,
+          marginBottom: 10,
+        }}
+      >
+        
       </Paper>
 
       <SmallModal
