@@ -38,6 +38,8 @@ const AddRol = ({ setShowModal }) => {
   const [pagoCreate, setPagoCreate] = useState(false);
   const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
 
+  const [cajaVer, setCajaVer] = useState(false);
+
   const [clientsVer, setClientsVer] = useState(false);
   const [clientsCreate, setClientsCreate] = useState(false);
   const [clientsUpdate, setClientsUpdate] = useState(false);
@@ -86,13 +88,15 @@ const AddRol = ({ setShowModal }) => {
     setVentasCreate(!isFullAccess);
     setVentasDelete(!isFullAccess);
 
-    setPagoCreate(!pagoCreate);
-    setPagoEspecificoCreate(!pagoEspecificoCreate);
+    setPagoCreate(!isFullAccess);
+    setPagoEspecificoCreate(!isFullAccess);
 
-    setClientsVer(!clientsVer);
-    setClientsCreate(!clientsCreate);
-    setClientsUpdate(!clientsUpdate);
-    setClientsDelete(!clientsDelete);
+    setCajaVer(!isFullAccess);
+
+    setClientsVer(!isFullAccess);
+    setClientsCreate(!isFullAccess);
+    setClientsUpdate(!isFullAccess);
+    setClientsDelete(!isFullAccess);
 
     setInProductsVer(!isFullAccess);
     setInProductsCreate(!isFullAccess);
@@ -161,6 +165,12 @@ const AddRol = ({ setShowModal }) => {
         {
           description: "PAGO ESPECIFICO CREATE",
           IsEnable: pagoEspecificoCreate,
+        },
+
+        //Caja Ver
+        {
+          description: "CAJA VER",
+          IsEnable: cajaVer,
         },
 
         //Modulo Clientes
@@ -458,6 +468,46 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Anular"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Caja */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Caja
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={cajaVer}
+                          onChange={() => setCajaVer(!cajaVer)}
+                        />
+                      }
+                      label="Ver"
                     />
                   </div>
                 </div>

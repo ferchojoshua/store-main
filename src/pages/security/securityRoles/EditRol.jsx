@@ -50,6 +50,8 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [pagoCreate, setPagoCreate] = useState(false);
   const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
 
+  const [cajaVer, setCajaVer] = useState(false);
+
   const [clientsVer, setClientsVer] = useState(false);
   const [clientsCreate, setClientsCreate] = useState(false);
   const [clientsUpdate, setClientsUpdate] = useState(false);
@@ -112,6 +114,11 @@ const EditRol = ({ setShowModal, selectedRol }) => {
 
         case "PAGO ESPECIFICO CREATE":
           setPagoEspecificoCreate(item.isEnable);
+          break;
+
+        //Modulo Caja
+        case "CAJA VER":
+          setCajaVer(item.isEnable);
           break;
 
         //Clientes
@@ -260,6 +267,11 @@ const EditRol = ({ setShowModal, selectedRol }) => {
 
         case "PAGO ESPECIFICO CREATE":
           item.isEnable = pagoEspecificoCreate;
+          break;
+          
+        //Caja ver
+        case "CAJA VER":
+          item.isEnable = cajaVer;
           break;
 
         //Clientes
@@ -545,6 +557,47 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                         />
                       }
                       label="Anular"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Caja */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Caja
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          disabled={!isEdit}
+                          checked={cajaVer}
+                          onChange={() => setCajaVer(!cajaVer)}
+                        />
+                      }
+                      label="Ver"
                     />
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import {
   faFileInvoiceDollar,
   faHandHoldingDollar,
   faRoute,
+  faCashRegister,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 
@@ -18,6 +19,7 @@ import SalesList from "./accountStatus/SalesList";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
 import { Itinerario } from "./itinerario/Itinerario";
+import CashMovements from "./Caja/CashMovements";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -101,6 +103,22 @@ const SalesContainer = () => {
             ""
           )}
 
+          {isAccess(access, "CAJA VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faCashRegister}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Caja"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
+
           <Tab
             icon={
               <FontAwesomeIcon icon={faUserGroup} style={{ fontSize: 20 }} />
@@ -139,7 +157,7 @@ const SalesContainer = () => {
           <></>
         )}
 
-        {isAccess(access, "CLIENTS VER") ? (
+        {isAccess(access, "CAJA VER") ? (
           <TabPanel
             value={value}
             index={
@@ -148,6 +166,37 @@ const SalesContainer = () => {
                 : isAccess(access, "SALES CREATE")
                 ? 1
                 : isAccess(access, "SALES VER")
+                ? 1
+                : 0
+            }
+          >
+            <CashMovements />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
+
+        {isAccess(access, "CLIENTS VER") ? (
+          <TabPanel
+            value={value}
+            index={
+              isAccess(access, "SALES CREATE") &&
+              isAccess(access, "SALES VER") &&
+              isAccess(access, "CAJA VER")
+                ? 3
+                : isAccess(access, "SALES CREATE") &&
+                  isAccess(access, "SALES VER")
+                ? 2
+                : isAccess(access, "SALES CREATE") &&
+                  isAccess(access, "SALES VER")
+                ? 2
+                : isAccess(access, "SALES VER") && isAccess(access, "CAJA VER")
+                ? 2
+                : isAccess(access, "SALES CREATE")
+                ? 1
+                : isAccess(access, "SALES VER")
+                ? 1
+                : isAccess(access, "CAJA VER")
                 ? 1
                 : 0
             }

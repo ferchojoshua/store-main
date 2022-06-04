@@ -123,11 +123,11 @@ const AddClient = ({ setShowModal }) => {
       setStoreList(resultSrores.data);
     })();
 
-    if (navigator.geolocation) {
-      getUserLocation().then((coords) => {
-        console.log(coords);
-      });
-    }
+    // if (navigator.geolocation) {
+    //   getUserLocation().then((coords) => {
+    //     console.log(coords);
+    //   });
+    // }
   }, []);
 
   const saveChangesAsync = async () => {
@@ -542,9 +542,7 @@ const AddClient = ({ setShowModal }) => {
           padding: 20,
           marginBottom: 10,
         }}
-      >
-        
-      </Paper>
+      ></Paper>
 
       <SmallModal
         titulo={"Agregar Comunidad"}

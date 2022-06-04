@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter } from "react-router-dom";
 import { DataProvider } from "./context/DataContext";
 import  "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 
 
 ReactDOM.render(

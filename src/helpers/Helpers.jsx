@@ -2,9 +2,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBug, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import { find, reject } from "lodash";
-
-// export const url = "https://localhost:7015/api/";
+import { find } from "lodash";
 
 export const simpleMessage = (text, icon) => {
   Swal.fire(text, "", icon);
