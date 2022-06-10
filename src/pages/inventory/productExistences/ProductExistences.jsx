@@ -36,7 +36,7 @@ const ProductExistences = () => {
   let navigate = useNavigate();
 
   const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState(4);
+  const [selectedStore, setSelectedStore] = useState("");
   const [productList, setProductList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -93,9 +93,12 @@ const ProductExistences = () => {
 
       setStoreList(resultStores.data);
 
+      setSelectedStore(resultStores.data[0].id);
+
       //Traemoslos productos del almacen de la deb
+
       const data = {
-        idAlmacen: selectedStore,
+        idAlmacen: resultStores.data[0].id,
       };
 
       const result = await getExistencesByStoreAsync(token, data);

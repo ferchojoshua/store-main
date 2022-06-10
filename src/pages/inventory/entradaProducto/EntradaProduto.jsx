@@ -131,11 +131,9 @@ const EntradaProduto = () => {
                         style={{
                           fontSize: 25,
                           marginTop: 5,
-                          color: item.fechaVencimiento ? "#f50057" : "#4caf50",
+                          color: item.isCanceled ? "#4caf50" : "#f50057",
                         }}
-                        icon={
-                          item.fechaVencimiento ? faCircleXmark : faCircleCheck
-                        }
+                        icon={item.isCanceled ? faCircleCheck : faCircleXmark}
                       />
                     }
                   </td>

@@ -40,6 +40,13 @@ import SalesContainer from "./pages/sales/SalesContainer";
 import Departments from "./pages/settings/locations/Departments";
 import Municipalities from "./pages/settings/locations/municipalities/Municipalities";
 import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 function App() {
   const {
@@ -50,6 +57,7 @@ function App() {
     isDefaultPass,
     setIsDefaultPass,
     setAccess,
+    isDarkMode,
   } = useContext(DataContext);
 
   let navigate = useNavigate();
@@ -74,7 +82,8 @@ function App() {
           navigate("/unauthorized");
           return;
         }
-        simpleMessage(result.error, "error");
+
+        simpleMessage("No se pudo conectar con el servidor", "error");
         return;
       }
       if (result.data === "eX01") {
@@ -103,56 +112,69 @@ function App() {
     return <Loading />;
   }
 
+  const darkTheme = createTheme({
+    palette: {
+      mode: isDarkMode ? "dark" : "light",
+    },
+  });
+
   return isLogged ? (
     isDefaultPass ? (
-      <SetNewPasswordComponent />
+      <ThemeProvider theme={darkTheme}>
+        <SetNewPasswordComponent />
+      </ThemeProvider>
     ) : (
-      <LocalizationProvider dateAdapter={DateAdapter}>
-        <div className="App">
-          <NavbarComponent />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            {/* Rutas Account */}
-            <Route path="/account" element={<MyAccount />} />
+      <ThemeProvider theme={darkTheme}>
+        <LocalizationProvider dateAdapter={DateAdapter}>
+          <div className="App">
+            <NavbarComponent />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              {/* Rutas Account */}
+              <Route path="/account" element={<MyAccount />} />
 
-            {/* Ruta Inventario */}
-            <Route path="/sales" element={<SalesContainer />} />
+              {/* Ruta Inventario */}
+              <Route path="/sales" element={<SalesContainer />} />
 
-            {/* Ruta Inventario */}
-            <Route path="/inventory" element={<InventoryContainer />} />
+              {/* Ruta Inventario */}
+              <Route path="/inventory" element={<InventoryContainer />} />
 
-            <Route path="/entrada/add" element={<AddEntradaProducto />} />
-            <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
+              <Route path="/entrada/add" element={<AddEntradaProducto />} />
+              <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
 
-            {/* Rutas Seguridad */}
-            <Route path="/security" element={<SecurityContiner />} />
+              {/* Rutas Seguridad */}
+              <Route path="/security" element={<SecurityContiner />} />
 
-            {/* Rutas miscelaneos */}
-            <Route path="/stores" element={<Stores />} />
-            <Route path="/store/:id" element={<StoreDetails />} />
-            <Route path="/providers" element={<Providers />} />
+              {/* Rutas miscelaneos */}
+              <Route path="/stores" element={<Stores />} />
+              <Route path="/store/:id" element={<StoreDetails />} />
+              <Route path="/providers" element={<Providers />} />
 
-            {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
-            <Route path="/tipo-negocio" element={<TipoNegocio />} />
-            <Route path="/tipo-negocio/:id" element={<TipoNegocioDetails />} />
+              {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
+              <Route path="/tipo-negocio" element={<TipoNegocio />} />
+              <Route
+                path="/tipo-negocio/:id"
+                element={<TipoNegocioDetails />}
+              />
 
-            <Route path="/departments" element={<Departments />} />
-            <Route path="/departments/:id" element={<Municipalities />} />
-            <Route
-              path="/departments/municipalities/:id"
-              element={<MunicipalityDetails />}
-            />
+              <Route path="/departments" element={<Departments />} />
+              <Route path="/departments/:id" element={<Municipalities />} />
+              <Route
+                path="/departments/municipalities/:id"
+                element={<MunicipalityDetails />}
+              />
 
-            {/* Rutas Error */}
-            <Route path="/unauthorized" element={<Page401 />} />
-            <Route path="*" element={<NotFound />} />
-            {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-          </Routes>
+              {/* Rutas Error */}
+              <Route path="/unauthorized" element={<Page401 />} />
+              <Route path="*" element={<NotFound />} />
+              {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
+            </Routes>
 
-          <Loading />
-          <ToastContainer />
-        </div>
-      </LocalizationProvider>
+            <Loading />
+            <ToastContainer />
+          </div>
+        </LocalizationProvider>
+      </ThemeProvider>
     )
   ) : (
     <Login />

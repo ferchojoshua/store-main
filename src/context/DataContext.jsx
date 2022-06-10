@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
   const [reload, setReload] = useState(false);
   const [user, setUser] = useState([]);
   const [access, setAccess] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   return (
     <DataContext.Provider
@@ -28,6 +29,8 @@ export const DataProvider = ({ children }) => {
         setUser,
         isDefaultPass,
         setIsDefaultPass,
+        isDarkMode,
+        setIsDarkMode,
       }}
     >
       {children}

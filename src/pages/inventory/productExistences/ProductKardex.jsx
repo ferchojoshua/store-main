@@ -12,7 +12,6 @@ import {
   IconButton,
   Tooltip,
   Paper,
-  Typography,
   Autocomplete,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -160,7 +159,6 @@ export const ProductKardex = ({ productList }) => {
       setIsDefaultPass(true);
       return;
     }
-
     setKardex(result.data);
     setIsLoading(false);
     setIsVisible(true);

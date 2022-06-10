@@ -16,8 +16,8 @@ export const MetaSemanal = ({ selectedStore }) => {
 
   const metas = [
     { id: 1, meta: 65000 },
-    { id: 2, meta: 90000 },
-    { id: 3, meta: 115000 },
+    { id: 2, meta: 115000 },
+    { id: 3, meta: 90000 },
     { id: 4, meta: 140000 },
   ];
 

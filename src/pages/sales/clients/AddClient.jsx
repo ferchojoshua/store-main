@@ -140,6 +140,7 @@ const AddClient = ({ setShowModal }) => {
         idCommunity: selectedCommunity,
         direccion,
         idStore: selectedStore,
+        nombreComercial: comercialName,
       };
       setIsLoading(true);
 

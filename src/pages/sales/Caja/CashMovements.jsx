@@ -77,8 +77,10 @@ const CashMovements = () => {
 
       setIsLoading(false);
       setStoreList(resultStore.data);
-
+      
+      setSelectedStore(resultStore.data[0].id);
       const result = await getCashMovmentByStore(token, resultStore.data[0].id);
+
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {

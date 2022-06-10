@@ -111,7 +111,7 @@ const SalesContainer = () => {
                   style={{ fontSize: 20 }}
                 />
               }
-              label="Caja"
+              label="Caja Chica"
               {...a11yProps(0)}
               style={{ fontSize: 12 }}
             />

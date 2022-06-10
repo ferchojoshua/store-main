@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Typography, Grid } from "@mui/material";
 
 import {
   GetSalesByDateAsync,
-  getSalesRecupMonthAsync,
 } from "../../services/DashboardApi";
 import { DataContext } from "../../context/DataContext";
 import { getToken } from "../../services/Account";
@@ -19,10 +17,6 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-
-import { isEmpty } from "lodash";
-import NoData from "../../components/NoData";
-import moment from "moment";
 
 ChartJS.register(
   CategoryScale,
@@ -42,9 +36,6 @@ export const VentaSemanal = ({ selectedStore }) => {
   const [contado, setContado] = useState([]);
   const [credito, setCredito] = useState([]);
   const [recuperacion, setRecuperacion] = useState([]);
-
-  //   const [meta, setMeta] = useState(0);
-  //   const [falta, setFalta] = useState(0);
 
   const dayName = (fecha) =>
     ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][
@@ -111,7 +102,6 @@ export const VentaSemanal = ({ selectedStore }) => {
       },
       title: {
         display: false,
-        // text: "Chart.js Line Chart",
       },
     },
     elements: {
