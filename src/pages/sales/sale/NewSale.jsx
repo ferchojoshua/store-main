@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 
 import { Container, Paper, Grid } from "@mui/material";
 
@@ -19,6 +19,8 @@ import SaleDetail from "./SaleDetail";
 import { addSaleAsync } from "../../../services/SalesApi";
 
 const NewSale = () => {
+  let ruta = getRuta();
+
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -43,6 +45,8 @@ const NewSale = () => {
   const [selectedProductList, setSelectedProductList] = useState([]);
 
   const [montoVenta, setMontoVenta] = useState(0);
+
+  const [barCodeSearch, setBarCodeSearch] = useState(false);
 
   const addToProductList = () => {
     const { precioVentaDetalle, precioVentaMayor, producto, almacen } =
@@ -90,7 +94,7 @@ const NewSale = () => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -134,7 +138,7 @@ const NewSale = () => {
         <hr />
 
         <Grid container spacing={1}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <Paper
               elevation={10}
               style={{
@@ -157,6 +161,8 @@ const NewSale = () => {
                 setSelectedStore={setSelectedStore}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
+                barCodeSearch={barCodeSearch}
+                setBarCodeSearch={setBarCodeSearch}
               />
 
               <SelectTipoVenta
@@ -167,7 +173,7 @@ const NewSale = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={9}>
             {selectedProduct ? (
               <ProductDescription
                 selectedProduct={selectedProduct}
@@ -180,6 +186,7 @@ const NewSale = () => {
                 costoXProducto={costoXProducto}
                 setcostoXProducto={setcostoXProducto}
                 addToProductList={addToProductList}
+                barCodeSearch={barCodeSearch}
               />
             ) : (
               <></>

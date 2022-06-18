@@ -9,7 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 
 import {
   getToken,
@@ -25,23 +25,24 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { updateProductExistenceAsync } from "../../../services/ExistanceApi";
 
-const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
-  const { existencia, precioVentaDetalle, precioVentaMayor, id } =
-    selectedProduct;
+const ProductExistenceEdit = ({ selectedStore, setShowModal }) => {
+  let ruta = getRuta();
+
+  const { exisistencia, pvd, pvm, idExistence } = selectedStore;
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
 
-  const [newExistencias, setNewExistencias] = useState(existencia);
-  const [newPVD, setNewPVD] = useState(precioVentaDetalle);
-  const [newPVM, setNewPVM] = useState(precioVentaMayor);
+  const [newExistencias, setNewExistencias] = useState(exisistencia);
+  const [newPVD, setNewPVD] = useState(pvd);
+  const [newPVM, setNewPVM] = useState(pvm);
 
   const token = getToken();
 
   const saveChangesAsync = async () => {
     const data = {
-      id,
+      id: idExistence,
       newExistencias,
       newPVD,
       newPVM,
@@ -68,7 +69,7 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       if (result.error.request.status === 204) {
@@ -156,7 +157,7 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
                   <Typography variant="h6">Exist:</Typography>
 
                   <Typography variant="h6" style={{ color: "#2196f3" }}>
-                    {existencia}
+                    {exisistencia}
                   </Typography>
                 </div>
               </div>
@@ -171,7 +172,7 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
                 >
                   <Typography variant="h6">PVD:</Typography>
                   <Typography variant="h6" style={{ color: "#2196f3" }}>
-                    {precioVentaDetalle}
+                    {pvd}
                   </Typography>
                 </div>
               </div>
@@ -186,7 +187,7 @@ const ProductExistenceEdit = ({ selectedProduct, setShowModal }) => {
                 >
                   <Typography variant="h6">PVM:</Typography>
                   <Typography variant="h6" style={{ color: "#2196f3" }}>
-                    {precioVentaMayor}
+                    {pvm}
                   </Typography>
                 </div>
               </div>

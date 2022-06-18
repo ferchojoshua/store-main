@@ -4,7 +4,12 @@ import { Container, Table } from "react-bootstrap";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -46,6 +51,8 @@ import EditUser from "./EditUser";
 import NoData from "../../../components/NoData";
 
 const UserList = () => {
+  let ruta = getRuta();
+
   const {
     setReload,
     reload,
@@ -53,6 +60,7 @@ const UserList = () => {
     setIsLogged,
     setIsDefaultPass,
     access,
+    isDarkMode,
   } = useContext(DataContext);
   const MySwal = withReactContent(Swal);
   const [userList, setUserList] = useState([]);
@@ -107,7 +115,7 @@ const UserList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -154,7 +162,7 @@ const UserList = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -196,7 +204,7 @@ const UserList = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError("No puedo resetear la contraseña, Intentelo de nuevo!");
@@ -241,7 +249,7 @@ const UserList = () => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError("No se pudo cargar la lista de usuarios");
@@ -277,7 +285,7 @@ const UserList = () => {
           <div>
             <FormControl
               variant="standard"
-              style={{ textAlign: "left", width: 200, marginTop:10 }}
+              style={{ textAlign: "left", width: 200, marginTop: 10 }}
             >
               <Select
                 labelId="demo-simple-select-standard-label"
@@ -362,7 +370,12 @@ const UserList = () => {
         {isEmpty(withSearch) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th style={{ textAlign: "left" }}>Usuario</th>
@@ -373,7 +386,7 @@ const UserList = () => {
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

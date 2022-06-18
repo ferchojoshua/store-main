@@ -3,6 +3,7 @@ import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
+  getRuta,
   isAccess,
   toastError,
   toastSuccess,
@@ -46,7 +47,10 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 const MunicipalityDetails = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     setIsLoading,
     reload,
     setReload,
@@ -91,7 +95,7 @@ const MunicipalityDetails = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -118,7 +122,7 @@ const MunicipalityDetails = () => {
       if (!resultComms.statusResponse) {
         setIsLoading(false);
         if (resultComms.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultComms.error.message);
@@ -160,7 +164,7 @@ const MunicipalityDetails = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -277,7 +281,12 @@ const MunicipalityDetails = () => {
           {isEmpty(withSearch) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -290,7 +299,7 @@ const MunicipalityDetails = () => {
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../context/DataContext";
-import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Button,
@@ -33,9 +32,8 @@ function Copyright(props) {
 }
 
 const Login = () => {
-  let navigate = useNavigate();
-  // const [movimientosList, setmovimientosList] = useState([]);
-  const { setIsLoading, setIsLogged } = useContext(DataContext);
+  const { setIsLoading, setIsLogged, setAccess, setIsDarkMode } =
+    useContext(DataContext);
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -56,13 +54,10 @@ const Login = () => {
       simpleMessage("Usuario o contraseña incorrecto", "error");
       return;
     }
-    actionLog();
-    setIsLoading(false);
-    navigate("/");
-  };
-
-  const actionLog = () => {
+    setIsDarkMode(result.data.user.isDarkMode);
+    setAccess(result.data.user.rol.permissions);
     setIsLogged(true);
+    setIsLoading(false);
   };
 
   return (

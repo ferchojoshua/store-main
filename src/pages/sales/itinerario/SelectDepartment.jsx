@@ -11,7 +11,7 @@ import {
 } from "../../../services/CommunitiesApi";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../helpers/Helpers";
 import { isEmpty } from "lodash";
 
 export const SelectDepartment = ({
@@ -20,6 +20,8 @@ export const SelectDepartment = ({
   setMunicipalityList,
   municipalityListSelected,
 }) => {
+  let ruta = getRuta();
+
   const [departmentList, setDepartmentList] = useState([]);
   const { setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
@@ -34,7 +36,7 @@ export const SelectDepartment = ({
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -72,7 +74,7 @@ export const SelectDepartment = ({
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);

@@ -9,7 +9,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpellCheck, faBarcode } from "@fortawesome/free-solid-svg-icons";
 
 import {
   deleteToken,
@@ -17,7 +22,7 @@ import {
   getToken,
   getUserAsync,
 } from "../../../services/Account";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../helpers/Helpers";
 
 import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
 import { isEmpty } from "lodash";
@@ -28,7 +33,11 @@ const SelectProduct = ({
   setSelectedProduct,
   selectedStore,
   setSelectedStore,
+  barCodeSearch,
+  setBarCodeSearch,
 }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -46,7 +55,7 @@ const SelectProduct = ({
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -77,7 +86,7 @@ const SelectProduct = ({
         if (!result.statusResponse) {
           setIsLoading(false);
           if (result.error.request.status === 401) {
-            navigate("/unauthorized");
+            navigate(`${ruta}/unauthorized`);
             return;
           }
           toastError(result.error.message);
@@ -117,7 +126,7 @@ const SelectProduct = ({
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -167,36 +176,101 @@ const SelectProduct = ({
         </Select>
       </FormControl>
 
-      <Autocomplete
-        style={{ marginTop: 20 }}
-        id="combo-box-demo"
-        fullWidth
-        options={productList}
-        getOptionLabel={(op) => (op ? `${op.producto.description}` : "")}
-        value={selectedProduct === "" ? null : selectedProduct}
-        onChange={(event, newValue) => {
-          setSelectedProduct(newValue);
+      <div
+        style={{
+          marginTop: 20,
+          display: "flex",
+          flexDirection: "row",
+          alignContent: "center",
+          justifyContent: "space-between",
         }}
-        noOptionsText="Producto no encontrado..."
-        renderOption={(props, option) => {
-          return (
-            <li
-              {...props}
-              key={option.producto.id}
-              style={{ color: option.existencia <= 0 ? "#ab003c" : "#357a38" }}
-            >
-              {option.producto.description}
-            </li>
-          );
-        }}
-        renderInput={(params) => (
-          <TextField
-            variant="standard"
-            {...params}
-            label="Seleccione un producto..."
+      >
+        {barCodeSearch ? (
+          <Autocomplete
+            fullWidth
+            options={productList}
+            getOptionLabel={(op) => (op ? `${op.producto.barCode}` || "" : "")}
+            value={selectedProduct === "" ? null : selectedProduct}
+            onChange={(event, newValue) => {
+              setSelectedProduct(newValue);
+            }}
+            noOptionsText="Producto no encontrado..."
+            renderOption={(props, option) => {
+              return (
+                <li
+                  {...props}
+                  key={option.producto.id}
+                  style={{
+                    color: option.existencia <= 0 ? "#ab003c" : "#357a38",
+                  }}
+                >
+                  {option.producto.barCode}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                variant="standard"
+                {...params}
+                label="Seleccione un producto..."
+              />
+            )}
+          />
+        ) : (
+          <Autocomplete
+            id="combo-box-demo"
+            fullWidth
+            options={productList}
+            getOptionLabel={(op) => (op ? `${op.producto.description}` : "")}
+            value={selectedProduct === "" ? null : selectedProduct}
+            onChange={(event, newValue) => {
+              setSelectedProduct(newValue);
+            }}
+            noOptionsText="Producto no encontrado..."
+            renderOption={(props, option) => {
+              return (
+                <li
+                  {...props}
+                  key={option.producto.id}
+                  style={{
+                    color: option.existencia <= 0 ? "#ab003c" : "#357a38",
+                  }}
+                >
+                  {option.producto.description}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                variant="standard"
+                {...params}
+                label="Seleccione un producto..."
+              />
+            )}
           />
         )}
-      />
+
+        <Tooltip
+          title={
+            barCodeSearch ? "Buscar por Codigo de Barras" : "Buscar por Nombre"
+          }
+          style={{ marginTop: 5 }}
+        >
+          <IconButton
+            onClick={() => {
+              setBarCodeSearch(!barCodeSearch);
+            }}
+          >
+            <FontAwesomeIcon
+              style={{
+                fontSize: 25,
+                color: "#2196f3",
+              }}
+              icon={barCodeSearch ? faBarcode : faSpellCheck}
+            />
+          </IconButton>
+        </Tooltip>
+      </div>
     </div>
   );
 };

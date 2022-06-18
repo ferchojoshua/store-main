@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../../helpers/Helpers";
 import {
   TextField,
   Button,
-  Divider,
-  Container,
   Typography,
   Paper,
   InputAdornment,
@@ -18,28 +16,20 @@ import {
   deleteUserData,
   deleteToken,
 } from "../../../../services/Account";
-import moment from "moment";
-import {
-  addAbonoAsync,
-  addAbonoEspecificoAsync,
-  getQuotesBySaleAsync,
-} from "../../../../services/SalesApi";
-import { isEmpty } from "lodash";
-import NoData from "../../../../components/NoData";
-import { Table } from "react-bootstrap";
+
+import { addAbonoEspecificoAsync } from "../../../../services/SalesApi";
 
 export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
   const {
     id,
-    fechaVencimiento,
-    fechaVenta,
+
     facturedBy,
     saldo,
-    montoVenta,
-    client,
   } = selectedVenta;
   let navigate = useNavigate();
 
@@ -73,7 +63,7 @@ export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

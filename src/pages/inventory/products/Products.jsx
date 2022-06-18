@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import {
   deleteProductAsync,
   getProductsAsync,
@@ -33,7 +38,10 @@ import ProductsDetails from "./ProductsDetails";
 import { ProductKardex } from "../productExistences/ProductKardex";
 
 const Products = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     reload,
     setReload,
     setIsLoading,
@@ -49,7 +57,10 @@ const Products = () => {
   const withSearch = productList.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (val.description.toString().includes(searchTerm)) {
+    } else if (
+      val.description.toString().includes(searchTerm) ||
+      val.barCode.toString().includes(searchTerm)
+    ) {
       return val;
     }
   });
@@ -77,7 +88,7 @@ const Products = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -118,7 +129,7 @@ const Products = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -238,14 +249,19 @@ const Products = () => {
         {isEmpty(withSearch) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
-                <th style={{ textAlign: "left" }}>Tipo Negocio</th>
+                <th style={{ textAlign: "left" }}>T. Negocio</th>
                 <th style={{ textAlign: "left" }}>Familia</th>
                 <th style={{ textAlign: "left" }}>Descripcion</th>
-                <th style={{ textAlign: "left" }}>Codigo de Barras</th>
+                <th style={{ textAlign: "left" }}>C. Barras</th>
                 <th style={{ textAlign: "left" }}>Marca</th>
                 <th style={{ textAlign: "left" }}>Modelo</th>
                 <th style={{ textAlign: "left" }}>U/M</th>
@@ -257,7 +273,7 @@ const Products = () => {
                 )}
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

@@ -18,11 +18,13 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import { createRolAsync } from "../../../services/RolApi";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
 
 const AddRol = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -39,6 +41,7 @@ const AddRol = ({ setShowModal }) => {
   const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
 
   const [cajaVer, setCajaVer] = useState(false);
+  const [cajaCreate, setCajaCreate] = useState(false);
 
   const [clientsVer, setClientsVer] = useState(false);
   const [clientsCreate, setClientsCreate] = useState(false);
@@ -92,6 +95,7 @@ const AddRol = ({ setShowModal }) => {
     setPagoEspecificoCreate(!isFullAccess);
 
     setCajaVer(!isFullAccess);
+    setCajaCreate(!isFullAccess);
 
     setClientsVer(!isFullAccess);
     setClientsCreate(!isFullAccess);
@@ -167,10 +171,14 @@ const AddRol = ({ setShowModal }) => {
           IsEnable: pagoEspecificoCreate,
         },
 
-        //Caja Ver
+        //Modulo Caja Chica
         {
           description: "CAJA VER",
           IsEnable: cajaVer,
+        },
+        {
+          description: "CAJA  CREATE",
+          IsEnable: cajaCreate,
         },
 
         //Modulo Clientes
@@ -319,7 +327,7 @@ const AddRol = ({ setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -508,6 +516,18 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-4 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={cajaCreate}
+                          onChange={() => setCajaCreate(!cajaCreate)}
+                        />
+                      }
+                      label="Crear"
                     />
                   </div>
                 </div>

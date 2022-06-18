@@ -4,7 +4,12 @@ import { Container, Table } from "react-bootstrap";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 
 import { Button, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,7 +33,10 @@ import NoData from "../../../components/NoData";
 import { useNavigate } from "react-router-dom";
 
 const RolList = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     setReload,
     reload,
     setIsLoading,
@@ -64,7 +72,7 @@ const RolList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -104,7 +112,7 @@ const RolList = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError("No puedo eliminar rol, Intentelo de nuevo!");
@@ -164,7 +172,12 @@ const RolList = () => {
         {isEmpty(currentItem) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th style={{ textAlign: "left" }}>#</th>
@@ -173,7 +186,7 @@ const RolList = () => {
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

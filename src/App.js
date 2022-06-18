@@ -25,7 +25,7 @@ import {
   getUser,
   getUserAsync,
 } from "./services/Account";
-import { simpleMessage } from "./helpers/Helpers";
+import { getRuta, simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
 import { useNavigate } from "react-router-dom";
@@ -41,14 +41,11 @@ import Departments from "./pages/settings/locations/Departments";
 import Municipalities from "./pages/settings/locations/municipalities/Municipalities";
 import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import { Box } from "@mui/material";
 
 function App() {
+  let ruta = getRuta();
+
   const {
     setIsLoading,
     isLogged,
@@ -56,8 +53,10 @@ function App() {
     setUser,
     isDefaultPass,
     setIsDefaultPass,
+    access,
     setAccess,
     isDarkMode,
+    setIsDarkMode,
   } = useContext(DataContext);
 
   let navigate = useNavigate();
@@ -79,7 +78,7 @@ function App() {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
 
@@ -98,6 +97,7 @@ function App() {
         setIsDefaultPass(true);
         return;
       }
+      setIsDarkMode(result.data.isDarkMode);
       setAccess(result.data.rol.permissions);
       setIsDefaultPass(false);
       setIsLogged(true);
@@ -108,74 +108,101 @@ function App() {
     setIsLoading(false);
   }, [isLogged]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (isLogged === null || isDefaultPass === null) {
-    return <Loading />;
-  }
-
   const darkTheme = createTheme({
     palette: {
       mode: isDarkMode ? "dark" : "light",
     },
   });
 
+  if (isLogged === null || isDefaultPass === null || access === []) {
+    return <Loading />;
+  }
+
   return isLogged ? (
-    isDefaultPass ? (
-      <ThemeProvider theme={darkTheme}>
-        <SetNewPasswordComponent />
-      </ThemeProvider>
-    ) : (
-      <ThemeProvider theme={darkTheme}>
-        <LocalizationProvider dateAdapter={DateAdapter}>
-          <div className="App">
-            <NavbarComponent />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              {/* Rutas Account */}
-              <Route path="/account" element={<MyAccount />} />
+    <ThemeProvider theme={darkTheme}>
+      <Box
+        sx={{
+          height: "100vh",
+          overflow: "auto",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "background.default",
+        }}
+      >
+        {isDefaultPass ? (
+          <SetNewPasswordComponent />
+        ) : (
+          <LocalizationProvider dateAdapter={DateAdapter}>
+            <div className={isDarkMode ? "App text-white" : "App"}>
+              <NavbarComponent />
+              <Routes>
+                <Route path={`${ruta}/`} element={<Home />} />
+                {/* Rutas Account */}
+                <Route path={`${ruta}/account`} element={<MyAccount />} />
 
-              {/* Ruta Inventario */}
-              <Route path="/sales" element={<SalesContainer />} />
+                {/* Ruta Inventario */}
+                <Route path={`${ruta}/sales`} element={<SalesContainer />} />
 
-              {/* Ruta Inventario */}
-              <Route path="/inventory" element={<InventoryContainer />} />
+                {/* Ruta Inventario */}
+                <Route
+                  path={`${ruta}/inventory`}
+                  element={<InventoryContainer />}
+                />
 
-              <Route path="/entrada/add" element={<AddEntradaProducto />} />
-              <Route path="/entrada/:id" element={<EntradaProductoDetails />} />
+                <Route
+                  path={`${ruta}/entrada/add`}
+                  element={<AddEntradaProducto />}
+                />
+                <Route
+                  path={`${ruta}/entrada/:id`}
+                  element={<EntradaProductoDetails />}
+                />
 
-              {/* Rutas Seguridad */}
-              <Route path="/security" element={<SecurityContiner />} />
+                {/* Rutas Seguridad */}
+                <Route
+                  path={`${ruta}/security`}
+                  element={<SecurityContiner />}
+                />
 
-              {/* Rutas miscelaneos */}
-              <Route path="/stores" element={<Stores />} />
-              <Route path="/store/:id" element={<StoreDetails />} />
-              <Route path="/providers" element={<Providers />} />
+                {/* Rutas miscelaneos */}
+                <Route path={`${ruta}/stores`} element={<Stores />} />
+                <Route path={`${ruta}/store/:id`} element={<StoreDetails />} />
+                <Route path={`${ruta}/providers`} element={<Providers />} />
 
-              {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
-              <Route path="/tipo-negocio" element={<TipoNegocio />} />
-              <Route
-                path="/tipo-negocio/:id"
-                element={<TipoNegocioDetails />}
-              />
+                {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
+                <Route
+                  path={`${ruta}/tipo-negocio`}
+                  element={<TipoNegocio />}
+                />
+                <Route
+                  path={`${ruta}/tipo-negocio/:id`}
+                  element={<TipoNegocioDetails />}
+                />
 
-              <Route path="/departments" element={<Departments />} />
-              <Route path="/departments/:id" element={<Municipalities />} />
-              <Route
-                path="/departments/municipalities/:id"
-                element={<MunicipalityDetails />}
-              />
+                <Route path={`${ruta}/departments`} element={<Departments />} />
+                <Route
+                  path={`${ruta}/departments/:id`}
+                  element={<Municipalities />}
+                />
+                <Route
+                  path={`${ruta}/departments/municipalities/:id`}
+                  element={<MunicipalityDetails />}
+                />
 
-              {/* Rutas Error */}
-              <Route path="/unauthorized" element={<Page401 />} />
-              <Route path="*" element={<NotFound />} />
-              {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
-            </Routes>
+                {/* Rutas Error */}
+                <Route path={`${ruta}/unauthorized`} element={<Page401 />} />
+                <Route path={`${ruta}/*`} element={<NotFound />} />
+                {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
+              </Routes>
 
-            <Loading />
-            <ToastContainer />
-          </div>
-        </LocalizationProvider>
-      </ThemeProvider>
-    )
+              <Loading />
+              <ToastContainer />
+            </div>
+          </LocalizationProvider>
+        )}
+      </Box>
+    </ThemeProvider>
   ) : (
     <Login />
   );

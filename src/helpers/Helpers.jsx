@@ -85,3 +85,22 @@ export const getUserLocation = async () => {
     );
   });
 };
+
+export const getRuta = () => {
+  const { REACT_APP_ROUTE, REACT_APP_PROD_ROUTE } = process.env;
+  let ruta = "";
+  if (process.env.NODE_ENV === "production") {
+    ruta = REACT_APP_PROD_ROUTE;
+  } else {
+    ruta = REACT_APP_ROUTE;
+  }
+  return ruta;
+};
+
+export const guid = () => {
+  return "yxyx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};

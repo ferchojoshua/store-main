@@ -8,8 +8,6 @@ if (process.env.NODE_ENV === "production") {
   controller = `${REACT_APP_URL}Account/`;
 }
 
-// const controller = `${url}Account/`;
-
 export const getToken = () => {
   return localStorage.getItem("token");
 };
@@ -29,6 +27,7 @@ export const deleteUserData = () => {
 export const createTokenAsync = async (data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}CreateToken`;
+
   try {
     await axios.post(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
@@ -80,6 +79,31 @@ export const logOutAsync = async (token) => {
 export const getUserAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetUser`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.status;
+      }
+      result.data = resp.data;
+    });
+    result.statusResponse = true;
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const changeThemeAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}ChangeTheme`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {

@@ -23,7 +23,12 @@ import {
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty, uniqBy } from "lodash";
 import { updateUserAsync } from "../../../services/UsersApi";
@@ -32,6 +37,8 @@ import { useNavigate } from "react-router-dom";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const EditUser = ({ selectedUser, setShowModal }) => {
+  let ruta = getRuta();
+
   const {
     setIsLoading,
     reload,
@@ -94,7 +101,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -144,7 +151,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
 

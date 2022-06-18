@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../helpers/Helpers";
 import { getDeptosWithMunCountAsync } from "../../../services/CommunitiesApi";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { IconButton, Paper } from "@mui/material";
@@ -17,7 +17,9 @@ import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
 
 const Departments = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged } =
+  let ruta = getRuta();
+
+  const { isDarkMode, reload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
   const [departmentList, setDepartmentList] = useState([]);
@@ -38,7 +40,7 @@ const Departments = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -89,7 +91,12 @@ const Departments = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -98,7 +105,7 @@ const Departments = () => {
                   <th>Ver</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.department.id}>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getProductsAsync } from "../../../services/ProductsApi";
 
 import {
@@ -22,10 +22,16 @@ import {
   Grid,
   Button,
   Paper,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSave,
+  faSpellCheck,
+  faBarcode,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { getStoresAsync } from "../../../services/AlmacenApi";
 import {
@@ -34,6 +40,8 @@ import {
 } from "../../../services/ExistanceApi";
 
 const MoverProductoAdd = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -52,6 +60,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
   const [existenceProcedencia, setExistenceProcedencia] = useState("");
 
   const [existenceDestino, setExistenceDestino] = useState([]);
+  const [barCodeSearch, setBarCodeSearch] = useState(false);
 
   const token = getToken();
 
@@ -62,7 +71,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
       if (!resultStores.statusResponse) {
         setIsLoading(false);
         if (resultStores.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultStores.error.message);
@@ -89,7 +98,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
         if (resultProducts.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultProducts.error);
@@ -136,7 +145,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
           setExistenceProcedencia(0);
           return;
         } else if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -181,7 +190,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
         setExistenceProcedencia(0);
         return;
       } else if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -234,7 +243,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
         setExistenceDestino(0);
         return;
       } else if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -321,7 +330,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
           toastError("No se pudo realizar el traslado");
           return;
         } else if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -350,35 +359,94 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
   return (
     <div>
-      <Container >
+      <Container>
         <Divider />
 
         <Grid container spacing={2} style={{ marginTop: 1 }}>
           <Grid item sm={6}>
-            <Autocomplete
-              fullWidth
-              options={productList}
-              getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-              value={selectedProduct === "" ? null : selectedProduct}
-              onChange={(event, newValue) => {
-                handleChangeProduct(newValue);
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignContent: "center",
+                justifyContent: "space-between",
               }}
-              noOptionsText="Producto no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.description}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label="Seleccione un producto..."
+            >
+              {barCodeSearch ? (
+                <Autocomplete
+                  fullWidth
+                  options={productList}
+                  getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
+                  value={selectedProduct === "" ? null : selectedProduct}
+                  onChange={(event, newValue) => {
+                    handleChangeProduct(newValue);
+                  }}
+                  noOptionsText="Producto no encontrado..."
+                  renderOption={(props, option) => {
+                    return (
+                      <li {...props} key={option.id}>
+                        {option.barCode}
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un producto..."
+                    />
+                  )}
+                />
+              ) : (
+                <Autocomplete
+                  fullWidth
+                  options={productList}
+                  getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
+                  value={selectedProduct === "" ? null : selectedProduct}
+                  onChange={(event, newValue) => {
+                    handleChangeProduct(newValue);
+                  }}
+                  noOptionsText="Producto no encontrado..."
+                  renderOption={(props, option) => {
+                    return (
+                      <li {...props} key={option.id}>
+                        {option.description}
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un producto..."
+                    />
+                  )}
                 />
               )}
-            />
+
+              <Tooltip
+                title={
+                  barCodeSearch
+                    ? "Buscar por Codigo de Barras"
+                    : "Buscar por Nombre"
+                }
+                style={{ marginTop: 5 }}
+              >
+                <IconButton
+                  onClick={() => {
+                    setBarCodeSearch(!barCodeSearch);
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{
+                      fontSize: 25,
+                      color: "#2196f3",
+                    }}
+                    icon={barCodeSearch ? faBarcode : faSpellCheck}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
 
             <TextField
               variant="standard"

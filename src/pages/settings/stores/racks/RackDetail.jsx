@@ -8,7 +8,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../../helpers/Helpers";
 import {
   getToken,
   deleteToken,
@@ -28,6 +28,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const RackDetail = ({ selectedRack, setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const token = getToken();
@@ -44,7 +46,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -85,7 +87,7 @@ const RackDetail = ({ selectedRack, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

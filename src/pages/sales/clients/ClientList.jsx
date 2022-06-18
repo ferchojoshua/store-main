@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -31,7 +36,10 @@ import AddClient from "./AddClient";
 import ClientDetails from "./ClientDetails";
 
 const ClientList = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     reload,
     setReload,
     setIsLoading,
@@ -74,7 +82,7 @@ const ClientList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -116,7 +124,7 @@ const ClientList = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -198,7 +206,12 @@ const ClientList = () => {
         {isEmpty(withSearch) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
@@ -210,7 +223,7 @@ const ClientList = () => {
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

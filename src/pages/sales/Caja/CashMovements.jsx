@@ -3,18 +3,17 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import {
   Button,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Grid,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
@@ -23,18 +22,25 @@ import {
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import MediumModal from "../../../components/modals/MediumModal";
 
 import { getCashMovmentByStore } from "../../../services/CashMovmentsApi";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import SmallModal from "../../../components/modals/SmallModal";
-import AddCashOut from "./AddCashOut";
+
+import { AddCashMovment } from "./AddCashMovment";
 
 const CashMovements = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  let ruta = getRuta();
+
+  const {
+    isDarkMode,
+    reload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
-  const MySwal = withReactContent(Swal);
 
   const [cashMovmentsList, setCashMovmentsList] = useState([]);
   const [storeList, setStoreList] = useState([]);
@@ -42,6 +48,7 @@ const CashMovements = () => {
 
   const token = getToken();
   const [showModal, setShowModal] = useState(false);
+  const [isEntrada, setIsEntrada] = useState(false);
 
   //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,14 +84,14 @@ const CashMovements = () => {
 
       setIsLoading(false);
       setStoreList(resultStore.data);
-      
+
       setSelectedStore(resultStore.data[0].id);
       const result = await getCashMovmentByStore(token, resultStore.data[0].id);
 
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -113,7 +120,7 @@ const CashMovements = () => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -135,71 +142,99 @@ const CashMovements = () => {
     setIsLoading(false);
   };
 
+  const addMovment = (value) => {
+    setIsEntrada(value);
+    setShowModal(true);
+  };
+
   return (
     <div>
       <Container>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <h1>Movimientos de Efectivo</h1>
+        <Grid container spacing={3} direction="row">
+          <Grid item xs={6} sm={4} lg={5} xl={6}>
+            <h1>Movimientos de Efectivo</h1>
+          </Grid>
 
-          <div>
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{
-                textAlign: "left",
-                width: 200,
-                marginRight: 20,
-              }}
-            >
-              <InputLabel id="selProc">Seleccione un Almacen</InputLabel>
-              <Select
-                labelId="selProc"
-                id="demo-simple-select-standard"
-                value={selectedStore}
-                onChange={(e) => onStoreChange(e.target.value)}
-              >
-                {storeList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-
-            <Button
-              variant="outlined"
-              style={{
-                borderRadius: 20,
-                borderColor: "#f50057",
-                color: "#f50057",
-                marginTop: 10,
-                width: 200,
-              }}
-              startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-              onClick={() => {
-                setShowModal(true);
-              }}
-            >
-              Salida de efectivo
-            </Button>
-          </div>
-        </div>
+          {isAccess(access, "CAJA CREATE") ? (
+            <Grid item xs={6} sm={8} lg={7} xl={6}>
+              <Grid container spacing={3} direction="row">
+                <Grid item xs={12} md={12} lg={4}>
+                  <FormControl
+                    variant="standard"
+                    style={{
+                      textAlign: "left",
+                    }}
+                  >
+                    <InputLabel id="selProc">Seleccione un Almacen</InputLabel>
+                    <Select
+                      labelId="selProc"
+                      id="demo-simple-select-standard"
+                      value={selectedStore}
+                      onChange={(e) => onStoreChange(e.target.value)}
+                    >
+                      {storeList.map((item) => {
+                        return (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={6} lg={4}>
+                  <Button
+                    variant="outlined"
+                    style={{
+                      borderRadius: 20,
+                      borderColor: "#4caf50",
+                      color: "#4caf50",
+                      marginTop: 10,
+                      width: 200,
+                    }}
+                    startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                    onClick={() => {
+                      addMovment(true);
+                    }}
+                  >
+                    Efectivo
+                  </Button>
+                </Grid>
+                <Grid item xs={12} md={6} lg={4}>
+                  <Button
+                    variant="outlined"
+                    style={{
+                      borderRadius: 20,
+                      borderColor: "#f50057",
+                      color: "#f50057",
+                      marginTop: 10,
+                      width: 200,
+                    }}
+                    startIcon={<FontAwesomeIcon icon={faCircleMinus} />}
+                    onClick={() => {
+                      addMovment(false);
+                    }}
+                  >
+                    Efectivo
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          ) : (
+            <></>
+          )}
+        </Grid>
 
         <hr />
         {isEmpty(cashMovmentsList) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th style={{ textAlign: "center" }}>#</th>
@@ -212,7 +247,7 @@ const CashMovements = () => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
@@ -257,11 +292,15 @@ const CashMovements = () => {
       </Container>
 
       <SmallModal
-        titulo={"Salida de Efectivo"}
+        titulo={isEntrada ? "Entrada de Efectivo" : "Salida de Efectivo"}
         isVisible={showModal}
         setVisible={setShowModal}
       >
-        <AddCashOut />
+        <AddCashMovment
+          setShowOutModal={setShowModal}
+          selectedStore={selectedStore}
+          isEntrada={isEntrada}
+        />
       </SmallModal>
     </div>
   );

@@ -9,7 +9,7 @@ import MediumModal from "../../../components/modals/MediumModal";
 
 import MoverProductoAdd from "./MoverProductoAdd";
 import { getProdMovmtsAsync } from "../../../services/ProductMovementsApi";
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import {
   deleteToken,
   deleteUserData,
@@ -21,9 +21,17 @@ import moment from "moment";
 import PaginationComponent from "../../../components/PaginationComponent";
 
 const MoverProducto = () => {
+  let ruta = getRuta();
+
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsLogged, setIsDefaultPass, access } =
-    useContext(DataContext);
+  const {
+    isDarkMode,
+    setIsLoading,
+    reload,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
   const [movimientosList, setMovimientosList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +52,7 @@ const MoverProducto = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -105,7 +113,12 @@ const MoverProducto = () => {
         {isEmpty(movimientosList) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
@@ -117,7 +130,7 @@ const MoverProducto = () => {
                 <th style={{ textAlign: "left" }}>Realizado Por</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

@@ -20,7 +20,7 @@ import {
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getRolesAsync } from "../../../services/RolApi";
 import { isEmpty } from "lodash";
 import { createUserAsync } from "../../../services/UsersApi";
@@ -28,6 +28,8 @@ import { useNavigate } from "react-router-dom";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const AddUser = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   const token = getToken();
@@ -57,7 +59,7 @@ const AddUser = ({ setShowModal }) => {
       if (!rolesResult.statusResponse) {
         setIsLoading(false);
         if (rolesResult.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(rolesResult.error.message);
@@ -84,7 +86,7 @@ const AddUser = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -134,7 +136,7 @@ const AddUser = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);

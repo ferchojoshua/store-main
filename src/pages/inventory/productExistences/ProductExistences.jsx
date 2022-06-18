@@ -3,20 +3,26 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 
 import {
   IconButton,
   InputAdornment,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
+  Menu,
   MenuItem,
   Divider,
+  ListItemText,
+  MenuList,
+  Grid,
 } from "@mui/material";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExternalLinkAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faExternalLinkAlt,
+  faSearch,
+  faCircleInfo,
+} from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
@@ -26,24 +32,31 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import { getStoresByUserAsync } from "../../../services/AlmacenApi";
-import { getExistencesByStoreAsync } from "../../../services/ExistanceApi";
+import { getExistencesAsync } from "../../../services/ExistanceApi";
 import ProductExistenceEdit from "./ProductExistenceEdit";
 
 const ProductExistences = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
-  let navigate = useNavigate();
+  let ruta = getRuta();
 
-  const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState("");
+  const {
+    isDarkMode,
+    reload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
+  let navigate = useNavigate();
   const [productList, setProductList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const withSearch = productList.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (val.producto.description.toString().includes(searchTerm)) {
+    } else if (
+      val.description.toString().includes(searchTerm) ||
+      val.barCode.toString().includes(searchTerm)
+    ) {
       return val;
     }
   });
@@ -61,51 +74,17 @@ const ProductExistences = () => {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState([]);
+  const [selectedStore, setSelectedStore] = useState([]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      //Traemos los Almacenes de la DB
-      const resultStores = await getStoresByUserAsync(token);
-      if (!resultStores.statusResponse) {
-        setIsLoading(false);
-        if (resultStores.error.request.status === 401) {
-          navigate("/unauthorized");
-          return;
-        }
-        toastError(resultStores.error.message);
-        return;
-      }
 
-      if (resultStores.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (resultStores.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setStoreList(resultStores.data);
-
-      setSelectedStore(resultStores.data[0].id);
-
-      //Traemoslos productos del almacen de la deb
-
-      const data = {
-        idAlmacen: resultStores.data[0].id,
-      };
-
-      const result = await getExistencesByStoreAsync(token, data);
+      const result = await getExistencesAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -130,39 +109,14 @@ const ProductExistences = () => {
     })();
   }, [reload]);
 
-  const handleChangeStore = async (event) => {
-    setSelectedStore(event.target.value);
-    const data = {
-      idAlmacen: event.target.value,
-    };
-    setIsLoading(true);
-    const result = await getExistencesByStoreAsync(token, data);
-    if (!result.statusResponse) {
-      setIsLoading(false);
-      if (result.error.request.status === 401) {
-        navigate("/unauthorized");
-        return;
-      }
-      toastError(result.error.message);
-      return;
-    }
-    if (result.data === "eX01") {
-      setIsLoading(false);
-      deleteUserData();
-      deleteToken();
-      setIsLogged(false);
-      return;
-    }
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-    if (result.data.isDefaultPass) {
-      setIsLoading(false);
-      setIsDefaultPass(true);
-      return;
-    }
-
-    setIsLoading(false);
-
-    setProductList(result.data);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -177,31 +131,6 @@ const ProductExistences = () => {
           }}
         >
           <h1>Existencia de Productos</h1>
-
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ textAlign: "left", width: 250 }}
-          >
-            <InputLabel id="selProc">Almacen</InputLabel>
-            <Select
-              labelId="selProc"
-              id="demo-simple-select-standard"
-              value={selectedStore}
-              onChange={handleChangeStore}
-            >
-              <MenuItem value="">
-                <em>Seleccione un Almacen...</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
         </div>
 
         <Divider style={{ marginBottom: 10, marginTop: 10 }} />
@@ -229,61 +158,60 @@ const ProductExistences = () => {
         {isEmpty(withSearch) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
                 <th style={{ textAlign: "left" }}>T.Negocio</th>
+                <th style={{ textAlign: "left" }}>Familia</th>
                 <th style={{ textAlign: "left" }}>Producto</th>
+                <th style={{ textAlign: "left" }}>C. Barra</th>
                 <th style={{ textAlign: "left" }}>Marca</th>
-                <th style={{ textAlign: "left" }}>Modelo</th>
-                <th style={{ textAlign: "center" }}>Existencias</th>
-                <th style={{ textAlign: "center" }}>PVM</th>
-                <th style={{ textAlign: "center" }}>PVD</th>
-                {isAccess(access, "EXISTANCE UPDATE") ? <th>Ver</th> : <></>}
+                {isAccess(access, "EXISTANCE VER") ? (
+                  <th>Existencias</th>
+                ) : (
+                  <></>
+                )}
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
-                  <tr key={item.id}>
-                    <td>{item.producto.id}</td>
+                  <tr key={item.idProducto}>
+                    <td>{item.idProducto}</td>
+
+                    <td style={{ textAlign: "left" }}>{item.tipoNegocio}</td>
+
+                    <td style={{ textAlign: "left" }}>{item.familia}</td>
+
+                    <td style={{ textAlign: "left" }}>{item.description}</td>
+
+                    <td style={{ textAlign: "left" }}>{item.barCode}</td>
+
                     <td style={{ textAlign: "left" }}>
-                      {item.producto.tipoNegocio.description}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.producto.description}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.producto.marca ? item.producto.marca : "S/M"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.producto.modelo ? item.producto.modelo : "S/M"}
-                    </td>
-                    <td style={{ textAlign: "center" }}>{item.existencia}</td>
-                    <td style={{ textAlign: "center" }}>
-                      {item.precioVentaMayor.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      {item.precioVentaDetalle.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
+                      {item.marca ? item.marca : "S/M"}
                     </td>
 
                     <td>
-                      {isAccess(access, "EXISTANCE UPDATE") ? (
+                      {isAccess(access, "EXISTANCE VER") ? (
                         <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
+                          style={{ marginRight: 10, color: "#2196f3" }}
+                          id="basic-button"
+                          aria-controls={open ? "basic-menu" : undefined}
+                          aria-haspopup="true"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(e) => {
+                            // console.log(item);
                             setSelectedProduct(item);
-                            setShowEditModal(true);
+                            handleClick(e);
                           }}
                         >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          <FontAwesomeIcon icon={faCircleInfo} />
                         </IconButton>
                       ) : (
                         <></>
@@ -303,17 +231,198 @@ const ProductExistences = () => {
         />
       </Container>
 
+      {open ? (
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+          PaperProps={{ style: { borderRadius: 25 } }}
+        >
+          <MenuList dense>
+            <MenuItem>
+              <Grid container spacing={3}>
+                <Grid item xs={5}>
+                  <ListItemText>
+                    <span
+                      style={{
+                        color: "#9c27b0",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                      }}
+                    >
+                      Almacen
+                    </span>
+                  </ListItemText>
+                </Grid>
+                <Grid item xs={1}>
+                  <ListItemText style={{ textAlign: "center" }}>
+                    <span
+                      style={{
+                        color: "#9c27b0",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                      }}
+                    >
+                      Exist
+                    </span>
+                  </ListItemText>
+                </Grid>
+                <Grid item xs={2}>
+                  <ListItemText style={{ textAlign: "center" }}>
+                    <span
+                      style={{
+                        color: "#9c27b0",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                      }}
+                    >
+                      PVD
+                    </span>
+                  </ListItemText>
+                </Grid>
+                <Grid item xs={2}>
+                  <ListItemText style={{ textAlign: "center" }}>
+                    <span
+                      style={{
+                        color: "#9c27b0",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                      }}
+                    >
+                      PVM
+                    </span>
+                  </ListItemText>
+                </Grid>
+
+                {isAccess(access, "EXISTANCE UPDATE") ? (
+                  <Grid item xs={2}>
+                    <ListItemText style={{ textAlign: "center" }}>
+                      <span
+                        style={{
+                          color: "#9c27b0",
+                          fontWeight: "bold",
+                          fontSize: 17,
+                        }}
+                      >
+                        Ajustar
+                      </span>
+                    </ListItemText>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </MenuItem>
+            <Divider />
+
+            {selectedProduct.existence.map((val) => {
+              return (
+                <MenuItem key={Math.random()} style={{ width: 500 }}>
+                  <Grid
+                    container
+                    spacing={3}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Grid item xs={5}>
+                      <ListItemText>
+                        <span
+                          style={{
+                            color: "#2196f3",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {val.almacen}
+                        </span>
+                      </ListItemText>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <ListItemText style={{ textAlign: "center" }}>
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {val.exisistencia}
+                        </span>
+                      </ListItemText>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <ListItemText style={{ textAlign: "center" }}>
+                        <span
+                          style={{
+                            color: "#4caf50",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(val.pvd)}
+                        </span>
+                      </ListItemText>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <ListItemText style={{ textAlign: "center" }}>
+                        <span
+                          style={{
+                            color: "#4caf50",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(val.pvm)}
+                        </span>
+                      </ListItemText>
+                    </Grid>
+                    {isAccess(access, "EXISTANCE UPDATE") ? (
+                      <Grid item xs={2}>
+                        <ListItemText style={{ textAlign: "center" }}>
+                          <IconButton
+                            style={{
+                              color: "#009688",
+                            }}
+                            onClick={() => {
+                              setSelectedStore(val);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          </IconButton>
+                        </ListItemText>
+                      </Grid>
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
+                </MenuItem>
+              );
+            })}
+          </MenuList>
+        </Menu>
+      ) : (
+        <></>
+      )}
+
       <MediumModal
         titulo={
           isEmpty(selectedProduct)
             ? ""
-            : `Ajustar Existencias: ${selectedProduct.producto.description}`
+            : `Ajustar Existencias: ${selectedProduct.description}`
         }
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >
         <ProductExistenceEdit
-          selectedProduct={selectedProduct}
+          selectedStore={selectedStore}
           setShowModal={setShowEditModal}
         />
       </MediumModal>

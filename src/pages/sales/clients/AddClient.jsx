@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import {
-  getUserLocation,
+  getRuta,
   toastError,
   toastSuccess,
   validateCedula,
@@ -19,6 +19,7 @@ import {
   IconButton,
   Tooltip,
   Paper,
+  InputAdornment,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus, faSave } from "@fortawesome/free-solid-svg-icons";
@@ -39,6 +40,8 @@ import CommunityAdd from "../../settings/locations/municipalities/communities/Co
 import { getStoresAsync } from "../../../services/AlmacenApi";
 
 const AddClient = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -49,6 +52,7 @@ const AddClient = ({ setShowModal }) => {
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
   const [comercialName, setComercialName] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
 
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -73,7 +77,7 @@ const AddClient = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -100,7 +104,7 @@ const AddClient = ({ setShowModal }) => {
       if (!resultSrores.statusResponse) {
         setIsLoading(false);
         if (resultSrores.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultSrores.error.message);
@@ -122,12 +126,6 @@ const AddClient = ({ setShowModal }) => {
       }
       setStoreList(resultSrores.data);
     })();
-
-    // if (navigator.geolocation) {
-    //   getUserLocation().then((coords) => {
-    //     console.log(coords);
-    //   });
-    // }
   }, []);
 
   const saveChangesAsync = async () => {
@@ -141,6 +139,7 @@ const AddClient = ({ setShowModal }) => {
         direccion,
         idStore: selectedStore,
         nombreComercial: comercialName,
+        creditLimit: creditLimit === "" ? 0 : creditLimit,
       };
       setIsLoading(true);
 
@@ -148,7 +147,7 @@ const AddClient = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -227,7 +226,7 @@ const AddClient = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -264,7 +263,7 @@ const AddClient = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -288,6 +287,13 @@ const AddClient = ({ setShowModal }) => {
       setCommunityList(result.data);
     } else {
       setCommunityList([]);
+    }
+  };
+
+  const montoMaximo = (value) => {
+    if (/^\d*\.?\d*$/.test(value.toString()) || value === "") {
+      setCreditLimit(value);
+      return;
     }
   };
 
@@ -514,15 +520,35 @@ const AddClient = ({ setShowModal }) => {
             </Grid>
           </Grid>
 
-          <TextField
-            style={{ marginTop: 20 }}
-            fullWidth
-            required
-            variant="standard"
-            onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-            label={"Direccion Cliente"}
-            value={direccion}
-          />
+          <Grid container spacing={3}>
+            <Grid item sm={6}>
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+                label={"Direccion Cliente"}
+                value={direccion}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => montoMaximo(e.target.value)}
+                label={"Limite de Credito"}
+                value={creditLimit}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">C$</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
 
           <Button
             fullWidth

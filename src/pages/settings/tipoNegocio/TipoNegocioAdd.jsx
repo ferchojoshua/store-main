@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { addTipoNegocioAsync } from "../../../services/TipoNegocioApi";
 import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,8 @@ import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { getToken } from "../../../services/Account";
 
 const TipoNegocioAdd = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -28,7 +30,7 @@ const TipoNegocioAdd = ({ setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError("Ocurrio un error..., Intente de nuevo");

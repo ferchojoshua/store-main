@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { simpleMessage, toastError } from "../../../helpers/Helpers";
+import { getRuta, simpleMessage, toastError } from "../../../helpers/Helpers";
 
 import {
   Button,
@@ -31,8 +31,16 @@ import DetallesDeEntrada from "./entradaProductosComponents/DetallesDeEntrada";
 import ProductDescription from "./entradaProductosComponents/ProductDescription";
 
 const AddEntradaProducto = () => {
-  const { setIsLoading, setIsLogged, reload, setReload, setIsDefaultPass } =
-    useContext(DataContext);
+  let ruta = getRuta();
+
+  const {
+    isDarkMode,
+    setIsLoading,
+    setIsLogged,
+    reload,
+    setReload,
+    setIsDefaultPass,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const [tipoCompra, setTipoCompra] = useState("");
   const [noFactura, setNoFactura] = useState("");
@@ -184,7 +192,7 @@ const AddEntradaProducto = () => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -234,7 +242,7 @@ const AddEntradaProducto = () => {
           >
             <Button
               onClick={() => {
-                navigate("/inventory/");
+                navigate(`${ruta}/inventory/`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"
@@ -307,7 +315,12 @@ const AddEntradaProducto = () => {
 
           <Divider style={{ marginBottom: 20 }} />
 
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
@@ -322,7 +335,7 @@ const AddEntradaProducto = () => {
                 <th>Eliminar</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {productDetailList ? (
                 productDetailList.map((item) => {
                   return (

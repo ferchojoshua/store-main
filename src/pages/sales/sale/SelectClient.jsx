@@ -19,7 +19,7 @@ import {
   deleteUserData,
   getToken,
 } from "../../../services/Account";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../helpers/Helpers";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +34,10 @@ const SelectClient = ({
   typeClient,
   setTypeClient,
 }) => {
+
+    let ruta = getRuta();
+
+
   const { setIsLoading, setIsLogged, reload, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -51,7 +55,7 @@ const SelectClient = ({
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
         if (resultProducts.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultProducts.error.message);

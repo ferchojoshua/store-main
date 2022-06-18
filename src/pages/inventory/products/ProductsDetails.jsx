@@ -11,7 +11,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { updateProductAsync } from "../../../services/ProductsApi";
 import {
   getFamiliasByTNAsync,
@@ -31,6 +31,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const ProductsDetails = ({ selectedProduct, setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -60,7 +62,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       if (!resultTipoNegocio.statusResponse) {
         setIsLoading(false);
         if (resultTipoNegocio.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultTipoNegocio.error.message);
@@ -88,8 +90,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
-          return;
+          navigate(`${ruta}/unauthorized`);
         }
         toastError(result.error.message);
         return;
@@ -144,7 +145,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -182,7 +183,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);

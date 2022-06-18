@@ -18,27 +18,40 @@ import {
   faWarehouse,
   faChartLine,
   faLocationDot,
+  faSun,
+  faMoon,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
-import { getToken, logOutAsync } from "../services/Account";
-import { isAccess, simpleMessage } from "../helpers/Helpers";
+import {
+  changeThemeAsync,
+  deleteToken,
+  deleteUserData,
+  getToken,
+  logOutAsync,
+} from "../services/Account";
+import {
+  getRuta,
+  isAccess,
+  simpleMessage,
+  toastError,
+} from "../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 
 const NavbarComponent = () => {
-  const { REACT_APP_ROUTE, REACT_APP_PROD_ROUTE } = process.env;
-  let rout = "";
-  if (process.env.NODE_ENV === "production") {
-    rout = `${REACT_APP_PROD_ROUTE}`;
-  } else {
-    rout = `${REACT_APP_ROUTE}`;
-  }
+  let ruta = getRuta();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [active, setActive] = useState("home");
 
-  const { user, setIsLogged, setTitle, access } = useContext(DataContext);
-
-  // console.log(isAccess(access, "CLIENTS VER"));
+  const {
+    user,
+    setIsLoading,
+    setIsLogged,
+    setTitle,
+    access,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
 
   let navigate = useNavigate();
 
@@ -56,7 +69,30 @@ const NavbarComponent = () => {
 
   const myAccount = () => {
     setTitle("Mi Cuenta");
-    navigate(`/account`);
+    navigate(`${ruta}/account`);
+  };
+
+  const changeTheme = async () => {
+    const result = await changeThemeAsync(token);
+
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    setIsDarkMode(!isDarkMode);
   };
 
   const logOut = async () => {
@@ -83,7 +119,7 @@ const NavbarComponent = () => {
             fontSize: 20,
           }}
           as={Link}
-          to={rout}
+          to={ruta}
           onClick={() => setActive("home")}
         >
           <img
@@ -113,7 +149,7 @@ const NavbarComponent = () => {
                 fontSize: 17,
               }}
               as={Link}
-              to={rout}
+              to={ruta}
             >
               <FontAwesomeIcon icon={faHome} style={{ marginRight: 10 }} />
               Inicio
@@ -130,7 +166,7 @@ const NavbarComponent = () => {
                   fontSize: 17,
                 }}
                 as={Link}
-                to={`${rout}/sales`}
+                to={`${ruta}/sales`}
               >
                 <FontAwesomeIcon
                   icon={faChartLine}
@@ -154,7 +190,7 @@ const NavbarComponent = () => {
                   fontSize: 17,
                 }}
                 as={Link}
-                to={`${rout}/inventory`}
+                to={`${ruta}/inventory`}
               >
                 <FontAwesomeIcon
                   icon={faBoxesStacked}
@@ -175,7 +211,7 @@ const NavbarComponent = () => {
                 }}
                 eventKey="security"
                 as={Link}
-                to={`${rout}/security`}
+                to={`${ruta}/security`}
               >
                 <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
                 Seguridad
@@ -201,7 +237,7 @@ const NavbarComponent = () => {
               <NavDropdown.Divider />
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${rout}/stores`}>
+                <NavDropdown.Item as={Link} to={`${ruta}/stores`}>
                   <FontAwesomeIcon
                     icon={faWarehouse}
                     style={{ marginRight: 10 }}
@@ -213,7 +249,7 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${rout}/providers`}>
+                <NavDropdown.Item as={Link} to={`${ruta}/providers`}>
                   <FontAwesomeIcon
                     icon={faPeopleCarryBox}
                     style={{ marginRight: 10 }}
@@ -225,7 +261,7 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${rout}/tipo-negocio`}>
+                <NavDropdown.Item as={Link} to={`${ruta}/tipo-negocio`}>
                   <FontAwesomeIcon
                     icon={faSitemap}
                     style={{ marginRight: 10 }}
@@ -237,7 +273,7 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "COMMUNITIES VER") ? (
-                <NavDropdown.Item as={Link} to={`${rout}/departments`}>
+                <NavDropdown.Item as={Link} to={`${ruta}/departments`}>
                   <FontAwesomeIcon
                     icon={faLocationDot}
                     style={{ marginRight: 10, marginRight: 15 }}
@@ -295,6 +331,14 @@ const NavbarComponent = () => {
               <MenuItem onClick={myAccount}>
                 <FontAwesomeIcon icon={faUserCog} style={{ marginRight: 20 }} />
                 Mi cuenta
+              </MenuItem>
+
+              <MenuItem onClick={changeTheme}>
+                <FontAwesomeIcon
+                  icon={isDarkMode ? faSun : faMoon}
+                  style={{ marginRight: 20 }}
+                />
+                {isDarkMode ? "Tema Claro" : "Tema Oscuro"}
               </MenuItem>
               <MenuItem onClick={logOut}>
                 <FontAwesomeIcon

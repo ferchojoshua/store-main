@@ -22,7 +22,7 @@ import {
 } from "../../../../services/Account";
 import { getprovidersAsync } from "../../../../services/ProviderApi";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
 import DatePicker from "@mui/lab/DatePicker";
 import { getStoresAsync } from "../../../../services/AlmacenApi";
 
@@ -40,6 +40,8 @@ const ProductDetailInComponent = ({
   setSelectedStore,
   isEdit,
 }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   const token = getToken();
@@ -56,7 +58,7 @@ const ProductDetailInComponent = ({
       if (!resultProviders.statusResponse) {
         setIsLoading(false);
         if (resultProviders.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultProviders.error.message);
@@ -81,7 +83,7 @@ const ProductDetailInComponent = ({
       if (!resultStore.statusResponse) {
         setIsLoading(false);
         if (resultStore.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultStore.error.message);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../helpers/Helpers";
 import {
   TextField,
   Button,
@@ -36,8 +36,16 @@ import { Table } from "react-bootstrap";
 import moment from "moment";
 
 export const ProductKardex = ({ productList }) => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  let ruta = getRuta();
+
+  const {
+    reload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+    isDarkMode,
+  } = useContext(DataContext);
 
   const [desde, setDesde] = useState(new Date());
   const [hasta, setHasta] = useState(new Date());
@@ -62,7 +70,7 @@ export const ProductKardex = ({ productList }) => {
       if (!resultStores.statusResponse) {
         setIsLoading(false);
         if (resultStores.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultStores.error.message);
@@ -101,7 +109,7 @@ export const ProductKardex = ({ productList }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -139,7 +147,7 @@ export const ProductKardex = ({ productList }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -329,7 +337,12 @@ export const ProductKardex = ({ productList }) => {
               <NoData />
             </div>
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
@@ -341,7 +354,7 @@ export const ProductKardex = ({ productList }) => {
                   <th style={{ textAlign: "left" }}>Usuario</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {kardex.map((item) => {
                   return (
                     <tr key={item.id}>

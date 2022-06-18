@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import { getEntradasAsync } from "../../../services/ProductIsApi";
 import moment from "moment/moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,10 +21,18 @@ import {
 } from "../../../services/Account";
 
 const EntradaProduto = () => {
+  let ruta = getRuta();
+
   let navigate = useNavigate();
   const [entradaList, setEntradaList] = useState([]);
-  const { setIsLoading, reload, setIsLogged, setIsDefaultPass, access } =
-    useContext(DataContext);
+  const {
+    isDarkMode,
+    setIsLoading,
+    reload,
+    setIsLogged,
+    setIsDefaultPass,
+    access,
+  } = useContext(DataContext);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(10);
@@ -42,7 +50,7 @@ const EntradaProduto = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -85,7 +93,7 @@ const EntradaProduto = () => {
               style={{ borderRadius: 20 }}
               startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
               onClick={() => {
-                navigate(`/entrada/add`);
+                navigate(`${ruta}/entrada/add`);
               }}
             >
               Agregar Entrada
@@ -97,7 +105,12 @@ const EntradaProduto = () => {
 
         <hr />
 
-        <Table hover size="sm">
+        <Table
+          hover={!isDarkMode}
+          size="sm"
+          responsive
+          className="text-primary"
+        >
           <thead>
             <tr>
               <th>#</th>
@@ -110,7 +123,7 @@ const EntradaProduto = () => {
               <th>Ver</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={isDarkMode ? "text-white" : "text-dark"}>
             {currentItem.map((item) => {
               return (
                 <tr key={item.id}>
@@ -141,7 +154,7 @@ const EntradaProduto = () => {
                     <IconButton
                       color="primary"
                       onClick={() => {
-                        navigate(`/entrada/${item.id}`);
+                        navigate(`${ruta}/entrada/${item.id}`);
                       }}
                     >
                       <FontAwesomeIcon icon={faExternalLink} />

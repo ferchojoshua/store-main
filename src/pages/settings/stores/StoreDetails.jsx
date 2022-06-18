@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import RackAdd from "./racks/RackAdd";
 import {
   TextField,
@@ -48,7 +48,10 @@ import NoData from "../../../components/NoData";
 import { isAccess } from "../../../helpers/Helpers";
 
 const StoreDetails = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     setIsLoading,
     reload,
     setReload,
@@ -85,7 +88,7 @@ const StoreDetails = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -112,7 +115,7 @@ const StoreDetails = () => {
       if (!resultRacks.statusResponse) {
         setIsLoading(false);
         if (resultRacks.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultRacks.error.message);
@@ -149,7 +152,7 @@ const StoreDetails = () => {
     const result = await updateStoreAsync(token, data);
     if (!result.statusResponse) {
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError("Ocurrio un error al guardar los cambios");
@@ -190,7 +193,7 @@ const StoreDetails = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError("Ocurrio un error al eliminar rack");
@@ -336,7 +339,12 @@ const StoreDetails = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -344,7 +352,7 @@ const StoreDetails = () => {
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {rackList.map((item) => {
                   return (
                     <tr key={item.id}>

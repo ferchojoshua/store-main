@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, Divider, Container, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { DataContext } from "../../../context/DataContext";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import {
   getToken,
   deleteToken,
@@ -20,6 +20,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ProviderDetails = ({ selectedProvider, setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -37,7 +39,7 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -93,7 +95,7 @@ const ProviderDetails = ({ selectedProvider, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

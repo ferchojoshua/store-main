@@ -4,7 +4,7 @@ import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import {
   deleteTipoNegocioAsync,
   getTipoNegocioAsync,
@@ -28,8 +28,16 @@ import NoData from "../../../components/NoData";
 import SmallModal from "../../../components/modals/SmallModal";
 
 const TipoNegocio = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  let ruta = getRuta();
+
+  const {
+    isDarkMode,
+    reload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [tipoNegocioList, setTpoNegocioList] = useState([]);
@@ -51,7 +59,7 @@ const TipoNegocio = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -91,7 +99,7 @@ const TipoNegocio = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -158,7 +166,12 @@ const TipoNegocio = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -167,7 +180,7 @@ const TipoNegocio = () => {
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>

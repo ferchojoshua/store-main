@@ -22,6 +22,7 @@ const ProductDescription = ({
   costoXProducto,
   setcostoXProducto,
   addToProductList,
+  barCodeSearch,
 }) => {
   const { precioVentaDetalle, precioVentaMayor, existencia, producto } =
     selectedProduct;
@@ -104,25 +105,49 @@ const ProductDescription = ({
       >
         <div>
           <div className="row justify-content-around align-items-center">
-            <div className="col-sm-3">
+            <div className="col-md-6 col-lg-4 col-xl-3  ">
               <p
                 style={{
                   textAlign: "center",
-                  color: "#2979ff",
-                  fontWeight: "bold",
                 }}
-              >{`Codigo: ${producto.id}`}</p>
+              >
+                <span
+                  style={{
+                    textAlign: "center",
+                    color: "#2979ff",
+                    fontWeight: "bold",
+                    marginRight: 5,
+                  }}
+                >
+                  Nombre:
+                </span>
+                {barCodeSearch ? (
+                  <span>{producto.description}</span>
+                ) : (
+                  <span>{producto.barCode}</span>
+                )}
+              </p>
             </div>
-            <div className="col-sm-3">
+            <div className="col-md-6 col-lg-2 col-xl-3">
               <p
                 style={{
                   textAlign: "center",
-                  color: "#2979ff",
-                  fontWeight: "bold",
                 }}
-              >{`Existencia: ${selectedProduct.existencia}`}</p>
+              >
+                <span
+                  style={{
+                    textAlign: "center",
+                    color: "#2979ff",
+                    fontWeight: "bold",
+                    marginRight: 5,
+                  }}
+                >
+                  Existencia:
+                </span>
+                <span>{selectedProduct.existencia}</span>
+              </p>
             </div>
-            <div className="col-sm-3 ">
+            <div className="col-md-6 col-lg-3 col-xl-3">
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <Radio
                   style={{ marginTop: -10 }}
@@ -132,21 +157,30 @@ const ProductDescription = ({
                   name="radio-buttons"
                   inputProps={{ "aria-label": "PVD" }}
                 />
-                <p
-                  style={{
-                    color: "#4caf50",
-                    fontWeight: "bold",
-                  }}
-                >{`PVD: ${selectedProduct.precioVentaDetalle.toLocaleString(
-                  "es-NI",
-                  {
-                    style: "currency",
-                    currency: "NIO",
-                  }
-                )}`}</p>
+                <p>
+                  <span
+                    style={{
+                      textAlign: "center",
+                      color: "#4caf50",
+                      fontWeight: "bold",
+                      marginRight: 5,
+                    }}
+                  >
+                    PVD:
+                  </span>
+                  <span>
+                    {selectedProduct.precioVentaDetalle.toLocaleString(
+                      "es-NI",
+                      {
+                        style: "currency",
+                        currency: "NIO",
+                      }
+                    )}
+                  </span>
+                </p>
               </div>
             </div>
-            <div className="col-sm-3">
+            <div className="col-md-6 col-lg-3 col-xl-3">
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <Radio
                   style={{ marginTop: -10 }}
@@ -156,20 +190,24 @@ const ProductDescription = ({
                   name="radio-buttons"
                   inputProps={{ "aria-label": "PVM" }}
                 />
-                <p
-                  style={{
-                    textAlign: "center",
-                    color: "#4caf50",
-                    fontWeight: "bold",
-                  }}
-                >{`PVM: ${selectedProduct.precioVentaMayor.toLocaleString(
-                  "es-NI",
-                  {
-                    textAlign: "center",
-                    style: "currency",
-                    currency: "NIO",
-                  }
-                )}`}</p>
+                <p>
+                  <span
+                    style={{
+                      textAlign: "center",
+                      color: "#4caf50",
+                      fontWeight: "bold",
+                      marginRight: 5,
+                    }}
+                  >
+                    PVM:
+                  </span>
+                  <span>
+                    {selectedProduct.precioVentaMayor.toLocaleString("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    })}
+                  </span>
+                </p>
               </div>
             </div>
           </div>

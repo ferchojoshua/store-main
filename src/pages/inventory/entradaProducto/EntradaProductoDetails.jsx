@@ -3,7 +3,12 @@ import { DataContext } from "../../../context/DataContext";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import ProductDetailInComponent from "./entradaProductoDetailsComponents/ProductDetailInComponent";
 import {
   Button,
@@ -34,7 +39,10 @@ import MediumModal from "../../../components/modals/MediumModal";
 import DetalleProductoComponent from "./entradaProductoDetailsComponents/DetalleProductoComponent";
 
 const EntradaProductoDetails = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     setIsLoading,
     setIsLogged,
     setReload,
@@ -70,7 +78,7 @@ const EntradaProductoDetails = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -144,7 +152,7 @@ const EntradaProductoDetails = () => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -227,7 +235,7 @@ const EntradaProductoDetails = () => {
           >
             <Button
               onClick={() => {
-                navigate("/inventory/");
+                navigate(`${ruta}/inventory`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"
@@ -291,7 +299,12 @@ const EntradaProductoDetails = () => {
 
           <hr />
 
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th>#</th>
@@ -310,7 +323,7 @@ const EntradaProductoDetails = () => {
                 )}
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {productList.map((item) => {
                 return (
                   <tr key={item.id}>

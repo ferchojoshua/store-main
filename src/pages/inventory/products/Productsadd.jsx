@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  guid,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import { addProductAsync } from "../../../services/ProductsApi";
 import {
   getTipoNegocioAsync,
@@ -32,6 +37,8 @@ import SmallModal from "../../../components/modals/SmallModal";
 import FamiliaAdd from "../../settings/familia/FamiliaAdd";
 
 const Productsadd = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -52,16 +59,6 @@ const Productsadd = ({ setShowModal }) => {
   const token = getToken();
 
   const saveChangesAsync = async () => {
-    const data = {
-      TipoNegocioId: selectedTipoNegocio,
-      FamiliaId: selectedFamilia,
-      description: description,
-      barCode: barCode,
-      marca: marca,
-      modelo: modelo,
-      uM: uM,
-    };
-
     if (selectedTipoNegocio === "" || selectedTipoNegocio === 0) {
       toastError("Seleccione un tipo de negocio...");
       return;
@@ -72,16 +69,30 @@ const Productsadd = ({ setShowModal }) => {
       return;
     }
 
-    if (description === "") {
+    if (description.length === 0) {
       toastError("Ingrese una descripcion...");
       return;
     }
+
     setIsLoading(true);
+    const data = {
+      TipoNegocioId: selectedTipoNegocio,
+      FamiliaId: selectedFamilia,
+      description: description,
+      barCode:
+        barCode.length === 0
+          ? `A&M${Math.floor(Math.random() * (1 - 100)) + 1}-${guid()}`
+          : barCode,
+      marca: marca.length === 0 ? "S/M" : marca,
+      modelo: modelo.length === 0 ? "S/M" : modelo,
+      uM: uM.length === 0 ? "S/UM" : uM,
+    };
+
     const result = await addProductAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -114,7 +125,7 @@ const Productsadd = ({ setShowModal }) => {
       if (!resultTipoNegocio.statusResponse) {
         setIsLoading(false);
         if (resultTipoNegocio.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultTipoNegocio.error.message);
@@ -149,7 +160,7 @@ const Productsadd = ({ setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);

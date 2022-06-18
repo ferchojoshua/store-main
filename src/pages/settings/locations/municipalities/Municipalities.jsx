@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
 
 import { Button, IconButton, Container, Paper } from "@mui/material";
 import {
@@ -25,7 +25,9 @@ import {
 } from "../../../../services/CommunitiesApi";
 
 const Municipalities = () => {
-  const { setIsLoading, reload, setIsDefaultPass, setIsLogged } =
+  let ruta = getRuta();
+
+  const { isDarkMode, setIsLoading, reload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
@@ -50,7 +52,7 @@ const Municipalities = () => {
       if (!resultDepto.statusResponse) {
         setIsLoading(false);
         if (resultDepto.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultDepto.error.message);
@@ -77,7 +79,7 @@ const Municipalities = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -141,7 +143,12 @@ const Municipalities = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -150,7 +157,7 @@ const Municipalities = () => {
                   <th>Ver</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.municipality.id}>

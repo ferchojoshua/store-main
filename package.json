@@ -1,6 +1,7 @@
 {
   "name": "automoto",
   "version": "1.0.0",
+  "homepage": "http://localhost/automoto/",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.7.1",

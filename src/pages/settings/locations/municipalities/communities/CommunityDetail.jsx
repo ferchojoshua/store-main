@@ -9,7 +9,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../../helpers/Helpers";
+import {
+  getRuta,
+  toastError,
+  toastSuccess,
+} from "../../../../../helpers/Helpers";
 import {
   faPenToSquare,
   faSave,
@@ -25,6 +29,8 @@ import {
 import { updateCommunityAsync } from "../../../../../services/CommunitiesApi";
 
 const CommunityDetail = ({ selectedCommunity, setShowModal }) => {
+  let ruta = getRuta();
+
   const { id, name } = selectedCommunity;
   let navigate = useNavigate();
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -48,7 +54,7 @@ const CommunityDetail = ({ selectedCommunity, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

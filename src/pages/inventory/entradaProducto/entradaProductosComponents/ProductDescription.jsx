@@ -8,7 +8,12 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus, faClipboard } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCirclePlus,
+  faClipboard,
+  faBarcode,
+  faSpellCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../../../context/DataContext";
 import {
   deleteToken,
@@ -16,7 +21,7 @@ import {
   getToken,
 } from "../../../../services/Account";
 import { useNavigate } from "react-router-dom";
-import { toastError } from "../../../../helpers/Helpers";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
 import MediumModal from "../../../../components/modals/MediumModal";
 import Productsadd from "../../products/Productsadd";
 import { getProductsAsync } from "../../../../services/ProductsApi";
@@ -49,12 +54,16 @@ const ProductDescription = ({
   setPrecioVentaDetalle,
   addToProductList,
 }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   const token = getToken();
   let navigate = useNavigate();
   const [productList, setProductList] = useState([]);
   const [showProductModal, setShowProductModal] = useState(false);
+
+  const [barCodeSearch, setBarCodeSearch] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -63,7 +72,7 @@ const ProductDescription = ({
       if (!resultProducts.statusResponse) {
         setIsLoading(false);
         if (resultProducts.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultProducts.error.message);
@@ -252,7 +261,7 @@ const ProductDescription = ({
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);
@@ -309,31 +318,77 @@ const ProductDescription = ({
                 justifyContent: "space-between",
               }}
             >
-              <Autocomplete
-                id="combo-box-demo"
-                fullWidth
-                options={productList}
-                getOptionLabel={(op) => (op ? `${op.description}` : "")}
-                value={selectedProduct === "" ? null : selectedProduct}
-                onChange={(event, newValue) => {
-                  getExistencias(newValue);
-                }}
-                noOptionsText="Producto no encontrado..."
-                renderOption={(props, option) => {
-                  return (
-                    <li {...props} key={option.id}>
-                      {option.description}
-                    </li>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    label="Seleccione un producto..."
+              {barCodeSearch ? (
+                <Autocomplete
+                  fullWidth
+                  options={productList}
+                  getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
+                  value={selectedProduct === "" ? null : selectedProduct}
+                  onChange={(event, newValue) => {
+                    getExistencias(newValue);
+                  }}
+                  noOptionsText="Producto no encontrado..."
+                  renderOption={(props, option) => {
+                    return (
+                      <li {...props} key={option.id}>
+                        {option.barCode}
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un producto..."
+                    />
+                  )}
+                />
+              ) : (
+                <Autocomplete
+                  id="combo-box-demo"
+                  fullWidth
+                  options={productList}
+                  getOptionLabel={(op) => (op ? `${op.description}` : "")}
+                  value={selectedProduct === "" ? null : selectedProduct}
+                  onChange={(event, newValue) => {
+                    getExistencias(newValue);
+                  }}
+                  noOptionsText="Producto no encontrado..."
+                  renderOption={(props, option) => {
+                    return (
+                      <li {...props} key={option.id}>
+                        {option.description}
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      variant="standard"
+                      {...params}
+                      label="Seleccione un producto..."
+                    />
+                  )}
+                />
+              )}
+
+              <Tooltip
+                title={
+                  barCodeSearch
+                    ? "Buscar por Codigo de Barras"
+                    : "Buscar por Nombre"
+                }
+                style={{ marginTop: 5 }}
+              >
+                <IconButton onClick={() => setBarCodeSearch(!barCodeSearch)}>
+                  <FontAwesomeIcon
+                    style={{
+                      fontSize: 25,
+                      color: "#2196f3",
+                    }}
+                    icon={barCodeSearch ? faBarcode : faSpellCheck}
                   />
-                )}
-              />
+                </IconButton>
+              </Tooltip>
 
               <Tooltip title="Agregar Producto" style={{ marginTop: 5 }}>
                 <IconButton onClick={() => setShowProductModal(true)}>

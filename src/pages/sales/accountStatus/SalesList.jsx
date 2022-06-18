@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 
 import {
   FormControl,
@@ -42,18 +42,30 @@ import SaleReturn from "../sale/returnVenta/SaleReturn";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 
 const SalesList = () => {
-  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  let ruta = getRuta();
+
+  const {
+    reload,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+    isDarkMode,
+  } = useContext(DataContext);
   let navigate = useNavigate();
   const [listaVentas, setListaVentas] = useState([]);
 
   const [selectedVenta, setSelectedVenta] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
+
   const withSearch = listaVentas.filter((val) => {
     if (searchTerm === "") {
       return val;
-    } else if (val.id.toString().includes(searchTerm)) {
+    } else if (
+      val.id.toString().includes(searchTerm) ||
+      val.client.nombreCliente.toString().includes(searchTerm)
+    ) {
       return val;
     }
   });
@@ -85,7 +97,7 @@ const SalesList = () => {
       if (!resultStores.statusResponse) {
         setIsLoading(false);
         if (resultStores.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultStores.error.message);
@@ -118,7 +130,7 @@ const SalesList = () => {
         if (!result.statusResponse) {
           setIsLoading(false);
           if (result.error.request.status === 401) {
-            navigate("/unauthorized");
+            navigate(`${ruta}/unauthorized`);
             return;
           }
           toastError(result.error.message);
@@ -157,7 +169,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -186,7 +198,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -215,7 +227,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -246,7 +258,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -272,7 +284,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -298,7 +310,7 @@ const SalesList = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -439,7 +451,12 @@ const SalesList = () => {
         {isEmpty(withSearch) ? (
           <NoData />
         ) : (
-          <Table hover size="sm">
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
             <thead>
               <tr>
                 <th style={{ textAlign: "center" }}>Fecha</th>
@@ -456,7 +473,7 @@ const SalesList = () => {
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>

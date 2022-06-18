@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../../../helpers/Helpers";
 import { TextField, Button, Divider, Container } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +13,8 @@ import {
 import { addCommunityAsync } from "../../../../../services/CommunitiesApi";
 
 const CommunityAdd = ({ setShowModal, idMunicipality }) => {
+  let ruta = getRuta();
+
   const { reload, setReload, setIsLoading, setIsLogged, setIsDefaultPass } =
     useContext(DataContext);
   let navigate = useNavigate();
@@ -34,7 +36,7 @@ const CommunityAdd = ({ setShowModal, idMunicipality }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

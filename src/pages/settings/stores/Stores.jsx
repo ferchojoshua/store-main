@@ -3,7 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../../../components/PaginationComponent";
-import { isAccess, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import { getStoresAsync } from "../../../services/AlmacenApi";
 import { Button, IconButton, Paper } from "@mui/material";
 import {
@@ -22,9 +22,17 @@ import StoreAdd from "./StoreAdd";
 import NoData from "../../../components/NoData";
 
 const Stores = () => {
+  let ruta = getRuta();
+
   let navigate = useNavigate();
-  const { setIsLoading, reload, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  const {
+    isDarkMode,
+    setIsLoading,
+    reload,
+    setIsDefaultPass,
+    setIsLogged,
+    access,
+  } = useContext(DataContext);
   const [storesList, setStoresList] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +52,7 @@ const Stores = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -110,7 +118,12 @@ const Stores = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -119,7 +132,7 @@ const Stores = () => {
                   <th>Ver Detalles</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.almacen.id}>

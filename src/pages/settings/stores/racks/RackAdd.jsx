@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { TextField, Button, Divider, Container } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../../helpers/Helpers";
 import { addRackToStoreAsync } from "../../../../services/AlmacenApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +14,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const RackAdd = ({ setShowModal }) => {
+  let ruta = getRuta();
+
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
   const { id } = useParams();
@@ -36,7 +38,7 @@ const RackAdd = ({ setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import {
   faPenToSquare,
   faSave,
@@ -28,6 +28,8 @@ import {
 } from "../../../services/TipoNegocioApi";
 
 const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
+  let ruta = getRuta();
+
   let navigate = useNavigate();
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
@@ -44,7 +46,7 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -84,7 +86,7 @@ const FamiliaDetails = ({ selectedFamilia, setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

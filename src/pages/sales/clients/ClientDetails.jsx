@@ -12,10 +12,12 @@ import {
   IconButton,
   Tooltip,
   Paper,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { DataContext } from "../../../context/DataContext";
 import {
+  getRuta,
   isAccess,
   toastError,
   toastSuccess,
@@ -46,6 +48,8 @@ import {
 } from "../../../services/ClientsApi";
 
 const ClientDetails = ({ selectedClient, setShowModal }) => {
+  let ruta = getRuta();
+
   const {
     setIsLoading,
     reload,
@@ -64,6 +68,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
   const [correo, setCorreo] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
 
   const [departmentList, setDepartmentList] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -83,7 +88,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -109,7 +114,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!resultClient.statusResponse) {
         setIsLoading(false);
         if (resultClient.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultClient.error.message);
@@ -138,6 +143,8 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
         resultClient.data.community.municipality.department.id
       );
 
+      setCreditLimit(resultClient.data.limiteCredito);
+
       //Definiendo el municipio seleccionado
       const resultMunicipality = await getMunicipalitiesByDeptoAsync(
         token,
@@ -146,7 +153,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!resultMunicipality.statusResponse) {
         setIsLoading(false);
         if (resultMunicipality.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resultMunicipality.error.message);
@@ -179,7 +186,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!resulCommunity.statusResponse) {
         setIsLoading(false);
         if (resulCommunity.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(resulCommunity.error.message);
@@ -217,14 +224,16 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
         telefono,
         idCommunity: selectedCommunity,
         direccion,
+        creditLimit: creditLimit === "" ? 0 : creditLimit,
       };
+
       setIsLoading(true);
 
       const result = await updateClientAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -309,7 +318,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -346,7 +355,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -370,6 +379,13 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
       setCommunityList(result.data);
     } else {
       setCommunityList([]);
+    }
+  };
+
+  const montoMaximo = (value) => {
+    if (/^\d*\.?\d*$/.test(value.toString()) || value === "") {
+      setCreditLimit(value);
+      return;
     }
   };
 
@@ -566,16 +582,37 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
             </Grid>
           </Grid>
 
-          <TextField
-            style={{ marginTop: 20 }}
-            fullWidth
-            required
-            variant="standard"
-            onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-            label={"Direccion Cliente"}
-            value={direccion}
-            disabled={!isEdit}
-          />
+          <Grid container spacing={3}>
+            <Grid item sm={6}>
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+                label={"Direccion Cliente"}
+                value={direccion}
+                disabled={!isEdit}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                style={{ marginTop: 20 }}
+                fullWidth
+                required
+                variant="standard"
+                onChange={(e) => montoMaximo(e.target.value)}
+                label={"Limite de Credito"}
+                value={creditLimit}
+                disabled={!isEdit}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">C$</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
 
           {isAccess(access, "SALES UPDATE") ? (
             <div

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import {
+  getRuta,
   isAccess,
   toastError,
   toastSuccess,
@@ -41,6 +42,8 @@ const NewAbono = ({
   selectedStore,
   setSelectedStore,
 }) => {
+  let ruta = getRuta();
+
   const {
     reload,
     setReload,
@@ -75,7 +78,7 @@ const NewAbono = ({
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -146,7 +149,7 @@ const NewAbono = ({
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
-        navigate("/unauthorized");
+        navigate(`${ruta}/unauthorized`);
         return;
       }
       toastError(result.error.message);

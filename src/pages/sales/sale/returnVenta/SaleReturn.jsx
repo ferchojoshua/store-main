@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import {
+  getRuta,
   isAccess,
   toastError,
   toastSuccess,
@@ -36,6 +37,8 @@ import withReactContent from "sweetalert2-react-content";
 import { Table } from "react-bootstrap";
 
 const SaleReturn = ({ selectedVenta, setVisible }) => {
+  let ruta = getRuta();
+
   const {
     reload,
     setReload,
@@ -84,7 +87,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -196,7 +199,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);

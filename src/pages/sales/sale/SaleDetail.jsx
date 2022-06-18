@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Table } from "react-bootstrap";
 import { Paper, Divider, IconButton, Typography, Button } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faSave } from "@fortawesome/free-solid-svg-icons";
+import { DataContext } from "../../../context/DataContext";
 
 const SaleDetail = ({
   selectedProductList,
@@ -11,6 +12,8 @@ const SaleDetail = ({
   setMontoVenta,
   addNewVenta,
 }) => {
+  const { isDarkMode } = useContext(DataContext);
+
   const deleteFromProductDetailList = (item) => {
     const filtered = selectedProductList.filter(
       (p) => p.product.id !== item.product.id
@@ -40,7 +43,12 @@ const SaleDetail = ({
 
         <Divider style={{ marginBottom: 20 }} />
 
-        <Table hover size="sm">
+        <Table
+          hover={!isDarkMode}
+          size="sm"
+          responsive
+          className="text-primary"
+        >
           <thead>
             <tr>
               <th>#</th>
@@ -58,7 +66,7 @@ const SaleDetail = ({
               <th style={{ textAlign: "center" }}>Eliminar</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={isDarkMode ? "text-white" : "text-dark"}>
             {selectedProductList ? (
               selectedProductList.map((item) => {
                 return (
@@ -67,8 +75,7 @@ const SaleDetail = ({
                     <td style={{ textAlign: "left" }}>
                       {item.product.description}
                     </td>
-                    <td>{item.cantidad}
-                    </td>
+                    <td>{item.cantidad}</td>
                     <td>{`${item.descuento}%`}</td>
                     <td>
                       {item.costoUnitario.toLocaleString("es-NI", {

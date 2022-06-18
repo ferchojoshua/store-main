@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { isAccess, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import ProviderAdd from "./ProviderAdd";
 import {
   deleteProviderAsync,
@@ -31,7 +36,10 @@ import ProviderDetails from "./ProviderDetails";
 import NoData from "../../../components/NoData";
 
 const Providers = () => {
+  let ruta = getRuta();
+
   const {
+    isDarkMode,
     reload,
     setReload,
     setIsLoading,
@@ -63,7 +71,7 @@ const Providers = () => {
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
-          navigate("/unauthorized");
+          navigate(`${ruta}/unauthorized`);
           return;
         }
         toastError(result.error.message);
@@ -105,7 +113,7 @@ const Providers = () => {
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
-              navigate("/unauthorized");
+              navigate(`${ruta}/unauthorized`);
               return;
             }
             toastError(result.error.message);
@@ -174,7 +182,12 @@ const Providers = () => {
           {isEmpty(currentItem) ? (
             <NoData />
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -190,7 +203,7 @@ const Providers = () => {
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>
