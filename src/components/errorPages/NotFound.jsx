@@ -1,6 +1,7 @@
 import React from "react";
 import { Divider, Container, Typography, Button } from "@mui/material";
-import noEncontrado from "../media/animations/noEncontrado.json";
+// import noEncontrado from "../media/animations/noEncontrado.json";
+import noEncontrado from "../media/animations/not-found.json";
 import Lottie from "react-lottie";
 import { faCircleArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";

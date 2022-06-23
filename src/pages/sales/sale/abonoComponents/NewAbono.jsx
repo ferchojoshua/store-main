@@ -51,6 +51,7 @@ const NewAbono = ({
     setIsDefaultPass,
     setIsLogged,
     access,
+    isDarkMode,
   } = useContext(DataContext);
 
   const { client, store } = selectedVenta;
@@ -201,8 +202,6 @@ const NewAbono = ({
             style={{
               display: "flex",
               flexDirection: "row",
-              // justifyContent: "space-around",
-              // textAlign: "center",
             }}
           >
             <Typography variant="body1">Cliente:</Typography>
@@ -222,8 +221,6 @@ const NewAbono = ({
             style={{
               display: "flex",
               flexDirection: "row",
-              // justifyContent: "space-around",
-              // textAlign: "center",
             }}
           >
             <Typography variant="body1">Facturas Pendientes:</Typography>
@@ -269,7 +266,12 @@ const NewAbono = ({
               <NoData />
             </div>
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <caption>
                 <div
                   style={{
@@ -339,7 +341,7 @@ const NewAbono = ({
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {uncanceledSales.map((item) => {
                   return (
                     <tr key={item.id}>
@@ -407,7 +409,12 @@ const NewAbono = ({
               <NoData />
             </div>
           ) : (
-            <Table hover size="sm">
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
               <caption style={{ color: "#4caf50" }}>
                 <Typography variant="body1" style={{ textAlign: "right" }}>
                   {`Total Abonado: ${new Intl.NumberFormat("es-NI", {
@@ -425,7 +432,7 @@ const NewAbono = ({
                   <th style={{ textAlign: "left" }}>Realizado por</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {quoteList.map((item) => {
                   return (
                     <tr key={item.id}>

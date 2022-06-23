@@ -119,7 +119,7 @@ const ProductDescription = ({
                     marginRight: 5,
                   }}
                 >
-                  Nombre:
+                  {barCodeSearch ? "Nombre:" : "Codigo"}
                 </span>
                 {barCodeSearch ? (
                   <span>{producto.description}</span>

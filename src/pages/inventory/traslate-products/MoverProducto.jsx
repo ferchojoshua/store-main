@@ -3,8 +3,11 @@ import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "@mui/material";
+import {
+  faCirclePlus,
+  faExternalLinkAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { Button, IconButton } from "@mui/material";
 import MediumModal from "../../../components/modals/MediumModal";
 
 import MoverProductoAdd from "./MoverProductoAdd";
@@ -19,9 +22,11 @@ import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
 import moment from "moment";
 import PaginationComponent from "../../../components/PaginationComponent";
+import { TrasladoDetails } from "./TrasladoDetails";
 
 const MoverProducto = () => {
   let ruta = getRuta();
+
 
   let navigate = useNavigate();
   const {
@@ -42,6 +47,9 @@ const MoverProducto = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const [showModal, setShowModal] = useState(false);
+
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState([]);
 
   const token = getToken();
 
@@ -72,7 +80,6 @@ const MoverProducto = () => {
         setIsDefaultPass(true);
         return;
       }
-
       setMovimientosList(result.data);
       setIsLoading(false);
     })();
@@ -121,34 +128,39 @@ const MoverProducto = () => {
           >
             <thead>
               <tr>
-                <th>#</th>
+                <th style={{ textAlign: "center" }}>#</th>
                 <th style={{ textAlign: "center" }}>Fecha</th>
-                <th style={{ textAlign: "left" }}>Producto</th>
-                <th style={{ textAlign: "left" }}>Almacen Procedencia</th>
+                <th style={{ textAlign: "center" }}>Cant. Productos</th>
                 <th style={{ textAlign: "left" }}>Concepto</th>
-                <th style={{ textAlign: "left" }}>Almacen Destino</th>
                 <th style={{ textAlign: "left" }}>Realizado Por</th>
+                <th style={{ textAlign: "center" }}>Detalles</th>
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
+                    <td style={{ textAlign: "center" }}>{item.id}</td>
                     <td style={{ textAlign: "center" }}>
                       {moment(item.fecha).format("L")}
                     </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.producto.description}
+                    <td style={{ textAlign: "center" }}>
+                      {item.movmentDetails.length}
                     </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.almacenProcedencia.name}
-                    </td>
+
                     <td style={{ textAlign: "left" }}>{item.concepto}</td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.almacenDestino.name}
-                    </td>
                     <td style={{ textAlign: "left" }}>{item.user.fullName}</td>
+                    <td>
+                      <IconButton
+                        style={{ marginRight: 10, color: "#009688" }}
+                        onClick={() => {
+                          setSelectedTransaction(item);
+                          setShowDetailsModal(true);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faExternalLinkAlt} />
+                      </IconButton>
+                    </td>
                   </tr>
                 );
               })}
@@ -169,6 +181,17 @@ const MoverProducto = () => {
         setVisible={setShowModal}
       >
         <MoverProductoAdd setShowModal={setShowModal} />
+      </MediumModal>
+
+      <MediumModal
+        titulo={"Detalles de Traslado"}
+        isVisible={showDetailsModal}
+        setVisible={setShowDetailsModal}
+      >
+        <TrasladoDetails
+          setShowModal={setShowDetailsModal}
+          selectedTransaction={selectedTransaction}
+        />
       </MediumModal>
     </div>
   );

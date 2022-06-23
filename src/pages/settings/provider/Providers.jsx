@@ -18,19 +18,26 @@ import {
 } from "../../../services/ProviderApi";
 import PaginationComponent from "../../../components/PaginationComponent";
 
-import { Button, IconButton, Paper } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Paper,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
   faExternalLinkAlt,
   faTrashAlt,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   getToken,
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import { isEmpty } from "lodash";
+import { isEmpty, without } from "lodash";
 import SmallModal from "../../../components/modals/SmallModal";
 import ProviderDetails from "./ProviderDetails";
 import NoData from "../../../components/NoData";
@@ -51,11 +58,24 @@ const Providers = () => {
   const MySwal = withReactContent(Swal);
   const [providerList, setProviderList] = useState([]);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const withSearch = providerList.filter((val) => {
+    if (searchTerm === "") {
+      return val;
+    } else if (
+      val.description.toString().includes(searchTerm) ||
+      val.barCode.toString().includes(searchTerm)
+    ) {
+      return val;
+    }
+  });
+
+  //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(10);
   const indexLast = currentPage * itemsperPage;
   const indexFirst = indexLast - itemsperPage;
-  const currentItem = providerList.slice(indexFirst, indexLast);
+  const currentItem = withSearch.slice(indexFirst, indexLast);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const [showModal, setShowModal] = useState(false);
@@ -141,6 +161,12 @@ const Providers = () => {
     });
   };
 
+  const onChangeSearch = (val) => {
+    setCurrentPage(1);
+    setSearchTerm(val);
+    paginate(1);
+  };
+
   return (
     <div>
       <Container>
@@ -178,6 +204,26 @@ const Providers = () => {
           </div>
 
           <hr />
+
+          <TextField
+            style={{ marginBottom: 20, width: 600 }}
+            variant="standard"
+            onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
+            value={searchTerm}
+            label={"Buscar Proveedor"}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      style={{ color: "#1769aa" }}
+                    />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
           {isEmpty(currentItem) ? (
             <NoData />
@@ -249,7 +295,7 @@ const Providers = () => {
             </Table>
           )}
           <PaginationComponent
-            data={providerList}
+            data={withSearch}
             paginate={paginate}
             itemsperPage={itemsperPage}
           />

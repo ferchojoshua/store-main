@@ -151,7 +151,11 @@ const NavbarComponent = () => {
               as={Link}
               to={ruta}
             >
-              <FontAwesomeIcon icon={faHome} style={{ marginRight: 10 }} />
+              <FontAwesomeIcon
+                icon={faHome}
+                style={{ marginRight: 10 }}
+                className={active === "home" ? "fa-beat-fade" : ""}
+              />
               Inicio
             </Nav.Link>
 
@@ -171,6 +175,7 @@ const NavbarComponent = () => {
                 <FontAwesomeIcon
                   icon={faChartLine}
                   style={{ marginRight: 10 }}
+                  className={active === "ventas" ? "fa-beat-fade" : ""}
                 />
                 Ventas
               </Nav.Link>
@@ -195,6 +200,7 @@ const NavbarComponent = () => {
                 <FontAwesomeIcon
                   icon={faBoxesStacked}
                   style={{ marginRight: 10 }}
+                  className={active === "inventario" ? "fa-beat-fade" : ""}
                 />
                 Inventario
               </Nav.Link>
@@ -213,7 +219,11 @@ const NavbarComponent = () => {
                 as={Link}
                 to={`${ruta}/security`}
               >
-                <FontAwesomeIcon icon={faShield} style={{ marginRight: 10 }} />
+                <FontAwesomeIcon
+                  icon={faShield}
+                  style={{ marginRight: 10 }}
+                  className={active === "security" ? "fa-beat-fade" : ""}
+                />
                 Seguridad
               </Nav.Link>
             ) : (

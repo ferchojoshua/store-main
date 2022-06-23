@@ -25,12 +25,8 @@ export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
-  const {
-    id,
+  const { id, facturedBy, saldo } = selectedVenta;
 
-    facturedBy,
-    saldo,
-  } = selectedVenta;
   let navigate = useNavigate();
 
   const token = getToken();

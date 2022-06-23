@@ -157,6 +157,12 @@ const Products = () => {
     });
   };
 
+  const onChangeSearch = (val) => {
+    setCurrentPage(1);
+    setSearchTerm(val);
+    paginate(1);
+  };
+
   return (
     <div>
       <Container>
@@ -229,7 +235,7 @@ const Products = () => {
         <TextField
           style={{ marginBottom: 20, width: 600 }}
           variant="standard"
-          onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
+          onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
           value={searchTerm}
           label={"Buscar Producto"}
           InputProps={{

@@ -46,6 +46,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     setIsDefaultPass,
     setIsLogged,
     access,
+    isDarkMode,
   } = useContext(DataContext);
   const {
     id,
@@ -174,6 +175,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     let suma = 0;
     filtered.map((item) => (suma += item.costoTotal));
     setSaleMount(suma);
+    setSaldoVenta(suma - totalAbonado);
   };
 
   const saveChanges = async () => {
@@ -366,6 +368,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                   currency: "NIO",
                 }).format(saleMount)}`}
               </Typography>
+
               <Typography
                 variant="body2"
                 style={{
@@ -398,7 +401,12 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
         </div>
         <Divider />
 
-        <Table hover size="sm">
+        <Table
+          hover={!isDarkMode}
+          size="sm"
+          responsive
+          className="text-primary"
+        >
           {isCanceled ? (
             <caption style={{ color: "#4caf50", paddingRight: 75 }}>
               <Typography variant="body1" style={{ textAlign: "right" }}>
@@ -428,7 +436,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
               )}
             </tr>
           </thead>
-          <tbody>
+          <tbody className={isDarkMode ? "text-white" : "text-dark"}>
             {detalleVenta.map((item) => {
               return (
                 <tr key={item.id}>

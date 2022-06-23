@@ -3,6 +3,7 @@ import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { getProductsAsync } from "../../../services/ProductsApi";
+import { Table } from "react-bootstrap";
 
 import {
   deleteToken,
@@ -13,7 +14,6 @@ import {
 import {
   Autocomplete,
   TextField,
-  Container,
   Divider,
   Select,
   InputLabel,
@@ -31,6 +31,8 @@ import {
   faSave,
   faSpellCheck,
   faBarcode,
+  faCirclePlus,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { getStoresAsync } from "../../../services/AlmacenApi";
@@ -38,12 +40,19 @@ import {
   addProductMoverAsync,
   getProducExistanceAsync,
 } from "../../../services/ExistanceApi";
+import { isEmpty } from "lodash";
 
 const MoverProductoAdd = ({ setShowModal }) => {
   let ruta = getRuta();
 
-  const { reload, setReload, setIsLoading, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const {
+    isDarkMode,
+    reload,
+    setReload,
+    setIsLoading,
+    setIsLogged,
+    setIsDefaultPass,
+  } = useContext(DataContext);
   let navigate = useNavigate();
 
   const [storeList, setStoreList] = useState([]);
@@ -61,6 +70,8 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
   const [existenceDestino, setExistenceDestino] = useState([]);
   const [barCodeSearch, setBarCodeSearch] = useState(false);
+
+  const [productDetails, setProductDetails] = useState([]);
 
   const token = getToken();
 
@@ -125,13 +136,25 @@ const MoverProductoAdd = ({ setShowModal }) => {
   }, [reload]);
 
   const handleChangeProduct = async (newValue) => {
+    setSelectedProcedencia("");
+    setSelectedDestino("");
+    setSelectedProduct("");
+    setExistenceProcedencia("");
     if (existenceProcedencia === "") {
       setSelectedProduct(newValue);
       return;
     } else {
+      if (newValue === "" || newValue === null) {
+        setSelectedProduct(newValue);
+        return;
+      }
+
+      if (selectedProcedencia === "") {
+        return;
+      }
       setSelectedProduct(newValue);
       const data = {
-        idProduct: newValue.id,
+        idProduct: newValue ? newValue.id : "",
         idAlmacen: selectedProcedencia,
       };
       setIsLoading(true);
@@ -176,6 +199,9 @@ const MoverProductoAdd = ({ setShowModal }) => {
   };
 
   const handleChangeProcedencia = async (event) => {
+    if (selectedDestino === event.target.value) {
+      setSelectedDestino("");
+    }
     setSelectedProcedencia(event.target.value);
     const data = {
       idProduct: selectedProduct.id,
@@ -284,23 +310,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
   //Validando campos ingresados
   const validate = () => {
     let isValid = true;
-    if (selectedProduct === null || selectedProduct === "") {
-      toastError("Debe seleccionar un producto");
-      return (isValid = false);
-    }
-
-    if (existenceProcedencia === "") {
-      toastError("Debe seleccionar almacen de procedencia");
-      return (isValid = false);
-    }
-
-    if (existenceProcedencia === 0) {
-      toastError("No hay existencias de este producto en este almacen");
-      return (isValid = false);
-    }
-
     if (concepto === "") {
       toastError("Debe ingresar un concepto de traslado");
+      return (isValid = false);
+    }
+
+    if (productDetails.length === 0) {
+      toastError("Debe agregar al menos un producto para trasladar");
       return (isValid = false);
     }
     return isValid;
@@ -310,11 +326,8 @@ const MoverProductoAdd = ({ setShowModal }) => {
   const addMoverProdut = async () => {
     if (validate()) {
       const data = {
-        IdProducto: selectedProduct.id,
-        AlmacenProcedenciaId: selectedProcedencia,
-        AlmacenDestinoId: selectedDestino,
-        cantidad,
         concepto,
+        movmentDetails: productDetails,
       };
 
       if (cantidad > existenceProcedencia) {
@@ -357,13 +370,69 @@ const MoverProductoAdd = ({ setShowModal }) => {
     }
   };
 
+  const addToDetail = () => {
+    if (isEmpty(selectedProduct)) {
+      toastError("Seleccione un producto");
+      return;
+    }
+    if (selectedProcedencia === "") {
+      toastError("Seleccione el almacen de procedencia");
+      return;
+    }
+    if (selectedDestino === "") {
+      toastError("Seleccione el almacen de destino");
+      return;
+    }
+    if (cantidad === "" || cantidad === "0") {
+      toastError("Debe ingresar cantidad a trasladar");
+      return;
+    }
+
+    const { id, description } = selectedProduct;
+
+    const data = {
+      idProducto: id,
+      description,
+      cantidad,
+      almacenProcedenciaId: selectedProcedencia,
+      almacenDestinoId: selectedDestino,
+    };
+
+    setSelectedProduct("");
+    setSelectedProcedencia("");
+    setSelectedDestino("");
+    setCantidad("");
+
+    setProductDetails([...productDetails, data]);
+  };
+
+  const getStoreName = (id) => {
+    const result = storeList.filter((i) => i.almacen.id === id);
+    return result[0].almacen.name;
+  };
+
+  const deleteFromProductDetailList = (item) => {
+    const filtered = productDetails.filter((p) => p.id !== item.id);
+    setProductDetails(filtered);
+  };
+
   return (
     <div>
-      <Container>
-        <Divider />
+      <Divider />
 
-        <Grid container spacing={2} style={{ marginTop: 1 }}>
-          <Grid item sm={6}>
+      <Paper
+        elevation={10}
+        style={{
+          marginTop: 20,
+          borderRadius: 30,
+          padding: 20,
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid
+            item
+            sm={barCodeSearch ? (isEmpty(selectedProduct) ? 12 : 6) : 12}
+          >
             <div
               style={{
                 display: "flex",
@@ -447,22 +516,45 @@ const MoverProductoAdd = ({ setShowModal }) => {
                 </IconButton>
               </Tooltip>
             </div>
-
-            <TextField
-              variant="standard"
-              style={{
-                marginTop: 20,
-              }}
-              fullWidth
-              value={selectedProduct ? selectedProduct.description : ""}
-              label="Descripcion"
-              InputLabelProps={{
-                shrink: selectedProduct ? true : false,
-              }}
-              disabled
-            />
           </Grid>
 
+          {!isEmpty(selectedProduct) ? (
+            barCodeSearch ? (
+              <Grid item sm={6}>
+                <div
+                  style={{
+                    marginTop: 20,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignContent: "center",
+                  }}
+                >
+                  <span style={{ color: "#2196f3", marginRight: 10 }}>
+                    Producto:
+                  </span>
+                  <span>
+                    {selectedProduct ? selectedProduct.description : ""}
+                  </span>
+                </div>
+              </Grid>
+            ) : (
+              <></>
+            )
+          ) : (
+            <></>
+          )}
+        </Grid>
+      </Paper>
+
+      <Paper
+        elevation={10}
+        style={{
+          marginTop: 20,
+          borderRadius: 30,
+          padding: 20,
+        }}
+      >
+        <Grid container spacing={2}>
           <Grid item sm={6}>
             <FormControl
               variant="standard"
@@ -488,11 +580,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
                 })}
               </Select>
             </FormControl>
+          </Grid>
 
+          <Grid item sm={6}>
             <FormControl
               variant="standard"
               fullWidth
-              style={{ textAlign: "left", marginTop: 20 }}
+              style={{ textAlign: "left" }}
             >
               <InputLabel id="selDestino">Almacen Destino</InputLabel>
               <Select
@@ -514,74 +608,179 @@ const MoverProductoAdd = ({ setShowModal }) => {
               </Select>
             </FormControl>
           </Grid>
+
+          <Grid item sm={12}>
+            {selectedProcedencia !== "" || selectedDestino !== "" ? (
+              <Paper
+                elevation={10}
+                style={{
+                  borderRadius: 30,
+                  padding: 20,
+                }}
+              >
+                <Grid
+                  container
+                  spacing={2}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <Grid item sm={4}>
+                    {selectedProcedencia !== "" ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          alignContent: "center",
+                          marginBottom: 5,
+                        }}
+                      >
+                        <span style={{ color: "#2196f3", marginRight: 10 }}>
+                          Existencia Procedencia:
+                        </span>
+                        <span>{existenceProcedencia}</span>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
+                  <Grid item sm={4}>
+                    {selectedDestino !== "" ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <span style={{ color: "#2196f3", marginRight: 10 }}>
+                          Existencia Destino:
+                        </span>
+                        <span>{existenceDestino}</span>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
+
+                  {selectedProcedencia !== "" && selectedDestino !== "" ? (
+                    <Grid item sm={4}>
+                      <TextField
+                        variant="standard"
+                        fullWidth
+                        value={cantidad}
+                        onChange={(e) => funcCantidad(e)}
+                        label="Cantidad a Trasladar"
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+                </Grid>
+              </Paper>
+            ) : (
+              <></>
+            )}
+          </Grid>
         </Grid>
-
-        <Paper
-          elevation={10}
-          style={{
-            marginTop: 30,
-            borderRadius: 30,
-            padding: 20,
-          }}
-        >
-          <div className="row justify-content-around align-items-center">
-            <div className="col-sm-4 ">
-              <TextField
-                variant="standard"
-                fullWidth
-                disabled
-                value={existenceProcedencia}
-                label="Exist. Almacen Procedencia"
-              />
-            </div>
-
-            <div className="col-sm-4 ">
-              <TextField
-                variant="standard"
-                fullWidth
-                disabled
-                value={existenceDestino}
-                label="Existencias Almacen Destino"
-              />
-            </div>
-
-            <div className="col-sm-4 ">
-              <TextField
-                variant="standard"
-                fullWidth
-                value={cantidad}
-                onChange={(e) => funcCantidad(e)}
-                label="Cantidad a Trasladar"
-              />
-            </div>
-
-            <div className="col-sm-12">
-              <TextField
-                variant="standard"
-                fullWidth
-                multiline
-                value={concepto}
-                label="Concepto"
-                style={{ marginTop: 20, marginBottom: 20 }}
-                onChange={(e) => setConcepto(e.target.value.toUpperCase())}
-              />
-            </div>
-          </div>
-        </Paper>
 
         <Button
           variant="outlined"
-          style={{ borderRadius: 20, marginTop: 30 }}
+          style={{
+            borderRadius: 20,
+            marginTop: 10,
+            borderColor: "#ffc107",
+            color: "#ffc107",
+          }}
           fullWidth
-          onClick={() => addMoverProdut()}
+          onClick={() => addToDetail()}
         >
           <FontAwesomeIcon
             style={{ marginRight: 10, fontSize: 20 }}
-            icon={faSave}
+            icon={faCirclePlus}
           />
-          Mover Producto
+          Agregar al detalle
         </Button>
-      </Container>
+      </Paper>
+
+      <div
+        style={{
+          marginTop: 20,
+          display: "flex",
+          flexDirection: "row",
+          alignContent: "center",
+        }}
+      >
+        <h6>Detalle de Traslado</h6>
+      </div>
+
+      <Divider style={{ marginBottom: 20 }} />
+
+      <Table hover={!isDarkMode} size="sm" responsive className="text-primary">
+        <thead>
+          <tr>
+            <th style={{ textAlign: "center" }}>#</th>
+            <th style={{ textAlign: "left" }}>Producto</th>
+            <th style={{ textAlign: "center" }}>Procedencia</th>
+            <th style={{ textAlign: "center" }}>Cantidad</th>
+            <th style={{ textAlign: "center" }}>Destino</th>
+            <th style={{ textAlign: "center" }}>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+          {productDetails ? (
+            productDetails.map((item) => {
+              return (
+                <tr key={productDetails.indexOf(item) + 1}>
+                  <td style={{ textAlign: "center" }}>
+                    {productDetails.indexOf(item) + 1}
+                  </td>
+                  <td>{item.description}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {getStoreName(item.almacenProcedenciaId)}
+                  </td>
+                  <td style={{ textAlign: "center" }}>{item.cantidad}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {getStoreName(item.almacenDestinoId)}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    <IconButton
+                      style={{ color: "#f50057" }}
+                      onClick={() => deleteFromProductDetailList(item)}
+                    >
+                      <FontAwesomeIcon icon={faTrashAlt} />
+                    </IconButton>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <></>
+          )}
+        </tbody>
+      </Table>
+
+      <TextField
+        variant="standard"
+        fullWidth
+        multiline
+        value={concepto}
+        label="Concepto"
+        style={{ marginBottom: 20 }}
+        onChange={(e) => setConcepto(e.target.value.toUpperCase())}
+      />
+
+      <Button
+        variant="outlined"
+        style={{ borderRadius: 20, marginTop: 30 }}
+        fullWidth
+        onClick={() => addMoverProdut()}
+      >
+        <FontAwesomeIcon
+          style={{ marginRight: 10, fontSize: 20 }}
+          icon={faSave}
+        />
+        Mover Producto
+      </Button>
     </div>
   );
 };
