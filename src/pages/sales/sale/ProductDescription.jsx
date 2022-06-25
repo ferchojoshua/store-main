@@ -261,7 +261,7 @@ const ProductDescription = ({
                     marginRight: 10,
                   }}
                 >
-                  {selectedProduct
+                  {costoXProducto !== ""
                     ? costoXProducto.toLocaleString("es-NI", {
                         style: "currency",
                         currency: "NIO",

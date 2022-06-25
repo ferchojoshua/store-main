@@ -27,7 +27,6 @@ import { TrasladoDetails } from "./TrasladoDetails";
 const MoverProducto = () => {
   let ruta = getRuta();
 
-
   let navigate = useNavigate();
   const {
     isDarkMode,
@@ -188,10 +187,7 @@ const MoverProducto = () => {
         isVisible={showDetailsModal}
         setVisible={setShowDetailsModal}
       >
-        <TrasladoDetails
-          setShowModal={setShowDetailsModal}
-          selectedTransaction={selectedTransaction}
-        />
+        <TrasladoDetails selectedTransaction={selectedTransaction} />
       </MediumModal>
     </div>
   );

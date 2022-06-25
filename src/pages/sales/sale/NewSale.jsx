@@ -55,6 +55,31 @@ const NewSale = () => {
       toastError("Ingrese cantidad a comprar");
       return;
     }
+
+    const filtered = selectedProductList.filter(
+      (item) => item.product.id === producto.id
+    );
+
+    if (filtered.length > 0) {
+      let cantActual = parseInt(filtered[0].cantidad);
+      let cantNueva = parseInt(cantidad);
+      if (cantActual + cantNueva > selectedProduct.existencia) {
+        toastError("No vender mas de lo que hay en existencia");
+        setCantidad("");
+        return;
+      }
+      filtered[0].cantidad = cantActual + cantNueva;
+      filtered[0].costoTotal =
+        (cantActual + cantNueva) * filtered[0].costoUnitario;
+
+      setMontoVenta(montoVenta + costoXProducto);
+      setSelectedProduct("");
+      setCantidad("");
+      setDescuento("");
+      setcostoXProducto("");
+      return;
+    }
+
     const data = {
       product: producto,
       cantidad,
@@ -70,6 +95,7 @@ const NewSale = () => {
     setSelectedProduct("");
     setCantidad("");
     setDescuento("");
+    setcostoXProducto("");
     setSelectedProductList([...selectedProductList, data]);
   };
 

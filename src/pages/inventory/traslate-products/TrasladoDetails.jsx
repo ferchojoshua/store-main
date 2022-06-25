@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
-import { getProductsAsync } from "../../../services/ProductsApi";
+import { getRuta, toastError } from "../../../helpers/Helpers";
+
 import { Table } from "react-bootstrap";
 
 import {
@@ -11,53 +11,23 @@ import {
   getToken,
 } from "../../../services/Account";
 
-import {
-  Autocomplete,
-  TextField,
-  Divider,
-  Select,
-  InputLabel,
-  MenuItem,
-  FormControl,
-  Grid,
-  Button,
-  Paper,
-  Tooltip,
-  IconButton,
-} from "@mui/material";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSave,
-  faSpellCheck,
-  faBarcode,
-  faCirclePlus,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { Paper } from "@mui/material";
 
 import { getStoresAsync } from "../../../services/AlmacenApi";
-import {
-  addProductMoverAsync,
-  getProducExistanceAsync,
-} from "../../../services/ExistanceApi";
-import { isEmpty } from "lodash";
+
 import moment from "moment";
 
-export const TrasladoDetails = ({ setShowModal, selectedTransaction }) => {
+export const TrasladoDetails = ({ selectedTransaction }) => {
   const { concepto, fecha, id, movmentDetails, user } = selectedTransaction;
+
+  console.log(selectedTransaction);
   let ruta = getRuta();
   let navigate = useNavigate();
 
   const [storeList, setStoreList] = useState([]);
 
-  const {
-    isDarkMode,
-    reload,
-    setReload,
-    setIsLoading,
-    setIsLogged,
-    setIsDefaultPass,
-  } = useContext(DataContext);
+  const { isDarkMode, reload, setIsLoading, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
 
   const token = getToken();
 
