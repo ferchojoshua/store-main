@@ -32,7 +32,7 @@ const SelectClient = ({
   eventualClient,
   setEventualClient,
   typeClient,
-  setTypeClient,
+  onTypeClientChange,
 }) => {
 
     let ruta = getRuta();
@@ -90,7 +90,7 @@ const SelectClient = ({
               <Checkbox
                 size="medium"
                 checked={typeClient}
-                onChange={() => setTypeClient(!typeClient)}
+                onChange={() => onTypeClientChange(!typeClient)}
               />
             }
             label="Cliente Eventual"

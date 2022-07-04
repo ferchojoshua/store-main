@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -47,6 +47,18 @@ const NewSale = () => {
   const [montoVenta, setMontoVenta] = useState(0);
 
   const [barCodeSearch, setBarCodeSearch] = useState(false);
+
+  useEffect(() => {
+    setTypeClient(true);
+    setTypeVenta("contado");
+  }, []);
+
+  const onTypeClientChange = (value) => {
+    setTypeClient(value);
+    if (value) {
+      setTypeVenta("contado");
+    }
+  };
 
   const addToProductList = () => {
     const { precioVentaDetalle, precioVentaMayor, producto, almacen } =
@@ -178,7 +190,7 @@ const NewSale = () => {
                 eventualClient={eventualClient}
                 setEventualClient={setEventualClient}
                 typeClient={typeClient}
-                setTypeClient={setTypeClient}
+                onTypeClientChange={onTypeClientChange}
               />
 
               <SelectProduct

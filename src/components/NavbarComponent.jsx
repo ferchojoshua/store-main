@@ -20,6 +20,8 @@ import {
   faLocationDot,
   faSun,
   faMoon,
+  faMoneyBillTransfer,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import {
@@ -36,6 +38,8 @@ import {
   toastError,
 } from "../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
+
+
 
 const NavbarComponent = () => {
   let ruta = getRuta();
@@ -207,6 +211,25 @@ const NavbarComponent = () => {
             ) : (
               <></>
             )}
+
+            <Nav.Link
+              style={{
+                fontWeight: active === "traslate-products" ? "bold" : "",
+                color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                fontSize: 17,
+              }}
+              eventKey="admon"
+              as={Link}
+              to={`${ruta}/admon`}
+            >
+              
+              <FontAwesomeIcon
+                icon={faBook}
+                style={{ marginRight: 10 }}
+                className={active === "admon" ? "fa-beat-fade" : ""}
+              />
+              Contabilidad
+            </Nav.Link>
 
             {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
               <Nav.Link

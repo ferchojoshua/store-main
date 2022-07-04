@@ -64,6 +64,11 @@ const AddRol = ({ setShowModal }) => {
   const [productsUpdate, setProductsUpdate] = useState(false);
   const [productsDelete, setProductsDelete] = useState(false);
 
+  const [contVer, setContVer] = useState(false);
+  const [contCreate, setContCreate] = useState(false);
+  const [contUpdate, setContUpdate] = useState(false);
+  const [contDelete, setContDelete] = useState(false);
+
   const [userVer, setUserVer] = useState(false);
   const [userCreate, setUserCreate] = useState(false);
   const [userUpdate, setUserUpdate] = useState(false);
@@ -117,6 +122,11 @@ const AddRol = ({ setShowModal }) => {
     setProductsCreate(!isFullAccess);
     setProductsUpdate(!isFullAccess);
     setProductsDelete(!isFullAccess);
+
+    setContVer(!isFullAccess);
+    setContCreate(!isFullAccess);
+    setContUpdate(!isFullAccess);
+    setContDelete(!isFullAccess);
 
     setUserVer(!isFullAccess);
     setUserCreate(!isFullAccess);
@@ -250,6 +260,25 @@ const AddRol = ({ setShowModal }) => {
           description: "PRODUCTS DELETE",
           IsEnable: rolesDelete,
         },
+
+        //Contabilidad
+        {
+          description: "CONT VER",
+          IsEnable: contVer,
+        },
+        {
+          description: "CONT CREATE",
+          IsEnable: contCreate,
+        },
+        {
+          description: "CONT UPDATE",
+          IsEnable: contUpdate,
+        },
+        {
+          description: "CONT DELETE",
+          IsEnable: contDelete,
+        },
+
         //Usuario
         {
           description: "USER VER",
@@ -652,6 +681,82 @@ const AddRol = ({ setShowModal }) => {
                         />
                       }
                       label="Crear"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Paper>
+
+          {/* Modulo Contabilidad */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <div className="row justify-content-around align-items-center">
+              <div className="col-sm-12 ">
+                <Typography
+                  style={{
+                    fontSize: 17,
+                    color: "#2196f3",
+                    fontWeight: 800,
+                    textAlign: "center",
+                  }}
+                >
+                  Modulo Contabilidad
+                </Typography>
+                <Divider />
+                <div className="row justify-content-around align-items-center">
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={contVer}
+                          onChange={() => setContVer(!contVer)}
+                        />
+                      }
+                      label="Ver"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={contCreate}
+                          onChange={() => setContCreate(!contCreate)}
+                        />
+                      }
+                      label="Crear"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={contUpdate}
+                          onChange={() => setContUpdate(!contUpdate)}
+                        />
+                      }
+                      label="Editar"
+                    />
+                  </div>
+                  <div className="col-sm-3 ">
+                    <FormControlLabel
+                      labelPlacement="top"
+                      control={
+                        <Checkbox
+                          checked={contDelete}
+                          onChange={() => setContDelete(!contDelete)}
+                        />
+                      }
+                      label="Eliminar"
                     />
                   </div>
                 </div>

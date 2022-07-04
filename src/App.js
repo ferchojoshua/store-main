@@ -42,6 +42,8 @@ import Municipalities from "./pages/settings/locations/municipalities/Municipali
 import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
+import AdmonContainer from "./pages/admon/AdmonContainer";
+import { NoConectionServer } from "./components/errorPages/NoConectionServer";
 
 function App() {
   let ruta = getRuta();
@@ -159,6 +161,9 @@ function App() {
                   element={<EntradaProductoDetails />}
                 />
 
+                {/* Rutas Administration */}
+                <Route path={`${ruta}/admon`} element={<AdmonContainer />} />
+
                 {/* Rutas Seguridad */}
                 <Route
                   path={`${ruta}/security`}
@@ -192,8 +197,11 @@ function App() {
 
                 {/* Rutas Error */}
                 <Route path={`${ruta}/unauthorized`} element={<Page401 />} />
+                <Route
+                  path={`${ruta}/noServerConecction`}
+                  element={<NoConectionServer />}
+                />
                 <Route path={`${ruta}/*`} element={<NotFound />} />
-                {/* <Route path="/entrada/:id" element={<EntradaProductoDetails />} /> */}
               </Routes>
 
               <Loading />
