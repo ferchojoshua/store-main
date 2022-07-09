@@ -11,7 +11,7 @@ import {
   toastError,
   toastSuccess,
 } from "../../../helpers/Helpers";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import { Button, IconButton, TextField, InputAdornment } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
@@ -27,7 +27,7 @@ import {
   deleteToken,
   deleteUserData,
 } from "../../../services/Account";
-import MediumModal from "../../../components/modals/MediumModal";
+
 import {
   deleteCountAsync,
   getCuentasAsync,

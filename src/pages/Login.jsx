@@ -12,11 +12,12 @@ import {
   TextField,
   Divider,
 } from "@mui/material";
-import { faUserLock } from "@fortawesome/free-solid-svg-icons";
+import animation from "../components/media/animations/login.json";
 
 import background from "../components/media/img1Encab.png";
 import { createTokenAsync } from "../services/Account";
 import { navigatorVersion, oSVersion, simpleMessage } from "../helpers/Helpers";
+import Lottie from "react-lottie";
 
 function Copyright(props) {
   return (
@@ -60,6 +61,12 @@ const Login = () => {
     setIsLoading(false);
   };
 
+  const defaultOptions = {
+    loop: true,
+    autoPlay: true,
+    animationData: animation,
+  };
+
   return (
     <div>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -93,7 +100,7 @@ const Login = () => {
             <Avatar
               sx={{ m: 1, bgcolor: "secondary.main", width: 70, height: 70 }}
             >
-              <FontAwesomeIcon style={{ fontSize: 40 }} icon={faUserLock} />
+              <Lottie options={defaultOptions} style={{ width: 500 }} />
             </Avatar>
             <Typography component="h1" variant="h5">
               Iniciar sesion

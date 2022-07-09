@@ -462,7 +462,7 @@ const EntradaProductoDetails = () => {
       </Container>
 
       <MediumModal
-        titulo={`Editar Detalle Producto #:${selectedDetail.id}`}
+        titulo={`Editar Detalle Producto #: ${selectedDetail.id}`}
         isVisible={showModal}
         setVisible={setShowModal}
       >

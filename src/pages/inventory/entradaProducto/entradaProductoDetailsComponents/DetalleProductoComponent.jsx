@@ -187,7 +187,7 @@ const DetalleProductoComponent = ({ selectedDetail, editDetail }) => {
   };
 
   return (
-    <div style={{ width: 700 }}>
+    <div>
       <Divider />
       <Typography
         variant="h5"

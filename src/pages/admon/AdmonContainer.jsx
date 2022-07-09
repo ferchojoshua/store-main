@@ -8,6 +8,7 @@ import {
   faCartFlatbed,
   faDollyBox,
   faLeftRight,
+  faListCheck,
   faListOl,
   faTruckRampBox,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +17,7 @@ import { Container } from "react-bootstrap";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
 import { CountList } from "./counts/CountList";
+import { AsientoList } from "./asientosContable/AsientoList";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -73,21 +75,15 @@ const AdmonContainer = () => {
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
           />
-          {/* {isAccess(access, "ENTRADAPRODUCTOS VER") ? (
-            <Tab
-              icon={
-                <FontAwesomeIcon
-                  icon={faTruckRampBox}
-                  style={{ fontSize: 20 }}
-                />
-              }
-              label="Entrada de Producto"
-              {...a11yProps(0)}
-              style={{ fontSize: 12 }}
-            />
-          ) : (
-            ""
-          )} */}
+
+          <Tab
+            icon={
+              <FontAwesomeIcon icon={faListCheck} style={{ fontSize: 20 }} />
+            }
+            label="Diario General"
+            {...a11yProps(0)}
+            style={{ fontSize: 12 }}
+          />
 
           {/* {isAccess(access, "EXISTANCE VER") ? (
             <Tab
@@ -136,6 +132,10 @@ const AdmonContainer = () => {
 
         <TabPanel value={value} index={0}>
           <CountList />
+        </TabPanel>
+
+        <TabPanel value={value} index={1}>
+          <AsientoList />
         </TabPanel>
       </Paper>
     </Container>

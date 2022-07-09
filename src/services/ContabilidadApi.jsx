@@ -34,6 +34,32 @@ export const getCuentasAsync = async (token) => {
   return result;
 };
 
+export const getAsientosContAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetAsientosContables`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
 export const getCountGroupAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetCountGroup`;

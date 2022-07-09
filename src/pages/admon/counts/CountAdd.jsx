@@ -71,7 +71,7 @@ export const CountAdd = ({ setShowModal }) => {
   }, []);
 
   const countNumb = (value) => {
-    if (/^[0-9]+$/.test(value.toString()) || value === "") {
+    if (/^[0-9,.]+$/.test(value.toString()) || value === "") {
       setCountNumber(value);
       return;
     }
