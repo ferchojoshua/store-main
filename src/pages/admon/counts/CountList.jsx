@@ -131,6 +131,7 @@ export const CountList = () => {
         (async () => {
           setIsLoading(true);
           const result = await deleteCountAsync(token, item.id);
+
           if (!result.statusResponse) {
             setIsLoading(false);
             if (result.error.request.status === 401) {
@@ -154,10 +155,11 @@ export const CountList = () => {
             setIsDefaultPass(true);
             return;
           }
+          return;
         })();
         setIsLoading(false);
         setReload(!reload);
-        toastSuccess("Cuenta Eliminado!");
+        toastSuccess("Cuenta Eliminad!");
       }
     });
   };
@@ -224,7 +226,7 @@ export const CountList = () => {
           >
             <thead>
               <tr>
-                <th>#.Cuenta</th>
+                <th style={{ textAlign: "left" }}>#.Cuenta</th>
                 <th style={{ textAlign: "left" }}>Nombre Cuenta</th>
                 <th style={{ textAlign: "center" }}>Clasficacion</th>
                 <th style={{ width: 150 }}>Acciones</th>
@@ -234,7 +236,7 @@ export const CountList = () => {
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
-                    <td>{item.countNumber}</td>
+                    <td style={{ textAlign: "left" }}>{item.countNumber}</td>
                     <td style={{ textAlign: "left" }}>{item.descripcion}</td>
                     <td style={{ textAlign: "center" }}>
                       {item.countGroup.description}

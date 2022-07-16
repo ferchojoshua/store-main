@@ -113,15 +113,15 @@ export const addCountAsync = async (token, data) => {
 
 export const deleteCountAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
-
+  let service = `${controller}DeleteCuenta/`;
   const authAxios = axios.create({
-    baseURL: controller,
+    baseURL: service,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
   try {
-    await authAxios.delete(controller + id).then((resp) => {
+    await authAxios.post(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -131,7 +131,6 @@ export const deleteCountAsync = async (token, id) => {
       }
     });
   } catch (error) {
-    console.log(error);
     result.statusResponse = false;
     result.error = error;
   }
@@ -148,6 +147,84 @@ export const updateCountAsync = async (token, data) => {
   });
   try {
     await authAxios.put(controller, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const addAsientoContableAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}AddAsientoContable`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getCountLibrosAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetCountLibros`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const getCountFuentesContablesAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetCountFuentesContables`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;

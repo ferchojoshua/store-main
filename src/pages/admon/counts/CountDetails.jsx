@@ -79,7 +79,7 @@ export const CountDetails = ({ selectedCount, setShowModal }) => {
   let ruta = getRuta();
 
   const countNumb = (value) => {
-    if (/^[0-9]+$/.test(value.toString()) || value === "") {
+    if (/^[0-9,.]+$/.test(value.toString()) || value === "") {
       setNewCountNumber(value);
       return;
     }
@@ -88,12 +88,12 @@ export const CountDetails = ({ selectedCount, setShowModal }) => {
   const saveChangesAsync = async () => {
     const data = {
       id,
-      countNumber,
+      countNumber: newCountNumber,
       description,
       idCountGroup: clasificationSelected,
     };
 
-    if (countNumber.length === 0) {
+    if (newCountNumber.length === 0) {
       toastError("Ingrese un numero de cuenta...");
       return;
     }

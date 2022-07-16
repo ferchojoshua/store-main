@@ -5,12 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import {
-  getRuta,
-  isAccess,
-  toastError,
-  toastSuccess,
-} from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import {
   Button,
   IconButton,
@@ -22,10 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
   faExternalLinkAlt,
-  faSearch,
-  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
 import NoData from "../../../components/NoData";
 import {
@@ -34,20 +26,16 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 
-import {
-  deleteCountAsync,
-  getAsientosContAsync,
-  getCuentasAsync,
-} from "../../../services/ContabilidadApi";
-import SmallModal from "../../../components/modals/SmallModal";
+import { getAsientosContAsync } from "../../../services/ContabilidadApi";
+import MediumModal from "../../../components/modals/MediumModal";
 import moment from "moment";
-import { AsientosContablesComponent } from "../../../components/AsientosContablesComponent";
+import { AddAsientoContable } from "./AddAsientoContable";
 
 export const AsientoList = () => {
+  const [showModal, setShowModal] = useState(false);
   const {
     isDarkMode,
     reload,
-    setReload,
     setIsLoading,
     setIsDefaultPass,
     setIsLogged,
@@ -115,8 +103,7 @@ export const AsientoList = () => {
               style={{ borderRadius: 20 }}
               startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
               onClick={() => {
-                console.log("Agregar Asiento");
-                // setShowModal(true);
+                setShowModal(true);
               }}
             >
               Agregar Asiento Contable
@@ -153,12 +140,9 @@ export const AsientoList = () => {
                 const {
                   countAsientoContableDetails,
                   fecha,
-                  fuenteContable,
                   id,
                   libroContable,
                   referencia,
-                  store,
-                  user,
                 } = item;
                 return (
                   <tr key={id}>
@@ -192,7 +176,13 @@ export const AsientoList = () => {
                           {countAsientoContableDetails.map((i) => {
                             return (
                               <tr key={i.id}>
-                                <td style={{ textAlign: "center" }}>
+                                <td
+                                  style={{
+                                    textAlign: "center",
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: "#2196f3",
+                                  }}
+                                >
                                   {i.cuenta.countNumber}
                                 </td>
                               </tr>
@@ -216,28 +206,39 @@ export const AsientoList = () => {
                           {countAsientoContableDetails.map((i) => {
                             return (
                               <tr key={i.id}>
-                                <td style={{ textAlign: "left" }}>
+                                <td
+                                  style={{
+                                    textAlign: "left",
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: "#2196f3",
+                                  }}
+                                >
                                   {i.cuenta.descripcion}
                                 </td>
                               </tr>
                             );
                           })}
                           <tr>
-                            <td style={{ textAlign: "left" }}>{referencia}</td>
+                            <td
+                              style={{
+                                textAlign: "left",
+                                fontWeight: "bold",
+                                color: "#ffc107",
+                              }}
+                            >
+                              {referencia}
+                            </td>
                           </tr>
                         </tbody>
                       </Table>
                     </td>
 
-                    <td
-                      style={{ textAlign: "center", verticalAlign: "middle" }}
-                    >
+                    <td style={{ textAlign: "center" }}>
                       <Table
                         hover={!isDarkMode}
                         size="sm"
                         responsive
                         className="text-primary"
-                        borderless
                       >
                         <tbody
                           className={isDarkMode ? "text-white" : "text-dark"}
@@ -245,7 +246,13 @@ export const AsientoList = () => {
                           {countAsientoContableDetails.map((i) => {
                             return (
                               <tr key={i.id}>
-                                <td style={{ textAlign: "center" }}>
+                                <td
+                                  style={{
+                                    textAlign: "center",
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: "#2196f3",
+                                  }}
+                                >
                                   {new Intl.NumberFormat("es-NI", {
                                     style: "currency",
                                     currency: "NIO",
@@ -258,15 +265,12 @@ export const AsientoList = () => {
                       </Table>
                     </td>
 
-                    <td
-                      style={{ textAlign: "center", verticalAlign: "middle" }}
-                    >
+                    <td style={{ textAlign: "center" }}>
                       <Table
                         hover={!isDarkMode}
                         size="sm"
                         responsive
                         className="text-primary"
-                        borderless
                       >
                         <tbody
                           className={isDarkMode ? "text-white" : "text-dark"}
@@ -274,7 +278,13 @@ export const AsientoList = () => {
                           {countAsientoContableDetails.map((i) => {
                             return (
                               <tr key={i.id}>
-                                <td style={{ textAlign: "center" }}>
+                                <td
+                                  style={{
+                                    textAlign: "center",
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: "#2196f3",
+                                  }}
+                                >
                                   {new Intl.NumberFormat("es-NI", {
                                     style: "currency",
                                     currency: "NIO",
@@ -293,6 +303,14 @@ export const AsientoList = () => {
           </Table>
         )}
       </Container>
+
+      <MediumModal
+        titulo={"Agregar Asiento Contable"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <AddAsientoContable setShowModal={setShowModal} />
+      </MediumModal>
     </div>
   );
 };

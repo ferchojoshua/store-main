@@ -116,6 +116,10 @@ function App() {
     },
   });
 
+  window.addEventListener("beforeunload", function (event) {
+    event.returnValue = "\o/";
+  });
+
   if (isLogged === null || isDefaultPass === null || access === []) {
     return <Loading />;
   }

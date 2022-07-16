@@ -178,7 +178,7 @@ export const TrasladoDetails = ({ selectedTransaction }) => {
             <span
               style={{ color: "#2196f3", marginRight: 10, fontWeight: "bold" }}
             >
-              Cencepto:
+              Concepto:
             </span>
             <span>{concepto}</span>
           </div>
