@@ -93,7 +93,7 @@ export const putProductInAsync = async (token, data) => {
     },
   });
   try {
-    await authAxios.put(service, data).then((resp) => {
+    await authAxios.post(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;

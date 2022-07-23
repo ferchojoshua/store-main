@@ -16,7 +16,7 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCircleArrowLeft,
+  faCircleChevronLeft,
   faSave,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
@@ -249,7 +249,7 @@ const AddEntradaProducto = () => {
             >
               <FontAwesomeIcon
                 style={{ marginRight: 10, fontSize: 20 }}
-                icon={faCircleArrowLeft}
+                icon={faCircleChevronLeft}
               />
               Regresar
             </Button>

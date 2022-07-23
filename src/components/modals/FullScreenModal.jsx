@@ -5,16 +5,22 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import CloseIcon from "@mui/icons-material/Close";
+
 import Slide from "@mui/material/Slide";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobeAmericas } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleXmark,
+  faGlobeAmericas,
+} from "@fortawesome/free-solid-svg-icons";
+import { DataContext } from "../../context/DataContext";
+import { useContext } from "react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const FullScreenModal = ({ titulo, children, setOpen, open }) => {
+  const { title } = useContext(DataContext);
   const handleClose = () => {
     setOpen(false);
   };
@@ -23,31 +29,42 @@ const FullScreenModal = ({ titulo, children, setOpen, open }) => {
       <Dialog
         fullScreen
         open={open}
-        onClose={() => handleClose}
+        onClose={() => handleClose()}
         TransitionComponent={Transition}
       >
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
-            <FontAwesomeIcon icon={faGlobeAmericas} style={{ fontSize: 30 }} />
+            <img
+              loading="lazy"
+              src={require("../media/Icono.png")}
+              alt="logo"
+              style={{ height: 40 }}
+            />
             <Typography
               sx={{ ml: 2, flex: 1, textAlign: "center" }}
               variant="h4"
               component="div"
             >
-             Aca va un titulo
+              {`${title} - Chinandega`}
             </Typography>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={handleClose}
+              onClick={() => handleClose()}
               aria-label="close"
             >
-              <CloseIcon />
+              <FontAwesomeIcon
+                icon={faCircleXmark}
+                style={{ color: "#ff9800" }}
+              />
             </IconButton>
           </Toolbar>
         </AppBar>
         <Typography
-          sx={{ textAlign: "center", marginTop: 3 }}
+          sx={{
+            textAlign: "center",
+            marginTop: 3,
+          }}
           variant="h5"
           component="div"
         >

@@ -20,10 +20,10 @@ import {
   faLocationDot,
   faSun,
   faMoon,
-  faMoneyBillTransfer,
   faBook,
+  faBell,
 } from "@fortawesome/free-solid-svg-icons";
-import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import { Divider, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import {
   changeThemeAsync,
   deleteToken,
@@ -38,8 +38,6 @@ import {
   toastError,
 } from "../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
-
-
 
 const NavbarComponent = () => {
   let ruta = getRuta();
@@ -106,6 +104,19 @@ const NavbarComponent = () => {
     }
     setIsLogged(false);
     setTitle("Auto&Moto");
+  };
+
+  const [anchorElNot, setAnchorElNot] = useState(null);
+  const openNotifications = Boolean(anchorElNot);
+  const handleClickNot = (event) => {
+    setAnchorElNot(event.currentTarget);
+  };
+  const handleCloseNot = () => {
+    setAnchorElNot(null);
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   return (
@@ -212,25 +223,27 @@ const NavbarComponent = () => {
               <></>
             )}
 
-            <Nav.Link
-              style={{
-                fontWeight: active === "traslate-products" ? "bold" : "",
-                color: active === "admon" ? "#bbdefb" : "#9e9e9e",
-                fontSize: 17,
-              }}
-              eventKey="admon"
-              as={Link}
-              to={`${ruta}/admon`}
-            >
-              
-              <FontAwesomeIcon
-                icon={faBook}
-                style={{ marginRight: 10 }}
-                className={active === "admon" ? "fa-beat-fade" : ""}
-              />
-              Contabilidad
-            </Nav.Link>
-
+            {isAccess(access, "CONT VER") ? (
+              <Nav.Link
+                style={{
+                  fontWeight: active === "traslate-products" ? "bold" : "",
+                  color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                eventKey="admon"
+                as={Link}
+                to={`${ruta}/admon`}
+              >
+                <FontAwesomeIcon
+                  icon={faBook}
+                  style={{ marginRight: 10 }}
+                  className={active === "admon" ? "fa-beat-fade" : ""}
+                />
+                Contabilidad
+              </Nav.Link>
+            ) : (
+              <></>
+            )}
             {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
               <Nav.Link
                 style={{
@@ -318,6 +331,66 @@ const NavbarComponent = () => {
               )}
             </NavDropdown>
           </Nav>
+
+          <Tooltip title="Notificaciones">
+            <IconButton
+              onClick={handleClickNot}
+              sx={{ mr: 1, width: 40 }}
+              aria-controls={openNotifications ? "account-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openNotifications ? "true" : undefined}
+            >
+              <FontAwesomeIcon icon={faBell} style={{ color: "#ffc107" }} />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            anchorEl={anchorElNot}
+            id="account-menu"
+            open={openNotifications}
+            onClose={handleCloseNot}
+            onClick={handleCloseNot}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem style={{ display: "flex", justifyContent: "center" }}>
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+                Notificaciones
+              </span>
+            </MenuItem>
+            <Divider />
+            <MenuItem>
+              {/* <ListItemIcon> */}
+              {/* <PersonAdd fontSize="small" /> */}
+              {/* </ListItemIcon> */}
+              Add another account
+            </MenuItem>
+          </Menu>
 
           <div>
             <a

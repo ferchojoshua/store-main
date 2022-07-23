@@ -15,7 +15,13 @@ import {
   deleteProductAsync,
   getProductsAsync,
 } from "../../../services/ProductsApi";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Stack,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBoxesPacking,
@@ -264,10 +270,10 @@ const Products = () => {
             <thead>
               <tr>
                 <th>#</th>
-                <th style={{ textAlign: "left" }}>T. Negocio</th>
+                <th style={{ textAlign: "center" }}>T. Negocio</th>
                 <th style={{ textAlign: "left" }}>Familia</th>
                 <th style={{ textAlign: "left" }}>Descripcion</th>
-                <th style={{ textAlign: "left" }}>C. Barras</th>
+                <th style={{ textAlign: "center" }}>C. Barras</th>
                 <th style={{ textAlign: "left" }}>Marca</th>
                 <th style={{ textAlign: "left" }}>Modelo</th>
                 <th style={{ textAlign: "left" }}>U/M</th>
@@ -296,30 +302,32 @@ const Products = () => {
                     <td style={{ textAlign: "left" }}>{item.modelo}</td>
                     <td style={{ textAlign: "left" }}>{item.um}</td>
                     <td>
-                      {isAccess(access, "PRODUCTS UPDATE") ? (
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedProduct(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                      ) : (
-                        <></>
-                      )}
+                      <Stack spacing={1} direction="row">
+                        {isAccess(access, "PRODUCTS UPDATE") ? (
+                          <IconButton
+                            style={{ color: "#009688" }}
+                            onClick={() => {
+                              setSelectedProduct(item);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
 
-                      {isAccess(access, "PRODUCTS DELETE") ? (
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteProduct(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      ) : (
-                        <></>
-                      )}
+                        {isAccess(access, "PRODUCTS DELETE") ? (
+                          <IconButton
+                            style={{ color: "#f50057" }}
+                            onClick={() => deleteProduct(item)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
+                      </Stack>
                     </td>
                   </tr>
                 );

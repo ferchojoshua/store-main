@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import {
   TextField,
   Button,
-  Divider,
   Container,
   InputLabel,
   Select,
@@ -117,12 +116,12 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
   const saveChangesAsync = async () => {
     const data = {
       id: selectedProduct.id,
-      TipoNegocioId: selectedTipoNegocio,
-      FamiliaId: selectedFamilia,
+      tipoNegocioId: selectedTipoNegocio,
+      familiaId: selectedFamilia,
       description: description,
       barCode: barCode,
-      marca: marca,
-      modelo: modelo,
+      marca: marca === "" ? "S/M" : marca,
+      modelo: modelo === "" ? "S/M" : modelo,
       uM: uM,
     };
 

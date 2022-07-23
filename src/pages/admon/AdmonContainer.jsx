@@ -10,6 +10,7 @@ import {
   faLeftRight,
   faListCheck,
   faListOl,
+  faScroll,
   faTruckRampBox,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
@@ -18,6 +19,7 @@ import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
 import { CountList } from "./counts/CountList";
 import { AsientoList } from "./asientosContable/AsientoList";
+import { ReportsContainer } from "./Reports/ReportsContainer";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -85,6 +87,13 @@ const AdmonContainer = () => {
             style={{ fontSize: 12 }}
           />
 
+          <Tab
+            icon={<FontAwesomeIcon icon={faScroll} style={{ fontSize: 20 }} />}
+            label="Reportes"
+            {...a11yProps(0)}
+            style={{ fontSize: 12 }}
+          />
+
           {/* {isAccess(access, "EXISTANCE VER") ? (
             <Tab
               icon={
@@ -136,6 +145,10 @@ const AdmonContainer = () => {
 
         <TabPanel value={value} index={1}>
           <AsientoList />
+        </TabPanel>
+
+        <TabPanel value={value} index={2}>
+          <ReportsContainer />
         </TabPanel>
       </Paper>
     </Container>

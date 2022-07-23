@@ -55,16 +55,27 @@ export const Especialidad = ({ selectedStore }) => {
     labels: data.map((item) => item.tn),
     datasets: [
       {
-        label: "# of Votes",
-        data: data.map((item) => item.contador),
+        data: data.map((item) => {
+          return item.contador;
+        }),
         backgroundColor: [
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
+          isEmpty(carros)
+            ? isEmpty(motos)
+              ? "rgba(255, 99, 132, 0.2)"
+              : "rgba(153, 102, 255, 0.2)"
+            : "rgba(255, 159, 64, 0.2)",
+          isEmpty(motos)
+            ? "rgba(255, 99, 132, 0.2)"
+            : "rgba(153, 102, 255, 0.2)",
           "rgba(255, 99, 132, 0.2)",
         ],
         borderColor: [
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
+          isEmpty(carros)
+            ? isEmpty(motos)
+              ? "rgba(255, 99, 132, 1)"
+              : "rgba(153, 102, 255, 1)"
+            : "rgba(255, 159, 64, 1)",
+          isEmpty(motos) ? "rgba(255, 99, 132, 1)" : "rgba(153, 102, 255, 1)",
           "rgba(255, 99, 132, 1)",
         ],
         borderWidth: 1,
@@ -76,66 +87,72 @@ export const Especialidad = ({ selectedStore }) => {
     <div>
       <Typography variant="h6">Ventas por Especialidad</Typography>
 
-      <Grid container spacing={2} style={{ marginTop: 3 }}>
-        <Grid item xs={4} sm={7} md={7}>
-          <Doughnut
-            data={graphicData}
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      let label = context.label || "";
-                      if (label) {
-                        label += ": ";
-                      }
-                      if (context.parsed !== null) {
-                        label +=
-                          Math.round((context.parsed / total) * 100) + "%";
-                      }
-                      return label;
+      {isEmpty(data) ? (
+        <div style={{ marginTop: 20 }}>
+          <NoData />
+        </div>
+      ) : (
+        <Grid container spacing={2} style={{ marginTop: 3 }}>
+          <Grid item xs={4} sm={7} md={7}>
+            <Doughnut
+              data={graphicData}
+              options={{
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        let label = context.label || "";
+                        if (label) {
+                          label += ": ";
+                        }
+                        if (context.parsed !== null) {
+                          label +=
+                            Math.round((context.parsed / total) * 100) + "%";
+                        }
+                        return label;
+                      },
                     },
                   },
+                  legend: { display: false },
                 },
-                legend: { display: false },
-              },
-            }}
-          />
-        </Grid>
-        <Grid item xs={8} sm={5} md={5}>
-          <div style={{ marginTop: 20 }}>
-            <Typography variant="body1">Motos</Typography>
-            <Typography
-              variant="body2"
-              style={{ color: "rgba(153, 102, 255, 1)", fontWeight: "bold" }}
-            >
-              {!isEmpty(motos)
-                ? `${Math.round((motos[0].contador / total) * 100)}%`
-                : "0%"}
-            </Typography>
+              }}
+            />
+          </Grid>
+          <Grid item xs={8} sm={5} md={5}>
+            <div style={{ marginTop: 20 }}>
+              <Typography variant="body1">Motos</Typography>
+              <Typography
+                variant="body2"
+                style={{ color: "rgba(153, 102, 255, 1)", fontWeight: "bold" }}
+              >
+                {!isEmpty(motos)
+                  ? `${Math.round((motos[0].contador / total) * 100)}%`
+                  : "0%"}
+              </Typography>
 
-            <Typography variant="body1">Carros</Typography>
-            <Typography
-              variant="body2"
-              style={{ color: "rgba(255, 159, 64, 1)", fontWeight: "bold" }}
-            >
-              {!isEmpty(carros)
-                ? `${Math.round((carros[0].contador / total) * 100)}%`
-                : "0%"}
-            </Typography>
+              <Typography variant="body1">Carros</Typography>
+              <Typography
+                variant="body2"
+                style={{ color: "rgba(255, 159, 64, 1)", fontWeight: "bold" }}
+              >
+                {!isEmpty(carros)
+                  ? `${Math.round((carros[0].contador / total) * 100)}%`
+                  : "0%"}
+              </Typography>
 
-            <Typography variant="body1">Lubricantes</Typography>
-            <Typography
-              variant="body2"
-              style={{ color: "rgba(255, 99, 132, 1)", fontWeight: "bold" }}
-            >
-              {!isEmpty(lub)
-                ? `${Math.round((lub[0].contador / total) * 100)}%`
-                : "0%"}
-            </Typography>
-          </div>
+              <Typography variant="body1">Lubricantes</Typography>
+              <Typography
+                variant="body2"
+                style={{ color: "rgba(255, 99, 132, 1)", fontWeight: "bold" }}
+              >
+                {!isEmpty(lub)
+                  ? `${Math.round((lub[0].contador / total) * 100)}%`
+                  : "0%"}
+              </Typography>
+            </div>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </div>
   );
 };

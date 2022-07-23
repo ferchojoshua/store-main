@@ -32,14 +32,14 @@ const VisitedClients = ({ selectedStore }) => {
       setIsLoading(false);
       setData(result.data);
       setTotal(sum(result.data));
+      console.log(result.data);
     })();
   }, [selectedStore]);
 
   const graphicData = {
-    labels: ["Existente", "Nuevo", "Potencial"],
+    labels: ["Recurente", "Nuevo", "Potencial"],
     datasets: [
       {
-        label: "# of Votes",
         data,
         backgroundColor: [
           "rgba(75, 192, 192, 0.2)",

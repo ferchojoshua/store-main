@@ -44,6 +44,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import AdmonContainer from "./pages/admon/AdmonContainer";
 import { NoConectionServer } from "./components/errorPages/NoConectionServer";
+import { serverMessages } from "./services/SignalRService";
 
 function App() {
   let ruta = getRuta();
@@ -104,9 +105,12 @@ function App() {
       setIsDefaultPass(false);
       setIsLogged(true);
       setIsLoading(false);
+
+      const notifications = serverMessages();
     })();
     setUser(user);
     setIsLogged(true);
+
     setIsLoading(false);
   }, [isLogged]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -117,7 +121,7 @@ function App() {
   });
 
   window.addEventListener("beforeunload", function (event) {
-    event.returnValue = "\o/";
+    event.returnValue = "o/";
   });
 
   if (isLogged === null || isDefaultPass === null || access === []) {

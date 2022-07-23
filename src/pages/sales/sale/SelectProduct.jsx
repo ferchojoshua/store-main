@@ -45,7 +45,6 @@ const SelectProduct = ({
   const token = getToken();
 
   const [storeList, setStoreList] = useState([]);
-
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {

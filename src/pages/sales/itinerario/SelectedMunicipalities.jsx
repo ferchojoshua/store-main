@@ -35,7 +35,7 @@ export const SelectedMunicipalities = ({
   };
 
   const verClientList = async () => {
-    console.log(municipalityListSelected);
+    // console.log(municipalityListSelected);
   };
 
   return (

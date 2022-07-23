@@ -146,7 +146,7 @@ export const updateCountAsync = async (token, data) => {
     },
   });
   try {
-    await authAxios.put(controller, data).then((resp) => {
+    await authAxios.post(controller, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -225,6 +225,32 @@ export const getCountFuentesContablesAsync = async (token) => {
   });
   try {
     await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+export const printProdHistoryAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}PrintProdHistory`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
