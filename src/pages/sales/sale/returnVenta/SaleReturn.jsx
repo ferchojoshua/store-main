@@ -14,6 +14,7 @@ import {
   Typography,
   Tooltip,
   IconButton,
+  Stack,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -229,64 +230,33 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
       }
     });
   };
+  
   return (
     <div>
       <Container>
         <Divider />
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Id Venta:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#2196f3", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {id}
-            </Typography>
-          </div>
+        <Stack spacing={2} justifyContent="center">
+          <Stack spacing={2} direction="row" justifyContent="space-between">
+            <Stack spacing={2} direction="row">
+              <span>Id Venta:</span>
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>{id}</span>
+            </Stack>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Fecha Venta</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#4caf50", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {moment(fechaVenta).format("L")}
-            </Typography>
-          </div>
+            <Stack spacing={2} direction="row">
+              <span>F. Venta:</span>
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+                {moment(fechaVenta).format("L")}
+              </span>
+            </Stack>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Fecha Vencimiento:</Typography>
-            <Typography
-              variant="body1"
-              style={{ color: "#f50057", fontWeight: "bold", marginLeft: 10 }}
-            >
-              {moment(fechaVencimiento).format("L")}
-            </Typography>
-          </div>
-        </div>
+            <Stack spacing={2} direction="row">
+              <span>F. Vencimiento:</span>
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+                {moment(fechaVencimiento).format("L")}
+              </span>
+            </Stack>
+          </Stack>
+        </Stack>
 
         <div
           style={{
@@ -301,9 +271,8 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
               flexDirection: "row",
             }}
           >
-            <Typography variant="body1">Cliente:</Typography>
-            <Typography
-              variant="body1"
+            <span>Cliente:</span>
+            <span
               style={{
                 color: "#2196f3",
                 fontWeight: "bold",
@@ -315,7 +284,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                 : nombreCliente === ""
                 ? "SIN NOMBRE"
                 : nombreCliente}
-            </Typography>
+            </span>
           </div>
         </div>
 
@@ -340,8 +309,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
           {isAnulado ? (
             <></>
           ) : isCanceled ? (
-            <Typography
-              variant="body2"
+            <span
               style={{
                 color: "#4caf50",
                 fontWeight: "bold",
@@ -352,7 +320,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                 style: "currency",
                 currency: "NIO",
               }).format(0)}`}
-            </Typography>
+            </span>
           ) : (
             <div>
               <Typography
@@ -511,52 +479,41 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
         {isAnulado ? (
           <></>
         ) : isAccess(access, "SALES DELETE") ? (
-          <div
-            style={{
-              marginTop: 20,
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div className="col-sm-5">
-              <Button
-                onClick={() => {
-                  devolucionTotal();
-                }}
-                style={{
-                  borderRadius: 20,
-                  color: "#f50057",
-                  borderColor: "#f50057",
-                }}
-                variant="outlined"
-                fullWidth
-              >
-                <FontAwesomeIcon
-                  style={{ marginRight: 10, fontSize: 20 }}
-                  icon={faSave}
-                />
-                Devolucion Total
-              </Button>
-            </div>
-            <div className="col-sm-5">
-              <Button
-                onClick={() => {
-                  saveChanges();
-                }}
-                style={{ borderRadius: 20 }}
-                variant="outlined"
-                fullWidth
-              >
-                <FontAwesomeIcon
-                  style={{ marginRight: 10, fontSize: 20 }}
-                  icon={faSave}
-                />
-                Guardar Cambios
-              </Button>
-            </div>
-          </div>
+          <Stack spacing={2} direction="row" justifyContent="space-around">
+            <Button
+              onClick={() => {
+                devolucionTotal();
+              }}
+              style={{
+                borderRadius: 20,
+                color: "#f50057",
+                borderColor: "#f50057",
+              }}
+              variant="outlined"
+              fullWidth
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faSave}
+              />
+              Devolucion Total
+            </Button>
+
+            <Button
+              onClick={() => {
+                saveChanges();
+              }}
+              style={{ borderRadius: 20 }}
+              variant="outlined"
+              fullWidth
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faSave}
+              />
+              Guardar Cambios
+            </Button>
+          </Stack>
         ) : (
           <></>
         )}

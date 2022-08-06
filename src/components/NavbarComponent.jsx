@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -22,6 +22,7 @@ import {
   faMoon,
   faBook,
   faBell,
+  faScroll,
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import {
@@ -72,6 +73,8 @@ const NavbarComponent = () => {
   const myAccount = () => {
     setTitle("Mi Cuenta");
     navigate(`${ruta}/account`);
+    setActive("account");
+    handleClose();
   };
 
   const changeTheme = async () => {
@@ -125,6 +128,7 @@ const NavbarComponent = () => {
         background: "#0d47a1",
       }}
       expand="lg"
+      sticky="top"
     >
       <Container fluid>
         <Navbar.Brand
@@ -205,7 +209,7 @@ const NavbarComponent = () => {
               <Nav.Link
                 eventKey="inventario"
                 style={{
-                  fontWeight: active === "Inventario" ? "bold" : "",
+                  fontWeight: active === "inventario" ? "bold" : "",
                   color: active === "inventario" ? "#bbdefb" : "#9e9e9e",
                   fontSize: 17,
                 }}
@@ -223,10 +227,28 @@ const NavbarComponent = () => {
               <></>
             )}
 
+            <Nav.Link
+              eventKey="reports"
+              style={{
+                fontWeight: active === "reports" ? "bold" : "",
+                color: active === "reports" ? "#bbdefb" : "#9e9e9e",
+                fontSize: 17,
+              }}
+              as={Link}
+              to={`${ruta}/reports`}
+            >
+              <FontAwesomeIcon
+                icon={faScroll}
+                style={{ marginRight: 10 }}
+                className={active === "reports" ? "fa-beat-fade" : ""}
+              />
+              Reportes
+            </Nav.Link>
+
             {isAccess(access, "CONT VER") ? (
               <Nav.Link
                 style={{
-                  fontWeight: active === "traslate-products" ? "bold" : "",
+                  fontWeight: active === "admon" ? "bold" : "",
                   color: active === "admon" ? "#bbdefb" : "#9e9e9e",
                   fontSize: 17,
                 }}
@@ -247,7 +269,7 @@ const NavbarComponent = () => {
             {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
               <Nav.Link
                 style={{
-                  fontWeight: active === "traslate-products" ? "bold" : "",
+                  fontWeight: active === "security" ? "bold" : "",
                   color: active === "security" ? "#bbdefb" : "#9e9e9e",
                   fontSize: 17,
                 }}
@@ -271,10 +293,16 @@ const NavbarComponent = () => {
               title={
                 <FontAwesomeIcon
                   icon={faEllipsisVertical}
-                  style={{ marginRight: 10, color: "#9e9e9e" }}
+                  className={active === "misc" ? "fa-beat-fade" : ""}
+                  style={{
+                    fontWeight: active === "misc" ? "bold" : "",
+                    marginRight: 10,
+                    color: active === "misc" ? "#bbdefb" : "#9e9e9e",
+                  }}
                 />
               }
               id="navbarScrollingDropdown"
+              onSelect={(selectedKey) => setActive(selectedKey)}
             >
               <NavDropdown.Header>
                 <FontAwesomeIcon icon={faSliders} style={{ marginRight: 10 }} />
@@ -283,7 +311,11 @@ const NavbarComponent = () => {
               <NavDropdown.Divider />
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${ruta}/stores`}>
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/stores`}
+                  eventKey="misc"
+                >
                   <FontAwesomeIcon
                     icon={faWarehouse}
                     style={{ marginRight: 10 }}
@@ -295,7 +327,11 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${ruta}/providers`}>
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/providers`}
+                  eventKey="misc"
+                >
                   <FontAwesomeIcon
                     icon={faPeopleCarryBox}
                     style={{ marginRight: 10 }}
@@ -307,7 +343,11 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item as={Link} to={`${ruta}/tipo-negocio`}>
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/tipo-negocio`}
+                  eventKey="misc"
+                >
                   <FontAwesomeIcon
                     icon={faSitemap}
                     style={{ marginRight: 10 }}
@@ -319,7 +359,11 @@ const NavbarComponent = () => {
               )}
 
               {isAccess(access, "COMMUNITIES VER") ? (
-                <NavDropdown.Item as={Link} to={`${ruta}/departments`}>
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/departments`}
+                  eventKey="misc"
+                >
                   <FontAwesomeIcon
                     icon={faLocationDot}
                     style={{ marginRight: 10, marginRight: 15 }}
@@ -332,17 +376,22 @@ const NavbarComponent = () => {
             </NavDropdown>
           </Nav>
 
-          <Tooltip title="Notificaciones">
-            <IconButton
-              onClick={handleClickNot}
-              sx={{ mr: 1, width: 40 }}
-              aria-controls={openNotifications ? "account-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={openNotifications ? "true" : undefined}
-            >
-              <FontAwesomeIcon icon={faBell} style={{ color: "#ffc107" }} />
-            </IconButton>
-          </Tooltip>
+          {isAccess(access, "CONT VER") ? (
+            <Tooltip title="Notificaciones">
+              <IconButton
+                onClick={handleClickNot}
+                sx={{ mr: 1, width: 40 }}
+                aria-controls={openNotifications ? "account-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={openNotifications ? "true" : undefined}
+              >
+                <FontAwesomeIcon icon={faBell} style={{ color: "#ffc107" }} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <></>
+          )}
+
           <Menu
             anchorEl={anchorElNot}
             id="account-menu"
@@ -416,7 +465,10 @@ const NavbarComponent = () => {
             >
               <FontAwesomeIcon
                 icon={faUserCircle}
-                style={{ color: "#9e9e9e" }}
+                className={active === "account" ? "fa-beat-fade" : ""}
+                style={{
+                  color: active === "account" ? "#bbdefb" : "#9e9e9e",
+                }}
               />
             </IconButton>
             <Menu

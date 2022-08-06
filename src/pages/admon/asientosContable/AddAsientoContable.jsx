@@ -277,7 +277,6 @@ export const AddAsientoContable = ({ setShowModal }) => {
       asientoContableDetails: detalleAtoContab,
       store: selectedStore,
     };
-    console.log(data);
 
     setIsLoading(true);
     const result = await addAsientoContableAsync(token, data);

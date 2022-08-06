@@ -17,6 +17,8 @@ import SelectTipoVenta from "./SelectTipoVenta";
 import ProductDescription from "./ProductDescription";
 import SaleDetail from "./SaleDetail";
 import { addSaleAsync } from "../../../services/SalesApi";
+import SmallModal from "../../../components/modals/SmallModal";
+import { BillComponent } from "./printBill/BillComponent";
 
 const NewSale = () => {
   let ruta = getRuta();
@@ -47,6 +49,9 @@ const NewSale = () => {
   const [montoVenta, setMontoVenta] = useState(0);
 
   const [barCodeSearch, setBarCodeSearch] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [dataBill, setDataBill] = useState([]);
 
   useEffect(() => {
     setTypeClient(true);
@@ -117,6 +122,11 @@ const NewSale = () => {
       return;
     }
 
+    if (!typeClient && isEmpty(selectedClient)) {
+      toastError("Seleccione un cliente");
+      return;
+    }
+
     const data = {
       isEventual: typeClient,
       nombreCliente: eventualClient,
@@ -158,6 +168,12 @@ const NewSale = () => {
     setIsLoading(false);
     toastSuccess("Venta Realizada");
     setReload(!reload);
+    setDataBill(result.data);
+    printBill();
+  };
+
+  const printBill = () => {
+    setShowModal(true);
   };
 
   return (
@@ -239,6 +255,14 @@ const NewSale = () => {
           </Grid>
         </Grid>
       </Container>
+
+      <SmallModal
+        titulo={"Imprimir Recibo"}
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <BillComponent data={dataBill} setShowModal={setShowModal} />
+      </SmallModal>
     </div>
   );
 };

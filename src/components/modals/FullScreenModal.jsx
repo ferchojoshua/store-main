@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, Stack } from "@mui/material";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -8,10 +8,7 @@ import Typography from "@mui/material/Typography";
 
 import Slide from "@mui/material/Slide";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleXmark,
-  faGlobeAmericas,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../context/DataContext";
 import { useContext } from "react";
 
@@ -19,11 +16,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const FullScreenModal = ({ titulo, children, setOpen, open }) => {
+const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
   const { title } = useContext(DataContext);
-  const handleClose = () => {
-    setOpen(false);
-  };
+
   return (
     <div>
       <Dialog
@@ -60,16 +55,22 @@ const FullScreenModal = ({ titulo, children, setOpen, open }) => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <Typography
-          sx={{
-            textAlign: "center",
-            marginTop: 3,
-          }}
-          variant="h5"
-          component="div"
-        >
-          {titulo}
-        </Typography>
+        <Stack display="flex" justifyContent="center">
+          <Typography
+            sx={{
+              color: "#2196f3",
+              textAlign: "center",
+              fontWeight: "bold",
+              marginTop: 2,
+            }}
+            variant="h5"
+            component="div"
+          >
+            {titulo}
+          </Typography>
+          <span style={{ textAlign: "center" }}>{fecha}</span>
+        </Stack>
+        <hr />
         <DialogContent>{children}</DialogContent>
       </Dialog>
     </div>

@@ -1,4 +1,3 @@
-// import { url } from "../helpers/Helpers";
 import axios from "axios";
 
 const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;

@@ -16,6 +16,7 @@ import {
   Paper,
   InputAdornment,
   IconButton,
+  Stack,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faHandHoldingDollar } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +35,7 @@ import NoData from "../../../../components/NoData";
 import { Table } from "react-bootstrap";
 import SmallModal from "../../../../components/modals/SmallModal";
 import { NewAbonoEspecifico } from "./NewAbonoEspecifico";
+import { AbonoBillComponent } from "./AbonoBillComponent";
 
 const NewAbono = ({
   selectedVenta,
@@ -71,6 +73,10 @@ const NewAbono = ({
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState([]);
+
+  const [showprintModal, setShowprintModal] = useState(false);
+  const [dataBill, setDataBill] = useState([]);
+  const [multipleBill, setMultipleBill] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -170,12 +176,16 @@ const NewAbono = ({
       setIsDefaultPass(true);
       return;
     }
+
+    setDataToPrint(result.data);
+
     setIsLoading(false);
     setActive(active);
     setSelectedStore(selectedStore);
     setReload(!reload);
     setNewAbono("");
     toastSuccess("Abono Agregado...");
+    printBill();
   };
 
   const totalAbonado = () => {
@@ -186,56 +196,54 @@ const NewAbono = ({
     return result;
   };
 
+  const printBill = () => {
+    setShowprintModal(true);
+  };
+
+  const setDataToPrint = (data) => {
+    if (data.length === 1) {
+      const [first] = data;
+      setDataBill(first);
+      return;
+    }
+    setMultipleBill(true);
+    setDataBill(data);
+  };
+
   return (
     <div>
       <Container>
         <Divider />
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          style={{ margin: 20 }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Cliente:</Typography>
+          <Stack direction="row" spacing={1}>
+            <Typography>Cliente:</Typography>
             <Typography
-              variant="body1"
               style={{
                 color: "#2196f3",
                 fontWeight: "bold",
-                marginLeft: 10,
               }}
             >
               {client.nombreCliente}
             </Typography>
-          </div>
+          </Stack>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Typography variant="body1">Facturas Pendientes:</Typography>
+          <Stack spacing={1} direction="row">
+            <Typography>Facturas Pendientes:</Typography>
             <Typography
-              variant="body1"
               style={{
                 color: "#2196f3",
                 fontWeight: "bold",
-                marginLeft: 10,
               }}
             >
               {uncanceledSales.length}
             </Typography>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
         <Paper
           elevation={10}
@@ -246,15 +254,9 @@ const NewAbono = ({
             marginBottom: 10,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-            }}
-          >
-            <h6>Facturas Pendientes</h6>
-          </div>
+          <Typography variant="h6" style={{ textAlign: "center", margin: 5 }}>
+            Facturas Pendientes
+          </Typography>
 
           {isEmpty(uncanceledSales) ? (
             <div
@@ -389,15 +391,9 @@ const NewAbono = ({
 
           <hr />
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-            }}
-          >
-            <h4>Lista de Abonos</h4>
-          </div>
+          <Typography variant="h6" style={{ textAlign: "center", margin: 5 }}>
+            Lista de Abonos
+          </Typography>
 
           {isEmpty(quoteList) ? (
             <div
@@ -514,6 +510,18 @@ const NewAbono = ({
         <NewAbonoEspecifico
           setVisible={setShowModal}
           selectedVenta={selectedSale}
+        />
+      </SmallModal>
+
+      <SmallModal
+        titulo={"Imprimir Recibo"}
+        isVisible={showprintModal}
+        setVisible={setShowprintModal}
+      >
+        <AbonoBillComponent
+          data={dataBill}
+          client={client}
+          multipleBill={multipleBill}
         />
       </SmallModal>
     </div>

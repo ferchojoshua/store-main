@@ -46,7 +46,7 @@ const MyAccount = () => {
         <hr />
 
         <Grid container spacing={10}>
-          <Grid item sm={4}>
+          <Grid item sm={12} md={4}>
             <Paper
               elevation={10}
               style={{
@@ -66,6 +66,7 @@ const MyAccount = () => {
                   <Avatar
                     sx={{ width: 120, height: 120, bgcolor: "#9c27b0" }}
                     style={{ marginTop: 50 }}
+                    src={require("../../components/media/Icono.png")}
                   />
                   <Typography
                     style={{
@@ -108,7 +109,7 @@ const MyAccount = () => {
             </Paper>
           </Grid>
 
-          <Grid item sm={8}>
+          <Grid item sm={12} md={8}>
             <Paper
               elevation={10}
               style={{

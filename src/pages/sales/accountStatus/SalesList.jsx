@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
+import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 
 import {
   FormControl,
@@ -14,6 +15,7 @@ import {
   Typography,
   Select,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -41,7 +43,12 @@ import NewAbono from "../sale/abonoComponents/NewAbono";
 import SaleReturn from "../sale/returnVenta/SaleReturn";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 
+import ReactToPrint from "react-to-print";
+import SmallModal from "../../../components/modals/SmallModal";
+import { BillComponent } from "../sale/printBill/BillComponent";
+
 const SalesList = () => {
+  const compRef = useRef();
   let ruta = getRuta();
 
   const {
@@ -83,11 +90,14 @@ const SalesList = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [showRetunModal, setShowReturnModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   const [active, setActive] = useState(0);
 
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("");
+
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -564,32 +574,59 @@ const SalesList = () => {
                     )}
 
                     <td style={{ width: 150 }}>
-                      {item.isCanceled ? (
-                        <></>
-                      ) : isAccess(access, "PAGO CREATE") ? (
-                        <Tooltip title="Abonar">
-                          <IconButton
-                            style={{ color: "#ff9100" }}
-                            onClick={() => {
-                              setSelectedVenta(item);
-                              setShowModal(true);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faHandHoldingDollar} />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <></>
-                      )}
-                      <IconButton
-                        style={{ color: "#009688" }}
-                        onClick={() => {
-                          setSelectedVenta(item);
-                          setShowReturnModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                      </IconButton>
+                      <Stack spacing={1} direction="row">
+                        <IconButton
+                          style={{
+                            color: "#2979ff",
+                          }}
+                          size="small"
+                          onClick={() => {
+                            setData(item);
+                            setShowPrintModal(true);
+                          }}
+                        >
+                          <PrintRoundedIcon style={{ fontSize: 30 }} />
+                        </IconButton>
+
+                        {isAccess(access, "PAGO CREATE") ? (
+                          active === 1 ? (
+                            <Tooltip
+                              title={item.isCanceled ? "Cancelado" : "Abonar"}
+                            >
+                              <span>
+                                <IconButton
+                                  style={{
+                                    color: item.isCanceled
+                                      ? "#4caf50"
+                                      : "#ff9100",
+                                  }}
+                                  onClick={() => {
+                                    setSelectedVenta(item);
+                                    setShowModal(true);
+                                  }}
+                                  disabled={item.isCanceled}
+                                >
+                                  <FontAwesomeIcon icon={faHandHoldingDollar} />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          ) : (
+                            <></>
+                          )
+                        ) : (
+                          <></>
+                        )}
+
+                        <IconButton
+                          style={{ color: "#009688" }}
+                          onClick={() => {
+                            setSelectedVenta(item);
+                            setShowReturnModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      </Stack>
                     </td>
                   </tr>
                 );
@@ -628,6 +665,14 @@ const SalesList = () => {
           setVisible={setShowReturnModal}
         />
       </MediumModal>
+
+      <SmallModal
+        titulo={"Reimprimir Recibo"}
+        isVisible={showPrintModal}
+        setVisible={setShowPrintModal}
+      >
+        <BillComponent data={data} setShowModal={setShowModal} />
+      </SmallModal>
     </div>
   );
 };

@@ -45,6 +45,7 @@ import { Box } from "@mui/material";
 import AdmonContainer from "./pages/admon/AdmonContainer";
 import { NoConectionServer } from "./components/errorPages/NoConectionServer";
 import { serverMessages } from "./services/SignalRService";
+import { ReportsContainer } from "./pages/reports/ReportsContainer";
 
 function App() {
   let ruta = getRuta();
@@ -167,6 +168,12 @@ function App() {
                 <Route
                   path={`${ruta}/entrada/:id`}
                   element={<EntradaProductoDetails />}
+                />
+
+                {/* Rutas Reportes */}
+                <Route
+                  path={`${ruta}/reports`}
+                  element={<ReportsContainer />}
                 />
 
                 {/* Rutas Administration */}

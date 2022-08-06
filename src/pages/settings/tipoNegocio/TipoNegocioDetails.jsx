@@ -135,7 +135,7 @@ const TipoNegocioDetails = () => {
         return;
       }
 
-      if (result.data === "eX01") {
+      if (resultFamilias.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
         deleteToken();

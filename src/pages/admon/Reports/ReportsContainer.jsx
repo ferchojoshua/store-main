@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Grid, IconButton, Paper } from "@mui/material";
 import React, { useState } from "react";
 import SmallModal from "../../../components/modals/SmallModal";
+import { ReportCaller } from "../../reports/component/ReportCaller";
 import { SelectorHistorialExistencias } from "./existenceStatus/SelectorHistorialExistencias";
 
 export const ReportsContainer = () => {
@@ -11,7 +12,7 @@ export const ReportsContainer = () => {
     <Container>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Paper
+          {/* <Paper
             elevation={10}
             style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
           >
@@ -31,7 +32,7 @@ export const ReportsContainer = () => {
             </IconButton>
             <hr />
             <h5 style={{ color: "#03a9f4" }}>Ver Existencia por Fecha</h5>
-          </Paper>
+          </Paper> */}
         </Grid>
         {/* <Grid item xs={12} sm={6} md={4} lg={3}>
           <Paper

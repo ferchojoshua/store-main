@@ -65,7 +65,7 @@ const UpdateData = () => {
       setSecondLastName(result.data.secondLastName);
       setAddress(result.data.address);
     })();
-  }, [reload]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [reload]);
 
   const setData = () => {
     const data = {
@@ -128,12 +128,7 @@ const UpdateData = () => {
       return;
     }
     await execute();
-    if (isEmpty(secondName)) {
-      simpleMessage("No ha ingresado el segundo nombre", "error");
-      return;
-    }
-    await execute();
-    simpleMessage("Segundo nombre actualizado", "success");
+    simpleMessage("Segundo apellido actualizado", "success");
   };
 
   const setNewAddress = async () => {
@@ -168,18 +163,17 @@ const UpdateData = () => {
           {` Editar datos: ${user}`}
         </Typography>
         <Grid container style={{ marginTop: 30, marginBottom: 30 }}>
-          <Grid item sm={6} style={{ paddingLeft: 20, paddingRight: 20 }}>
+          <Grid item xs={6} style={{ paddingLeft: 20, paddingRight: 20 }}>
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setfirstName(e.target.value)}
+              onChange={(e) => setfirstName(e.target.value.toUpperCase())}
               value={firstName}
               label={"Primer nombre"}
               placeholder={"Ingrese primer nombre"}
               InputLabelProps={{
                 shrink: firstName ? true : false,
               }}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -199,7 +193,7 @@ const UpdateData = () => {
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setSecondName(e.target.value)}
+              onChange={(e) => setSecondName(e.target.value.toUpperCase())}
               value={secondName}
               label={"Segundo nombre"}
               placeholder={"Ingrese segundo nombre"}
@@ -207,7 +201,6 @@ const UpdateData = () => {
               InputLabelProps={{
                 shrink: secondName ? true : false,
               }}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -224,10 +217,11 @@ const UpdateData = () => {
                 ),
               }}
             />
+
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.toUpperCase())}
               value={phone}
               label={"Numero telefonico"}
               placeholder={"Ingrese numero telefonico"}
@@ -235,7 +229,6 @@ const UpdateData = () => {
               InputLabelProps={{
                 shrink: phone ? true : false,
               }}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -254,15 +247,14 @@ const UpdateData = () => {
             />
           </Grid>
 
-          <Grid item sm={6} style={{ paddingLeft: 20, paddingRight: 20 }}>
+          <Grid item xs={6} style={{ paddingLeft: 20, paddingRight: 20 }}>
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => setLastName(e.target.value.toUpperCase())}
               value={lastName}
               label={"Primer apellido"}
               placeholder={"Ingrese primer apellido"}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -279,15 +271,15 @@ const UpdateData = () => {
                 ),
               }}
             />
+
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setSecondLastName(e.target.value)}
+              onChange={(e) => setSecondLastName(e.target.value.toUpperCase())}
               value={secondlastName}
               label={"Segundo apellido"}
               placeholder={"Ingrese segundo apellido"}
               style={{ marginTop: 30 }}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -304,15 +296,15 @@ const UpdateData = () => {
                 ),
               }}
             />
+
             <TextField
               fullWidth
               variant="standard"
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => setAddress(e.target.value.toUpperCase())}
               value={address}
               label={"Direccion"}
               placeholder={"Ingrese direccion"}
               style={{ marginTop: 30 }}
-              inputProps={{ style: { textTransform: "capitalize" } }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">

@@ -32,7 +32,6 @@ const VisitedClients = ({ selectedStore }) => {
       setIsLoading(false);
       setData(result.data);
       setTotal(sum(result.data));
-      console.log(result.data);
     })();
   }, [selectedStore]);
 
