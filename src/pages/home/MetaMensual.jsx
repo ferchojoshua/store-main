@@ -18,7 +18,7 @@ export const MetaMensual = ({ selectedStore }) => {
     { id: 1, meta: 260000 },
     { id: 2, meta: 160000 },
     { id: 3, meta: 360000 },
-    { id: 4, meta: 460000 },
+    { id: 4, meta: 160000 },
   ];
 
   const [totalVendido, setTotalVendido] = useState(0);

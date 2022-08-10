@@ -21,7 +21,7 @@ export const ReportCaller = ({ icon, text, modalTitle, children }) => {
       >
         <FontAwesomeIcon
           icon={icon}
-          style={{ fontSize: 60, color: "#2979ff"}}
+          style={{ color: "#2979ff", width: 60, height: 60 }}
         />
       </IconButton>
       <hr />

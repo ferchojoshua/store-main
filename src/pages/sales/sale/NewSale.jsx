@@ -19,6 +19,7 @@ import SaleDetail from "./SaleDetail";
 import { addSaleAsync } from "../../../services/SalesApi";
 import SmallModal from "../../../components/modals/SmallModal";
 import { BillComponent } from "./printBill/BillComponent";
+import ProformaComponent from "./printBill/ProformaComponent";
 
 const NewSale = () => {
   let ruta = getRuta();
@@ -27,6 +28,7 @@ const NewSale = () => {
     useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
+
 
   const [typeClient, setTypeClient] = useState(true);
 
@@ -41,7 +43,7 @@ const NewSale = () => {
 
   const [cantidad, setCantidad] = useState("");
   const [descuento, setDescuento] = useState("");
-  const [selectedPrecio, setSelectedPrecio] = useState("PVD");
+  const [selectedPrecio, setSelectedPrecio] = useState("PVM");
   const [costoXProducto, setcostoXProducto] = useState("");
 
   const [selectedProductList, setSelectedProductList] = useState([]);
@@ -52,6 +54,9 @@ const NewSale = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [dataBill, setDataBill] = useState([]);
+
+  const [showProformaModal, setShowProformaModal] = useState(false);
+  const [dataProforma, setDataProforma] = useState([]);
 
   useEffect(() => {
     setTypeClient(true);
@@ -172,6 +177,29 @@ const NewSale = () => {
     printBill();
   };
 
+  const addProformma = async () => {
+    if (isEmpty(selectedProductList) || montoVenta === 0) {
+      toastError("Seleccione al menos un producto para vender");
+      return;
+    }
+
+    if (!typeClient && isEmpty(selectedClient)) {
+      toastError("Seleccione un cliente");
+      return;
+    }
+
+    const data = {
+      nombreCliente: eventualClient,
+      idClient: selectedClient.id,
+      montoVenta,
+      saleDetails: selectedProductList,
+      storeid: selectedStore,
+    };
+
+    setDataProforma(data);
+    setShowProformaModal(true);
+  };
+
   const printBill = () => {
     setShowModal(true);
   };
@@ -251,6 +279,7 @@ const NewSale = () => {
               montoVenta={montoVenta}
               setMontoVenta={setMontoVenta}
               addNewVenta={addNewVenta}
+              addProformma={addProformma}
             />
           </Grid>
         </Grid>
@@ -262,6 +291,17 @@ const NewSale = () => {
         setVisible={setShowModal}
       >
         <BillComponent data={dataBill} setShowModal={setShowModal} />
+      </SmallModal>
+
+      <SmallModal
+        titulo={"Imprimir Proforma"}
+        isVisible={showProformaModal}
+        setVisible={setShowProformaModal}
+      >
+        <ProformaComponent
+          data={dataProforma}
+          setShowModal={setShowProformaModal}
+        />
       </SmallModal>
     </div>
   );

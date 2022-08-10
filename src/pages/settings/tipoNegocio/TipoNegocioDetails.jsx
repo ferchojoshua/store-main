@@ -254,7 +254,7 @@ const TipoNegocioDetails = () => {
           >
             <Button
               onClick={() => {
-                navigate("/tipo-negocio/");
+                navigate(`${ruta}/tipo-negocio/`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"

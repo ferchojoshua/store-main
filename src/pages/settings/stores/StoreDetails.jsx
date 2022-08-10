@@ -241,7 +241,7 @@ const StoreDetails = () => {
           >
             <Button
               onClick={() => {
-                navigate("/stores/");
+                navigate(`${ruta}/stores/`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"

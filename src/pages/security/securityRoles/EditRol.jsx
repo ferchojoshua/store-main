@@ -1168,7 +1168,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                 onChange={() => setProdVendidos(!prodVendidos)}
               />
             }
-            label="C. por Cobrar"
+            label="Productos Vendidos"
           />
         </Stack>
       </Paper>

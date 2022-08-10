@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { LocalizationProvider } from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
+
 import "react-toastify/dist/ReactToastify.min.css";
 
 import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";

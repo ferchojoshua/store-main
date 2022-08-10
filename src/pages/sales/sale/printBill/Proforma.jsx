@@ -1,23 +1,97 @@
-import React from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Divider, Grid, Stack, Typography } from "@mui/material";
 import moment from "moment";
 import { Table } from "react-bootstrap";
-import { isEmpty } from "lodash";
+import { isUndefined } from "lodash";
+import { DataContext } from "../../../../context/DataContext";
+import { getClientByIdAsync } from "../../../../services/ClientsApi";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+  getUser,
+} from "../../../../services/Account";
+import { useNavigate } from "react-router-dom";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getStoreByIdAsync } from "../../../../services/AlmacenApi";
 
-export const Bill = React.forwardRef((props, ref) => {
-  const {
-    id,
-    client,
-    facturedBy,
-    fechaVenta,
-    fechaVencimiento,
-    isContado,
-    montoVenta,
-    nombreCliente,
-    saldo,
-    saleDetails,
-    store,
-  } = props.data;
+const Proforma = React.forwardRef((props, ref) => {
+  const { idClient, storeid, montoVenta, nombreCliente, saleDetails } =
+    props.data;
+
+  let navigate = useNavigate();
+
+  const { setIsLoading, setIsLogged, setIsDefaultPass } =
+    useContext(DataContext);
+  const token = getToken();
+  const user = getUser();
+
+  let ruta = getRuta();
+  const [client, setClient] = useState([]);
+  const [store, setStore] = useState([]);
+
+  const hoy = new Date();
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      if (!isUndefined(idClient)) {
+        const resultClient = await getClientByIdAsync(token, idClient);
+        if (!resultClient.statusResponse) {
+          setIsLoading(false);
+          if (resultClient.error.request.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(resultClient.error.message);
+          return;
+        }
+
+        if (resultClient.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+
+        if (resultClient.data.isDefaultPass) {
+          setIsLoading(false);
+          setIsDefaultPass(true);
+          return;
+        }
+
+        setClient(resultClient.data);
+      }
+
+      const result = await getStoreByIdAsync(token, storeid);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setStore(result.data);
+      setIsLoading(false);
+    })();
+  }, []);
 
   return (
     <div
@@ -41,9 +115,10 @@ export const Bill = React.forwardRef((props, ref) => {
         alt="logo"
         style={{ height: 80 }}
       />
+
       <Stack>
         <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
-          FACTURA
+          PROFORMA
         </Typography>
 
         <Divider />
@@ -51,9 +126,6 @@ export const Bill = React.forwardRef((props, ref) => {
         <Grid spacing={1} container>
           <Grid item xs={4}>
             <Stack textAlign="right">
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                FACTURA:
-              </Typography>
               <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
                 Agencia:
               </Typography>
@@ -65,9 +137,9 @@ export const Bill = React.forwardRef((props, ref) => {
               </Typography>
             </Stack>
           </Grid>
+
           <Grid item xs={8}>
             <Stack textAlign="left">
-              <Typography style={{ fontSize: 11 }}>{id}</Typography>
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
               <Typography style={{ fontSize: 11 }}>2810505580009A</Typography>
               <Typography style={{ fontSize: 11 }}>
@@ -89,33 +161,28 @@ export const Bill = React.forwardRef((props, ref) => {
               <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
                 F. Emision:
               </Typography>
-              {isContado ? (
-                <></>
-              ) : (
-                <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                  Vence:
-                </Typography>
-              )}
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
+                Vence:
+              </Typography>
               <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
                 Cliente:
               </Typography>
             </Stack>
           </Grid>
+
           <Grid item xs={8}>
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>+505 7837-6964</Typography>
               <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography>
               <Typography style={{ fontSize: 11 }}>
-                {moment(fechaVenta).format("DD/MM/YYYY HH:mm A")}
+                {moment(hoy).format("L")}
               </Typography>
-              {isContado ? (
-                <></>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  {moment(fechaVencimiento).format("L")}
-                </Typography>
-              )}
-              {isEmpty(client) ? (
+
+              <Typography style={{ fontSize: 11 }}>
+                {moment(hoy).add(15, "d").format("L")}
+              </Typography>
+
+              {isUndefined(idClient) ? (
                 <Typography style={{ fontSize: 11 }}>
                   {nombreCliente === "" ? "Cliente Eventual" : nombreCliente}
                 </Typography>
@@ -128,10 +195,8 @@ export const Bill = React.forwardRef((props, ref) => {
           </Grid>
         </Grid>
 
-        <Divider />
-
         <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
-          Detalle de Compra
+          DETALLE DE PROFORMA
         </Typography>
 
         <Table size="sm" responsive>
@@ -143,11 +208,10 @@ export const Bill = React.forwardRef((props, ref) => {
               <th style={{ textAlign: "center", fontSize: 11 }}>Total</th>
             </tr>
           </thead>
-
           <tbody>
             {saleDetails.map((item) => {
               return (
-                <tr key={item.id}>
+                <tr key={saleDetails.indexOf(item) + 1}>
                   <td style={{ textAlign: "left", fontSize: 11 }}>
                     {item.product.description}
                   </td>
@@ -179,66 +243,27 @@ export const Bill = React.forwardRef((props, ref) => {
           justifyContent={"center"}
         >
           <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-            Gestor:
+            Monto Total:
           </Typography>
           <Typography style={{ fontSize: 11 }}>
-            {facturedBy.fullName}
+            {new Intl.NumberFormat("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            }).format(montoVenta)}
           </Typography>
         </Stack>
 
-        <Stack display={"flex"} justifyContent="space-between" direction="row">
-          <Stack
-            display="flex"
-            spacing={1}
-            direction="row"
-            justifyContent={"center"}
-          >
-            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-              Monto Total:
-            </Typography>
-            <Typography style={{ fontSize: 11 }}>
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(montoVenta)}
-            </Typography>
-          </Stack>
-
-          {isContado ? (
-            <Stack
-              display="flex"
-              spacing={1}
-              direction="row"
-              justifyContent={"center"}
-            >
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Saldo:
-              </Typography>
-              <Typography style={{ fontSize: 11 }}>
-                {new Intl.NumberFormat("es-NI", {
-                  style: "currency",
-                  currency: "NIO",
-                }).format(saldo)}
-              </Typography>
-            </Stack>
-          ) : (
-            <Stack
-              display="flex"
-              spacing={1}
-              direction="row"
-              justifyContent={"center"}
-            >
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Dias de Credito:
-              </Typography>
-              <Typography style={{ fontSize: 11 }}>15</Typography>
-            </Stack>
-          )}
+        <Stack
+          display="flex"
+          spacing={1}
+          direction="row"
+          justifyContent={"center"}
+        >
+          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
+            Gestor:
+          </Typography>
+          <Typography style={{ fontSize: 11 }}>{user}</Typography>
         </Stack>
-
-        <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-          NO SE ACEPTAN DEVOLUCIONES
-        </Typography>
       </Stack>
 
       <hr />
@@ -248,3 +273,5 @@ export const Bill = React.forwardRef((props, ref) => {
     </div>
   );
 });
+
+export default Proforma;

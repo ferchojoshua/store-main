@@ -26,13 +26,10 @@ import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
 import { getClientsAsync } from "../../../../services/ClientsApi";
-import { DocumentosXCobrar } from "../Reportes/DocumentosXCobrar";
 import {
-  getFamiliaByIdAsync,
   getFamiliasByTNAsync,
   getTipoNegocioAsync,
 } from "../../../../services/TipoNegocioApi";
-import { isEmpty } from "lodash";
 import { ArticulosVendidos } from "../Reportes/ArticulosVendidos";
 
 export const SelectorArtVendidos = () => {
@@ -54,7 +51,7 @@ export const SelectorArtVendidos = () => {
 
   const [showFullScreenModal, setShowFullScreenModal] = useState(false);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access } =
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
   let navigate = useNavigate();
@@ -422,7 +419,7 @@ export const SelectorArtVendidos = () => {
         </Paper>
 
         <FullScreenModal
-          titulo={"Articulos Vendidos"}
+          titulo={"Productos Vendidos"}
           fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
             fechaHassta
           ).format("L")}`}
@@ -437,7 +434,6 @@ export const SelectorArtVendidos = () => {
             selectedTNegocio={selectedTNegocio}
             selectedFamilia={selectedFamilia}
           />
-         
         </FullScreenModal>
       </Container>
     </div>

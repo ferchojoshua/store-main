@@ -194,7 +194,7 @@ const TipoNegocio = () => {
                           color="primary"
                           style={{ marginRight: 10 }}
                           onClick={() => {
-                            navigate(`/tipo-negocio/${item.id}`);
+                            navigate(`${ruta}/tipo-negocio/${item.id}`);
                           }}
                         >
                           <FontAwesomeIcon icon={faExternalLink} />

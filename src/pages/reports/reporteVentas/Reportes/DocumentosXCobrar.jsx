@@ -21,10 +21,11 @@ export const DocumentosXCobrar = ({
   desde,
   hasta,
   selectedClient,
+  includeCanceled,
 }) => {
   const [data, setData] = useState([]);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
+  const { setIsLoading, setIsDefaultPass, setIsLogged, isDarkMode } =
     useContext(DataContext);
 
   let navigate = useNavigate();
@@ -67,8 +68,12 @@ export const DocumentosXCobrar = ({
         setIsDefaultPass(true);
         return;
       }
-
-      setData(result.data);
+      if (includeCanceled) {
+        setData(result.data);
+      } else {
+        let filtered = result.data.filter((item) => item.isCanceled === false);
+        setData(filtered);
+      }
       setIsLoading(false);
     })();
   }, []);
@@ -78,7 +83,6 @@ export const DocumentosXCobrar = ({
     data.map((item) => (sum += item.montoVenta));
     return sum;
   };
-
 
   const sumCreditoSales = () => {
     const credSales = data.filter((item) => item.isContado === false);

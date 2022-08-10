@@ -1,8 +1,15 @@
 import React, { useContext } from "react";
 import { Table } from "react-bootstrap";
-import { Paper, Divider, IconButton, Typography, Button } from "@mui/material";
+import {
+  Paper,
+  Divider,
+  IconButton,
+  Typography,
+  Button,
+  Stack,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../../context/DataContext";
 
 const SaleDetail = ({
@@ -11,6 +18,7 @@ const SaleDetail = ({
   montoVenta,
   setMontoVenta,
   addNewVenta,
+  addProformma,
 }) => {
   const { isDarkMode } = useContext(DataContext);
 
@@ -127,8 +135,24 @@ const SaleDetail = ({
           padding: 20,
         }}
       >
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-4 ">
+        <Stack direction="row" justifyContent="space-between">
+          <Button
+            variant="outlined"
+            style={{
+              borderRadius: 20,
+              borderColor: "#2979ff",
+              color: "#2979ff",
+            }}
+            onClick={() => addProformma()}
+          >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faPrint}
+            />
+            Proformar
+          </Button>
+
+          <Stack>
             <Typography
               style={{
                 marginBottom: 10,
@@ -149,9 +173,9 @@ const SaleDetail = ({
             >
               {selectedProductList.length}
             </Typography>
-          </div>
+          </Stack>
 
-          <div className="col-sm-4 ">
+          <Stack>
             <Typography
               style={{
                 marginBottom: 10,
@@ -175,22 +199,24 @@ const SaleDetail = ({
                 currency: "NIO",
               }).format(montoVenta)}
             </Typography>
-          </div>
+          </Stack>
 
-          <div className="col-sm-4 ">
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              onClick={() => addNewVenta()}
-            >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faSave}
-              />
-              Facturar
-            </Button>
-          </div>
-        </div>
+          <Button
+            variant="outlined"
+            style={{
+              borderRadius: 20,
+              borderColor: "#00a152",
+              color: "#00a152",
+            }}
+            onClick={() => addNewVenta()}
+          >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faSave}
+            />
+            Facturar
+          </Button>
+        </Stack>
       </Paper>
     </div>
   );

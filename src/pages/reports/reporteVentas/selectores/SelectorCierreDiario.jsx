@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DatePicker } from "@mui/lab";
+import { DatePicker, TimePicker } from "@mui/lab";
 import {
   Container,
   Paper,
@@ -11,9 +11,6 @@ import {
   Button,
   Stack,
   Autocomplete,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 import { getStoresAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
@@ -29,21 +26,23 @@ import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
 import { getClientsAsync } from "../../../../services/ClientsApi";
-import { DocumentosXCobrar } from "../Reportes/DocumentosXCobrar";
+import {
+  getFamiliasByTNAsync,
+  getTipoNegocioAsync,
+} from "../../../../services/TipoNegocioApi";
+import { ArticulosVendidos } from "../Reportes/ArticulosVendidos";
 
-export const SelectorDocXCobrar = () => {
+const SelectorCierreDiario = () => {
   var date = new Date();
-  const [fechaDesde, setDesdeFecha] = useState(
-    new Date(date.getFullYear(), date.getMonth(), 1)
-  );
-  const [fechaHassta, setHasstaFecha] = useState(new Date());
+  const [fechaDesde, setDesdeFecha] = useState(date);
+  const [fechaHasta, setHastaFecha] = useState(date);
+  const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
+  const [horaHasta, setHoraHasta] = useState(date.setHours(18, 0));
+
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
-  const [clientList, setClientList] = useState([]);
-  const [selectedClient, setSelectedClient] = useState("");
 
   const [showFullScreenModal, setShowFullScreenModal] = useState(false);
-  const [includeCanceled, setIncludeCanceled] = useState(false);
 
   const { setIsLoading, setIsDefaultPass, setIsLogged, access } =
     useContext(DataContext);
@@ -81,51 +80,16 @@ export const SelectorDocXCobrar = () => {
       }
 
       setStoreList(resultStore.data);
-
-      const resultClients = await getClientsAsync(token);
-      if (!resultClients.statusResponse) {
-        setIsLoading(false);
-        if (resultClients.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(resultClients.error.message);
-        return;
-      }
-
-      if (resultClients.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (resultClients.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setClientList(resultClients.data);
       setIsLoading(false);
     })();
   }, []);
-
-  const handleClose = () => {
-    setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
-    setHasstaFecha(new Date());
-    setSelectedStore("t");
-
-    setShowFullScreenModal(false);
-  };
 
   const verReport = () => {
     if (!moment(fechaDesde).isValid()) {
       toastError("Ingrese una fecha de inicio valida");
       return;
     }
-    if (!moment(fechaHassta).isValid()) {
+    if (!moment(fechaHasta).isValid()) {
       toastError("Ingrese una fecha de final valida");
       return;
     }
@@ -135,6 +99,14 @@ export const SelectorDocXCobrar = () => {
     }
 
     setShowFullScreenModal(true);
+  };
+
+  const handleClose = () => {
+    setDesdeFecha(date);
+    setHastaFecha(date);
+    setSelectedStore("t");
+
+    setShowFullScreenModal(false);
   };
 
   return (
@@ -151,7 +123,7 @@ export const SelectorDocXCobrar = () => {
           <Stack spacing={3}>
             <Stack spacing={2} direction="row">
               <DatePicker
-                label="Desde"
+                label="Fecha Desde"
                 value={fechaDesde}
                 onChange={(newValue) => {
                   setDesdeFecha(newValue);
@@ -167,10 +139,46 @@ export const SelectorDocXCobrar = () => {
               />
 
               <DatePicker
-                label="Hasta"
-                value={fechaHassta}
+                label="FechaHasta"
+                value={fechaHasta}
                 onChange={(newValue) => {
-                  setHasstaFecha(newValue);
+                  setHastaFecha(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+            </Stack>
+
+            <Stack spacing={2} direction="row">
+              <TimePicker
+                label="Hora Desde"
+                value={horaDesde}
+                ampm
+                onChange={(newValue) => {
+                  setHoraDesde(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+
+              <TimePicker
+                label="Hora Hasta"
+                value={horaHasta}
+                ampm
+                onChange={(newValue) => {
+                  setHoraHasta(newValue);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -216,80 +224,32 @@ export const SelectorDocXCobrar = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-
-            <Autocomplete
-              id="combo-box-demo"
-              fullWidth
-              options={clientList}
-              getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
-              value={selectedClient === "" ? null : selectedClient}
-              onChange={(event, newValue) => {
-                setSelectedClient(newValue);
-              }}
-              noOptionsText="Cliente no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.nombreCliente}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label={
-                    selectedClient === "" || selectedClient === null
-                      ? "Todos los clientes"
-                      : "Cliente"
-                  }
-                />
-              )}
-            />
-
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={includeCanceled}
-                    onChange={() => setIncludeCanceled(!includeCanceled)}
-                  />
-                }
-                label="Incluir Facturas Canceladas"
-              />
-            </FormGroup>
-
-            <Button
-              variant="outlined"
-              fullWidth
-              style={{ borderRadius: 20, marginTop: 30 }}
-              startIcon={<FontAwesomeIcon icon={faPrint} />}
-              onClick={() => {
-                verReport();
-              }}
-            >
-              Generar Reporte
-            </Button>
           </Stack>
+
+          <Button
+            variant="outlined"
+            fullWidth
+            style={{ borderRadius: 20, marginTop: 30 }}
+            startIcon={<FontAwesomeIcon icon={faPrint} />}
+            onClick={() => {
+              verReport();
+            }}
+          >
+            Generar Reporte
+          </Button>
         </Paper>
 
         <FullScreenModal
-          titulo={"Documentos por Cobrar"}
+          titulo={"Cierre Diario"}
           fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-            fechaHassta
+            fechaHasta
           ).format("L")}`}
           open={showFullScreenModal}
           handleClose={handleClose}
-        >
-          <DocumentosXCobrar
-            selectedStore={selectedStore}
-            desde={fechaDesde}
-            hasta={fechaHassta}
-            selectedClient={selectedClient}
-            includeCanceled={includeCanceled}
-          />
-        </FullScreenModal>
+        ></FullScreenModal>
       </Container>
     </div>
   );
 };
+
+export default SelectorCierreDiario;

@@ -143,7 +143,7 @@ const Stores = () => {
                         <IconButton
                           style={{ marginRight: 10, color: "#009688" }}
                           onClick={() => {
-                            navigate(`/store/${item.almacen.id}`);
+                            navigate(`${ruta}/store/${item.almacen.id}`);
                           }}
                         >
                           <FontAwesomeIcon icon={faExternalLinkAlt} />

@@ -18,8 +18,10 @@ import {
 } from "../../../../services/Account";
 
 import { addAbonoEspecificoAsync } from "../../../../services/SalesApi";
+import SmallModal from "../../../../components/modals/SmallModal";
+import { AbonoBillComponent } from "./AbonoBillComponent";
 
-export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
+export const NewAbonoEspecifico = ({ selectedVenta, setVisible, client }) => {
   let ruta = getRuta();
 
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -32,6 +34,9 @@ export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
   const token = getToken();
   const [newAbono, setNewAbono] = useState("");
   const [newSaldo, setNewSaldo] = useState(saldo);
+
+  const [showprintModal, setShowprintModal] = useState(false);
+  const [dataBill, setDataBill] = useState([]);
 
   const funcCantidad = (value) => {
     if (/^\d*\.?\d*$/.test(value.toString()) || value === "") {
@@ -79,11 +84,14 @@ export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
       setIsDefaultPass(true);
       return;
     }
+
     setIsLoading(false);
     setReload(!reload);
+    setDataBill(result.data);
     setVisible(false);
     setNewAbono("");
     toastSuccess("Abono Agregado...");
+    setShowprintModal(true);
   };
 
   return (
@@ -218,6 +226,18 @@ export const NewAbonoEspecifico = ({ selectedVenta, setVisible }) => {
           </Typography>
         </div>
       </div>
+
+      <SmallModal
+        titulo={"Imprimir Recibo"}
+        isVisible={showprintModal}
+        setVisible={setShowprintModal}
+      >
+        <AbonoBillComponent
+          data={dataBill}
+          client={client}
+          multipleBill={false}
+        />
+      </SmallModal>
     </div>
   );
 };

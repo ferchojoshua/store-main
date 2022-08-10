@@ -2,10 +2,9 @@ import React, { useRef } from "react";
 import { IconButton } from "@mui/material";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import ReactToPrint from "react-to-print";
-import { AbonoBill } from "./AbonoBill";
-import AbonoMultipleBills from "./AbonoMultipleBills";
+import Proforma from "./Proforma";
 
-export const AbonoBillComponent = ({ data, client, multipleBill }) => {
+const ProformaComponent = ({ data, setShowModal }) => {
   const compRef = useRef();
 
   return (
@@ -15,6 +14,7 @@ export const AbonoBillComponent = ({ data, client, multipleBill }) => {
       }}
     >
       <hr />
+
       <ReactToPrint
         trigger={() => {
           return (
@@ -34,12 +34,10 @@ export const AbonoBillComponent = ({ data, client, multipleBill }) => {
           display: "none",
         }}
       >
-        {multipleBill ? (
-          <AbonoMultipleBills data={data} client={client} ref={compRef} />
-        ) : (
-          <AbonoBill data={data} client={client} ref={compRef} />
-        )}
+        <Proforma data={data} ref={compRef} />
       </div>
     </div>
   );
 };
+
+export default ProformaComponent;

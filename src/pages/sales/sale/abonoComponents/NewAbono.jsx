@@ -510,6 +510,7 @@ const NewAbono = ({
         <NewAbonoEspecifico
           setVisible={setShowModal}
           selectedVenta={selectedSale}
+          client={client}
         />
       </SmallModal>
 

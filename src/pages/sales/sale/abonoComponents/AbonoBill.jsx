@@ -5,7 +5,7 @@ import moment from "moment";
 export const AbonoBill = React.forwardRef((props, ref) => {
   const { id, monto, fechaAbono, realizedBy, sale, store } = props.data;
   const { nombreCliente } = props.client;
-  console.log(props.data);
+
   return (
     <div
       ref={ref}
@@ -17,9 +17,13 @@ export const AbonoBill = React.forwardRef((props, ref) => {
       <img
         loading="lazy"
         src={
-          store.id === 4
-            ? require("../../../../components/media/superMoto.jpeg")
-            : require("../../../../components/media/Icono.png")
+          store.id === 1
+            ? require("../../../../components/media/Icono.png")
+            : store.id === 2
+            ? require("../../../../components/media/autoFull.jpeg")
+            : store.id === 3
+            ? require("../../../../components/media/Icono.png")
+            : require("../../../../components/media/superMoto.jpeg")
         }
         alt="logo"
         style={{ height: 80 }}
@@ -158,7 +162,7 @@ export const AbonoBill = React.forwardRef((props, ref) => {
         </Stack>
 
         <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-          NO SE ACEPTAN DEVOLUCIONES
+          GRACIAS POR SU ABONO
         </Typography>
       </Stack>
 
