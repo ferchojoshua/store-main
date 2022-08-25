@@ -613,7 +613,7 @@ const ClientDetails = ({ selectedClient, setShowModal }) => {
             </Grid>
           </Grid>
 
-          {isAccess(access, "SALES UPDATE") ? (
+          {isAccess(access, "CLIENTS UPDATE") ? (
             <div
               style={{
                 marginTop: 20,

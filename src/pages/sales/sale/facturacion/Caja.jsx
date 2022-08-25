@@ -1,51 +1,57 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { DataContext } from "../../../context/DataContext";
-import { Container, Table } from "react-bootstrap";
+
+import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
-import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import {
   FormControl,
   IconButton,
   InputAdornment,
   TextField,
-  Tooltip,
-  Typography,
   Select,
   MenuItem,
   Stack,
+  Container,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCreditCard,
-  faExternalLinkAlt,
-  faHandHoldingDollar,
-  faMoneyBillTransfer,
+  faCartShopping,
+  faHandshake,
+  faReceipt,
   faSearch,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import PaginationComponent from "../../../components/PaginationComponent";
+
 import { isEmpty } from "lodash";
-import NoData from "../../../components/NoData";
+
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { DataContext } from "../../../../context/DataContext";
 import {
-  getToken,
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../../helpers/Helpers";
+import {
   deleteToken,
   deleteUserData,
-} from "../../../services/Account";
-import MediumModal from "../../../components/modals/MediumModal";
+  getToken,
+} from "../../../../services/Account";
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import {
-  getAnulatedSalesByStoreAsync,
-  getContadoSalesByStoreAsync,
-  getCreditoSalesByStoreAsync,
-} from "../../../services/SalesApi";
-import NewAbono from "../sale/abonoComponents/NewAbono";
-import SaleReturn from "../sale/returnVenta/SaleReturn";
-import { getStoresByUserAsync } from "../../../services/AlmacenApi";
+  deleteFacturaAsync,
+  getFactCancelledByStoreAsync,
+  getFactUncancelledByStoreAsync,
+} from "../../../../services/FacturationApi";
+import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 
-import SmallModal from "../../../components/modals/SmallModal";
-import { BillComponent } from "../sale/printBill/BillComponent";
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import Pagar from "./Pagar";
+import SmallModal from "../../../../components/modals/SmallModal";
+import { BillComponent } from "../printBill/BillComponent";
 
 let controller = "";
 if (process.env.NODE_ENV === "production") {
@@ -54,9 +60,8 @@ if (process.env.NODE_ENV === "production") {
   controller = "https://localhost:7015/";
 }
 
-const SalesList = () => {
+const Caja = () => {
   let ruta = getRuta();
-
   const {
     reload,
     setReload,
@@ -67,13 +72,12 @@ const SalesList = () => {
     isDarkMode,
   } = useContext(DataContext);
   let navigate = useNavigate();
-  const [listaVentas, setListaVentas] = useState([]);
 
-  const [selectedVenta, setSelectedVenta] = useState([]);
-
+  const [facturaList, setFacturaList] = useState([]);
+  const [facturaSelected, setFacturaSelect] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const withSearch = listaVentas.filter((val) => {
+  const withSearch = facturaList.filter((val) => {
     if (isEmpty(val.client)) {
       if (searchTerm === "") {
         return val;
@@ -105,22 +109,19 @@ const SalesList = () => {
 
   const token = getToken();
 
-  const [showModal, setShowModal] = useState(false);
-
-  const [showRetunModal, setShowReturnModal] = useState(false);
-  const [showPrintModal, setShowPrintModal] = useState(false);
-
-  const [active, setActive] = useState(0);
-
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("");
+  const [active, setActive] = useState(0);
 
-  const [data, setData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showBillModal, setShowBillModal] = useState(false);
+  const [dataBill, setDataBill] = useState([]);
+
+  const MySwal = withReactContent(Swal);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-
       const resultStores = await getStoresByUserAsync(token);
       if (!resultStores.statusResponse) {
         setIsLoading(false);
@@ -150,8 +151,7 @@ const SalesList = () => {
 
       if (selectedStore === "") {
         setSelectedStore(resultStores.data[0].id);
-
-        const result = await getContadoSalesByStoreAsync(
+        const result = await getFactUncancelledByStoreAsync(
           token,
           resultStores.data[0].id
         );
@@ -178,7 +178,8 @@ const SalesList = () => {
           setIsDefaultPass(true);
           return;
         }
-        setListaVentas(result.data);
+
+        setFacturaList(result.data);
       } else {
         onSelectChange(active);
       }
@@ -190,7 +191,7 @@ const SalesList = () => {
     setSelectedStore(event.target.value);
     if (active === 0) {
       setIsLoading(true);
-      const result = await getContadoSalesByStoreAsync(
+      const result = await getFactUncancelledByStoreAsync(
         token,
         event.target.value
       );
@@ -216,39 +217,11 @@ const SalesList = () => {
         return;
       }
       setIsLoading(false);
-      setListaVentas(result.data);
-    } else if (active === 1) {
-      setIsLoading(true);
-      const result = await getCreditoSalesByStoreAsync(
-        token,
-        event.target.value
-      );
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(result.error.message);
-        return;
-      }
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-      setIsLoading(false);
-      setListaVentas(result.data);
+
+      setFacturaList(result.data);
     } else {
       setIsLoading(true);
-      const result = await getAnulatedSalesByStoreAsync(
+      const result = await getFactCancelledByStoreAsync(
         token,
         event.target.value
       );
@@ -274,15 +247,45 @@ const SalesList = () => {
         return;
       }
       setIsLoading(false);
-      setListaVentas(result.data);
+      setFacturaList(result.data);
     }
+    //  else {
+    //   setIsLoading(true);
+    //   const result = await getAnulatedSalesByStoreAsync(
+    //     token,
+    //     event.target.value
+    //   );
+    //   if (!result.statusResponse) {
+    //     setIsLoading(false);
+    //     if (result.error.request.status === 401) {
+    //       navigate(`${ruta}/unauthorized`);
+    //       return;
+    //     }
+    //     toastError(result.error.message);
+    //     return;
+    //   }
+    //   if (result.data === "eX01") {
+    //     setIsLoading(false);
+    //     deleteUserData();
+    //     deleteToken();
+    //     setIsLogged(false);
+    //     return;
+    //   }
+    //   if (result.data.isDefaultPass) {
+    //     setIsLoading(false);
+    //     setIsDefaultPass(true);
+    //     return;
+    //   }
+    //   setIsLoading(false);
+    //   setListaVentas(result.data);
+    // }
   };
 
   const onSelectChange = async (value) => {
     setActive(value);
     if (value === 0) {
       setIsLoading(true);
-      const result = await getContadoSalesByStoreAsync(token, selectedStore);
+      const result = await getFactUncancelledByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -305,36 +308,10 @@ const SalesList = () => {
         return;
       }
       setIsLoading(false);
-      setListaVentas(result.data);
-    } else if (value === 1) {
-      setIsLoading(true);
-      const result = await getCreditoSalesByStoreAsync(token, selectedStore);
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(result.error.message);
-        return;
-      }
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-      setIsLoading(false);
-      setListaVentas(result.data);
+      setFacturaList(result.data);
     } else {
       setIsLoading(true);
-      const result = await getAnulatedSalesByStoreAsync(token, selectedStore);
+      const result = await getFactCancelledByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -357,7 +334,7 @@ const SalesList = () => {
         return;
       }
       setIsLoading(false);
-      setListaVentas(result.data);
+      setFacturaList(result.data);
     }
   };
 
@@ -368,14 +345,14 @@ const SalesList = () => {
   };
 
   const connection = new HubConnectionBuilder()
-    .withUrl(`${controller}newSalehub`)
+    .withUrl(`${controller}newFactHub`)
     .configureLogging(LogLevel.Information)
     .build();
 
   async function start() {
     try {
       await connection.start();
-      connection.on("saleUpdate", () => {
+      connection.on("factListUpdate", () => {
         setReload(!reload);
       });
     } catch (err) {
@@ -389,6 +366,50 @@ const SalesList = () => {
 
   start();
 
+  const anulateFactura = (fact) => {
+    MySwal.fire({
+      icon: "warning",
+      title: <p>Confirmar Eliminar</p>,
+      text: `Elimiar Facturacion: ${fact.id}!`,
+      showDenyButton: true,
+      confirmButtonText: "Aceptar",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        (async () => {
+          setIsLoading(true);
+          const result = await deleteFacturaAsync(token, fact.id);
+          if (!result.statusResponse) {
+            setIsLoading(false);
+            if (result.error.request.status === 401) {
+              navigate(`${ruta}/unauthorized`);
+              return;
+            }
+            toastError(result.error.message);
+            return;
+          }
+
+          if (result.data === "eX01") {
+            setIsLoading(false);
+            deleteUserData();
+            deleteToken();
+            setIsLogged(false);
+            return;
+          }
+
+          if (result.data.isDefaultPass) {
+            setIsLoading(false);
+            setIsDefaultPass(true);
+            return;
+          }
+        })();
+        setIsLoading(false);
+        setReload(!reload);
+        toastSuccess("Facturacion Eliminada");
+      }
+    });
+  };
+
   return (
     <div>
       <Container>
@@ -401,8 +422,7 @@ const SalesList = () => {
             alignItems: "center",
           }}
         >
-          <h1 style={{ textAlign: "left" }}>Lista de Ventas</h1>
-
+          <h1 style={{ textAlign: "left" }}>Facturacion Piso</h1>
           <div>
             <FormControl
               variant="standard"
@@ -447,36 +467,25 @@ const SalesList = () => {
               >
                 <MenuItem key={0} value={0}>
                   <FontAwesomeIcon
-                    icon={faHandHoldingDollar}
+                    icon={faCartShopping}
                     style={{
                       marginRight: 10,
                       marginLeft: 10,
                       color: "#1769aa",
                     }}
                   />
-                  Ventas de Contado
+                  Pendiente
                 </MenuItem>
                 <MenuItem key={1} value={1}>
                   <FontAwesomeIcon
-                    icon={faCreditCard}
+                    icon={faHandshake}
                     style={{
                       marginRight: 10,
                       marginLeft: 10,
-                      color: "#b23c17",
+                      color: "#00a152",
                     }}
                   />
-                  Ventas de Credito
-                </MenuItem>
-                <MenuItem key={2} value={2}>
-                  <FontAwesomeIcon
-                    icon={faMoneyBillTransfer}
-                    style={{
-                      marginRight: 10,
-                      marginLeft: 10,
-                      color: "#6d1b7b",
-                    }}
-                  />
-                  Devoluciones
+                  Procesadas
                 </MenuItem>
               </Select>
             </FormControl>
@@ -522,12 +531,6 @@ const SalesList = () => {
                 <th style={{ textAlign: "left" }}>Cliente</th>
                 <th style={{ textAlign: "center" }}>Monto Venta</th>
                 <th style={{ textAlign: "center" }}>Productos</th>
-
-                {active === 1 ? (
-                  <th style={{ textAlign: "center" }}>Saldo </th>
-                ) : (
-                  <></>
-                )}
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -538,6 +541,7 @@ const SalesList = () => {
                     <td style={{ textAlign: "center" }}>
                       {moment(item.fechaVenta).format("L")}
                     </td>
+
                     <td>{item.id}</td>
 
                     <td
@@ -550,7 +554,7 @@ const SalesList = () => {
                       {item.isEventual
                         ? item.nombreCliente === ""
                           ? "CLIENTE EVENTUAL - S/N"
-                          : `CLIENTE EVENTUAL - ${item.nombreCliente}`
+                          : `C/E - ${item.nombreCliente}`
                         : item.client.nombreCliente}
                     </td>
 
@@ -571,101 +575,42 @@ const SalesList = () => {
                       {item.productsCount}
                     </td>
 
-                    {active === 1 ? (
-                      <td
-                        style={{
-                          textAlign: "center",
-                        }}
+                    <td style={{ width: 100 }}>
+                      <Stack
+                        spacing={2}
+                        direction="row"
+                        justifyContent={"center"}
                       >
-                        <Typography
-                          style={{
-                            fontWeight: "bold",
-                            color: item.isCanceled ? "#4caf50" : "#f50057",
-                          }}
-                        >
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.saldo)}
-                        </Typography>
-                        {item.isCanceled ? (
-                          <></>
-                        ) : (
-                          <Typography
-                            style={{
-                              color: moment().isAfter(
-                                item.fechaVencimiento,
-                                "day"
-                              )
-                                ? "#f50057"
-                                : "#03a9f4",
-
-                              fontSize: 13,
-                            }}
-                          >
-                            {`Vence: ${moment(item.fechaVencimiento).format(
-                              "L"
-                            )}`}
-                          </Typography>
-                        )}
-                      </td>
-                    ) : (
-                      <></>
-                    )}
-
-                    <td style={{ width: 150 }}>
-                      <Stack spacing={1} direction="row">
                         <IconButton
-                          style={{
-                            color: "#2979ff",
-                          }}
-                          size="small"
+                          style={{ color: "#009688", height: 40, width: 40 }}
                           onClick={() => {
-                            setData(item);
-                            setShowPrintModal(true);
+                            setFacturaSelect(item);
+                            setShowModal(true);
                           }}
                         >
-                          <PrintRoundedIcon style={{ fontSize: 30 }} />
+                          <FontAwesomeIcon icon={faReceipt} />
                         </IconButton>
 
-                        {isAccess(access, "PAGO CREATE") ? (
-                          active === 1 ? (
-                            <Tooltip
-                              title={item.isCanceled ? "Cancelado" : "Abonar"}
+                        {active === 0 ? (
+                          isAccess(access, "SALES DELETE") ? (
+                            <IconButton
+                              style={{
+                                color: "#f50057",
+                                height: 40,
+                                width: 40,
+                              }}
+                              onClick={() => {
+                                anulateFactura(item);
+                              }}
                             >
-                              <span>
-                                <IconButton
-                                  style={{
-                                    color: item.isCanceled
-                                      ? "#4caf50"
-                                      : "#ff9100",
-                                  }}
-                                  onClick={() => {
-                                    setSelectedVenta(item);
-                                    setShowModal(true);
-                                  }}
-                                  disabled={item.isCanceled}
-                                >
-                                  <FontAwesomeIcon icon={faHandHoldingDollar} />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </IconButton>
                           ) : (
                             <></>
                           )
                         ) : (
                           <></>
                         )}
-
-                        <IconButton
-                          style={{ color: "#009688" }}
-                          onClick={() => {
-                            setSelectedVenta(item);
-                            setShowReturnModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
                       </Stack>
                     </td>
                   </tr>
@@ -681,40 +626,28 @@ const SalesList = () => {
         />
       </Container>
 
-      <MediumModal
-        titulo={"Abonar"}
+      <SmallModal
+        titulo={"Pagar"}
         isVisible={showModal}
         setVisible={setShowModal}
       >
-        <NewAbono
-          selectedVenta={selectedVenta}
-          active={active}
-          setActive={setActive}
-          selectedStore={selectedStore}
-          setSelectedStore={setSelectedStore}
+        <Pagar
+          facturaSelected={facturaSelected}
+          setVisible={setShowModal}
+          setShowBillModal={setShowBillModal}
+          setDataBill={setDataBill}
         />
-      </MediumModal>
-
-      <MediumModal
-        titulo={"Devolver Producto"}
-        isVisible={showRetunModal}
-        setVisible={setShowReturnModal}
-      >
-        <SaleReturn
-          selectedVenta={selectedVenta}
-          setVisible={setShowReturnModal}
-        />
-      </MediumModal>
+      </SmallModal>
 
       <SmallModal
-        titulo={"Reimprimir Recibo"}
-        isVisible={showPrintModal}
-        setVisible={setShowPrintModal}
+        titulo={"Imprimir Recibo"}
+        isVisible={showBillModal}
+        setVisible={setShowBillModal}
       >
-        <BillComponent data={data} setShowModal={setShowModal} />
+        <BillComponent data={dataBill} setShowModal={setShowBillModal} />
       </SmallModal>
     </div>
   );
 };
 
-export default SalesList;
+export default Caja;

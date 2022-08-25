@@ -126,13 +126,13 @@ export const changeThemeAsync = async (token) => {
   return result;
 };
 
-export const changePasswordAsync = async (data) => {
+export const changePasswordAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}ChangePass`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
-      Authorization: `Bearer ${data.token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
   try {

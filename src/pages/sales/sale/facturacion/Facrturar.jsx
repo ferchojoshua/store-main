@@ -1,35 +1,29 @@
-import React, { useState, useContext, useEffect } from "react";
-import { DataContext } from "../../../context/DataContext";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
-
-import { Container, Paper, Grid } from "@mui/material";
-
+import { Container, Paper, Grid, Typography } from "@mui/material";
+import { isEmpty } from "lodash";
+import { getRuta, toastError, toastSuccess } from "../../../../helpers/Helpers";
+import { DataContext } from "../../../../context/DataContext";
 import {
   deleteToken,
   deleteUserData,
   getToken,
-} from "../../../services/Account";
-import { isEmpty } from "lodash";
-import SelectClient from "./SelectClient";
-import SelectProduct from "./SelectProduct";
-import SelectTipoVenta from "./SelectTipoVenta";
-import ProductDescription from "./ProductDescription";
-import SaleDetail from "./SaleDetail";
-import { addSaleAsync } from "../../../services/SalesApi";
-import SmallModal from "../../../components/modals/SmallModal";
-import { BillComponent } from "./printBill/BillComponent";
-import ProformaComponent from "./printBill/ProformaComponent";
-import PreFacturar from "./PreFacturar";
+} from "../../../../services/Account";
+import SelectClient from "../SelectClient";
+import SelectProduct from "../SelectProduct";
+import SelectTipoVenta from "../SelectTipoVenta";
+import ProductDescription from "../ProductDescription";
+import SaleDetail from "../SaleDetail";
+import { addFacturaAsync } from "../../../../services/FacturationApi";
+import SmallModal from "../../../../components/modals/SmallModal";
+import ProformaComponent from "../printBill/ProformaComponent";
 
-const NewSale = () => {
+const Facrturar = () => {
   let ruta = getRuta();
-
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } =
     useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
-
   const [typeClient, setTypeClient] = useState(true);
 
   const [selectedClient, setSelectedClient] = useState("");
@@ -64,17 +58,14 @@ const NewSale = () => {
 
   const [barCodeSearch, setBarCodeSearch] = useState(false);
 
-  const [showModal, setShowModal] = useState(false);
-  const [dataBill, setDataBill] = useState([]);
-
-  const [showProformaModal, setShowProformaModal] = useState(false);
-  const [dataProforma, setDataProforma] = useState([]);
-
   const [showFacturarModal, setShowFacturarModal] = useState(false);
 
   const [montoVentaDespuesDescuento, setMontoVentaDespuesDescuento] =
     useState(0);
   const [montoVentaAntesDescuento, setMontoVentaAntesDescuento] = useState(0);
+
+  const [dataProforma, setDataProforma] = useState([]);
+  const [showProformaModal, setShowProformaModal] = useState(false);
 
   useEffect(() => {
     setTypeClient(true);
@@ -128,6 +119,7 @@ const NewSale = () => {
 
     const data = {
       product: producto,
+      productId: producto.id,
       cantidad: parseInt(cantidad),
       descuento: descuentoXMonto === "" ? 0 : parseFloat(descuentoXMonto),
       costoUnitario: costoAntesDescuento / cantidad,
@@ -163,26 +155,23 @@ const NewSale = () => {
 
   const addNewVenta = async () => {
     if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
-      toastError("Seleccione al menos un producto");
+      toastError("Seleccione al menos un producto para facturar");
       return;
     }
-
     if (descuentoCod !== "VC.2022*" && !isEmpty(descuentoGlobal)) {
-      toastError("Codigo incorrecto");
+      toastError("Codigo incorrecto!");
       return;
     }
-
     if (!typeClient && isEmpty(selectedClient)) {
       toastError("Seleccione un cliente");
       return;
     }
-
     const data = {
       isEventual: typeClient,
       nombreCliente: eventualClient,
       idClient: selectedClient.id,
       montoVenta: montoVentaDespuesDescuento,
-      saleDetails: selectedProductList,
+      facturacionDetails: selectedProductList,
       isContado: typeVenta === "contado" ? true : false,
       storeid: selectedStore,
       isDescuento: descuentoGlobal ? true : false,
@@ -193,7 +182,7 @@ const NewSale = () => {
     };
 
     setIsLoading(true);
-    const result = await addSaleAsync(token, data);
+    const result = await addFacturaAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
@@ -229,11 +218,8 @@ const NewSale = () => {
     setSelectedStore("");
     setSelectedProductList([]);
     setIsLoading(false);
-    toastSuccess("Venta Realizada");
+    toastSuccess("Productos Facturados");
     setReload(!reload);
-    setDataBill(result.data);
-    setShowFacturarModal(false);
-    printBill();
   };
 
   const addProformma = async () => {
@@ -241,12 +227,10 @@ const NewSale = () => {
       toastError("Seleccione al menos un producto");
       return;
     }
-
     if (!typeClient && isEmpty(selectedClient)) {
       toastError("Seleccione un cliente");
       return;
     }
-
     const data = {
       nombreCliente: eventualClient,
       idClient: selectedClient.id,
@@ -254,30 +238,17 @@ const NewSale = () => {
       saleDetails: selectedProductList,
       storeid: selectedStore,
     };
-
     setDataProforma(data);
     setShowProformaModal(true);
-  };
-
-  const printBill = () => {
-    setShowModal(true);
   };
 
   return (
     <div>
       <Container maxWidth="xl">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h1>Agregar Venta de Productos</h1>
-        </div>
-
+        <Typography variant="h4" textAlign={"left"}>
+          Facturar
+        </Typography>
         <hr />
-
         <Paper
           elevation={10}
           style={{
@@ -295,6 +266,7 @@ const NewSale = () => {
                 typeClient={typeClient}
                 onTypeClientChange={onTypeClientChange}
               />
+
               <SelectProduct
                 selectedProductList={selectedProductList}
                 selectedStore={selectedStore}
@@ -355,17 +327,9 @@ const NewSale = () => {
           montoVentaDespuesDescuento={montoVentaDespuesDescuento}
           setMontoVentaDespuesDescuento={setMontoVentaDespuesDescuento}
           descuentoGlobal={descuentoGlobal}
-          isFacturar={false}
+          isFacturar={true}
         />
       </Container>
-
-      <SmallModal
-        titulo={"Imprimir Recibo"}
-        isVisible={showModal}
-        setVisible={setShowModal}
-      >
-        <BillComponent data={dataBill} setShowModal={setShowModal} />
-      </SmallModal>
 
       <SmallModal
         titulo={"Imprimir Proforma"}
@@ -377,33 +341,8 @@ const NewSale = () => {
           setShowModal={setShowProformaModal}
         />
       </SmallModal>
-
-      <SmallModal
-        titulo={"Facturar"}
-        isVisible={showFacturarModal}
-        setVisible={setShowFacturarModal}
-      >
-        <PreFacturar
-          isDescPercent={isDescPercent}
-          setIsDescPercent={setIsDescPercent}
-          descuentoCod={descuentoCod}
-          setDescuentoCod={setDescuentoCod}
-          descuentoGlobalMonto={descuentoGlobalMonto}
-          setDescuentoGlobalMonto={setDescuentoGlobalMonto}
-          descuentoGlobalPercent={descuentoGlobalPercent}
-          setDescuentoGlobalPercent={setDescuentoGlobalPercent}
-          descuentoGlobal={descuentoGlobal}
-          setDescuentoGlobal={setDescuentoGlobal}
-          montoVentaDespuesDescuento={montoVentaDespuesDescuento}
-          setMontoVentaDespuesDescuento={setMontoVentaDespuesDescuento}
-          addNewVenta={addNewVenta}
-          montoVentaAntesDescuento={montoVentaAntesDescuento}
-          setMontoVentaAntesDescuento={setMontoVentaAntesDescuento}
-          selectedProductList={selectedProductList}
-        />
-      </SmallModal>
     </div>
   );
 };
 
-export default NewSale;
+export default Facrturar;

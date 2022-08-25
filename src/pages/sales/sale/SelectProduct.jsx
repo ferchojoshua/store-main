@@ -81,6 +81,7 @@ const SelectProduct = ({
           idAlmacen: selectedStore,
         };
         setIsLoading(true);
+        
         const result = await getExistencesByStoreAsync(token, data);
         if (!result.statusResponse) {
           setIsLoading(false);

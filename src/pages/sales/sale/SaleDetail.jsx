@@ -15,10 +15,15 @@ import { DataContext } from "../../../context/DataContext";
 const SaleDetail = ({
   selectedProductList,
   setSelectedProductList,
-  montoVenta,
-  setMontoVenta,
-  addNewVenta,
   addProformma,
+  setShowFacturarModal,
+  montoVentaDespuesDescuento,
+  setMontoVentaDespuesDescuento,
+  descuentoGlobal,
+  montoVentaAntesDescuento,
+  setMontoVentaAntesDescuento,
+  isFacturar,
+  addNewVenta,
 }) => {
   const { isDarkMode } = useContext(DataContext);
 
@@ -26,9 +31,11 @@ const SaleDetail = ({
     const filtered = selectedProductList.filter(
       (p) => p.product.id !== item.product.id
     );
-    setMontoVenta(montoVenta - item.costoTotal);
+    setMontoVentaAntesDescuento(montoVentaAntesDescuento - item.costoTotal);
+    setMontoVentaDespuesDescuento(montoVentaAntesDescuento - item.costoTotal);
     setSelectedProductList(filtered);
   };
+
   return (
     <div>
       <Paper
@@ -61,15 +68,10 @@ const SaleDetail = ({
             <tr>
               <th>#</th>
               <th style={{ textAlign: "left" }}>Producto</th>
-              <th style={{ textAlign: "center" }}>Cantidad</th>
+              <th style={{ textAlign: "center" }}>C. Unitario</th>
               <th style={{ textAlign: "center" }}>Descuento</th>
-              <th style={{ textAlign: "center" }}>Costo Unitario</th>
-              <th style={{ textAlign: "center", color: "#757575" }}>
-                P.V. Mayor
-              </th>
-              <th style={{ textAlign: "center", color: "#757575" }}>
-                P.V. Detalle
-              </th>
+              <th style={{ textAlign: "center" }}>Cost-Desc</th>
+              <th style={{ textAlign: "center" }}>Cantidad</th>
               <th style={{ textAlign: "center" }}>Costo Total</th>
               <th style={{ textAlign: "center" }}>Eliminar</th>
             </tr>
@@ -83,26 +85,26 @@ const SaleDetail = ({
                     <td style={{ textAlign: "left" }}>
                       {item.product.description}
                     </td>
-                    <td>{item.cantidad}</td>
-                    <td>{`${item.descuento}%`}</td>
+
                     <td>
                       {item.costoUnitario.toLocaleString("es-NI", {
                         style: "currency",
                         currency: "NIO",
                       })}
                     </td>
+                    <td>{`${parseFloat(item.descuento).toLocaleString("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    })} = ${Math.round(item.descuentoXPercent)}%`}</td>
+
                     <td>
-                      {item.PVM.toLocaleString("es-NI", {
+                      {item.costoTotalDespuesDescuento.toLocaleString("es-NI", {
                         style: "currency",
                         currency: "NIO",
                       })}
                     </td>
-                    <td>
-                      {item.PVD.toLocaleString("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      })}
-                    </td>
+                    <td>{item.cantidad}</td>
+
                     <td>
                       {item.costoTotal.toLocaleString("es-NI", {
                         style: "currency",
@@ -194,10 +196,15 @@ const SaleDetail = ({
                 fontWeight: "bold",
               }}
             >
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(montoVenta)}
+              {descuentoGlobal
+                ? new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(montoVentaDespuesDescuento)
+                : new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(montoVentaAntesDescuento)}
             </Typography>
           </Stack>
 
@@ -208,7 +215,9 @@ const SaleDetail = ({
               borderColor: "#00a152",
               color: "#00a152",
             }}
-            onClick={() => addNewVenta()}
+            onClick={() =>
+              isFacturar ? addNewVenta() : setShowFacturarModal(true)
+            }
           >
             <FontAwesomeIcon
               style={{ marginRight: 10, fontSize: 20 }}

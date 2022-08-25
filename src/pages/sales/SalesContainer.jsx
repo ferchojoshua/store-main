@@ -9,6 +9,8 @@ import {
   faFileInvoiceDollar,
   faHandHoldingDollar,
   faCashRegister,
+  faCartPlus,
+  faMoneyCheckDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 
@@ -18,6 +20,8 @@ import SalesList from "./accountStatus/SalesList";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
 import CashMovements from "./Caja/CashMovements";
+import Facrturar from "./sale/facturacion/Facrturar";
+import Caja from "./sale/facturacion/Caja";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,6 +59,33 @@ const SalesContainer = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const tabIndex = (value) => {
+    let result = null;
+    for (let index = 0; index <= value; index++) {
+      if (isAccess(access, "SALES CREATE") && index === 0) {
+        result === null ? (result = 0) : result++;
+      }
+      if (isAccess(access, "SALES FACTURACION") && index === 1) {
+        result === null ? (result = 0) : result++;
+      }
+      if (isAccess(access, "SALES CAJA") && index === 2) {
+        result === null ? (result = 0) : result++;
+      }
+      if (isAccess(access, "SALES VER") && index === 3) {
+        result === null ? (result = 0) : result++;
+      }
+      if (isAccess(access, "CAJA VER") && index === 4) {
+        result === null ? (result = 0) : result++;
+      }
+      if (isAccess(access, "CLIENTS VER") && index === 5) {
+        result === null ? (result = 0) : result++;
+      }
+    }
+
+    return result;
+  };
+
   return (
     <Container>
       <Paper
@@ -85,6 +116,35 @@ const SalesContainer = () => {
             ""
           )}
 
+          {isAccess(access, "SALES FACTURACION") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faCartPlus} style={{ fontSize: 20 }} />
+              }
+              label="Facturar"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
+
+          {isAccess(access, "SALES CAJA") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon
+                  icon={faCashRegister}
+                  style={{ fontSize: 20 }}
+                />
+              }
+              label="Caja"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
+
           {isAccess(access, "SALES VER") ? (
             <Tab
               icon={
@@ -105,7 +165,7 @@ const SalesContainer = () => {
             <Tab
               icon={
                 <FontAwesomeIcon
-                  icon={faCashRegister}
+                  icon={faMoneyCheckDollar}
                   style={{ fontSize: 20 }}
                 />
               }
@@ -130,18 +190,31 @@ const SalesContainer = () => {
         <Divider style={{ marginTop: 10 }} />
 
         {isAccess(access, "SALES CREATE") ? (
-          <TabPanel value={value} index={0}>
+          <TabPanel value={value} index={tabIndex(0)}>
             <NewSale />
           </TabPanel>
         ) : (
           <></>
         )}
 
+        {isAccess(access, "SALES FACTURACION") ? (
+          <TabPanel value={value} index={tabIndex(1)}>
+            <Facrturar />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
+
+        {isAccess(access, "SALES CAJA") ? (
+          <TabPanel value={value} index={tabIndex(2)}>
+            <Caja />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
+
         {isAccess(access, "SALES VER") ? (
-          <TabPanel
-            value={value}
-            index={isAccess(access, "SALES CREATE") ? 1 : 0}
-          >
+          <TabPanel value={value} index={tabIndex(3)}>
             <SalesList />
           </TabPanel>
         ) : (
@@ -149,18 +222,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "CAJA VER") ? (
-          <TabPanel
-            value={value}
-            index={
-              isAccess(access, "SALES CREATE") && isAccess(access, "SALES VER")
-                ? 2
-                : isAccess(access, "SALES CREATE")
-                ? 1
-                : isAccess(access, "SALES VER")
-                ? 1
-                : 0
-            }
-          >
+          <TabPanel value={value} index={tabIndex(4)}>
             <CashMovements />
           </TabPanel>
         ) : (
@@ -168,30 +230,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "CLIENTS VER") ? (
-          <TabPanel
-            value={value}
-            index={
-              isAccess(access, "SALES CREATE") &&
-              isAccess(access, "SALES VER") &&
-              isAccess(access, "CAJA VER")
-                ? 3
-                : isAccess(access, "SALES CREATE") &&
-                  isAccess(access, "SALES VER")
-                ? 2
-                : isAccess(access, "SALES CREATE") &&
-                  isAccess(access, "SALES VER")
-                ? 2
-                : isAccess(access, "SALES VER") && isAccess(access, "CAJA VER")
-                ? 2
-                : isAccess(access, "SALES CREATE")
-                ? 1
-                : isAccess(access, "SALES VER")
-                ? 1
-                : isAccess(access, "CAJA VER")
-                ? 1
-                : 0
-            }
-          >
+          <TabPanel value={value} index={tabIndex(5)}>
             <ClientList />
           </TabPanel>
         ) : (

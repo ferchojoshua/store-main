@@ -55,6 +55,8 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [ventasVer, setVentasVer] = useState(false);
   const [ventasCreate, setVentasCreate] = useState(false);
   const [ventasDelete, setVentasDelete] = useState(false);
+  const [ventasFacturacion, setVentasFacturacion] = useState(false);
+  const [ventasCaja, setVentasCaja] = useState(false);
 
   const [pagoCreate, setPagoCreate] = useState(false);
   const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
@@ -124,6 +126,12 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "SALES DELETE":
           setVentasDelete(item.isEnable);
+          break;
+        case "SALES FACTURACION":
+          setVentasFacturacion(item.isEnable);
+          break;
+        case "SALES CAJA":
+          setVentasCaja(item.isEnable);
           break;
 
         //Ventas Producto
@@ -306,6 +314,12 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "SALES DELETE":
           item.isEnable = ventasDelete;
+          break;
+        case "SALES FACTURACION":
+          item.isEnable = ventasFacturacion;
+          break;
+        case "SALES CAJA":
+          item.isEnable = ventasCaja;
           break;
 
         //Ventas Producto
@@ -504,73 +518,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     setShowModal(false);
   };
 
-  // const permisos = (item) => {
-  //   const { description, isEnable } = item;
-  //   if (description === "SALES VER") {
-  //     console.log(isEnable);
-  //   }
-  //   const permiso = {
-  //     "USER VER": setUserVer(isEnable),
-  //     "USER CREATE": setUserCreate(isEnable),
-  //     "USER UPDATE": setUserUpdate(isEnable),
-  //     "USER DELETE": setUserDelete(isEnable),
-
-  //     "MISCELANEOS VER": setMiscelaneosVer(isEnable),
-  //     "MISCELANEOS CREATE": setMiscelaneosCreate(isEnable),
-  //     "MISCELANEOS UPDATE": setMiscelaneosUpdate(isEnable),
-  //     "MISCELANEOS DELETE": setMiscelaneosDelete(isEnable),
-
-  //     "ENTRADAPRODUCTOS VER": setInProductsVer(isEnable),
-  //     "ENTRADAPRODUCTOS CREATE": setInProductsCreate(isEnable),
-  //     "ENTRADAPRODUCTOS UPDATE": setInProductsUpdate(isEnable),
-
-  //     "ROLES VER": setRolesVer(isEnable),
-  //     "ROLES CREATE": setRolesCreate(isEnable),
-  //     "ROLES UPDATE": setRolesUpdate(isEnable),
-  //     "ROLES DELETE": setRolesDelete(isEnable),
-
-  //     "PRODUCTS VER": setProductsVer(isEnable),
-  //     "PRODUCTS CREATE": setProductsCreate(isEnable),
-  //     "PRODUCTS UPDATE": setProductsUpdate(isEnable),
-  //     "PRODUCTS DELETE": setProductsDelete(isEnable),
-
-  //     "PRODUCT TRANSLATE VER": setProductTraslateVer(isEnable),
-  //     "PRODUCT TRANSLATE CREATE": setProductTraslateCreate(isEnable),
-
-  //     "EXISTANCE VER": setExistenceProductsVer(isEnable),
-  //     "EXISTANCE UPDATE": setExistenceProductsUpdate(isEnable),
-  //     "KARDEX VER": setKardexVer(isEnable),
-
-  //     "CLIENTS VER": setClientsVer(isEnable),
-  //     "CLIENTS CREATE": setClientsCreate(isEnable),
-  //     "CLIENTS UPDATE": setClientsUpdate(isEnable),
-  //     "CLIENTS DELETE": setClientsDelete(isEnable),
-
-  //     "COMMUNITIES VER": setCommunitiesVer(isEnable),
-  //     "COMMUNITIES CREATE": setCommunitiesCreate(isEnable),
-  //     "COMMUNITIES UPDATE": setCommunitiesUpdate(isEnable),
-  //     "COMMUNITIES DELETE": setCommunitiesDelete(isEnable),
-
-  //     "SALES VER": setVentasVer(isEnable),
-  //     "SALES CREATE": setVentasCreate(isEnable),
-  //     "SALES DELETE": setVentasDelete(isEnable),
-
-  //     "PAGO CREATE": setPagoCreate(isEnable),
-  //     "PAGO ESPECIFICO CREATE": setPagoEspecificoCreate(isEnable),
-
-  //     "CAJA VER": setCajaVer(isEnable),
-  //     "CAJA CREATE": setCajaCreate(isEnable),
-
-  //     "CONT VER": setContVer(isEnable),
-  //     "CONT CREATE": setContCreate(isEnable),
-  //     "CONT UPDATE": setContUpdate(isEnable),
-  //     "CONT DELETE": setContDelete(isEnable),
-
-  //     "MASTER VENTAS VER": setMasterVentasVer(isEnable),
-  //     "CUENTASXCOBRAR VER": setCXCobrarVer(isEnable),
-  //   };
-  // };
-
   return (
     <div>
       <Divider />
@@ -640,69 +587,99 @@ const EditRol = ({ setShowModal, selectedRol }) => {
       </Typography>
       <Divider />
 
+      {/* Modulo Ventas */}
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 10,
+        }}
+      >
+        <Typography
+          style={{
+            fontSize: 17,
+            color: "#2196f3",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          Modulo Venta de Productos
+        </Typography>
+        <Divider />
+        <Stack direction="row" display="flex" justifyContent="space-around">
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={ventasVer}
+                onChange={() => setVentasVer(!ventasVer)}
+              />
+            }
+            label="Estado de Cuenta"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={ventasCreate}
+                onChange={() => setVentasCreate(!ventasCreate)}
+              />
+            }
+            label="Venta Directa"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={ventasDelete}
+                onChange={() => setVentasDelete(!ventasDelete)}
+              />
+            }
+            label="Anular"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={ventasFacturacion}
+                onChange={() => setVentasFacturacion(!ventasFacturacion)}
+              />
+            }
+            label="Facturacion"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={ventasCaja}
+                onChange={() => setVentasCaja(!ventasCaja)}
+              />
+            }
+            label="Caja"
+          />
+        </Stack>
+      </Paper>
+
       <Grid spacing={2} container>
         <Grid item sm={12} md={6}>
-          {/* Modulo Ventas */}
-          <Paper
-            elevation={10}
-            style={{
-              borderRadius: 30,
-              padding: 10,
-            }}
-          >
-            <Typography
-              style={{
-                fontSize: 17,
-                color: "#2196f3",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              Modulo Venta de Productos
-            </Typography>
-            <Divider />
-            <Stack direction="row" display="flex" justifyContent="space-around">
-              <FormControlLabel
-                labelPlacement="top"
-                control={
-                  <Checkbox
-                    disabled={!isEdit}
-                    checked={ventasVer}
-                    onChange={() => setVentasVer(!ventasVer)}
-                  />
-                }
-                label="Ver"
-              />
-
-              <FormControlLabel
-                labelPlacement="top"
-                control={
-                  <Checkbox
-                    disabled={!isEdit}
-                    checked={ventasCreate}
-                    onChange={() => setVentasCreate(!ventasCreate)}
-                  />
-                }
-                label="Crear"
-              />
-
-              <FormControlLabel
-                labelPlacement="top"
-                style={{
-                  textAlign: "center",
-                }}
-                control={
-                  <Checkbox
-                    disabled={!isEdit}
-                    checked={ventasDelete}
-                    onChange={() => setVentasDelete(!ventasDelete)}
-                  />
-                }
-                label="Anular Venta"
-              />
-            </Stack>
-          </Paper>
-
           {/* Modulo Caja */}
           <Paper
             elevation={10}
@@ -720,7 +697,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                 textAlign: "center",
               }}
             >
-              Modulo Caja
+              Modulo Caja Chica
             </Typography>
             <Divider />
             <Stack direction="row" display="flex" justifyContent="space-around">
@@ -865,6 +842,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <Typography

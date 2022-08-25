@@ -26,7 +26,7 @@ export const ArticulosVendidos = ({
 }) => {
   const [data, setData] = useState([]);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
+  const { setIsLoading, setIsDefaultPass, setIsLogged, isDarkMode } =
     useContext(DataContext);
 
   let navigate = useNavigate();

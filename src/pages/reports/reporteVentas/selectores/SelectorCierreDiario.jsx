@@ -10,7 +10,6 @@ import {
   MenuItem,
   Button,
   Stack,
-  Autocomplete,
 } from "@mui/material";
 import { getStoresAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
@@ -25,12 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
-import { getClientsAsync } from "../../../../services/ClientsApi";
-import {
-  getFamiliasByTNAsync,
-  getTipoNegocioAsync,
-} from "../../../../services/TipoNegocioApi";
-import { ArticulosVendidos } from "../Reportes/ArticulosVendidos";
+import CierreDiario from "../Reportes/CierreDiario";
 
 const SelectorCierreDiario = () => {
   var date = new Date();
@@ -44,7 +38,7 @@ const SelectorCierreDiario = () => {
 
   const [showFullScreenModal, setShowFullScreenModal] = useState(false);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access } =
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
   let navigate = useNavigate();
@@ -246,7 +240,15 @@ const SelectorCierreDiario = () => {
           ).format("L")}`}
           open={showFullScreenModal}
           handleClose={handleClose}
-        ></FullScreenModal>
+        >
+          <CierreDiario
+            selectedStore={selectedStore}
+            fechaDesde={fechaDesde}
+            fechaHasta={fechaHasta}
+            horaDesde={horaDesde}
+            horaHasta={horaHasta}
+          />
+        </FullScreenModal>
       </Container>
     </div>
   );

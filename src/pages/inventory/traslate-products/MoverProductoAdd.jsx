@@ -24,6 +24,9 @@ import {
   Paper,
   Tooltip,
   IconButton,
+  selectClasses,
+  Stack,
+  Typography,
 } from "@mui/material";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -136,78 +139,28 @@ const MoverProductoAdd = ({ setShowModal }) => {
   }, [reload]);
 
   const handleChangeProduct = async (newValue) => {
-    setSelectedProcedencia("");
-    setSelectedDestino("");
     setSelectedProduct("");
     setExistenceProcedencia("");
-    if (existenceProcedencia === "") {
+    //Si el producto seleccionado es null or empty
+    //Asignamos el valor al producto seleccionado
+    //y lo sacamos del proceso
+    if (newValue === "" || newValue === null) {
       setSelectedProduct(newValue);
       return;
-    } else {
-      if (newValue === "" || newValue === null) {
-        setSelectedProduct(newValue);
-        return;
-      }
+    }
 
-      if (selectedProcedencia === "") {
-        return;
-      }
+    if (selectedProcedencia === "") {
       setSelectedProduct(newValue);
-      const data = {
-        idProduct: newValue ? newValue.id : "",
-        idAlmacen: selectedProcedencia,
-      };
-      setIsLoading(true);
-      const result = await getProducExistanceAsync(token, data);
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error === 204) {
-          toastError(
-            "Almacen procedencia no tiene existencias de este producto"
-          );
-          setExistenceProcedencia(0);
-          return;
-        } else if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(result.error.message);
-        return;
-      }
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setIsLoading(false);
-      if (result.data.existencia === 0) {
-        toastError("Almacen procedencia no este producto, seleccione otro");
-        setExistenceProcedencia(0);
-        return;
-      }
-      setExistenceProcedencia(result.data.existencia);
+      return;
     }
-  };
 
-  const handleChangeProcedencia = async (event) => {
-    if (selectedDestino === event.target.value) {
-      setSelectedDestino("");
-    }
-    setSelectedProcedencia(event.target.value);
+    setSelectedProduct(newValue);
     const data = {
-      idProduct: selectedProduct.id,
-      idAlmacen: event.target.value,
+      idProduct: newValue ? newValue.id : "",
+      idAlmacen: selectedProcedencia,
     };
     setIsLoading(true);
+    //Traemos la existencia del producto
     const result = await getProducExistanceAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
@@ -238,9 +191,61 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
     setIsLoading(false);
     if (result.data.existencia === 0) {
-      toastError(
-        "Este almacen no tiene existencias de este producto, seleccione otro"
-      );
+      toastError("Almacen procedencia no este producto, seleccione otro");
+      setExistenceProcedencia(0);
+      return;
+    }
+    setExistenceProcedencia(result.data.existencia);
+  };
+
+  const handleChangeProcedencia = async (event) => {
+    if (selectedDestino === event.target.value) {
+      setSelectedDestino("");
+    }
+
+    setSelectedProcedencia(event.target.value);
+    if (isEmpty(selectedProduct)) {
+      return;
+    }
+
+    const data = {
+      idProduct: selectedProduct.id,
+      idAlmacen: event.target.value,
+    };
+
+    setIsLoading(true);
+    const result = await getProducExistanceAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error === 204) {
+        console.log(result);
+        toastError("Almacen procedencia no tiene existencias de este producto");
+        setExistenceProcedencia(0);
+        return;
+      } else if (result.error.request.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
+    setIsLoading(false);
+    if (result.data.existencia === 0) {
+      toastError("No hay existencias de este producto, seleccione otro");
       setExistenceProcedencia(0);
       return;
     }
@@ -412,7 +417,10 @@ const MoverProductoAdd = ({ setShowModal }) => {
   };
 
   const deleteFromProductDetailList = (item) => {
-    const filtered = productDetails.filter((p) => p.id !== item.id);
+    const filtered = productDetails.filter(
+      (p) => p.idProducto !== item.idProducto
+    );
+
     setProductDetails(filtered);
   };
 
@@ -625,38 +633,48 @@ const MoverProductoAdd = ({ setShowModal }) => {
                 >
                   <Grid item sm={4}>
                     {selectedProcedencia !== "" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          justifyContent: "center",
-                          alignContent: "center",
-                          marginBottom: 5,
-                        }}
-                      >
-                        <span style={{ color: "#2196f3", marginRight: 10 }}>
+                      <Stack>
+                        <Typography
+                          style={{
+                            color: "#2196f3",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                          }}
+                        >
                           Existencia Procedencia:
-                        </span>
-                        <span>{existenceProcedencia}</span>
-                      </div>
+                        </Typography>
+                        <Typography
+                          style={{
+                            textAlign: "center",
+                          }}
+                        >
+                          {existenceProcedencia}
+                        </Typography>
+                      </Stack>
                     ) : (
                       <></>
                     )}
                   </Grid>
                   <Grid item sm={4}>
                     {selectedDestino !== "" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <span style={{ color: "#2196f3", marginRight: 10 }}>
+                      <Stack>
+                        <Typography
+                          style={{
+                            color: "#2196f3",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                          }}
+                        >
                           Existencia Destino:
-                        </span>
-                        <span>{existenceDestino}</span>
-                      </div>
+                        </Typography>
+                        <Typography
+                          style={{
+                            textAlign: "center",
+                          }}
+                        >
+                          {existenceDestino}
+                        </Typography>
+                      </Stack>
                     ) : (
                       <></>
                     )}

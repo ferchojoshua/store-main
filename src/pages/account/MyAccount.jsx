@@ -15,7 +15,6 @@ import "moment/locale/es";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import UpdateData from "./UpdateData";
-import Loading from "../../components/Loading";
 import SmallModal from "../../components/modals/SmallModal";
 import ChangePass from "./ChangePass";
 moment.locale("es");
@@ -121,7 +120,6 @@ const MyAccount = () => {
           </Grid>
         </Grid>
       </Container>
-      <Loading />
 
       <SmallModal
         isVisible={showModal}

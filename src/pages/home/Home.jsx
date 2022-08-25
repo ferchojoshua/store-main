@@ -58,6 +58,7 @@ const Home = () => {
 
       setIsLoading(false);
       setStoreList(result.data);
+
       handleChangeStore(result.data[0].id);
     })();
   }, []);

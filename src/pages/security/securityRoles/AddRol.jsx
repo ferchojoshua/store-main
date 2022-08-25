@@ -38,6 +38,8 @@ const AddRol = ({ setShowModal }) => {
   const [ventasVer, setVentasVer] = useState(false);
   const [ventasCreate, setVentasCreate] = useState(false);
   const [ventasDelete, setVentasDelete] = useState(false);
+  const [ventasFacturacion, setVentasFacturacion] = useState(false);
+  const [ventasCaja, setVentasCaja] = useState(false);
 
   const [pagoCreate, setPagoCreate] = useState(false);
   const [pagoEspecificoCreate, setPagoEspecificoCreate] = useState(false);
@@ -101,6 +103,8 @@ const AddRol = ({ setShowModal }) => {
     setVentasVer(!isFullAccess);
     setVentasCreate(!isFullAccess);
     setVentasDelete(!isFullAccess);
+    setVentasFacturacion(!isFullAccess);
+    setVentasCaja(!isFullAccess);
 
     setPagoCreate(!isFullAccess);
     setPagoEspecificoCreate(!isFullAccess);
@@ -177,6 +181,22 @@ const AddRol = ({ setShowModal }) => {
         },
         {
           description: "SALES DELETE",
+          IsEnable: ventasDelete,
+        },
+        {
+          description: "SALES DELETE",
+          IsEnable: ventasDelete,
+        },
+        {
+          description: "SALES DELETE",
+          IsEnable: ventasDelete,
+        },
+        {
+          description: "SALES FACTURACION",
+          IsEnable: ventasDelete,
+        },
+        {
+          description: "SALES CAJA",
           IsEnable: ventasDelete,
         },
 
@@ -468,66 +488,94 @@ const AddRol = ({ setShowModal }) => {
         />
       </div>
 
+      {/* Modulo Ventas */}
+      <Paper
+        elevation={10}
+        style={{
+          borderRadius: 30,
+          padding: 10,
+        }}
+      >
+        <Typography
+          style={{
+            fontSize: 17,
+            color: "#2196f3",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          Modulo Venta de Productos
+        </Typography>
+        <Divider />
+        <Stack direction="row" display="flex" justifyContent="space-around">
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={ventasVer}
+                onChange={() => setVentasVer(!ventasVer)}
+              />
+            }
+            label="Estado de Cuenta"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={ventasCreate}
+                onChange={() => setVentasCreate(!ventasCreate)}
+              />
+            }
+            label="Venta Directa"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                checked={ventasDelete}
+                onChange={() => setVentasDelete(!ventasDelete)}
+              />
+            }
+            label="Anular "
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                checked={ventasFacturacion}
+                onChange={() => setVentasFacturacion(!ventasFacturacion)}
+              />
+            }
+            label="Facturacion"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            style={{
+              textAlign: "center",
+            }}
+            control={
+              <Checkbox
+                checked={ventasCaja}
+                onChange={() => setVentasCaja(!ventasCaja)}
+              />
+            }
+            label="Caja"
+          />
+        </Stack>
+      </Paper>
+
       <Grid spacing={2} container>
         <Grid item sm={12} md={6}>
-          {/* Modulo Ventas */}
-          <Paper
-            elevation={10}
-            style={{
-              borderRadius: 30,
-              padding: 10,
-            }}
-          >
-            <Typography
-              style={{
-                fontSize: 17,
-                color: "#2196f3",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              Modulo Venta de Productos
-            </Typography>
-            <Divider />
-            <Stack direction="row" display="flex" justifyContent="space-around">
-              <FormControlLabel
-                labelPlacement="top"
-                control={
-                  <Checkbox
-                    checked={ventasVer}
-                    onChange={() => setVentasVer(!ventasVer)}
-                  />
-                }
-                label="Ver"
-              />
-
-              <FormControlLabel
-                labelPlacement="top"
-                control={
-                  <Checkbox
-                    checked={ventasCreate}
-                    onChange={() => setVentasCreate(!ventasCreate)}
-                  />
-                }
-                label="Crear"
-              />
-
-              <FormControlLabel
-                labelPlacement="top"
-                style={{
-                  textAlign: "center",
-                }}
-                control={
-                  <Checkbox
-                    checked={ventasDelete}
-                    onChange={() => setVentasDelete(!ventasDelete)}
-                  />
-                }
-                label="Anular Venta"
-              />
-            </Stack>
-          </Paper>
-
           {/* Modulo Caja */}
           <Paper
             elevation={10}
@@ -545,7 +593,7 @@ const AddRol = ({ setShowModal }) => {
                 textAlign: "center",
               }}
             >
-              Modulo Caja
+              Modulo Caja Chica
             </Typography>
             <Divider />
             <Stack direction="row" display="flex" justifyContent="space-around">
@@ -684,6 +732,7 @@ const AddRol = ({ setShowModal }) => {
             style={{
               borderRadius: 30,
               padding: 10,
+              marginTop: 20,
             }}
           >
             <Typography

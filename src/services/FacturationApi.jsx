@@ -1,17 +1,16 @@
 import axios from "axios";
-
 const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
 let controller = "";
 if (process.env.NODE_ENV === "production") {
-  controller = `${REACT_APP_PRODURL}Reports/`;
+  controller = `${REACT_APP_PRODURL}Facturation/`;
 } else {
-  controller = `${REACT_APP_URL}Reports/`;
+  controller = `${REACT_APP_URL}Facturation/`;
 }
 
-export const getMasterVentasAsync = async (token, data) => {
+export const getFactUncancelledByStoreAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}GetMasterVentas`;
+  let service = `${controller}GetFacturationsUncancelled/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -19,7 +18,7 @@ export const getMasterVentasAsync = async (token, data) => {
     },
   });
   try {
-    await authAxios.post(service, data).then((resp) => {
+    await authAxios.get(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -32,13 +31,12 @@ export const getMasterVentasAsync = async (token, data) => {
     result.statusResponse = false;
     result.error = error;
   }
-
   return result;
 };
 
-export const getCuentasXCobrarAsync = async (token, data) => {
+export const getFactCancelledByStoreAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}GetCuentasXCobrar`;
+  let service = `${controller}GetFactCancelled/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -46,7 +44,7 @@ export const getCuentasXCobrarAsync = async (token, data) => {
     },
   });
   try {
-    await authAxios.post(service, data).then((resp) => {
+    await authAxios.get(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -59,21 +57,19 @@ export const getCuentasXCobrarAsync = async (token, data) => {
     result.statusResponse = false;
     result.error = error;
   }
-
   return result;
 };
 
-export const getProductosVendidosAsync = async (token, data) => {
+export const addFacturaAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}GetProdVendidos`;
   const authAxios = axios.create({
-    baseURL: service,
+    baseURL: controller,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
   try {
-    await authAxios.post(service, data).then((resp) => {
+    await authAxios.post(controller, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -86,13 +82,37 @@ export const getProductosVendidosAsync = async (token, data) => {
     result.statusResponse = false;
     result.error = error;
   }
-
   return result;
 };
 
-export const getGetCierreDiarioAsync = async (token, data) => {
+export const deleteFacturaAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}GetCierreDiario`;
+  let service = `${controller}DeleteFactura/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+export const paidFacturaAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}Paidfactura/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -113,6 +133,5 @@ export const getGetCierreDiarioAsync = async (token, data) => {
     result.statusResponse = false;
     result.error = error;
   }
-
   return result;
 };

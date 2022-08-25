@@ -141,7 +141,7 @@ const Proforma = React.forwardRef((props, ref) => {
           <Grid item xs={8}>
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
-              <Typography style={{ fontSize: 11 }}>2810505580009A</Typography>
+              <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
               <Typography style={{ fontSize: 11 }}>
                 Chinandega, Semaforos Super 7, 1/2 C. al Norte
               </Typography>

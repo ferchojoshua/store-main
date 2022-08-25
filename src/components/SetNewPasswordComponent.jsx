@@ -64,7 +64,7 @@ const SetNewPasswordComponent = () => {
         newPassword: newPasword,
         token,
       };
-      const result = await changePasswordAsync(data);
+      const result = await changePasswordAsync(token, data);
       if (!result.statusResponse) {
         setIsLoading(false);
         toastError(result.error.message);

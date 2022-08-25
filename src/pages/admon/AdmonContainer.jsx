@@ -87,12 +87,12 @@ const AdmonContainer = () => {
             style={{ fontSize: 12 }}
           />
 
-          <Tab
+          {/* <Tab
             icon={<FontAwesomeIcon icon={faScroll} style={{ fontSize: 20 }} />}
             label="Reportes"
             {...a11yProps(0)}
             style={{ fontSize: 12 }}
-          />
+          /> */}
 
           {/* {isAccess(access, "EXISTANCE VER") ? (
             <Tab
@@ -147,9 +147,9 @@ const AdmonContainer = () => {
           <AsientoList />
         </TabPanel>
 
-        <TabPanel value={value} index={2}>
+        {/* <TabPanel value={value} index={2}>
           <ReportsContainer />
-        </TabPanel>
+        </TabPanel> */}
       </Paper>
     </Container>
   );

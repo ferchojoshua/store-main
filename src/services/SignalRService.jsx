@@ -2,20 +2,20 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 let controller = "";
 if (process.env.NODE_ENV === "production") {
-  controller = "https://localhost:7015/notificationHub";
+  controller = "http://20.231.75.97:8090/";
 } else {
-  controller = "https://localhost:7015/notificationHub";
+  controller = "https://localhost:7015/";
 }
 
 export const serverMessages = async () => {
   try {
     const connection = new HubConnectionBuilder()
-      .withUrl(controller)
+      .withUrl(`${controller}notificationHub`)
       .configureLogging(LogLevel.Information)
       .build();
 
     connection.on("alertaCampana", (message) => {
-      console.log("Recepcion: ", message);
+      // console.log("Recepcion: ", message);
     });
 
     await connection.start();
