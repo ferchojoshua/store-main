@@ -26,9 +26,10 @@ const CierreDiario = ({
   horaHasta,
 }) => {
   const [data, setData] = useState([]);
-  const [dataVentas, setDataVentas] = useState([]);
-  const [dataAbonos, setDataAbonos] = useState([]);
+  const [dataVentasCredito, setDataVentasCredito] = useState([]);
+  const [dataVentasContado, setDataVentasContado] = useState([]);
   const [dataDevoluciones, setDataDevoluciones] = useState([]);
+  const [dataAbonos, setDataAbonos] = useState([]);
 
   const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
     useContext(DataContext);
@@ -36,8 +37,6 @@ const CierreDiario = ({
   let navigate = useNavigate();
   let ruta = getRuta();
   const token = getToken();
-
-  //   console.log(fechaDesde.toLocaleTimeString());
 
   useEffect(() => {
     (async () => {
@@ -74,10 +73,53 @@ const CierreDiario = ({
       }
       console.log(result.data);
       setData(result.data);
+      getAbonos(result.data);
+      saleDesgloce(result.data);
       setIsLoading(false);
     })();
   }, []);
-  return <div>CierreDiario</div>;
+
+  const getAbonos = (datos) => {
+    setDataAbonos(datos.abonoList);
+  };
+
+  const saleDesgloce = (datos) => {
+    console.log(datos.saleList);
+    let contSales = datos.saleList.map(
+      (item) => item.isContado === true && item.isAnulado === false
+    );
+    let credSales = datos.saleList.map(
+      (item) => item.isContado === false && item.isAnulado === false
+    );
+  };
+
+  return (
+    <div>
+      <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+        {isEmpty(data) ? (
+          <NoData />
+        ) : (
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
+            <thead>
+              <tr>
+                <th style={{ textAlign: "right" }}>#.Factura</th>
+                <th style={{ textAlign: "left" }}>Cliente</th>
+                <th style={{ textAlign: "center" }}>Neto</th>
+                <th style={{ textAlign: "center" }}>Descuento</th>
+                <th style={{ textAlign: "center" }}>Venta Neta</th>
+                <th style={{ textAlign: "center" }}>Utilidad</th>
+              </tr>
+            </thead>
+          </Table>
+        )}
+      </Container>
+    </div>
+  );
 };
 
 export default CierreDiario;

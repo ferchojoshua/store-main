@@ -135,7 +135,7 @@ const Facrturar = () => {
       isDescuento: descuento ? true : false,
       descuentoXPercent: descuentoXPercent,
       codigoDescuento: descuentoCod,
-      costoCompra: selectedProduct.precioCompra * cantidad,
+      costoCompra: selectedProduct.precioCompra * parseInt(cantidad),
     };
 
     setMontoVentaAntesDescuento(

@@ -153,7 +153,6 @@ const Pagar = ({
       setIsDefaultPass(true);
       return;
     }
-    console.log(result.data)
     setDataBill(result.data);
     setReload(!reload);
     setIsLoading(false);
