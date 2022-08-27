@@ -1,4 +1,4 @@
-import { Container, Stack } from "@mui/material";
+import { Container, Divider, Stack, Typography } from "@mui/material";
 import { isEmpty } from "lodash";
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +30,11 @@ const CierreDiario = ({
   const [dataVentasContado, setDataVentasContado] = useState([]);
   const [dataDevoluciones, setDataDevoluciones] = useState([]);
   const [dataAbonos, setDataAbonos] = useState([]);
+
+  const [sumContadoSales, setSumContadoSales] = useState(0);
+  const [sumRecuperacion, setSumRecuperacion] = useState(0);
+  const [sumCreditoSales, setSumCreditoSales] = useState(0);
+  const [sumAnulatedSales, setSumAnulatedSales] = useState(0);
 
   const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
     useContext(DataContext);
@@ -71,26 +76,47 @@ const CierreDiario = ({
         setIsDefaultPass(true);
         return;
       }
-      console.log(result.data);
+
       setData(result.data);
-      getAbonos(result.data);
       saleDesgloce(result.data);
+      setDataDevoluciones(result.data.anulatedSaleList);
+      setDataAbonos(result.data.abonoList);
+      sumRec(result.data.abonoList);
       setIsLoading(false);
     })();
   }, []);
 
-  const getAbonos = (datos) => {
-    setDataAbonos(datos.abonoList);
-  };
-
   const saleDesgloce = (datos) => {
-    console.log(datos.saleList);
-    let contSales = datos.saleList.map(
+    const { saleList } = datos;
+    let contSales = saleList.filter(
       (item) => item.isContado === true && item.isAnulado === false
     );
-    let credSales = datos.saleList.map(
+    let credSales = saleList.filter(
       (item) => item.isContado === false && item.isAnulado === false
     );
+    setDataVentasContado(contSales);
+    setDataVentasCredito(credSales);
+
+    sumContado(contSales);
+    sumCredito(credSales);
+  };
+
+  const sumContado = (data) => {
+    let result = 0;
+    data.map((item) => (result += item.montoVenta));
+    setSumContadoSales(result);
+  };
+
+  const sumCredito = (data) => {
+    let result = 0;
+    data.map((item) => (result += item.montoVenta));
+    setSumCreditoSales(result);
+  };
+
+  const sumRec = (data) => {
+    let result = 0;
+    data.map((item) => (result += item.monto));
+    setSumRecuperacion(result);
   };
 
   return (
@@ -99,23 +125,290 @@ const CierreDiario = ({
         {isEmpty(data) ? (
           <NoData />
         ) : (
-          <Table
-            hover={!isDarkMode}
-            size="sm"
-            responsive
-            className="text-primary"
-          >
-            <thead>
-              <tr>
-                <th style={{ textAlign: "right" }}>#.Factura</th>
-                <th style={{ textAlign: "left" }}>Cliente</th>
-                <th style={{ textAlign: "center" }}>Neto</th>
-                <th style={{ textAlign: "center" }}>Descuento</th>
-                <th style={{ textAlign: "center" }}>Venta Neta</th>
-                <th style={{ textAlign: "center" }}>Utilidad</th>
-              </tr>
-            </thead>
-          </Table>
+          <Stack spacing={2}>
+            <Typography variant="h5">Ventas de Contado</Typography>
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
+              <caption style={{ color: "#4caf50" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography
+                    variant="h6"
+                    style={{ color: "#4caf50", fontWeight: "bold" }}
+                  >
+                    Total Ventas de Contado:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#4caf50" }}>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumContadoSales)}
+                  </Typography>
+                </Stack>
+              </caption>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "left" }}>Cliente</th>
+                  <th style={{ textAlign: "center" }}>Neto</th>
+                  <th style={{ textAlign: "center" }}>Descuento</th>
+                  <th style={{ textAlign: "center" }}>Venta Neta</th>
+                </tr>
+              </thead>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                {dataVentasContado.map((item) => {
+                  return (
+                    <tr key={item.id}>
+                      <td style={{ textAlign: "center" }}>{item.id}</td>
+                      <td style={{ textAlign: "left" }}>
+                        {item.client
+                          ? item.client.nombreCliente
+                          : item.nombreCliente === ""
+                          ? "CLIENTE EVENTUAL"
+                          : item.nombreCliente}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.montoVentaAntesDescuento)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.descuentoXMonto)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.montoVenta)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <Divider />
+
+            <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
+              <caption style={{ color: "#357a38" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography
+                    variant="h6"
+                    style={{ color: "#357a38", fontWeight: "bold" }}
+                  >
+                    Total de Recuperacion:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#357a38" }}>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumRecuperacion)}
+                  </Typography>
+                </Stack>
+              </caption>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>#.Abono</th>
+                  <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "left" }}>Cliente</th>
+                  <th style={{ textAlign: "center" }}>Monto Abonado</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
+                </tr>
+              </thead>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                {dataAbonos.map((item) => {
+                  const { id, monto, sale, store } = item;
+                  return (
+                    <tr key={id}>
+                      <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "center" }}>{sale.id}</td>
+                      <td style={{ textAlign: "left" }}>
+                        {sale.client
+                          ? sale.client.nombreCliente
+                          : sale.nombreCliente === ""
+                          ? "CLIENTE EVENTUAL"
+                          : sale.nombreCliente}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(monto)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>{store.name}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <Divider />
+
+            <Typography variant="h5">Ventas de Credito</Typography>
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
+              <caption style={{ color: "#ffc107" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography
+                    variant="h6"
+                    style={{ color: "#ffc107", fontWeight: "bold" }}
+                  >
+                    Total de Ventas de Credito:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#ffc107" }}>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumCreditoSales)}
+                  </Typography>
+                </Stack>
+              </caption>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "left" }}>Cliente</th>
+                  <th style={{ textAlign: "center" }}>Neto</th>
+                  <th style={{ textAlign: "center" }}>Descuento</th>
+                  <th style={{ textAlign: "center" }}>Venta Neta</th>
+                </tr>
+              </thead>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                {dataVentasCredito.map((item) => {
+                  const {
+                    id,
+                    client,
+                    montoVentaAntesDescuento,
+                    descuentoXMonto,
+                    montoVenta,
+                    nombreCliente,
+                  } = item;
+                  return (
+                    <tr key={id}>
+                      <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "left" }}>
+                        {client
+                          ? client.nombreCliente
+                          : nombreCliente === ""
+                          ? "CLIENTE EVENTUAL"
+                          : nombreCliente}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(montoVentaAntesDescuento)}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(descuentoXMonto)}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(montoVenta)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <Divider />
+
+            <Typography variant="h5">Ventas de Devoluciones</Typography>
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
+              <caption style={{ color: "#ffc107" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography
+                    variant="h6"
+                    style={{ color: "#ffc107", fontWeight: "bold" }}
+                  >
+                    Total de Devoluciones:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#ffc107" }}>
+                    {/* {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumCreditoSales)} */}
+                  </Typography>
+                </Stack>
+              </caption>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "left" }}>Cliente</th>
+                  <th style={{ textAlign: "center" }}>Neto</th>
+                  <th style={{ textAlign: "center" }}>Descuento</th>
+                  <th style={{ textAlign: "center" }}>Venta Neta</th>
+                </tr>
+              </thead>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                {dataDevoluciones.map((item) => {
+                  const { id } = item;
+                  console.log(item);
+                  return (
+                    <tr key={id}>
+                      {/* <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "left" }}>
+                        {client
+                          ? client.nombreCliente
+                          : nombreCliente === ""
+                          ? "CLIENTE EVENTUAL"
+                          : nombreCliente}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(montoVentaAntesDescuento)}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(descuentoXMonto)}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(montoVenta)}
+                      </td> */}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <Divider />
+          </Stack>
         )}
       </Container>
     </div>

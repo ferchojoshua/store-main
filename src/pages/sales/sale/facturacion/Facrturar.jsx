@@ -107,9 +107,15 @@ const Facrturar = () => {
       filtered[0].costoTotal =
         (cantActual + cantNueva) * filtered[0].costoUnitario;
 
-      setMontoVentaDespuesDescuento(
-        parseFloat(montoVenta) + parseFloat(costoXProducto)
+      let montoSumar = cantNueva * filtered[0].costoUnitario;
+
+      setMontoVentaAntesDescuento(
+        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
       );
+      setMontoVentaDespuesDescuento(
+        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
+      );
+
       setSelectedProduct("");
       setCantidad("");
       setDescuento("");

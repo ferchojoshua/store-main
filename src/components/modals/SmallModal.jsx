@@ -7,6 +7,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const SmallModal = ({ titulo, isVisible, setVisible, children }) => {
+ 
   return (
     <div>
       <div>

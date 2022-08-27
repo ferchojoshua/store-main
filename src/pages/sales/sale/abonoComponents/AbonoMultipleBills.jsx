@@ -1,7 +1,6 @@
 import React from "react";
 import { Divider, Grid, Stack, Typography } from "@mui/material";
 import moment from "moment";
-import { Table } from "react-bootstrap";
 
 const AbonoMultipleBills = React.forwardRef((props, ref) => {
   const { client, data } = props;

@@ -507,11 +507,7 @@ const NewAbono = ({
         isVisible={showModal}
         setVisible={setShowModal}
       >
-        <NewAbonoEspecifico
-          setVisible={setShowModal}
-          selectedVenta={selectedSale}
-          client={client}
-        />
+        <NewAbonoEspecifico selectedVenta={selectedSale} client={client} />
       </SmallModal>
 
       <SmallModal

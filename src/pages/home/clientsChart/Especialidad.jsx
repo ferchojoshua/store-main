@@ -51,33 +51,46 @@ export const Especialidad = ({ selectedStore }) => {
     })();
   }, [selectedStore]);
 
+  const bgColors = () => {
+    const colors = [];
+    data.map((item) => {
+      const { tn } = item;
+      if (tn === "CARROS") {
+        colors.push("rgba(255, 159, 64, 0.2)");
+      } else if (tn === "LUBRICANTES") {
+        colors.push("rgba(255, 99, 132, 0.2)");
+      } else {
+        colors.push("rgba(153, 102, 255, 0.2)");
+      }
+    });
+    return colors;
+  };
+
+  const borderColors = () => {
+    const colors = [];
+    data.map((item) => {
+      const { tn } = item;
+      if (tn === "CARROS") {
+        colors.push("rgba(255, 159, 64, 1)");
+      } else if (tn === "LUBRICANTES") {
+        colors.push("rgba(255, 99, 132, 1)");
+      } else {
+        colors.push("rgba(153, 102, 255, 1)");
+      }
+    });
+    return colors;
+  };
+
   const graphicData = {
     labels: data.map((item) => item.tn),
     datasets: [
       {
         data: data.map((item) => {
-          return item.contador;
+          const { contador } = item;
+          return contador;
         }),
-        backgroundColor: [
-          isEmpty(carros)
-            ? isEmpty(motos)
-              ? "rgba(255, 99, 132, 0.2)"
-              : "rgba(153, 102, 255, 0.2)"
-            : "rgba(255, 159, 64, 0.2)",
-          isEmpty(motos)
-            ? "rgba(255, 99, 132, 0.2)"
-            : "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 99, 132, 0.2)",
-        ],
-        borderColor: [
-          isEmpty(carros)
-            ? isEmpty(motos)
-              ? "rgba(255, 99, 132, 1)"
-              : "rgba(153, 102, 255, 1)"
-            : "rgba(255, 159, 64, 1)",
-          isEmpty(motos) ? "rgba(255, 99, 132, 1)" : "rgba(153, 102, 255, 1)",
-          "rgba(255, 99, 132, 1)",
-        ],
+        backgroundColor: bgColors(),
+        borderColor: borderColors(),
         borderWidth: 1,
       },
     ],

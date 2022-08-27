@@ -130,9 +130,11 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
       pvd,
       pvm,
       store,
+      cantidadAnulada,
     } = item;
 
     let newCantidad = cantidad;
+    let newCantidadAnulada = cantidadAnulada;
     let totalCost = costoTotal;
 
     if (cantidad - 1 === 0) {
@@ -140,6 +142,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
       return;
     }
     newCantidad = newCantidad - 1;
+    newCantidadAnulada = newCantidadAnulada + 1;
 
     totalCost = costoUnitario * newCantidad;
 
@@ -156,6 +159,8 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
             pvd,
             pvm,
             store,
+            cantidadAnulada: newCantidadAnulada,
+            isPartialAnulation: true,
           }
         : item
     );
@@ -163,6 +168,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     editedItem.map((item) => (suma += item.costoTotal));
     setSaldoVenta(suma - totalAbonado);
     setSaleMount(suma);
+    console.log(editedItem);
     setDetalleVenta(editedItem);
   };
 
@@ -230,7 +236,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
       }
     });
   };
-  
+
   return (
     <div>
       <Container>
@@ -458,7 +464,7 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
                     <td style={{ textAlign: "center" }}>
                       <Tooltip title="Eliminar">
                         <IconButton
-                          style={{ marginRight: 10, color: "#f50057" }}
+                          style={{ color: "#f50057", width: 40, height: 40 }}
                           onClick={() => {
                             devolucionParcial(item);
                           }}

@@ -116,8 +116,13 @@ const NewSale = () => {
       filtered[0].costoTotal =
         (cantActual + cantNueva) * filtered[0].costoUnitario;
 
+      let montoSumar = cantNueva * filtered[0].costoUnitario;
+
+      setMontoVentaAntesDescuento(
+        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
+      );
       setMontoVentaDespuesDescuento(
-        parseFloat(montoVenta) + parseFloat(costoXProducto)
+        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
       );
       setSelectedProduct("");
       setCantidad("");
