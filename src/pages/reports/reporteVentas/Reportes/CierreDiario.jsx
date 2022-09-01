@@ -12,10 +12,7 @@ import {
 } from "../../../../services/Account";
 
 import { Table } from "react-bootstrap";
-import {
-  getGetCierreDiarioAsync,
-  getMasterVentasAsync,
-} from "../../../../services/ReportApi";
+import { getGetCierreDiarioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 
 const CierreDiario = ({
@@ -36,8 +33,13 @@ const CierreDiario = ({
   const [sumCreditoSales, setSumCreditoSales] = useState(0);
   const [sumAnulatedSales, setSumAnulatedSales] = useState(0);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -82,7 +84,9 @@ const CierreDiario = ({
       setDataDevoluciones(result.data.anulatedSaleList);
       setDataAbonos(result.data.abonoList);
       sumRec(result.data.abonoList);
+      sumAnulated(result.data.anulatedSaleList);
       setIsLoading(false);
+      setIsDarkMode(false);
     })();
   }, []);
 
@@ -119,8 +123,15 @@ const CierreDiario = ({
     setSumRecuperacion(result);
   };
 
+  const sumAnulated = (data) => {
+    let result = 0;
+    data.map((item) => (result += item.montoAnulado));
+    setSumAnulatedSales(result);
+  };
+
   return (
     <div>
+      <hr />
       <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
         {isEmpty(data) ? (
           <NoData />
@@ -151,7 +162,9 @@ const CierreDiario = ({
               </caption>
               <thead>
                 <tr>
+                  <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
                   <th style={{ textAlign: "center" }}>Neto</th>
                   <th style={{ textAlign: "center" }}>Descuento</th>
@@ -162,7 +175,11 @@ const CierreDiario = ({
                 {dataVentasContado.map((item) => {
                   return (
                     <tr key={item.id}>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(item.fechaVenta).format("L")}
+                      </td>
                       <td style={{ textAlign: "center" }}>{item.id}</td>
+                      <td style={{ textAlign: "center" }}>{item.store.name}</td>
                       <td style={{ textAlign: "left" }}>
                         {item.client
                           ? item.client.nombreCliente
@@ -220,20 +237,26 @@ const CierreDiario = ({
               </caption>
               <thead>
                 <tr>
+                  <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "center" }}>#.Abono</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "center" }}>#.Factura</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
                   <th style={{ textAlign: "center" }}>Monto Abonado</th>
-                  <th style={{ textAlign: "center" }}>Almacen</th>
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {dataAbonos.map((item) => {
-                  const { id, monto, sale, store } = item;
+                  const { id, monto, sale, store, fechaAbono } = item;
+
                   return (
                     <tr key={id}>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(fechaAbono).format("L")}
+                      </td>
                       <td style={{ textAlign: "center" }}>{id}</td>
                       <td style={{ textAlign: "center" }}>{sale.id}</td>
+                      <td style={{ textAlign: "center" }}>{store.name}</td>
                       <td style={{ textAlign: "left" }}>
                         {sale.client
                           ? sale.client.nombreCliente
@@ -247,7 +270,6 @@ const CierreDiario = ({
                           currency: "NIO",
                         }).format(monto)}
                       </td>
-                      <td style={{ textAlign: "center" }}>{store.name}</td>
                     </tr>
                   );
                 })}
@@ -280,7 +302,9 @@ const CierreDiario = ({
               </caption>
               <thead>
                 <tr>
+                  <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
                   <th style={{ textAlign: "center" }}>Neto</th>
                   <th style={{ textAlign: "center" }}>Descuento</th>
@@ -296,10 +320,17 @@ const CierreDiario = ({
                     descuentoXMonto,
                     montoVenta,
                     nombreCliente,
+                    fechaVenta,
+                    store,
                   } = item;
+
                   return (
                     <tr key={id}>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(fechaVenta).format("L")}
+                      </td>
                       <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "center" }}>{store.name}</td>
                       <td style={{ textAlign: "left" }}>
                         {client
                           ? client.nombreCliente
@@ -335,79 +366,160 @@ const CierreDiario = ({
             </Table>
             <Divider />
 
-            <Typography variant="h5">Ventas de Devoluciones</Typography>
+            <Typography variant="h5">Devoluciones</Typography>
             <Table
               hover={!isDarkMode}
               size="sm"
               responsive
               className="text-primary"
             >
-              <caption style={{ color: "#ffc107" }}>
+              <caption style={{ color: "#ab003c" }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography
                     variant="h6"
-                    style={{ color: "#ffc107", fontWeight: "bold" }}
+                    style={{ color: "#ab003c", fontWeight: "bold" }}
                   >
                     Total de Devoluciones:
                   </Typography>
-                  <Typography variant="h6" style={{ color: "#ffc107" }}>
-                    {/* {new Intl.NumberFormat("es-NI", {
+                  <Typography variant="h6" style={{ color: "#ab003c" }}>
+                    {new Intl.NumberFormat("es-NI", {
                       style: "currency",
                       currency: "NIO",
-                    }).format(sumCreditoSales)} */}
+                    }).format(sumAnulatedSales)}
                   </Typography>
                 </Stack>
               </caption>
               <thead>
                 <tr>
+                  <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "center" }}>#.Factura</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
-                  <th style={{ textAlign: "center" }}>Neto</th>
-                  <th style={{ textAlign: "center" }}>Descuento</th>
-                  <th style={{ textAlign: "center" }}>Venta Neta</th>
+                  <th style={{ textAlign: "center" }}>Neto Anulado</th>
+                  <th style={{ textAlign: "center" }}>Anulado Por</th>
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {dataDevoluciones.map((item) => {
-                  const { id } = item;
-                  console.log(item);
+                  const {
+                    id,
+                    ventaAfectada,
+                    fechaAnulacion,
+                    montoAnulado,
+                    store,
+                    anulatedBy,
+                  } = item;
                   return (
                     <tr key={id}>
-                      {/* <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(fechaAnulacion).format("L")}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {ventaAfectada.id}
+                      </td>
+                      <td style={{ textAlign: "center" }}>{store.name}</td>
                       <td style={{ textAlign: "left" }}>
-                        {client
-                          ? client.nombreCliente
-                          : nombreCliente === ""
+                        {ventaAfectada.client
+                          ? ventaAfectada.client.nombreCliente
+                          : ventaAfectada.nombreCliente === ""
                           ? "CLIENTE EVENTUAL"
-                          : nombreCliente}
+                          : ventaAfectada.nombreCliente}
                       </td>
 
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
                           currency: "NIO",
-                        }).format(montoVentaAntesDescuento)}
+                        }).format(montoAnulado)}
                       </td>
 
                       <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                        }).format(descuentoXMonto)}
+                        {anulatedBy.fullName}
                       </td>
-
-                      <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                        }).format(montoVenta)}
-                      </td> */}
                     </tr>
                   );
                 })}
               </tbody>
             </Table>
             <Divider />
+
+            <Stack spacing={1}>
+              <Stack direction={"row"} justifyContent="space-between">
+                <Typography
+                  variant="h6"
+                  style={{ color: "#1c54b2", fontWeight: "bold" }}
+                >
+                  Ventas de Contado:
+                </Typography>
+                <Typography variant="h6">
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumContadoSales)}
+                </Typography>
+              </Stack>
+
+              <Stack direction={"row"} justifyContent="space-between">
+                <Typography
+                  variant="h6"
+                  style={{ color: "#1c54b2", fontWeight: "bold" }}
+                >
+                  Recuperacion Sobre Ventas:
+                </Typography>
+                <Typography variant="h6">
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumRecuperacion)}
+                </Typography>
+              </Stack>
+              <Divider />
+
+              <Stack direction={"row"} justifyContent="space-between">
+                <Typography
+                  variant="h6"
+                  style={{ color: "#1c54b2", fontWeight: "bold" }}
+                >
+                  Total Final:
+                </Typography>
+                <Typography variant="h6">
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumContadoSales + sumRecuperacion)}
+                </Typography>
+              </Stack>
+
+              <Stack direction={"row"} justifyContent="space-between">
+                <Typography
+                  variant="h6"
+                  style={{ color: "#ffc107", fontWeight: "bold" }}
+                >
+                  Ventas de Credito:
+                </Typography>
+                <Typography variant="h6">
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumCreditoSales)}
+                </Typography>
+              </Stack>
+
+              <Stack direction={"row"} justifyContent="space-between">
+                <Typography
+                  variant="h6"
+                  style={{ color: "#ab003c", fontWeight: "bold" }}
+                >
+                  Devoluciones:
+                </Typography>
+                <Typography variant="h6">
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumAnulatedSales)}
+                </Typography>
+              </Stack>
+            </Stack>
           </Stack>
         )}
       </Container>

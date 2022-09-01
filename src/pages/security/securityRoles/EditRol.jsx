@@ -85,9 +85,13 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [productsUpdate, setProductsUpdate] = useState(false);
   const [productsDelete, setProductsDelete] = useState(false);
 
+  //Reportes
   const [masterVentasVer, setMasterVentasVer] = useState(false);
   const [cXCobrarVer, setCXCobrarVer] = useState(false);
   const [prodVendidos, setProdVendidos] = useState(false);
+  const [prodVendidosUtils, setProdVendidosUtils] = useState(false);
+  const [cierreDiario, setCierreDiario] = useState(false);
+  const [cajaChica, setCajaChica] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -219,6 +223,15 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "PRODVENDIDOS VER":
           setProdVendidos(item.isEnable);
+          break;
+        case "PRODVENDIDOSUTIL VER":
+          setProdVendidosUtils(item.isEnable);
+          break;
+        case "CIERREDIARIO VER":
+          setCierreDiario(item.isEnable);
+          break;
+        case "CAJACHICA VER":
+          setCajaChica(item.isEnable);
           break;
 
         //Contabilidad
@@ -400,7 +413,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = productsDelete;
           break;
 
-        //Products
+        //Reportes
         case "MASTER VENTAS VER":
           item.isEnable = masterVentasVer;
           break;
@@ -409,6 +422,15 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "PRODVENDIDOS VER":
           item.isEnable = prodVendidos;
+          break;
+        case "PRODVENDIDOSUTIL VER":
+          item.isEnable = prodVendidosUtils;
+          break;
+        case "CIERREDIARIO VER":
+          item.isEnable = cierreDiario;
+          break;
+        case "CAJACHICA VER":
+          item.isEnable = cajaChica;
           break;
 
         //Contabilidad
@@ -1114,6 +1136,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         <Divider />
         <Stack direction="row" display="flex" justifyContent="space-around">
           <FormControlLabel
+            style={{ textAlign: "center" }}
             labelPlacement="top"
             control={
               <Checkbox
@@ -1126,6 +1149,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           />
 
           <FormControlLabel
+            style={{ textAlign: "center" }}
             labelPlacement="top"
             control={
               <Checkbox
@@ -1137,16 +1161,66 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             label="C. por Cobrar"
           />
 
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Stack direction="row" justifyContent="space-around">
+              <FormControlLabel
+                style={{ textAlign: "center" }}
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    disabled={!isEdit}
+                    checked={prodVendidos}
+                    onChange={() => setProdVendidos(!prodVendidos)}
+                  />
+                }
+                label="Productos Vendidos"
+              />
+              <FormControlLabel
+                style={{ textAlign: "center" }}
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    disabled={!isEdit}
+                    checked={prodVendidosUtils}
+                    onChange={() => setProdVendidosUtils(!prodVendidosUtils)}
+                  />
+                }
+                label="Ver Utilidad"
+              />
+            </Stack>
+          </Paper>
+
           <FormControlLabel
+            style={{ textAlign: "center" }}
             labelPlacement="top"
             control={
               <Checkbox
                 disabled={!isEdit}
-                checked={prodVendidos}
-                onChange={() => setProdVendidos(!prodVendidos)}
+                checked={cierreDiario}
+                onChange={() => setCierreDiario(!cierreDiario)}
               />
             }
-            label="Productos Vendidos"
+            label="Cierre Diario"
+          />
+
+          <FormControlLabel
+            style={{ textAlign: "center" }}
+            labelPlacement="top"
+            control={
+              <Checkbox
+                disabled={!isEdit}
+                checked={cajaChica}
+                onChange={() => setCajaChica(!cajaChica)}
+              />
+            }
+            label="Caja Chica"
           />
         </Stack>
       </Paper>

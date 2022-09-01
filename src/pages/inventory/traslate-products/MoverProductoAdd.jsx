@@ -218,7 +218,6 @@ const MoverProductoAdd = ({ setShowModal }) => {
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error === 204) {
-        console.log(result);
         toastError("Almacen procedencia no tiene existencias de este producto");
         setExistenceProcedencia(0);
         return;

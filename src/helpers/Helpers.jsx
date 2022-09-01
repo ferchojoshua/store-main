@@ -67,6 +67,7 @@ export function validateCedula(cedula) {
 }
 
 export function isAccess(access, permiso) {
+  console.log(permiso)
   let result = find(access, { description: permiso }, "isEnable");
   return result.isEnable;
 }

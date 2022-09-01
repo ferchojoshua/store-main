@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useRef } from "react";
 import { Dialog, DialogContent, Stack } from "@mui/material";
 
 import AppBar from "@mui/material/AppBar";
@@ -11,12 +11,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../context/DataContext";
 import { useContext } from "react";
+import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
+import ReactToPrint from "react-to-print";
+import { PrintReport } from "./PrintReport";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
+  const compRef = useRef();
   const { title } = useContext(DataContext);
 
   return (
@@ -55,6 +59,7 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
             </IconButton>
           </Toolbar>
         </AppBar>
+
         <Stack display="flex" justifyContent="center">
           <Typography
             sx={{
@@ -69,9 +74,34 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
             {titulo}
           </Typography>
           <span style={{ textAlign: "center" }}>{fecha}</span>
+
+          <ReactToPrint
+            trigger={() => {
+              return (
+                <IconButton
+                  variant="outlined"
+                  style={{ position: "fixed", right: 50, top: 75 }}
+                >
+                  <PrintRoundedIcon
+                    style={{ fontSize: 50, color: "#2979ff", width: 50 }}
+                  />
+                </IconButton>
+              );
+            }}
+            content={() => compRef.current}
+          />
         </Stack>
-        <hr />
+
         <DialogContent>{children}</DialogContent>
+        <div
+          style={{
+            display: "none",
+          }}
+        >
+          <PrintReport ref={compRef} fecha={fecha} titulo={titulo}>
+            {children}
+          </PrintReport>
+        </div>
       </Dialog>
     </div>
   );

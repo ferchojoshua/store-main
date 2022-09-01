@@ -168,7 +168,6 @@ const SaleReturn = ({ selectedVenta, setVisible }) => {
     editedItem.map((item) => (suma += item.costoTotal));
     setSaldoVenta(suma - totalAbonado);
     setSaleMount(suma);
-    console.log(editedItem);
     setDetalleVenta(editedItem);
   };
 

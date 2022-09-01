@@ -6,6 +6,7 @@ import {
   faCartFlatbed,
   faDolly,
   faCalendarDay,
+  faSackDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Grid, Paper, Stack } from "@mui/material";
@@ -17,6 +18,7 @@ import { SelectorMasterVentas } from "./reporteVentas/selectores/SelectorMasterV
 import { isAccess } from "../../helpers/Helpers";
 import { SelectorArtVendidos } from "./reporteVentas/selectores/SelectorArtVendidos";
 import SelectorCierreDiario from "./reporteVentas/selectores/SelectorCierreDiario";
+import SelectorCajaChica from "./reporteVentas/selectores/SelectorCajaChica";
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -48,7 +50,7 @@ export const ReportsContainer = () => {
               <ReportCaller
                 icon={faCashRegister}
                 text="Master de Ventas"
-                modalTitle="Ver Existencias por Fecha"
+                modalTitle="Ventas por Fecha"
               >
                 <SelectorMasterVentas />
               </ReportCaller>
@@ -93,6 +95,20 @@ export const ReportsContainer = () => {
                 modalTitle="Ver Cierre Diario"
               >
                 <SelectorCierreDiario />
+              </ReportCaller>
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          {isAccess(access, "CAJACHICA VER") ? (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+              <ReportCaller
+                icon={faSackDollar}
+                text="Caja Chica"
+                modalTitle="Ver Mov. de Caja Chica"
+              >
+                <SelectorCajaChica />
               </ReportCaller>
             </Grid>
           ) : (

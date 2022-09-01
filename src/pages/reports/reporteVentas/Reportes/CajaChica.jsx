@@ -10,20 +10,17 @@ import {
   deleteUserData,
   getToken,
 } from "../../../../services/Account";
-
-import { Table } from "react-bootstrap";
-import { getCuentasXCobrarAsync } from "../../../../services/ReportApi";
 import moment from "moment";
-import "../../../../components/styles/estilo.css";
+import { Table } from "react-bootstrap";
+import { getGetCajaChicaAsync } from "../../../../services/ReportApi";
 
-export const DocumentosXCobrar = ({
-  selectedStore,
-  desde,
-  hasta,
-  selectedClient,
-  includeCanceled,
-}) => {
+const CajaChica = ({ selectedStore, desde, hasta }) => {
   const [data, setData] = useState([]);
+  const [saldoAnterior, setSaldoAnterior] = useState(0);
+
+  let navigate = useNavigate();
+  let ruta = getRuta();
+  const token = getToken();
 
   const {
     setIsLoading,
@@ -33,25 +30,17 @@ export const DocumentosXCobrar = ({
     setIsDarkMode,
   } = useContext(DataContext);
 
-  let navigate = useNavigate();
-  let ruta = getRuta();
-  const token = getToken();
-
   useEffect(() => {
     (async () => {
       const datos = {
         desde,
         hasta,
         storeId: selectedStore === "t" ? 0 : selectedStore,
-        clientId:
-          selectedClient === "" || selectedClient === null
-            ? 0
-            : selectedClient.id,
       };
 
       setIsLoading(true);
 
-      const result = await getCuentasXCobrarAsync(token, datos);
+      const result = await getGetCajaChicaAsync(token, datos);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -73,47 +62,26 @@ export const DocumentosXCobrar = ({
         setIsDefaultPass(true);
         return;
       }
-      if (includeCanceled) {
-        setData(result.data);
-      } else {
-        let filtered = result.data.filter((item) => item.isCanceled === false);
-        setData(filtered);
-      }
+
+      setData(result.data);
+      setSaldoAnterior(
+        result.data[0].saldo - result.data[0].entradas + result.data[0].salidas
+      );
       setIsLoading(false);
       setIsDarkMode(false);
     })();
   }, []);
 
-  const sumSales = () => {
+  const sumEntradas = () => {
     let sum = 0;
-    data.map((item) => (sum += item.montoVenta));
+    data.map((item) => (sum += item.entradas));
     return sum;
   };
 
-  const sumCreditoSales = () => {
-    const credSales = data.filter((item) => item.isContado === false);
+  const sumSalidas = () => {
     let sum = 0;
-    credSales.map((item) => (sum += item.montoVenta));
+    data.map((item) => (sum += item.salidas));
     return sum;
-  };
-
-  const sumAbonado = () => {
-    const credSales = data.filter((item) => item.isContado === false);
-    let sum = 0;
-    credSales.map((item) => (sum += item.montoVenta - item.saldo));
-    return sum;
-  };
-
-  const sumSaldo = () => {
-    const credSales = data.filter((item) => item.isContado === false);
-    let sum = 0;
-    credSales.map((item) => (sum += item.saldo));
-    return sum;
-  };
-
-  const getDays = (fVencimiento) => {
-    var result = moment(fVencimiento).diff(moment(new Date()), "days");
-    return result;
   };
 
   return (
@@ -132,59 +100,40 @@ export const DocumentosXCobrar = ({
             <thead>
               <tr>
                 <th style={{ textAlign: "center" }}>Fecha</th>
-                <th style={{ textAlign: "center" }}>Vence</th>
-                <th style={{ textAlign: "center" }}>Atraso</th>
-                <th style={{ textAlign: "center" }}>Factura</th>
-                <th style={{ textAlign: "left" }}>Almacen</th>
-                <th style={{ textAlign: "left" }}>Cliente</th>
-                <th style={{ textAlign: "center" }}>M. Venta</th>
-                <th style={{ textAlign: "center" }}>T. Abonado</th>
+                <th style={{ textAlign: "left" }}>Descripcion</th>
+                <th style={{ textAlign: "center" }}>Entrada</th>
+                <th style={{ textAlign: "center" }}>Salida</th>
                 <th style={{ textAlign: "center" }}>Saldo</th>
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {data.map((item) => {
+                const { id, fecha, description, entradas, salidas, saldo } =
+                  item;
+
                 return (
-                  <tr key={item.id}>
+                  <tr key={id}>
                     <td style={{ textAlign: "center" }}>
-                      {moment(item.fechaVenta).format("L")}
+                      {moment(fecha).format("L")}
                     </td>
+                    <td style={{ textAlign: "left" }}>{description}</td>
                     <td style={{ textAlign: "center" }}>
-                      {moment(item.fechaVencimiento).format("L")}
-                    </td>
-                    <td
-                      style={{
-                        textAlign: "center",
-                        color:
-                          getDays(item.fechaVencimiento) < 0
-                            ? "#f50057"
-                            : "#2196f3",
-                      }}
-                    >
-                      {`${getDays(item.fechaVencimiento)} Días`}
-                    </td>
-                    <td style={{ textAlign: "center" }}>{item.id}</td>
-                    <td style={{ textAlign: "left" }}>{item.store.name}</td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.client.nombreCliente}
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(entradas)}
                     </td>
                     <td style={{ textAlign: "center" }}>
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
-                      }).format(item.montoVenta)}
+                      }).format(salidas)}
                     </td>
                     <td style={{ textAlign: "center" }}>
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
-                      }).format(item.montoVenta - item.saldo)}
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(item.saldo)}
+                      }).format(saldo)}
                     </td>
                   </tr>
                 );
@@ -194,64 +143,59 @@ export const DocumentosXCobrar = ({
         )}
 
         <hr />
+
         <Stack direction="row" flex="row" justifyContent="space-around">
           <Stack textAlign="center">
             <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Total de Ventas
-            </span>
-            <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
-          </Stack>
-
-          <Stack textAlign="center">
-            <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Total de Ventas
+              Total de Entradas:
             </span>
             <span>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
                 currency: "NIO",
-              }).format(sumSales())}
+              }).format(sumEntradas())}
             </span>
           </Stack>
 
           <Stack textAlign="center">
             <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Ventas de Credito
+              Total de Salidas:
             </span>
             <span>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
                 currency: "NIO",
-              }).format(sumCreditoSales())}
+              }).format(sumSalidas())}
             </span>
           </Stack>
 
           <Stack textAlign="center">
             <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Total de Abonado
+              Saldo Inicial:
             </span>
             <span>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
                 currency: "NIO",
-              }).format(sumAbonado())}
+              }).format(saldoAnterior)}
             </span>
           </Stack>
 
           <Stack textAlign="center">
             <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Total de Saldo
+              Saldo Final:
             </span>
             <span>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
                 currency: "NIO",
-              }).format(sumSaldo())}
+              }).format(sumEntradas() - sumSalidas() + saldoAnterior)}
             </span>
           </Stack>
         </Stack>
-        <hr />
       </Container>
     </div>
   );
 };
+
+export default CajaChica;

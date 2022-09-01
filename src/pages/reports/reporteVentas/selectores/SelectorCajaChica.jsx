@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DatePicker, TimePicker } from "@mui/lab";
+import { DatePicker } from "@mui/lab";
 import {
   Container,
   Paper,
@@ -24,9 +24,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
-import CierreDiario from "../Reportes/CierreDiario";
+import CajaChica from "../Reportes/CajaChica";
 
-const SelectorCierreDiario = () => {
+const SelectorCajaChica = () => {
   const {
     setIsLoading,
     setIsDefaultPass,
@@ -36,11 +36,10 @@ const SelectorCierreDiario = () => {
   } = useContext(DataContext);
 
   var date = new Date();
-  const [fechaDesde, setDesdeFecha] = useState(date);
-  const [fechaHasta, setHastaFecha] = useState(date);
-  const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
-  const [horaHasta, setHoraHasta] = useState(date.setHours(18, 0));
-
+  const [fechaDesde, setDesdeFecha] = useState(
+    new Date(date.getFullYear(), date.getMonth(), 1)
+  );
+  const [fechaHassta, setHasstaFecha] = useState(new Date());
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
 
@@ -90,7 +89,7 @@ const SelectorCierreDiario = () => {
       toastError("Ingrese una fecha de inicio valida");
       return;
     }
-    if (!moment(fechaHasta).isValid()) {
+    if (!moment(fechaHassta).isValid()) {
       toastError("Ingrese una fecha de final valida");
       return;
     }
@@ -104,16 +103,14 @@ const SelectorCierreDiario = () => {
 
   const handleClose = () => {
     setIsDarkMode(theme);
-    setDesdeFecha(date);
-    setHastaFecha(date);
-    setSelectedStore("t");
-
+    setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
+    setHasstaFecha(new Date());
     setShowFullScreenModal(false);
   };
 
   return (
     <div>
-      <Container style={{ width: 550 }}>
+      <Container style={{ width: 500 }}>
         <Paper
           elevation={10}
           style={{
@@ -125,7 +122,7 @@ const SelectorCierreDiario = () => {
           <Stack spacing={3}>
             <Stack spacing={2} direction="row">
               <DatePicker
-                label="Fecha Desde"
+                label="Desde"
                 value={fechaDesde}
                 onChange={(newValue) => {
                   setDesdeFecha(newValue);
@@ -141,46 +138,10 @@ const SelectorCierreDiario = () => {
               />
 
               <DatePicker
-                label="FechaHasta"
-                value={fechaHasta}
+                label="Hasta"
+                value={fechaHassta}
                 onChange={(newValue) => {
-                  setHastaFecha(newValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    required
-                    fullWidth
-                    variant="standard"
-                    {...params}
-                  />
-                )}
-              />
-            </Stack>
-
-            <Stack spacing={2} direction="row">
-              <TimePicker
-                label="Hora Desde"
-                value={horaDesde}
-                ampm
-                onChange={(newValue) => {
-                  setHoraDesde(newValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    required
-                    fullWidth
-                    variant="standard"
-                    {...params}
-                  />
-                )}
-              />
-
-              <TimePicker
-                label="Hora Hasta"
-                value={horaHasta}
-                ampm
-                onChange={(newValue) => {
-                  setHoraHasta(newValue);
+                  setHasstaFecha(newValue);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -226,35 +187,33 @@ const SelectorCierreDiario = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-          </Stack>
 
-          <Button
-            variant="outlined"
-            fullWidth
-            style={{ borderRadius: 20, marginTop: 30 }}
-            startIcon={<FontAwesomeIcon icon={faPrint} />}
-            onClick={() => {
-              verReport();
-            }}
-          >
-            Generar Reporte
-          </Button>
+            <Button
+              variant="outlined"
+              fullWidth
+              style={{ borderRadius: 20, marginTop: 30 }}
+              startIcon={<FontAwesomeIcon icon={faPrint} />}
+              onClick={() => {
+                verReport();
+              }}
+            >
+              Generar Reporte
+            </Button>
+          </Stack>
         </Paper>
 
         <FullScreenModal
-          titulo={"Cierre Diario"}
+          titulo={"Movimientos de Caja Chica"}
           fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-            fechaHasta
+            fechaHassta
           ).format("L")}`}
           open={showFullScreenModal}
           handleClose={handleClose}
         >
-          <CierreDiario
+          <CajaChica
             selectedStore={selectedStore}
-            fechaDesde={fechaDesde}
-            fechaHasta={fechaHasta}
-            horaDesde={horaDesde}
-            horaHasta={horaHasta}
+            desde={fechaDesde}
+            hasta={fechaHassta}
           />
         </FullScreenModal>
       </Container>
@@ -262,4 +221,4 @@ const SelectorCierreDiario = () => {
   );
 };
 
-export default SelectorCierreDiario;
+export default SelectorCajaChica;

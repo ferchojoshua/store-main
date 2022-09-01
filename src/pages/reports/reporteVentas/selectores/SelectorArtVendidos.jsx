@@ -33,6 +33,14 @@ import {
 import { ArticulosVendidos } from "../Reportes/ArticulosVendidos";
 
 export const SelectorArtVendidos = () => {
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
+
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
@@ -51,8 +59,7 @@ export const SelectorArtVendidos = () => {
 
   const [showFullScreenModal, setShowFullScreenModal] = useState(false);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -145,10 +152,10 @@ export const SelectorArtVendidos = () => {
   }, []);
 
   const handleClose = () => {
+    setIsDarkMode(theme);
     setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
     setHasstaFecha(new Date());
     setSelectedStore("t");
-
     setShowFullScreenModal(false);
   };
 

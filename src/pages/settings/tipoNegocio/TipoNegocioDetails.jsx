@@ -203,7 +203,7 @@ const TipoNegocioDetails = () => {
               navigate(`${ruta}/unauthorized`);
               return;
             }
-            toastError("Ocurrio un error al eliminar rack");
+            toastError("Ocurrio un error al eliminar familia");
             return;
           }
 

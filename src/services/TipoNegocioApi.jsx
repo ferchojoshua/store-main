@@ -251,7 +251,7 @@ export const deleteFamiliaAsync = async (token, id) => {
     },
   });
   try {
-    await authAxios.delete(service + id).then((resp) => {
+    await authAxios.post(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;

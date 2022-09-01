@@ -30,6 +30,13 @@ import moment from "moment";
 import { MasterVentas } from "../Reportes/MasterVentas";
 
 export const SelectorMasterVentas = () => {
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
@@ -43,9 +50,7 @@ export const SelectorMasterVentas = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectCreditSales, setSelectCreditSales] = useState(false);
   const [selectContadoSales, setSelectContadoSales] = useState(false);
-
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -113,6 +118,7 @@ export const SelectorMasterVentas = () => {
   };
 
   const handleClose = () => {
+    setIsDarkMode(theme);
     setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
     setHasstaFecha(new Date());
     setSelectedStore("t");

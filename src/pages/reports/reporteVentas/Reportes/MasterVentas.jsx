@@ -25,8 +25,13 @@ export const MasterVentas = ({
 }) => {
   const [data, setData] = useState([]);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access, isDarkMode } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -68,6 +73,7 @@ export const MasterVentas = ({
 
       setData(result.data);
       setIsLoading(false);
+      setIsDarkMode(false);
     })();
   }, []);
 
@@ -107,6 +113,7 @@ export const MasterVentas = ({
 
   return (
     <div>
+      <hr />
       <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
         {isEmpty(data) ? (
           <NoData />

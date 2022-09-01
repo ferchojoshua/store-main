@@ -28,6 +28,7 @@ const PreFacturar = ({
   addNewVenta,
   montoVentaAntesDescuento,
   selectedProductList,
+  typeVenta,
 }) => {
   const [montoRecibido, setMontoRecibido] = useState("");
   const [cambio, setCambio] = useState("");
@@ -98,6 +99,7 @@ const PreFacturar = ({
     }
   };
 
+  console.log(typeVenta);
 
   return (
     <div
@@ -167,25 +169,31 @@ const PreFacturar = ({
           })}
         </Typography>
       </Stack>
-      <Divider />
 
-      <TextField
-        style={{ marginTop: 20, marginBottom: 20 }}
-        fullWidth
-        variant="standard"
-        label={"Monto Recibido"}
-        value={montoRecibido}
-        onChange={(e) => funcMontoRecibido(e.target.value)}
-      />
-      <Stack spacing={2} direction="row">
-        <Typography style={{ fontWeight: "bold" }}>Cambio:</Typography>
-        <Typography style={{ color: cambio < 0 ? "#f50057" : "#2979ff" }}>
-          {cambio.toLocaleString("es-NI", {
-            style: "currency",
-            currency: "NIO",
-          })}
-        </Typography>
-      </Stack>
+      {typeVenta === "contado" ? (
+        <>
+          <Divider />
+          <TextField
+            style={{ marginTop: 20, marginBottom: 20 }}
+            fullWidth
+            variant="standard"
+            label={"Monto Recibido"}
+            value={montoRecibido}
+            onChange={(e) => funcMontoRecibido(e.target.value)}
+          />
+          <Stack spacing={2} direction="row">
+            <Typography style={{ fontWeight: "bold" }}>Cambio:</Typography>
+            <Typography style={{ color: cambio < 0 ? "#f50057" : "#2979ff" }}>
+              {cambio.toLocaleString("es-NI", {
+                style: "currency",
+                currency: "NIO",
+              })}
+            </Typography>
+          </Stack>
+        </>
+      ) : (
+        <hr />
+      )}
 
       <Button
         variant="outlined"

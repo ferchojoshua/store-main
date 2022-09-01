@@ -511,7 +511,7 @@ const NavbarComponent = () => {
                   icon={faCodeBranch}
                   style={{ marginRight: 20 }}
                 />
-                Version - 1.0
+                Version - 1.5
               </MenuItem>
             </Menu>
           </div>

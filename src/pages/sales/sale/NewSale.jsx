@@ -405,6 +405,7 @@ const NewSale = () => {
           montoVentaAntesDescuento={montoVentaAntesDescuento}
           setMontoVentaAntesDescuento={setMontoVentaAntesDescuento}
           selectedProductList={selectedProductList}
+          typeVenta={typeVenta}
         />
       </SmallModal>
     </div>

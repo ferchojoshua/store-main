@@ -3,7 +3,7 @@ import React, { createContext, useState } from "react";
 export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  const [title, setTitle] = useState("Auto&Moto");
+  const [title, setTitle] = useState("AutoMoto");
   const [isLoading, setIsLoading] = useState(true);
   const [isLogged, setIsLogged] = useState(null);
   const [isDefaultPass, setIsDefaultPass] = useState(null);

@@ -32,6 +32,14 @@ import { getClientsAsync } from "../../../../services/ClientsApi";
 import { DocumentosXCobrar } from "../Reportes/DocumentosXCobrar";
 
 export const SelectorDocXCobrar = () => {
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+  } = useContext(DataContext);
+
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
@@ -45,8 +53,7 @@ export const SelectorDocXCobrar = () => {
   const [showFullScreenModal, setShowFullScreenModal] = useState(false);
   const [includeCanceled, setIncludeCanceled] = useState(false);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, access } =
-    useContext(DataContext);
+  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -113,6 +120,7 @@ export const SelectorDocXCobrar = () => {
   }, []);
 
   const handleClose = () => {
+    setIsDarkMode(theme);
     setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
     setHasstaFecha(new Date());
     setSelectedStore("t");

@@ -60,7 +60,7 @@ export const ReportExistences = ({
         setIsDefaultPass(true);
         return;
       }
-      console.log(result.data);
+
       setData(result.data);
       setIsLoading(false);
     })();

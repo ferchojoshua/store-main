@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
 import { DataContext } from "../../../../context/DataContext";
-import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../../helpers/Helpers";
 import {
   deleteToken,
   deleteUserData,
@@ -26,8 +26,14 @@ export const ArticulosVendidos = ({
 }) => {
   const [data, setData] = useState([]);
 
-  const { setIsLoading, setIsDefaultPass, setIsLogged, isDarkMode } =
-    useContext(DataContext);
+  const {
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+    isDarkMode,
+    setIsDarkMode,
+    access,
+  } = useContext(DataContext);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -75,6 +81,8 @@ export const ArticulosVendidos = ({
       setData(result.data);
       setIsLoading(false);
     })();
+
+    setIsDarkMode(false);
   }, []);
 
   const sumCostoCompra = () => {
@@ -97,6 +105,7 @@ export const ArticulosVendidos = ({
 
   return (
     <div>
+      <hr />
       <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
         {isEmpty(data) ? (
           <NoData />
@@ -114,7 +123,11 @@ export const ArticulosVendidos = ({
                 <th style={{ textAlign: "center" }}>Cant. Vendida</th>
                 <th style={{ textAlign: "center" }}>Costo</th>
                 <th style={{ textAlign: "center" }}>Venta Neta</th>
-                <th style={{ textAlign: "center" }}>Utilidad</th>
+                {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
+                  <th style={{ textAlign: "center" }}>Utilidad</th>
+                ) : (
+                  <></>
+                )}
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -138,12 +151,16 @@ export const ArticulosVendidos = ({
                         currency: "NIO",
                       }).format(item.montoVenta)}
                     </td>
-                    <td style={{ textAlign: "center" }}>
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(item.utilidad)}
-                    </td>
+                    {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.utilidad)}
+                      </td>
+                    ) : (
+                      <></>
+                    )}
                   </tr>
                 );
               })}
@@ -161,18 +178,21 @@ export const ArticulosVendidos = ({
             <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
           </Stack>
 
-          <Stack textAlign="center">
-            <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Total Costo de Compra
-            </span>
-            <span>
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(sumCostoCompra())}
-            </span>
-          </Stack>
-
+          {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
+            <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                Total Costo de Compra
+              </span>
+              <span>
+                {new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(sumCostoCompra())}
+              </span>
+            </Stack>
+          ) : (
+            <></>
+          )}
           <Stack textAlign="center">
             <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
               Total Ventas Netas
@@ -184,18 +204,21 @@ export const ArticulosVendidos = ({
               }).format(sumVentaNeta())}
             </span>
           </Stack>
-
-          <Stack textAlign="center">
-            <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-              Utilidad Neta
-            </span>
-            <span>
-              {new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(sumUtilidad())}
-            </span>
-          </Stack>
+          {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
+            <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                Utilidad Neta
+              </span>
+              <span>
+                {new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(sumUtilidad())}
+              </span>
+            </Stack>
+          ) : (
+            <></>
+          )}
         </Stack>
       </Container>
     </div>

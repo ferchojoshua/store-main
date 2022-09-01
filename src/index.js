@@ -7,8 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 import { DataProvider } from "./context/DataContext";
 import  "bootstrap";
 
-
-
 ReactDOM.render(
   <BrowserRouter>
     <DataProvider>     

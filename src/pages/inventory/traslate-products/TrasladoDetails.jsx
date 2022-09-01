@@ -20,7 +20,6 @@ import moment from "moment";
 export const TrasladoDetails = ({ selectedTransaction }) => {
   const { concepto, fecha, id, movmentDetails, user } = selectedTransaction;
 
-  console.log(selectedTransaction);
   let ruta = getRuta();
   let navigate = useNavigate();
 
