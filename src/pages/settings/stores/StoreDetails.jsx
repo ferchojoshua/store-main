@@ -12,6 +12,7 @@ import {
   IconButton,
   Container,
   Paper,
+  Stack,
 } from "@mui/material";
 
 import {
@@ -25,13 +26,11 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 import {
-  faCancel,
-  faCircleArrowLeft,
   faCirclePlus,
   faExternalLinkAlt,
   faTrashAlt,
-  faPaperPlane,
   faPenToSquare,
+  faChevronCircleLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -46,6 +45,7 @@ import PaginationComponent from "../../../components/PaginationComponent";
 import RackDetail from "./racks/RackDetail";
 import NoData from "../../../components/NoData";
 import { isAccess } from "../../../helpers/Helpers";
+import { Send } from "@mui/icons-material";
 
 const StoreDetails = () => {
   let ruta = getRuta();
@@ -59,6 +59,7 @@ const StoreDetails = () => {
     setIsLogged,
     access,
   } = useContext(DataContext);
+
   const token = getToken();
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
@@ -67,6 +68,7 @@ const StoreDetails = () => {
   const [store, setStore] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [name, setName] = useState("");
+  const [meta, setMeta] = useState("");
 
   const [rackList, setRackList] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -109,6 +111,7 @@ const StoreDetails = () => {
         return;
       }
       setName(result.data.name);
+      setMeta(result.data.meta);
       setStore(result.data);
 
       const resultRacks = await getRackStoreAsync(token, id);
@@ -143,14 +146,17 @@ const StoreDetails = () => {
   const saveChangesAsync = async () => {
     const data = {
       id: id,
-      name: name,
+      name,
+      meta,
     };
-    if (name === store.name) {
-      toastError("Ingrese un nombre diferente...");
+    if (name === store.name && meta === store.meta) {
+      toastError("No ha realizado cambios...");
       return;
     }
+    setIsLoading(true);
     const result = await updateStoreAsync(token, data);
     if (!result.statusResponse) {
+      setIsLoading(false);
       if (result.error.request.status === 401) {
         navigate(`${ruta}/unauthorized`);
         return;
@@ -221,6 +227,14 @@ const StoreDetails = () => {
     });
   };
 
+  const funcMeta = (value) => {
+    if (/^\d*\.?\d*$/.test(value.toString()) || value === "") {
+      setMeta(value);
+
+      return;
+    }
+  };
+
   return (
     <div>
       <Container>
@@ -243,12 +257,12 @@ const StoreDetails = () => {
               onClick={() => {
                 navigate(`${ruta}/stores/`);
               }}
-              style={{ marginRight: 20, borderRadius: 20 }}
+              style={{ borderRadius: 20 }}
               variant="outlined"
             >
               <FontAwesomeIcon
                 style={{ marginRight: 10, fontSize: 20 }}
-                icon={faCircleArrowLeft}
+                icon={faChevronCircleLeft}
               />
               Regresar
             </Button>
@@ -256,19 +270,27 @@ const StoreDetails = () => {
             <h1>Detalle Almacen # {id}</h1>
 
             {isAccess(access, "MISCELANEOS UPDATE") ? (
-              <IconButton
+              <Button
                 onClick={() => {
                   setIsEdit(!isEdit);
                 }}
+                style={{
+                  marginRight: 20,
+                  borderRadius: 20,
+                  color: isEdit ? "#4caf50" : "#ff5722",
+                  borderColor: isEdit ? "#4caf50" : "#ff5722",
+                }}
+                variant="outlined"
               >
                 <FontAwesomeIcon
                   style={{
-                    fontSize: 30,
-                    color: isEdit ? "#4caf50" : "#ff5722",
+                    fontSize: 20,
+                    marginRight: 10,
                   }}
-                  icon={isEdit ? faCancel : faPenToSquare}
+                  icon={faPenToSquare}
                 />
-              </IconButton>
+                Editar
+              </Button>
             ) : (
               <div />
             )}
@@ -276,34 +298,63 @@ const StoreDetails = () => {
 
           <hr />
 
-          <TextField
-            fullWidth
-            variant="standard"
-            onChange={(e) => setName(e.target.value.toUpperCase())}
-            value={name}
-            label={"Nombre Almacen"}
-            disabled={!isEdit}
-            placeholder={"Ingrese nombre almacen"}
-            InputProps={
-              isEdit
-                ? {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          style={{ marginRight: 10 }}
-                          onClick={() => saveChangesAsync()}
-                        >
-                          <FontAwesomeIcon
+          <Stack spacing={2} direction="row">
+            <TextField
+              fullWidth
+              variant="standard"
+              onChange={(e) => setName(e.target.value.toUpperCase())}
+              value={name}
+              label={"Nombre Almacen"}
+              disabled={!isEdit}
+              placeholder={"Ingrese nombre almacen"}
+              InputProps={
+                isEdit
+                  ? {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            style={{ marginRight: 10 }}
+                            onClick={() => saveChangesAsync()}
+                          >
+                            <Send style={{ color: "#ff5722" }} />
+                            {/* <FontAwesomeIcon
                             style={{ color: "#ff5722" }}
                             icon={faPaperPlane}
-                          />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }
-                : {}
-            }
-          />
+                          /> */}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  : {}
+              }
+            />
+
+            <TextField
+              fullWidth
+              variant="standard"
+              onChange={(e) => funcMeta(e.target.value)}
+              value={meta}
+              label={"Meta Almacen"}
+              disabled={!isEdit}
+              placeholder={"Ingrese meta almacen"}
+              InputProps={
+                isEdit
+                  ? {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            style={{ marginRight: 10 }}
+                            onClick={() => saveChangesAsync()}
+                          >
+                            <Send style={{ color: "#ff5722" }} />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  : {}
+              }
+            />
+          </Stack>
 
           <Divider />
 

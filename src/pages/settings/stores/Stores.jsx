@@ -129,6 +129,7 @@ const Stores = () => {
                   <th>#</th>
                   <th style={{ width: 150 }}>Numero de Racks</th>
                   <th style={{ textAlign: "left" }}>Nombre</th>
+                  <th style={{ textAlign: "left" }}>Meta</th>
                   <th>Ver Detalles</th>
                 </tr>
               </thead>
@@ -139,6 +140,12 @@ const Stores = () => {
                       <td>{item.almacen.id}</td>
                       <td style={{ width: 150 }}>{item.racksNumber}</td>
                       <td style={{ textAlign: "left" }}>{item.almacen.name}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(item.almacen.meta)}
+                      </td>
                       <td>
                         <IconButton
                           style={{ marginRight: 10, color: "#009688" }}

@@ -2,7 +2,12 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Paper, Grid, Typography } from "@mui/material";
 import { isEmpty } from "lodash";
-import { getRuta, toastError, toastSuccess } from "../../../../helpers/Helpers";
+import {
+  getController,
+  getRuta,
+  toastError,
+  toastSuccess,
+} from "../../../../helpers/Helpers";
 import { DataContext } from "../../../../context/DataContext";
 import {
   deleteToken,
@@ -17,6 +22,7 @@ import SaleDetail from "../SaleDetail";
 import { addFacturaAsync } from "../../../../services/FacturationApi";
 import SmallModal from "../../../../components/modals/SmallModal";
 import ProformaComponent from "../printBill/ProformaComponent";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const Facrturar = () => {
   let ruta = getRuta();
@@ -175,7 +181,7 @@ const Facrturar = () => {
     const data = {
       isEventual: typeClient,
       nombreCliente: eventualClient,
-      idClient: selectedClient.id,
+      clientId: selectedClient.id,
       montoVenta: montoVentaDespuesDescuento,
       facturacionDetails: selectedProductList,
       isContado: typeVenta === "contado" ? true : false,
@@ -247,6 +253,30 @@ const Facrturar = () => {
     setDataProforma(data);
     setShowProformaModal(true);
   };
+
+  let controller = getController();
+
+  const connection = new HubConnectionBuilder()
+    .withUrl(`${controller}updateClientHub`)
+    .configureLogging(LogLevel.Information)
+    .build();
+
+  async function start() {
+    try {
+      await connection.start();
+      connection.on("updateClient", () => {
+        setReload(!reload);
+      });
+    } catch (err) {
+      setTimeout(start, 5000);
+    }
+  }
+
+  connection.onclose(async () => {
+    await start();
+  });
+
+  start();
 
   return (
     <div>

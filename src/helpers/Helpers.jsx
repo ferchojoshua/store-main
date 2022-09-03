@@ -67,7 +67,6 @@ export function validateCedula(cedula) {
 }
 
 export function isAccess(access, permiso) {
-  console.log(permiso)
   let result = find(access, { description: permiso }, "isEnable");
   return result.isEnable;
 }
@@ -104,4 +103,14 @@ export const guid = () => {
       v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+};
+
+export const getController = () => {
+  let ruta = "";
+  if (process.env.NODE_ENV === "production") {
+    ruta = "http://20.231.75.97:8090/";
+  } else {
+    ruta = "https://localhost:7015/";
+  }
+  return ruta;
 };

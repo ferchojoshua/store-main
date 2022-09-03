@@ -47,11 +47,17 @@ const CierreDiario = ({
 
   useEffect(() => {
     (async () => {
+      let fechaD = moment(fechaDesde).format("YYYY-MM-DD");
+      let horaD = moment(horaDesde).format("HH:mm");
+      let fhDesde = new Date(`${fechaD} ${horaD}`);
+
+      let fechaH = moment(fechaHasta).format("YYYY-MM-DD");
+      let horaH = moment(horaHasta).format("HH:mm");
+      let fhHasta = new Date(`${fechaH} ${horaH}`);
+
       const datos = {
-        fechaDesde: new Date(fechaDesde).toLocaleDateString(),
-        fechaHasta: new Date(fechaHasta).toLocaleDateString(),
-        horaDesde: new Date(horaDesde).toLocaleTimeString(),
-        horaHasta: new Date(horaHasta).toLocaleTimeString(),
+        desde: moment(fhDesde).format("YYYY-MM-DD HH:mm"),
+        hasta: moment(fhHasta).format("YYYY-MM-DD HH:mm"),
         storeId: selectedStore === "t" ? 0 : selectedStore,
       };
 

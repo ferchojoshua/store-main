@@ -123,7 +123,7 @@ const Municipalities = () => {
           >
             <Button
               onClick={() => {
-                navigate("/departments/");
+                navigate(`${ruta}/departments/`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"
@@ -172,7 +172,7 @@ const Municipalities = () => {
                           style={{ marginRight: 10 }}
                           onClick={() => {
                             navigate(
-                              `/departments/municipalities/${item.municipality.id}`
+                              `${ruta}/departments/municipalities/${item.municipality.id}`
                             );
                           }}
                         >

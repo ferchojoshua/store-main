@@ -30,6 +30,7 @@ import { isEmpty } from "lodash";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { DataContext } from "../../../../context/DataContext";
 import {
+  getController,
   getRuta,
   isAccess,
   toastError,
@@ -53,12 +54,7 @@ import Pagar from "./Pagar";
 import SmallModal from "../../../../components/modals/SmallModal";
 import { BillComponent } from "../printBill/BillComponent";
 
-let controller = "";
-if (process.env.NODE_ENV === "production") {
-  controller = "http://20.231.75.97:8090/";
-} else {
-  controller = "https://localhost:7015/";
-}
+let controller = getController();
 
 const Caja = () => {
   let ruta = getRuta();

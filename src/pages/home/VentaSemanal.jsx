@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import {
-  GetSalesByDateAsync,
-} from "../../services/DashboardApi";
+import { GetSalesByDateAsync } from "../../services/DashboardApi";
 import { DataContext } from "../../context/DataContext";
 import { getToken } from "../../services/Account";
 import { toastError } from "../../helpers/Helpers";
@@ -13,10 +11,10 @@ import {
   PointElement,
   LineElement,
   Title,
-  Tooltip,
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
   CategoryScale,
@@ -24,7 +22,6 @@ ChartJS.register(
   PointElement,
   LineElement,
   Title,
-  Tooltip,
   Legend
 );
 
@@ -46,6 +43,7 @@ export const VentaSemanal = ({ selectedStore }) => {
     labels: labels,
     datasets: [
       {
+        datalabels: { color: "rgba(75, 192, 192, 1)" },
         label: "Contado",
         data: contado,
         backgroundColor: ["rgba(75, 192, 192, 0.2)"],
@@ -55,6 +53,7 @@ export const VentaSemanal = ({ selectedStore }) => {
         tension: 0.3,
       },
       {
+        datalabels: { color: "rgba(255, 99, 132, 1)" },
         label: "Credito",
         data: credito,
         backgroundColor: ["rgba(255, 99, 132, 0.2)"],
@@ -64,6 +63,7 @@ export const VentaSemanal = ({ selectedStore }) => {
         tension: 0.3,
       },
       {
+        datalabels: { color: "rgba(54, 162, 235, 1)" },
         label: "Recuperacion",
         data: recuperacion,
         backgroundColor: ["rgba(54, 162, 235, 0.2)"],
@@ -78,27 +78,42 @@ export const VentaSemanal = ({ selectedStore }) => {
   const options = {
     responsive: true,
     aspectRatio: 5,
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            let label = context.dataset.label || "";
 
-            if (label) {
-              label += ": ";
-            }
-            if (context.parsed.y !== null) {
-              label += new Intl.NumberFormat("es-NI", {
-                style: "currency",
-                currency: "NIO",
-              }).format(context.parsed.y);
-            }
-            return label;
-          },
+    plugins: {
+      datalabels: {
+        formatter: function (value) {
+          let result = `${new Intl.NumberFormat("es-NI", {
+            style: "currency",
+            currency: "NIO",
+          }).format(value)}`;
+
+          return result;
         },
+        align: "end",
       },
+      tooltip: { enabled: false },
+      // tooltip: {
+      //   callbacks: {
+      //     label: function (context) {
+      //       let label = context.dataset.label || "";
+
+      //       if (label) {
+      //         label += ": ";
+      //       }
+      //       if (context.parsed.y !== null) {
+      //         label += new Intl.NumberFormat("es-NI", {
+      //           style: "currency",
+      //           currency: "NIO",
+      //         }).format(context.parsed.y);
+      //       }
+      //       return label;
+      //     },
+      //   },
+      // },
+
       legend: {
         position: "top",
+        align: "end",
       },
       title: {
         display: false,
@@ -155,7 +170,7 @@ export const VentaSemanal = ({ selectedStore }) => {
 
   return (
     <div>
-      <Line options={options} data={graphicData} />
+      <Line options={options} data={graphicData} plugins={[ChartDataLabels]} />
     </div>
   );
 };

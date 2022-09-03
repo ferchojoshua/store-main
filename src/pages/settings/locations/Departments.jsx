@@ -119,7 +119,7 @@ const Departments = () => {
                           color="primary"
                           style={{ marginRight: 10 }}
                           onClick={() => {
-                            navigate(`/departments/${item.department.id}`);
+                            navigate(`${ruta}/departments/${item.department.id}`);
                           }}
                         >
                           <FontAwesomeIcon icon={faExternalLink} />

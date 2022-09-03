@@ -217,7 +217,7 @@ const MunicipalityDetails = () => {
           >
             <Button
               onClick={() => {
-                navigate(`/departments/${municipality.department.id}`);
+                navigate(`${ruta}/departments/${municipality.department.id}`);
               }}
               style={{ marginRight: 20, borderRadius: 20 }}
               variant="outlined"

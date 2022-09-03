@@ -127,6 +127,7 @@ const Home = () => {
             Ventas y Clientes Nuevos
           </Typography>
         </div>
+
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <Paper
@@ -217,7 +218,8 @@ const Home = () => {
               elevation={10}
               style={{
                 borderRadius: 30,
-                padding: 20,
+                paddingTop: 20,
+                paddingBottom: 20,
                 minWidth: 280,
                 maxHeight: 280,
               }}
