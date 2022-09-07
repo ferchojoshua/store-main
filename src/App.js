@@ -47,6 +47,12 @@ import AdmonContainer from "./pages/admon/AdmonContainer";
 import { NoConectionServer } from "./components/errorPages/NoConectionServer";
 import { serverMessages } from "./services/SignalRService";
 import { ReportsContainer } from "./pages/reports/ReportsContainer";
+import FullScreenModal from "./components/modals/FullScreenModal";
+import { MasterVentas } from "./pages/reports/reporteVentas/Reportes/MasterVentas";
+import { DocumentosXCobrar } from "./pages/reports/reporteVentas/Reportes/DocumentosXCobrar";
+import { ArticulosVendidos } from "./pages/reports/reporteVentas/Reportes/ArticulosVendidos";
+import CierreDiario from "./pages/reports/reporteVentas/Reportes/CierreDiario";
+import CajaChica from "./pages/reports/reporteVentas/Reportes/CajaChica";
 
 function App() {
   let ruta = getRuta();
@@ -175,6 +181,26 @@ function App() {
                 <Route
                   path={`${ruta}/reports`}
                   element={<ReportsContainer />}
+                />
+                <Route
+                  path={`${ruta}/r-master-vetas/:params`}
+                  element={<MasterVentas />}
+                />
+                <Route
+                  path={`${ruta}/r-docs-cobrar/:params`}
+                  element={<DocumentosXCobrar />}
+                />
+                <Route
+                  path={`${ruta}/r-sales-prods/:params`}
+                  element={<ArticulosVendidos />}
+                />
+                <Route
+                  path={`${ruta}/r-daily-close/:params`}
+                  element={<CierreDiario />}
+                />
+                <Route
+                  path={`${ruta}/r-caja-chica/:params`}
+                  element={<CajaChica />}
                 />
 
                 {/* Rutas Administration */}

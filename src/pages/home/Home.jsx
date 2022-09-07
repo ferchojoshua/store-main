@@ -23,6 +23,7 @@ import { VentaSemanal } from "./VentaSemanal";
 import VisitedClients from "./clientsChart/VisitedClients";
 import { Especialidad } from "./clientsChart/Especialidad";
 import { LocationClients } from "./clientsChart/LocationClients";
+import { set } from "lodash";
 
 const Home = () => {
   const { setIsLoading, setIsLogged, setIsDefaultPass } =
@@ -31,6 +32,8 @@ const Home = () => {
   const token = getToken();
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("");
+  const [metas, setMetas] = useState([]);
+  const [metaSemanal, setMetaSemanal] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +62,16 @@ const Home = () => {
       setIsLoading(false);
       setStoreList(result.data);
 
+      let storeMetas = result.data.map(({ name, users, ...rest }) => {
+        return rest;
+      });
+
+      let storeMetaSemanal = result.data.map((item) => {
+        const { id, meta } = item;
+        return { id, meta: Math.round(meta / 4) };
+      });
+      setMetas(storeMetas);
+      setMetaSemanal(storeMetaSemanal);
       handleChangeStore(result.data[0].id);
     })();
   }, []);
@@ -139,7 +152,7 @@ const Home = () => {
                 maxHeight: 280,
               }}
             >
-              <MetaMensual selectedStore={selectedStore} />
+              <MetaMensual selectedStore={selectedStore} metas={metas} />
             </Paper>
           </Grid>
 
@@ -167,7 +180,10 @@ const Home = () => {
                 maxHeight: 280,
               }}
             >
-              <MetaSemanal selectedStore={selectedStore} />
+              <MetaSemanal
+                selectedStore={selectedStore}
+                metaSemanal={metaSemanal}
+              />
             </Paper>
           </Grid>
 

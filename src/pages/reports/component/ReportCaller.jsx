@@ -8,20 +8,20 @@ export const ReportCaller = ({ icon, text, modalTitle, children }) => {
   return (
     <Paper
       elevation={10}
-      style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
+      style={{ textAlign: "center", padding: 15, borderRadius: 20 }}
     >
       <IconButton
         onClick={() => setShowModal(true)}
         sx={{
           border: 1,
           borderColor: "#03a9f4",
-          p: 3,
+          p: 2,
           mb: 1,
         }}
       >
         <FontAwesomeIcon
           icon={icon}
-          style={{ color: "#2979ff", width: 60, height: 60 }}
+          style={{ color: "#2979ff", width: 50, height: 50 }}
         />
       </IconButton>
       <hr />

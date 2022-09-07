@@ -22,18 +22,12 @@ import {
 import { DataContext } from "../../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
-import FullScreenModal from "../../../../components/modals/FullScreenModal";
+
 import moment from "moment";
-import CajaChica from "../Reportes/CajaChica";
 
 const SelectorCajaChica = () => {
-  const {
-    setIsLoading,
-    setIsDefaultPass,
-    setIsLogged,
-    isDarkMode,
-    setIsDarkMode,
-  } = useContext(DataContext);
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
 
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
@@ -42,10 +36,6 @@ const SelectorCajaChica = () => {
   const [fechaHassta, setHasstaFecha] = useState(new Date());
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
-
-  const [showFullScreenModal, setShowFullScreenModal] = useState(false);
-
-  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -98,14 +88,13 @@ const SelectorCajaChica = () => {
       return;
     }
 
-    setShowFullScreenModal(true);
-  };
-
-  const handleClose = () => {
-    setIsDarkMode(theme);
-    setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
-    setHasstaFecha(new Date());
-    setShowFullScreenModal(false);
+    var params = {
+      selectedStore,
+      desde: fechaDesde,
+      hasta: fechaHassta,
+    };
+    params = JSON.stringify(params);
+    window.open(`${ruta}/r-caja-chica/${params}`);
   };
 
   return (
@@ -201,21 +190,6 @@ const SelectorCajaChica = () => {
             </Button>
           </Stack>
         </Paper>
-
-        <FullScreenModal
-          titulo={"Movimientos de Caja Chica"}
-          fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-            fechaHassta
-          ).format("L")}`}
-          open={showFullScreenModal}
-          handleClose={handleClose}
-        >
-          <CajaChica
-            selectedStore={selectedStore}
-            desde={fechaDesde}
-            hasta={fechaHassta}
-          />
-        </FullScreenModal>
       </Container>
     </div>
   );

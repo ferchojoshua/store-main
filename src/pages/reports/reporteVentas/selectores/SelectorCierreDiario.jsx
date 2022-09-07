@@ -22,18 +22,11 @@ import {
 import { DataContext } from "../../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
-import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
-import CierreDiario from "../Reportes/CierreDiario";
 
 const SelectorCierreDiario = () => {
-  const {
-    setIsLoading,
-    setIsDefaultPass,
-    setIsLogged,
-    isDarkMode,
-    setIsDarkMode,
-  } = useContext(DataContext);
+  const { setIsLoading, setIsDefaultPass, setIsLogged, isDarkMode } =
+    useContext(DataContext);
 
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(date);
@@ -43,10 +36,6 @@ const SelectorCierreDiario = () => {
 
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
-
-  const [showFullScreenModal, setShowFullScreenModal] = useState(false);
-
-  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -99,16 +88,15 @@ const SelectorCierreDiario = () => {
       return;
     }
 
-    setShowFullScreenModal(true);
-  };
-
-  const handleClose = () => {
-    setIsDarkMode(theme);
-    setDesdeFecha(date);
-    setHastaFecha(date);
-    setSelectedStore("t");
-
-    setShowFullScreenModal(false);
+    var params = {
+      selectedStore,
+      fechaDesde,
+      fechaHasta,
+      horaDesde,
+      horaHasta,
+    };
+    params = JSON.stringify(params);
+    window.open(`${ruta}/r-daily-close/${params}`);
   };
 
   return (
@@ -240,23 +228,6 @@ const SelectorCierreDiario = () => {
             Generar Reporte
           </Button>
         </Paper>
-
-        <FullScreenModal
-          titulo={"Cierre Diario"}
-          fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-            fechaHasta
-          ).format("L")}`}
-          open={showFullScreenModal}
-          handleClose={handleClose}
-        >
-          <CierreDiario
-            selectedStore={selectedStore}
-            fechaDesde={fechaDesde}
-            fechaHasta={fechaHasta}
-            horaDesde={horaDesde}
-            horaHasta={horaHasta}
-          />
-        </FullScreenModal>
       </Container>
     </div>
   );

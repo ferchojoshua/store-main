@@ -2,13 +2,22 @@ import React, { useContext } from "react";
 import { Typography, Stack } from "@mui/material";
 import { DataContext } from "../../context/DataContext";
 
-let tema = false;
 
 export const PrintReport = React.forwardRef((props, ref) => {
   const { title } = useContext(DataContext);
 
+  const getPageMargins = () => {
+    return `body
+    {
+      margin: 0mm 10mm 0mm 10mm;
+      padding-top:15mm;
+      padding-bottom:15mm;
+    }`;
+  };
+
   return (
-    <div ref={ref} style={{ padding: 20 }}>
+    <div ref={ref}>
+      <style>{getPageMargins()}</style>
       <Stack justifyContent={"space-between"} direction="row">
         <img
           loading="lazy"

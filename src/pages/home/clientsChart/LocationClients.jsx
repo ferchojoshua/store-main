@@ -42,30 +42,7 @@ export const LocationClients = ({ selectedStore }) => {
 
   const data = {
     labels: datos.map((item) => {
-      // let abrev = "";
-      // let caracts = item.location;
-      // let tieneGion = caracts.search("-");
-
-      // if (tieneGion > 0) {
-      //   caracts.replace("-", " ");
-      // }
-
-      // let tieneEspace = caracts.search(" ");
-
-      // if (tieneEspace > 0) {
-      //   let caractsArray = caracts.split(" ");
-
-      //   caractsArray.map((value) => {
-      //     let sub = value.substring(0, 3);
-      //     abrev += `${sub}. `;
-      //   });
-
-      //   console.log(abrev);
-      //   abrev = "";
-      // }
-      // console.log(sub, caracts);
-
-      return `${item.location} ${Math.round((item.contador / total) * 100)}%`;
+      return `${item.abrev} ${Math.round((item.contador / total) * 100)}%`;
     }),
     datasets: [
       {

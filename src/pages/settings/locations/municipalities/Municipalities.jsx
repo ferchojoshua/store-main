@@ -4,10 +4,12 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 
-import { Button, IconButton, Container, Paper } from "@mui/material";
+import { Button, IconButton, Container, Paper, Tooltip } from "@mui/material";
 import {
   faCircleArrowLeft,
+  faCirclePlus,
   faExternalLink,
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,6 +25,8 @@ import {
   getDepartmentByIdAsync,
   getMunsWithCommsCountAsync,
 } from "../../../../services/CommunitiesApi";
+import SmallModal from "../../../../components/modals/SmallModal";
+import AddEditAbreviatura from "./AddEditAbreviatura";
 
 const Municipalities = () => {
   let ruta = getRuta();
@@ -43,6 +47,9 @@ const Municipalities = () => {
   const indexFirst = indexLast - itemsperPage;
   const currentItem = municipalityList.slice(indexFirst, indexLast);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMun, setSelectedMun] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -153,6 +160,7 @@ const Municipalities = () => {
                 <tr>
                   <th>#</th>
                   <th style={{ textAlign: "left" }}>Nombre Municipio</th>
+                  <th style={{ textAlign: "center" }}>Abreviatura</th>
                   <th style={{ textAlign: "center" }}># Comunidades</th>
                   <th>Ver</th>
                 </tr>
@@ -164,6 +172,39 @@ const Municipalities = () => {
                       <td>{item.municipality.id}</td>
                       <td style={{ textAlign: "left" }}>
                         {item.municipality.name}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        {item.municipality.abreviatura}
+                        <Tooltip
+                          title={
+                            item.municipality.abreviatura === ""
+                              ? "Agregar"
+                              : "Editar"
+                          }
+                        >
+                          <IconButton
+                            size="small"
+                            style={{
+                              marginRight: 5,
+                              color:
+                                item.municipality.abreviatura === ""
+                                  ? "#2979ff"
+                                  : "#ff9800",
+                            }}
+                            onClick={() => {
+                              setSelectedMun(item.municipality);
+                              setShowModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={
+                                item.municipality.abreviatura === ""
+                                  ? faCirclePlus
+                                  : faPenToSquare
+                              }
+                            />
+                          </IconButton>
+                        </Tooltip>
                       </td>
                       <td>{item.communitiesCount}</td>
                       <td>
@@ -192,6 +233,21 @@ const Municipalities = () => {
           />
         </Paper>
       </Container>
+
+      <SmallModal
+        titulo={
+          selectedMun.abreviatura === ""
+            ? "Agregar Abreviatura"
+            : "Editar Abreviatura"
+        }
+        isVisible={showModal}
+        setVisible={setShowModal}
+      >
+        <AddEditAbreviatura
+          selectedMun={selectedMun}
+          setShowModal={setShowModal}
+        />
+      </SmallModal>
     </div>
   );
 };

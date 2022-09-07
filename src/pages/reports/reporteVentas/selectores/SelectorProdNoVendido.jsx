@@ -31,7 +31,7 @@ import {
   getTipoNegocioAsync,
 } from "../../../../services/TipoNegocioApi";
 
-export const SelectorArtVendidos = () => {
+const SelectorProdNoVendido = () => {
   const { setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
 
@@ -42,8 +42,6 @@ export const SelectorArtVendidos = () => {
   const [fechaHassta, setHasstaFecha] = useState(new Date());
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
-  const [clientList, setClientList] = useState([]);
-  const [selectedClient, setSelectedClient] = useState("");
 
   const [tNegocioList, setTNegocioList] = useState([]);
   const [selectedTNegocio, setSelectedTNegocio] = useState("t");
@@ -84,33 +82,6 @@ export const SelectorArtVendidos = () => {
       }
 
       setStoreList(resultStore.data);
-
-      const resultClients = await getClientsAsync(token);
-      if (!resultClients.statusResponse) {
-        setIsLoading(false);
-        if (resultClients.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(resultClients.error.message);
-        return;
-      }
-
-      if (resultClients.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (resultClients.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setClientList(resultClients.data);
 
       const result = await getTipoNegocioAsync(token);
       if (!result.statusResponse) {
@@ -170,7 +141,6 @@ export const SelectorArtVendidos = () => {
       selectedStore,
       desde: fechaDesde,
       hasta: fechaHassta,
-      selectedClient,
       selectedTNegocio,
       selectedFamilia,
     };
@@ -372,36 +342,6 @@ export const SelectorArtVendidos = () => {
               </Select>
             </FormControl>
 
-            <Autocomplete
-              id="combo-box-demo"
-              fullWidth
-              options={clientList}
-              getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
-              value={selectedClient === "" ? null : selectedClient}
-              onChange={(event, newValue) => {
-                setSelectedClient(newValue);
-              }}
-              noOptionsText="Cliente no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.nombreCliente}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label={
-                    selectedClient === "" || selectedClient === null
-                      ? "Todos los clientes"
-                      : "Cliente"
-                  }
-                />
-              )}
-            />
-
             <Button
               variant="outlined"
               fullWidth
@@ -419,3 +359,5 @@ export const SelectorArtVendidos = () => {
     </div>
   );
 };
+
+export default SelectorProdNoVendido;

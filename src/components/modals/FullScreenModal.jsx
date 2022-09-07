@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Dialog, DialogContent, Stack } from "@mui/material";
 
 import AppBar from "@mui/material/AppBar";
@@ -14,22 +14,32 @@ import { useContext } from "react";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import ReactToPrint from "react-to-print";
 import { PrintReport } from "./PrintReport";
+import { useParams } from "react-router-dom";
+import moment from "moment/moment";
+// const Transition = React.forwardRef(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />;
+// });
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
+const FullScreenModal = (props) => {
+  const { data } = useParams();
+  const dataJson = JSON.parse(data);
+  const { titulo, desde, hasta } = dataJson;
   const compRef = useRef();
   const { title } = useContext(DataContext);
+  // { titulo, children, fecha }=
+
+  // const [showModal, setShowModal] = useState(false);
+
+  //   useEffect(() => {
+  // windo
+  //   }, []);
 
   return (
     <div>
       <Dialog
         fullScreen
-        open={open}
-        onClose={() => handleClose()}
-        TransitionComponent={Transition}
+        open={true}
+        // TransitionComponent={Transition}
       >
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
@@ -46,17 +56,17 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
             >
               {`${title} - Chinandega`}
             </Typography>
-            <IconButton
+            {/* <IconButton
               edge="start"
               color="inherit"
-              onClick={() => handleClose()}
+              onClick={() => setShowModal(false)}
               aria-label="close"
             >
               <FontAwesomeIcon
                 icon={faCircleXmark}
                 style={{ color: "#ff9800" }}
               />
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
         </AppBar>
 
@@ -73,7 +83,9 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
           >
             {titulo}
           </Typography>
-          <span style={{ textAlign: "center" }}>{fecha}</span>
+          <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
+            "L"
+          )} - Hasta: ${moment(hasta).format("L")}`}</span>
 
           <ReactToPrint
             trigger={() => {
@@ -92,8 +104,8 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
           />
         </Stack>
 
-        <DialogContent>{children}</DialogContent>
-        <div
+        {/* <DialogContent>{children}</DialogContent> */}
+        {/* <div
           style={{
             display: "none",
           }}
@@ -101,7 +113,7 @@ const FullScreenModal = ({ titulo, children, handleClose, open, fecha }) => {
           <PrintReport ref={compRef} fecha={fecha} titulo={titulo}>
             {children}
           </PrintReport>
-        </div>
+        </div> */}
       </Dialog>
     </div>
   );

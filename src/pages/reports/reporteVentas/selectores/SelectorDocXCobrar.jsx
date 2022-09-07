@@ -26,19 +26,12 @@ import {
 import { DataContext } from "../../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
-import FullScreenModal from "../../../../components/modals/FullScreenModal";
 import moment from "moment";
 import { getClientsAsync } from "../../../../services/ClientsApi";
-import { DocumentosXCobrar } from "../Reportes/DocumentosXCobrar";
 
 export const SelectorDocXCobrar = () => {
-  const {
-    setIsLoading,
-    setIsDefaultPass,
-    setIsLogged,
-    isDarkMode,
-    setIsDarkMode,
-  } = useContext(DataContext);
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
 
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
@@ -50,10 +43,7 @@ export const SelectorDocXCobrar = () => {
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
 
-  const [showFullScreenModal, setShowFullScreenModal] = useState(false);
   const [includeCanceled, setIncludeCanceled] = useState(false);
-
-  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -119,15 +109,6 @@ export const SelectorDocXCobrar = () => {
     })();
   }, []);
 
-  const handleClose = () => {
-    setIsDarkMode(theme);
-    setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
-    setHasstaFecha(new Date());
-    setSelectedStore("t");
-
-    setShowFullScreenModal(false);
-  };
-
   const verReport = () => {
     if (!moment(fechaDesde).isValid()) {
       toastError("Ingrese una fecha de inicio valida");
@@ -142,7 +123,16 @@ export const SelectorDocXCobrar = () => {
       return;
     }
 
-    setShowFullScreenModal(true);
+    var params = {
+      selectedStore: selectedStore,
+      desde: fechaDesde,
+      hasta: fechaHassta,
+      selectedClient,
+      includeCanceled,
+    };
+    params = JSON.stringify(params);
+
+    window.open(`${ruta}/r-docs-cobrar/${params}`);
   };
 
   return (
@@ -280,23 +270,6 @@ export const SelectorDocXCobrar = () => {
             </Button>
           </Stack>
         </Paper>
-
-        <FullScreenModal
-          titulo={"Documentos por Cobrar"}
-          fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-            fechaHassta
-          ).format("L")}`}
-          open={showFullScreenModal}
-          handleClose={handleClose}
-        >
-          <DocumentosXCobrar
-            selectedStore={selectedStore}
-            desde={fechaDesde}
-            hasta={fechaHassta}
-            selectedClient={selectedClient}
-            includeCanceled={includeCanceled}
-          />
-        </FullScreenModal>
       </Container>
     </div>
   );

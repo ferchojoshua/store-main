@@ -25,18 +25,12 @@ import {
 import { DataContext } from "../../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
-import FullScreenModal from "../../../../components/modals/FullScreenModal";
+
 import moment from "moment";
-import { MasterVentas } from "../Reportes/MasterVentas";
 
 export const SelectorMasterVentas = () => {
-  const {
-    setIsLoading,
-    setIsDefaultPass,
-    setIsLogged,
-    isDarkMode,
-    setIsDarkMode,
-  } = useContext(DataContext);
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =
+    useContext(DataContext);
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
@@ -45,12 +39,9 @@ export const SelectorMasterVentas = () => {
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
 
-  const [showFullScreenModal, setShowFullScreenModal] = useState(false);
-
   const [selectAll, setSelectAll] = useState(false);
   const [selectCreditSales, setSelectCreditSales] = useState(false);
   const [selectContadoSales, setSelectContadoSales] = useState(false);
-  const [theme] = useState(isDarkMode);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -108,22 +99,21 @@ export const SelectorMasterVentas = () => {
       return;
     }
 
-    setShowFullScreenModal(true);
+    var params = {
+      selectedStore,
+      desde: fechaDesde,
+      hasta: fechaHassta,
+      creditSales: selectCreditSales,
+      contadoSales: selectContadoSales,
+    };
+    params = JSON.stringify(params);
+    window.open(`${ruta}/r-master-vetas/${params}`);
   };
 
   const seleccionarTodos = () => {
     setSelectAll(!selectAll);
     setSelectContadoSales(!selectAll);
     setSelectCreditSales(!selectAll);
-  };
-
-  const handleClose = () => {
-    setIsDarkMode(theme);
-    setDesdeFecha(new Date(date.getFullYear(), date.getMonth(), 1));
-    setHasstaFecha(new Date());
-    setSelectedStore("t");
-    seleccionarTodos();
-    setShowFullScreenModal(false);
   };
 
   return (
@@ -257,23 +247,6 @@ export const SelectorMasterVentas = () => {
           </Button>
         </Paper>
       </Container>
-
-      <FullScreenModal
-        titulo={"Master de Ventas"}
-        fecha={`Desde: ${moment(fechaDesde).format("L")} - Hasta: ${moment(
-          fechaHassta
-        ).format("L")}`}
-        open={showFullScreenModal}
-        handleClose={handleClose}
-      >
-        <MasterVentas
-          selectedStore={selectedStore}
-          desde={fechaDesde}
-          hasta={fechaHassta}
-          creditSales={selectCreditSales}
-          contadoSales={selectContadoSales}
-        />
-      </FullScreenModal>
     </div>
   );
 };

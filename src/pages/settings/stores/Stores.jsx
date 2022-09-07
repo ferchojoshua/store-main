@@ -129,7 +129,7 @@ const Stores = () => {
                   <th>#</th>
                   <th style={{ width: 150 }}>Numero de Racks</th>
                   <th style={{ textAlign: "left" }}>Nombre</th>
-                  <th style={{ textAlign: "left" }}>Meta</th>
+                  <th style={{ textAlign: "center" }}>Meta</th>
                   <th>Ver Detalles</th>
                 </tr>
               </thead>

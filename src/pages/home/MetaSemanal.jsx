@@ -8,18 +8,13 @@ import { DataContext } from "../../context/DataContext";
 import { getToken } from "../../services/Account";
 import { toastError } from "../../helpers/Helpers";
 
-export const MetaSemanal = ({ selectedStore }) => {
+export const MetaSemanal = ({ selectedStore, metaSemanal }) => {
   const { setIsLoading } = useContext(DataContext);
   const [meta, setMeta] = useState(0);
   const [falta, setFalta] = useState(0);
   const [percent, setPercent] = useState(0);
 
-  const metas = [
-    { id: 1, meta: 65000 },
-    { id: 2, meta: 40000 },
-    { id: 3, meta: 90000 },
-    { id: 4, meta: 40000 },
-  ];
+  const metas = metaSemanal;
 
   const [totalVendido, setTotalVendido] = useState(0);
 
