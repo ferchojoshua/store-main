@@ -35,6 +35,7 @@ const SelectProduct = ({
   setSelectedStore,
   barCodeSearch,
   setBarCodeSearch,
+  recalculate,
 }) => {
   let ruta = getRuta();
 
@@ -81,7 +82,7 @@ const SelectProduct = ({
           idAlmacen: selectedStore,
         };
         setIsLoading(true);
-        
+
         const result = await getExistencesByStoreAsync(token, data);
         if (!result.statusResponse) {
           setIsLoading(false);

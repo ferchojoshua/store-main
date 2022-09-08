@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Divider,
   Radio,
@@ -43,7 +43,12 @@ const ProductDescription = ({
     precioCompra,
   } = selectedProduct;
 
-
+  useEffect(() => {
+    console.log(cantidad.length);
+    if (cantidad.length > 0) {
+      funcCantidad(cantidad);
+    }
+  }, [selectedProduct]);
 
   const funcCantidad = (value) => {
     if (value === 0 || value === "0") {

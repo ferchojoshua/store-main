@@ -145,7 +145,7 @@ const SelectorProdNoVendido = () => {
       selectedFamilia,
     };
     params = JSON.stringify(params);
-    window.open(`${ruta}/r-sales-prods/${params}`);
+    window.open(`${ruta}/r-no-sales-prods/${params}`);
   };
 
   const onChangeTN = async (value) => {

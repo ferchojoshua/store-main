@@ -53,6 +53,7 @@ import { DocumentosXCobrar } from "./pages/reports/reporteVentas/Reportes/Docume
 import { ArticulosVendidos } from "./pages/reports/reporteVentas/Reportes/ArticulosVendidos";
 import CierreDiario from "./pages/reports/reporteVentas/Reportes/CierreDiario";
 import CajaChica from "./pages/reports/reporteVentas/Reportes/CajaChica";
+import { ProdNoVendidos } from "./pages/reports/reporteVentas/Reportes/ProdNoVendidos";
 
 function App() {
   let ruta = getRuta();
@@ -201,6 +202,10 @@ function App() {
                 <Route
                   path={`${ruta}/r-caja-chica/:params`}
                   element={<CajaChica />}
+                />
+                <Route
+                  path={`${ruta}/r-no-sales-prods/:params`}
+                  element={<ProdNoVendidos />}
                 />
 
                 {/* Rutas Administration */}

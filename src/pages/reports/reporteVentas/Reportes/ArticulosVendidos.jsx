@@ -100,8 +100,6 @@ export const ArticulosVendidos = () => {
       setData(result.data);
       setIsLoading(false);
     })();
-
-    setIsDarkMode(false);
   }, []);
 
   const sumCostoCompra = () => {
