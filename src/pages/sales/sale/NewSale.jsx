@@ -76,6 +76,10 @@ const NewSale = () => {
     useState(0);
   const [montoVentaAntesDescuento, setMontoVentaAntesDescuento] = useState(0);
 
+  const [creditoDisponible, setCreditoDisponible] = useState("");
+  const [saldoVencido, setSaldoVencido] = useState("");
+  const [factVencidas, setFactVencidas] = useState("");
+
   useEffect(() => {
     setTypeClient(true);
     setTypeVenta("contado");
@@ -83,8 +87,12 @@ const NewSale = () => {
 
   const onTypeClientChange = (value) => {
     setTypeClient(value);
+
     if (value) {
       setTypeVenta("contado");
+      setSelectedClient("");
+    } else {
+      setEventualClient("");
     }
   };
 
@@ -179,6 +187,11 @@ const NewSale = () => {
 
     if (!typeClient && isEmpty(selectedClient)) {
       toastError("Seleccione un cliente");
+      return;
+    }
+
+    if (!typeClient && selectedClient.facturasVencidas > 0) {
+      toastError("El cliente tiene saldo vencido");
       return;
     }
 
@@ -299,6 +312,11 @@ const NewSale = () => {
                 setEventualClient={setEventualClient}
                 typeClient={typeClient}
                 onTypeClientChange={onTypeClientChange}
+                creditoDisponible={creditoDisponible}
+                setCreditoDisponible={setCreditoDisponible}
+                saldoVencido={saldoVencido}
+                setSaldoVencido={setSaldoVencido}
+                setFactVencidas={setFactVencidas}
               />
               <SelectProduct
                 selectedProductList={selectedProductList}

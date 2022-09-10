@@ -49,7 +49,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
   );
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(
-    selectedProduct.familia.id
+    selectedProduct.familia ? selectedProduct.familia.id : ""
   );
 
   const token = getToken();

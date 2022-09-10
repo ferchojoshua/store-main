@@ -133,6 +133,8 @@ const AddEntradaProducto = () => {
       precioVentaDetalle: parseFloat(precioVentaDetalle),
     };
 
+    console.log(data);
+
     setMontoFactura(montoFactura + cantidad * costo);
     setSelectedProduct("");
     setCantidad("");

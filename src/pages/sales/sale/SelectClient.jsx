@@ -10,6 +10,10 @@ import {
   Tooltip,
   IconButton,
   FormGroup,
+  Stack,
+  Typography,
+  Grid,
+  Divider,
 } from "@mui/material";
 
 import { getClientsAsync } from "../../../services/ClientsApi";
@@ -33,10 +37,13 @@ const SelectClient = ({
   setEventualClient,
   typeClient,
   onTypeClientChange,
+  creditoDisponible,
+  setCreditoDisponible,
+  saldoVencido,
+  setSaldoVencido,
+  setFactVencidas,
 }) => {
-
-    let ruta = getRuta();
-
+  let ruta = getRuta();
 
   const { setIsLoading, setIsLogged, reload, setIsDefaultPass } =
     useContext(DataContext);
@@ -81,6 +88,26 @@ const SelectClient = ({
     })();
   }, [reload]);
 
+  const onChangeSelectedClient = (client) => {
+    if (client === null) {
+      setSelectedClient(client);
+      return;
+    } else {
+      const { limiteCredito, creditoConsumido } = client;
+      let diferencia = limiteCredito - creditoConsumido;
+      setCreditoDisponible(diferencia);
+      setSaldoVencido(client.saldoVencido);
+      setFactVencidas(client.facturasVencidas);
+      if (diferencia < 0) {
+        toastError("Limite de credito alcanzado");
+        return;
+      } else {
+        setSelectedClient(client);
+        return;
+      }
+    }
+  };
+
   return (
     <div>
       <div style={{ textAlign: "left" }}>
@@ -108,51 +135,78 @@ const SelectClient = ({
           onChange={(e) => setEventualClient(e.target.value.toUpperCase())}
         />
       ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Autocomplete
-            id="combo-box-demo"
-            fullWidth
-            options={clientList}
-            getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
-            value={selectedClient === "" ? null : selectedClient}
-            onChange={(event, newValue) => {
-              setSelectedClient(newValue);
-            }}
-            noOptionsText="Cliente no encontrado..."
-            renderOption={(props, option) => {
-              return (
-                <li {...props} key={option.id}>
-                  {option.nombreCliente}
-                </li>
-              );
-            }}
-            renderInput={(params) => (
-              <TextField
-                variant="standard"
-                {...params}
-                label="Seleccione un cliente..."
-              />
-            )}
-          />
+        <div>
+          <Stack direction="row" spacing={1}>
+            <Autocomplete
+              id="combo-box-demo"
+              fullWidth
+              options={clientList}
+              getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
+              value={selectedClient === "" ? null : selectedClient}
+              onChange={(event, newValue) => {
+                onChangeSelectedClient(newValue);
+              }}
+              noOptionsText="Cliente no encontrado..."
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.id}>
+                    {option.nombreCliente}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  variant="standard"
+                  {...params}
+                  label="Seleccione un cliente..."
+                />
+              )}
+            />
+            <Tooltip title="Agregar Cliente" style={{ marginTop: 5 }}>
+              <IconButton onClick={() => setShowModal(true)}>
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 25,
+                    color: "#ff5722",
+                  }}
+                  icon={faCirclePlus}
+                />
+              </IconButton>
+            </Tooltip>
+          </Stack>
 
-          <Tooltip title="Agregar Cliente" style={{ marginTop: 5 }}>
-            <IconButton onClick={() => setShowModal(true)}>
-              <FontAwesomeIcon
-                style={{
-                  fontSize: 25,
-                  color: "#ff5722",
-                }}
-                icon={faCirclePlus}
-              />
-            </IconButton>
-          </Tooltip>
+          {selectedClient ? (
+            <Stack
+              direction="row"
+              justifyContent={"space-between"}
+              style={{ marginTop: 10 }}
+            >
+              <Stack spacing={1} direction="row">
+                <Typography style={{ color: "#2979ff" }}>
+                  Credito Disponible:
+                </Typography>
+                <Typography>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(creditoDisponible)}
+                </Typography>
+              </Stack>
+              <Stack spacing={1} direction="row">
+                <Typography style={{ color: "#f50057" }}>
+                  Saldo Vencido:
+                </Typography>
+                <Typography>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(saldoVencido)}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : (
+            <></>
+          )}
         </div>
       )}
 

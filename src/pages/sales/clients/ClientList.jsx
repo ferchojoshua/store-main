@@ -11,7 +11,13 @@ import {
   toastError,
   toastSuccess,
 } from "../../../helpers/Helpers";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlus,
@@ -225,7 +231,7 @@ const ClientList = () => {
                 <th style={{ textAlign: "center" }}>Telefono</th>
                 <th style={{ textAlign: "left" }}>Comunidad</th>
                 <th style={{ textAlign: "left" }}>Direccion</th>
-                <th style={{ textAlign: "left" }}>Correo</th>
+                <th style={{ textAlign: "center" }}>L. Credito</th>
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
@@ -240,32 +246,39 @@ const ClientList = () => {
                       {item.community ? item.community.name : ""}
                     </td>
                     <td style={{ textAlign: "left" }}>{item.direccion}</td>
-                    <td style={{ textAlign: "left" }}>{item.correo}</td>
+                    <td style={{ textAlign: "center" }}>
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(item.limiteCredito)}
+                    </td>
 
                     <td style={{ width: 150 }}>
-                      {isAccess(access, "CLIENTS VER") ? (
-                        <IconButton
-                          style={{ marginRight: 10, color: "#009688" }}
-                          onClick={() => {
-                            setSelectedClient(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faExternalLinkAlt} />
-                        </IconButton>
-                      ) : (
-                        <></>
-                      )}
-                      {isAccess(access, "CLIENTS DELETE") ? (
-                        <IconButton
-                          style={{ color: "#f50057" }}
-                          onClick={() => deleteClient(item)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </IconButton>
-                      ) : (
-                        <></>
-                      )}
+                      <Stack direction={"row"} spacing={1}>
+                        {isAccess(access, "CLIENTS VER") ? (
+                          <IconButton
+                            style={{ color: "#009688" }}
+                            onClick={() => {
+                              setSelectedClient(item);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
+                        {isAccess(access, "CLIENTS DELETE") ? (
+                          <IconButton
+                            style={{ color: "#f50057" }}
+                            onClick={() => deleteClient(item)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
+                      </Stack>
                     </td>
                   </tr>
                 );

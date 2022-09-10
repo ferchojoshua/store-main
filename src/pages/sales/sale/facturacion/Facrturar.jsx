@@ -73,6 +73,10 @@ const Facrturar = () => {
   const [dataProforma, setDataProforma] = useState([]);
   const [showProformaModal, setShowProformaModal] = useState(false);
 
+  const [creditoDisponible, setCreditoDisponible] = useState("");
+  const [saldoVencido, setSaldoVencido] = useState("");
+  const [factVencidas, setFactVencidas] = useState("");
+
   useEffect(() => {
     setTypeClient(true);
     setTypeVenta("contado");
@@ -80,8 +84,12 @@ const Facrturar = () => {
 
   const onTypeClientChange = (value) => {
     setTypeClient(value);
+
     if (value) {
       setTypeVenta("contado");
+      setSelectedClient("");
+    } else {
+      setEventualClient("");
     }
   };
 
@@ -178,6 +186,12 @@ const Facrturar = () => {
       toastError("Seleccione un cliente");
       return;
     }
+
+    if (!typeClient && selectedClient.facturasVencidas > 0) {
+      toastError("El cliente tiene saldo vencido");
+      return;
+    }
+
     const data = {
       isEventual: typeClient,
       nombreCliente: eventualClient,
@@ -301,6 +315,11 @@ const Facrturar = () => {
                 setEventualClient={setEventualClient}
                 typeClient={typeClient}
                 onTypeClientChange={onTypeClientChange}
+                creditoDisponible={creditoDisponible}
+                setCreditoDisponible={setCreditoDisponible}
+                saldoVencido={saldoVencido}
+                setSaldoVencido={setSaldoVencido}
+                setFactVencidas={setFactVencidas}
               />
 
               <SelectProduct

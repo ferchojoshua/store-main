@@ -99,8 +99,6 @@ const PreFacturar = ({
     }
   };
 
-  console.log(typeVenta);
-
   return (
     <div
       style={{

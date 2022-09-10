@@ -101,6 +101,12 @@ const ProductDescription = ({
   //Devuelve un entero positivo
   const funcCantidad = (value) => {
     if (/^[0-9]+$/.test(value.toString()) || value === "") {
+      if (value === "") {
+        setCantidad(value);
+        setCosto(0);
+        return;
+      }
+
       let pC = 0;
       let imp = 0;
       let desc = 0;
@@ -116,12 +122,18 @@ const ProductDescription = ({
 
   //Devuelve un entero positivo
   const funcPrecioCompra = (value) => {
+    if (value === "") {
+      setPrecioCompra(value);
+      setCosto(0);
+      return;
+    }
     if (/^\d*\.?\d*$/.test(value.toString())) {
       let cant = 0;
       let imp = 0;
       let desc = 0;
-      cantidad ? (cant = cantidad) : (cant = 0);
-      let subPrecio = value / cant;
+      cantidad.length !== 0 ? (cant = cantidad) : (cant = 0);
+
+      let subPrecio = cant === 0 ? 0 : value / cant;
       descuento ? (desc = subPrecio * (descuento / 100)) : (desc = 0);
       impuesto ? (imp = subPrecio * (impuesto / 100)) : (imp = 0);
       setCosto(subPrecio - desc + imp);
