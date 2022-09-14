@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCartShopping,
   faHandshake,
+  faHandshakeAltSlash,
   faReceipt,
   faSearch,
   faTrashAlt,
@@ -44,8 +45,10 @@ import {
 import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import {
   deleteFacturaAsync,
+  getFactAnulatedByStoreAsync,
   getFactCancelledByStoreAsync,
   getFactUncancelledByStoreAsync,
+  getReprintSaleAsync,
 } from "../../../../services/FacturationApi";
 import NoData from "../../../../components/NoData";
 import PaginationComponent from "../../../../components/PaginationComponent";
@@ -111,7 +114,9 @@ const Caja = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [showBillModal, setShowBillModal] = useState(false);
+  const [showRePtintBillModal, setShowRePtintBillModal] = useState(false);
   const [dataBill, setDataBill] = useState([]);
+  const [dataReprintBill, setDataReprintBill] = useState([]);
 
   const MySwal = withReactContent(Swal);
 
@@ -305,9 +310,35 @@ const Caja = () => {
       }
       setIsLoading(false);
       setFacturaList(result.data);
-    } else {
+    } else if (value === 1) {
       setIsLoading(true);
       const result = await getFactCancelledByStoreAsync(token, selectedStore);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setFacturaList(result.data);
+    } else {
+      setIsLoading(true);
+      const result = await getFactAnulatedByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -406,20 +437,53 @@ const Caja = () => {
     });
   };
 
+  const rePrintSale = async (saleId) => {
+    if (saleId.sale === null) {
+      toastError("No se puede reimpimir esta venta");
+      return;
+    }
+
+    setIsLoading(true);
+    const result = await getReprintSaleAsync(token, saleId.sale.id);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+    setIsLoading(false);
+    setDataReprintBill(result.data);
+    setShowRePtintBillModal(true);
+  };
+
   return (
     <div>
       <Container>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          spacing={2}
         >
           <h1 style={{ textAlign: "left" }}>Facturacion Piso</h1>
-          <div>
+          <Stack
+            spacing={2}
+            direction={{ xs: "column", sm: "column", md: "row" }}
+          >
             <FormControl
               variant="standard"
               fullWidth
@@ -427,7 +491,6 @@ const Caja = () => {
                 textAlign: "left",
                 width: 200,
                 marginTop: 10,
-                marginRight: 20,
               }}
             >
               <Select
@@ -452,7 +515,6 @@ const Caja = () => {
                 textAlign: "left",
                 width: 200,
                 marginTop: 10,
-                marginRight: 20,
               }}
             >
               <Select
@@ -483,15 +545,27 @@ const Caja = () => {
                   />
                   Procesadas
                 </MenuItem>
+                <MenuItem key={2} value={2}>
+                  <FontAwesomeIcon
+                    icon={faHandshakeAltSlash}
+                    style={{
+                      marginRight: 10,
+                      marginLeft: 10,
+                      color: "#f50057",
+                    }}
+                  />
+                  Anuladas
+                </MenuItem>
               </Select>
             </FormControl>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
         <hr />
 
         <TextField
-          style={{ marginBottom: 20, width: 600 }}
+          style={{ marginBottom: 20, maxWidth: 600 }}
           variant="standard"
+          fullWidth
           onChange={(e) => {
             onChangeSearch(e.target.value.toUpperCase());
           }}
@@ -527,7 +601,9 @@ const Caja = () => {
                 <th style={{ textAlign: "left" }}>Cliente</th>
                 <th style={{ textAlign: "center" }}>Monto Venta</th>
                 <th style={{ textAlign: "center" }}>Productos</th>
-                <th>Acciones</th>
+                <th>
+                  {active === 0 ? "Acciones" : active === 1 ? "Reimprimir" : ""}
+                </th>
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -572,7 +648,48 @@ const Caja = () => {
                     </td>
 
                     <td style={{ width: 100 }}>
-                      <Stack
+                      {active === 0 ? (
+                        <Stack
+                          spacing={2}
+                          direction="row"
+                          justifyContent={"center"}
+                        >
+                          <IconButton
+                            style={{ color: "#009688", height: 40, width: 40 }}
+                            onClick={() => {
+                              setFacturaSelect(item);
+                              setShowModal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faReceipt} />
+                          </IconButton>
+
+                          <IconButton
+                            style={{
+                              color: "#f50057",
+                              height: 40,
+                              width: 40,
+                            }}
+                            onClick={() => {
+                              anulateFactura(item);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </IconButton>
+                        </Stack>
+                      ) : active === 1 ? (
+                        <IconButton
+                          style={{ color: "#009688", height: 40, width: 40 }}
+                          onClick={() => {
+                            rePrintSale(item);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faReceipt} />
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )}
+                      {/* <Stack
                         spacing={2}
                         direction="row"
                         justifyContent={"center"}
@@ -607,7 +724,7 @@ const Caja = () => {
                         ) : (
                           <></>
                         )}
-                      </Stack>
+                      </Stack> */}
                     </td>
                   </tr>
                 );
@@ -641,6 +758,17 @@ const Caja = () => {
         setVisible={setShowBillModal}
       >
         <BillComponent data={dataBill} setShowModal={setShowBillModal} />
+      </SmallModal>
+
+      <SmallModal
+        titulo={"Reimprimir Recibo"}
+        isVisible={showRePtintBillModal}
+        setVisible={setShowRePtintBillModal}
+      >
+        <BillComponent
+          data={dataReprintBill}
+          setShowModal={setShowRePtintBillModal}
+        />
       </SmallModal>
     </div>
   );

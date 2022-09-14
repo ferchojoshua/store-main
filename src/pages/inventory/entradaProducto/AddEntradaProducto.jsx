@@ -12,6 +12,7 @@ import {
   Typography,
   Grid,
   IconButton,
+  Stack,
 } from "@mui/material";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,6 +30,7 @@ import {
 
 import DetallesDeEntrada from "./entradaProductosComponents/DetallesDeEntrada";
 import ProductDescription from "./entradaProductosComponents/ProductDescription";
+import { parseInt } from "lodash";
 
 const AddEntradaProducto = () => {
   let ruta = getRuta();
@@ -48,6 +50,7 @@ const AddEntradaProducto = () => {
   const [selectedProvider, setSelectedProvider] = useState("");
 
   const [montoFactura, setMontoFactura] = useState(0);
+  const [montoFacturaADesc, setMontoFacturaADesc] = useState(0);
 
   const [selectedProduct, setSelectedProduct] = useState("");
 
@@ -56,6 +59,7 @@ const AddEntradaProducto = () => {
   const [descuento, setDescuento] = useState("");
   const [impuesto, setImpuesto] = useState("");
 
+  const [costoAntesDesc, setCostoAntesDesc] = useState(0);
   const [costo, setCosto] = useState(0);
 
   const [baseGanancia, setBaseGanancia] = useState("");
@@ -128,14 +132,14 @@ const AddEntradaProducto = () => {
       costoUnitario: costo,
       descuento: descuento ? descuento : 0,
       impuesto: impuesto ? impuesto : 0,
+      costAntDesc: costoAntesDesc,
       costoCompra: cantidad * costo,
       precioVentaMayor: parseFloat(precioVenta),
       precioVentaDetalle: parseFloat(precioVentaDetalle),
     };
 
-    console.log(data);
-
     setMontoFactura(montoFactura + cantidad * costo);
+    setMontoFacturaADesc(montoFacturaADesc + cantidad * costoAntesDesc);
     setSelectedProduct("");
     setCantidad("");
     setPrecioCompra("");
@@ -148,6 +152,7 @@ const AddEntradaProducto = () => {
     setBaseGananciaDetalle("");
     setGananciaDetalle("");
     setPrecioVentaDetalle("");
+    setCostoAntesDesc("");
     setProductDetailList([...productDetailList, data]);
   };
 
@@ -157,6 +162,9 @@ const AddEntradaProducto = () => {
     );
 
     setMontoFactura(montoFactura - item.costoCompra);
+    setMontoFacturaADesc(
+      montoFacturaADesc - item.costAntDesc * parseInt(item.cantidad)
+    );
     setProductDetailList(filtered);
   };
 
@@ -185,44 +193,46 @@ const AddEntradaProducto = () => {
       noFactura,
       tipoPago: tipoCompra,
       providerId: selectedProvider.id,
+      montFactAntDesc: montoFacturaADesc,
       montoFactura,
       productInDetails: productDetailList,
     };
+    console.log("data", data);
 
-    setIsLoading(true);
-    const result = await addEntradaProductoAsync(token, data);
-    if (!result.statusResponse) {
-      setIsLoading(false);
-      if (result.error.request.status === 401) {
-        navigate(`${ruta}/unauthorized`);
-        return;
-      }
-      toastError(result.error.message);
-      return;
-    }
+    // setIsLoading(true);
+    // const result = await addEntradaProductoAsync(token, data);
+    // if (!result.statusResponse) {
+    //   setIsLoading(false);
+    //   if (result.error.request.status === 401) {
+    //     navigate(`${ruta}/unauthorized`);
+    //     return;
+    //   }
+    //   toastError(result.error.message);
+    //   return;
+    // }
 
-    if (result.data === "eX01") {
-      setIsLoading(false);
-      deleteUserData();
-      deleteToken();
-      setIsLogged(false);
-      return;
-    }
+    // if (result.data === "eX01") {
+    //   setIsLoading(false);
+    //   deleteUserData();
+    //   deleteToken();
+    //   setIsLogged(false);
+    //   return;
+    // }
 
-    if (result.data.isDefaultPass) {
-      setIsLoading(false);
-      setIsDefaultPass(true);
-      return;
-    }
+    // if (result.data.isDefaultPass) {
+    //   setIsLoading(false);
+    //   setIsDefaultPass(true);
+    //   return;
+    // }
 
-    setReload(!reload);
-    setNoFactura("");
-    setTipoCompra("");
-    setSelectedProvider("");
-    setMontoFactura(0);
-    setProductDetailList([]);
-    setIsLoading(false);
-    simpleMessage("Exito...!", "success");
+    // setReload(!reload);
+    // setNoFactura("");
+    // setTipoCompra("");
+    // setSelectedProvider("");
+    // setMontoFactura(0);
+    // setProductDetailList([]);
+    // setIsLoading(false);
+    // simpleMessage("Exito...!", "success");
   };
 
   return (
@@ -260,62 +270,52 @@ const AddEntradaProducto = () => {
           </div>
 
           <hr />
+          <Stack spacing={2}>
+            <DetallesDeEntrada
+              setNoFactura={setNoFactura}
+              noFactura={noFactura}
+              tipoCompra={tipoCompra}
+              setTipoCompra={setTipoCompra}
+              selectedProvider={selectedProvider}
+              setSelectedProvider={setSelectedProvider}
+            />
 
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={3}>
-              <DetallesDeEntrada
-                setNoFactura={setNoFactura}
-                noFactura={noFactura}
-                tipoCompra={tipoCompra}
-                setTipoCompra={setTipoCompra}
-                selectedProvider={selectedProvider}
-                setSelectedProvider={setSelectedProvider}
-              />
-            </Grid>
+            <ProductDescription
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              cantidad={cantidad}
+              setCantidad={setCantidad}
+              precioCompra={precioCompra}
+              setPrecioCompra={setPrecioCompra}
+              descuento={descuento}
+              setDescuento={setDescuento}
+              impuesto={impuesto}
+              setImpuesto={setImpuesto}
+              costo={costo}
+              setCosto={setCosto}
+              baseGanancia={baseGanancia}
+              setBaseGanancia={setBaseGanancia}
+              ganancia={ganancia}
+              setGanancia={setGanancia}
+              precioVenta={precioVenta}
+              setPrecioVenta={setPrecioVenta}
+              baseGananciaDetalle={baseGananciaDetalle}
+              setBaseGananciaDetalle={setBaseGananciaDetalle}
+              gananciaDetalle={gananciaDetalle}
+              setGananciaDetalle={setGananciaDetalle}
+              precioVentaDetalle={precioVentaDetalle}
+              setPrecioVentaDetalle={setPrecioVentaDetalle}
+              addToProductList={addToProductList}
+              costoAntesDesc={costoAntesDesc}
+              setCostoAntesDesc={setCostoAntesDesc}
+            />
+          </Stack>
 
-            <Grid item xs={12} md={9}>
-              <ProductDescription
-                selectedProduct={selectedProduct}
-                setSelectedProduct={setSelectedProduct}
-                cantidad={cantidad}
-                setCantidad={setCantidad}
-                precioCompra={precioCompra}
-                setPrecioCompra={setPrecioCompra}
-                descuento={descuento}
-                setDescuento={setDescuento}
-                impuesto={impuesto}
-                setImpuesto={setImpuesto}
-                costo={costo}
-                setCosto={setCosto}
-                baseGanancia={baseGanancia}
-                setBaseGanancia={setBaseGanancia}
-                ganancia={ganancia}
-                setGanancia={setGanancia}
-                precioVenta={precioVenta}
-                setPrecioVenta={setPrecioVenta}
-                baseGananciaDetalle={baseGananciaDetalle}
-                setBaseGananciaDetalle={setBaseGananciaDetalle}
-                gananciaDetalle={gananciaDetalle}
-                setGananciaDetalle={setGananciaDetalle}
-                precioVentaDetalle={precioVentaDetalle}
-                setPrecioVentaDetalle={setPrecioVentaDetalle}
-                addToProductList={addToProductList}
-              />
-            </Grid>
-          </Grid>
-
-          <div
-            style={{
-              marginTop: -15,
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-            }}
-          >
+          <Stack direction={"row"} marginTop={2}>
             <h5>Detalle de Entrada</h5>
-          </div>
+          </Stack>
 
-          <Divider style={{ marginBottom: 20 }} />
+          <Divider style={{ marginBottom: 10 }} />
 
           <Table
             hover={!isDarkMode}
@@ -326,12 +326,13 @@ const AddEntradaProducto = () => {
             <thead>
               <tr>
                 <th>#</th>
-                <th style={{ textAlign: "left", minWidth: 250 }}>Nombre</th>
+                <th style={{ textAlign: "left" }}>Nombre</th>
                 <th>Cantidad</th>
-                <th>Costo Unitario</th>
-                <th>Descuento</th>
-                <th>Impuesto</th>
-                <th>Costo de Compra</th>
+                <th>C.Unit</th>
+                <th>Desc</th>
+                <th>Imp</th>
+                <th>C.Unit Desc</th>
+                <th>C.Compra</th>
                 <th>P.V. Mayor</th>
                 <th>P.V. Detalle</th>
                 <th>Eliminar</th>
@@ -343,18 +344,24 @@ const AddEntradaProducto = () => {
                   return (
                     <tr key={productDetailList.indexOf(item) + 1}>
                       <td>{productDetailList.indexOf(item) + 1}</td>
-                      <td style={{ textAlign: "left", minWidth: 250 }}>
+                      <td style={{ textAlign: "left" }}>
                         {item.product.description}
                       </td>
                       <td>{item.cantidad}</td>
                       <td>
-                        {item.costoUnitario.toLocaleString("es-NI", {
+                        {item.costAntDesc.toLocaleString("es-NI", {
                           style: "currency",
                           currency: "NIO",
                         })}
                       </td>
                       <td>{`${item.descuento}%`}</td>
                       <td>{`${item.impuesto}%`}</td>
+                      <td>
+                        {item.costoUnitario.toLocaleString("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        })}
+                      </td>
                       <td>
                         {item.costoCompra.toLocaleString("es-NI", {
                           style: "currency",
@@ -401,7 +408,7 @@ const AddEntradaProducto = () => {
           }}
         >
           <div className="row justify-content-around align-items-center">
-            <div className="col-sm-4 ">
+            <div className="col-sm-3 ">
               <Typography
                 style={{
                   marginBottom: 10,
@@ -424,7 +431,33 @@ const AddEntradaProducto = () => {
               </Typography>
             </div>
 
-            <div className="col-sm-4 ">
+            <div className="col-sm-3 ">
+              <Typography
+                style={{
+                  marginBottom: 10,
+                  fontSize: 15,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                M. Antes Descuento
+              </Typography>
+              <Typography
+                style={{
+                  fontSize: 14,
+                  color: "#f50057",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {new Intl.NumberFormat("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                }).format(montoFacturaADesc)}
+              </Typography>
+            </div>
+
+            <div className="col-sm-3 ">
               <Typography
                 style={{
                   marginBottom: 10,
@@ -450,7 +483,7 @@ const AddEntradaProducto = () => {
               </Typography>
             </div>
 
-            <div className="col-sm-4 ">
+            <div className="col-sm-3 ">
               <Button
                 variant="outlined"
                 style={{ borderRadius: 20 }}

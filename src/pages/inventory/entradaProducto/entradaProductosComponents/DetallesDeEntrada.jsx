@@ -9,6 +9,10 @@ import {
   Paper,
   Autocomplete,
   IconButton,
+  Stack,
+  Typography,
+  Divider,
+  Grid,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DataContext } from "../../../../context/DataContext";
@@ -23,6 +27,7 @@ import {
 import { getprovidersAsync } from "../../../../services/ProviderApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { Grid3x3 } from "@mui/icons-material";
 
 const DetallesDeEntrada = ({
   setNoFactura,
@@ -80,92 +85,86 @@ const DetallesDeEntrada = ({
           padding: 20,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h4>Datos de Entrada</h4>
-        </div>
+        <Stack spacing={2}>
+          <Typography variant="h5" textAlign={"left"}>
+            Datos de Entrada
+          </Typography>
+        </Stack>
 
-        <hr />
+        <Divider style={{ marginTop: 10, marginBottom: 10 }} />
 
-        <TextField
-          fullWidth
-          required
-          variant="standard"
-          onChange={(e) => setNoFactura(e.target.value.toUpperCase())}
-          label={"N° Factura"}
-          value={noFactura}
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => setNoFactura(e.target.value.toUpperCase())}
+              label={"N° Factura"}
+              value={noFactura}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id="demo-simple-select-standard-label">
+                Tipo de pago...
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={tipoCompra}
+                onChange={(e) => setTipoCompra(e.target.value)}
+                label="Unidad de Medida"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={0} value="">
+                  <em>Tipo de pago...</em>
+                </MenuItem>
 
-        <FormControl variant="standard" fullWidth style={{ marginTop: 20 }}>
-          <InputLabel id="demo-simple-select-standard-label">
-            Seleccione un tipo de pago...
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={tipoCompra}
-            onChange={(e) => setTipoCompra(e.target.value)}
-            label="Unidad de Medida"
-            style={{ textAlign: "left" }}
-          >
-            <MenuItem key={0} value="">
-              <em>Seleccione un tipo de pago...</em>
-            </MenuItem>
-
-            <MenuItem key={1} value={"Pago de Contado"}>
-              Pago de Contado
-            </MenuItem>
-            <MenuItem key={2} value={"Pago de Credito"}>
-              Pago de Credito
-            </MenuItem>
-          </Select>
-        </FormControl>
-
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Autocomplete
-            id="combo-box-demo"
-            fullWidth
-            options={providerList}
-            getOptionLabel={(op) => (op ? `${op.nombre}` : "")}
-            value={selectedProvider === "" ? null : selectedProvider}
-            onChange={(event, newValue) => {
-              setSelectedProvider(newValue);
-            }}
-            noOptionsText="Proveedor no encontrado..."
-            renderInput={(params) => (
-              <TextField
-                variant="standard"
-                {...params}
-                label="Seleccione un proveedor..."
-              />
-            )}
-          />
-
-          <Tooltip title="Agregar Proveedor" style={{ marginTop: 5 }}>
-            <IconButton onClick={() => setShowProvidermodal(true)}>
-              <FontAwesomeIcon
-                style={{
-                  fontSize: 25,
-                  color: "#ff5722",
+                <MenuItem key={1} value={"Pago de Contado"}>
+                  Pago de Contado
+                </MenuItem>
+                <MenuItem key={2} value={"Pago de Credito"}>
+                  Pago de Credito
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Stack direction={"row"} spacing={2}>
+              <Autocomplete
+                id="combo-box-demo"
+                fullWidth
+                options={providerList}
+                getOptionLabel={(op) => (op ? `${op.nombre}` : "")}
+                value={selectedProvider === "" ? null : selectedProvider}
+                onChange={(event, newValue) => {
+                  setSelectedProvider(newValue);
                 }}
-                icon={faCirclePlus}
+                noOptionsText="Proveedor no encontrado..."
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Proveedor..."
+                  />
+                )}
               />
-            </IconButton>
-          </Tooltip>
-        </div>
+
+              <Tooltip title="Agregar Proveedor" style={{ marginTop: 5 }}>
+                <IconButton onClick={() => setShowProvidermodal(true)}>
+                  <FontAwesomeIcon
+                    style={{
+                      fontSize: 25,
+                      color: "#ff5722",
+                    }}
+                    icon={faCirclePlus}
+                  />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Grid>
+        </Grid>
       </Paper>
 
       <SmallModal

@@ -485,8 +485,9 @@ const SalesList = () => {
         <hr />
 
         <TextField
-          style={{ marginBottom: 20, width: 600 }}
+          style={{ marginBottom: 20, maxWidth: 600 }}
           variant="standard"
+          fullWidth
           onChange={(e) => {
             onChangeSearch(e.target.value.toUpperCase());
           }}
@@ -622,6 +623,7 @@ const SalesList = () => {
                           size="small"
                           onClick={() => {
                             setData(item);
+                            console.log("item", item);
                             setShowPrintModal(true);
                           }}
                         >

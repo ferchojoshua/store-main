@@ -6,6 +6,9 @@ import {
   IconButton,
   Button,
   Autocomplete,
+  Stack,
+  Typography,
+  Divider,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -53,6 +56,8 @@ const ProductDescription = ({
   precioVentaDetalle,
   setPrecioVentaDetalle,
   addToProductList,
+  costoAntesDesc,
+  setCostoAntesDesc,
 }) => {
   let ruta = getRuta();
 
@@ -104,6 +109,7 @@ const ProductDescription = ({
       if (value === "") {
         setCantidad(value);
         setCosto(0);
+        setCostoAntesDesc(0);
         return;
       }
 
@@ -116,6 +122,7 @@ const ProductDescription = ({
       impuesto ? (imp = subPrecio * (impuesto / 100)) : (imp = 0);
       setCosto(subPrecio - desc + imp);
       setCantidad(value);
+      setCostoAntesDesc(subPrecio);
       return;
     }
   };
@@ -125,6 +132,7 @@ const ProductDescription = ({
     if (value === "") {
       setPrecioCompra(value);
       setCosto(0);
+      setCostoAntesDesc(0);
       return;
     }
     if (/^\d*\.?\d*$/.test(value.toString())) {
@@ -138,6 +146,7 @@ const ProductDescription = ({
       impuesto ? (imp = subPrecio * (impuesto / 100)) : (imp = 0);
       setCosto(subPrecio - desc + imp);
       setPrecioCompra(value);
+      setCostoAntesDesc(subPrecio);
       return;
     }
   };
@@ -263,9 +272,10 @@ const ProductDescription = ({
       setSelectedProduct("");
       return;
     }
+    
     const data = {
       IdProduct: newValue.id,
-      IdAlmacen: 4,
+      IdAlmacen: 1,
     };
 
     setIsLoading(true);
@@ -308,227 +318,263 @@ const ProductDescription = ({
           padding: 20,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
-        >
-          <h4>Datos del Producto</h4>
-        </div>
-
+        <Typography variant="h5" textAlign={"left"}>
+          Datos del Producto
+        </Typography>
         <hr />
 
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-6">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
+        <Stack spacing={2}>
+          <Stack direction={"row"} spacing={1} alignItems="center">
+            {barCodeSearch ? (
+              <Autocomplete
+                fullWidth
+                options={productList}
+                getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
+                value={selectedProduct === "" ? null : selectedProduct}
+                onChange={(event, newValue) => {
+                  getExistencias(newValue);
+                }}
+                noOptionsText="Producto no encontrado..."
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.id}>
+                      {option.barCode}
+                    </li>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Seleccione un producto..."
+                  />
+                )}
+              />
+            ) : (
+              <Autocomplete
+                id="combo-box-demo"
+                fullWidth
+                options={productList}
+                getOptionLabel={(op) => (op ? `${op.description}` : "")}
+                value={selectedProduct === "" ? null : selectedProduct}
+                onChange={(event, newValue) => {
+                  getExistencias(newValue);
+                }}
+                noOptionsText="Producto no encontrado..."
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.id}>
+                      {option.description}
+                    </li>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Seleccione un producto..."
+                  />
+                )}
+              />
+            )}
+
+            <Tooltip
+              title={
+                barCodeSearch
+                  ? "Buscar por Codigo de Barras"
+                  : "Buscar por Nombre"
+              }
             >
-              {barCodeSearch ? (
-                <Autocomplete
-                  fullWidth
-                  options={productList}
-                  getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
-                  value={selectedProduct === "" ? null : selectedProduct}
-                  onChange={(event, newValue) => {
-                    getExistencias(newValue);
-                  }}
-                  noOptionsText="Producto no encontrado..."
-                  renderOption={(props, option) => {
-                    return (
-                      <li {...props} key={option.id}>
-                        {option.barCode}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      variant="standard"
-                      {...params}
-                      label="Seleccione un producto..."
-                    />
-                  )}
-                />
-              ) : (
-                <Autocomplete
-                  id="combo-box-demo"
-                  fullWidth
-                  options={productList}
-                  getOptionLabel={(op) => (op ? `${op.description}` : "")}
-                  value={selectedProduct === "" ? null : selectedProduct}
-                  onChange={(event, newValue) => {
-                    getExistencias(newValue);
-                  }}
-                  noOptionsText="Producto no encontrado..."
-                  renderOption={(props, option) => {
-                    return (
-                      <li {...props} key={option.id}>
-                        {option.description}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      variant="standard"
-                      {...params}
-                      label="Seleccione un producto..."
-                    />
-                  )}
-                />
-              )}
-
-              <Tooltip
-                title={
-                  barCodeSearch
-                    ? "Buscar por Codigo de Barras"
-                    : "Buscar por Nombre"
-                }
-                style={{ marginTop: 5 }}
+              <IconButton
+                onClick={() => setBarCodeSearch(!barCodeSearch)}
+                style={{ height: 35, width: 35 }}
               >
-                <IconButton onClick={() => setBarCodeSearch(!barCodeSearch)}>
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#2196f3",
-                    }}
-                    icon={barCodeSearch ? faBarcode : faSpellCheck}
-                  />
-                </IconButton>
-              </Tooltip>
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 20,
+                    color: "#2196f3",
+                  }}
+                  icon={barCodeSearch ? faBarcode : faSpellCheck}
+                />
+              </IconButton>
+            </Tooltip>
 
-              <Tooltip title="Agregar Producto" style={{ marginTop: 5 }}>
-                <IconButton onClick={() => setShowProductModal(true)}>
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
-                    }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </div>
-          <div className="col-sm-6">
+            <Tooltip
+              title="Agregar Producto"
+              //  style={{ marginTop: 5 }}
+            >
+              <IconButton
+                onClick={() => setShowProductModal(true)}
+                style={{ height: 35, width: 35 }}
+              >
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 20,
+                    color: "#ff5722",
+                  }}
+                  icon={faCirclePlus}
+                />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+
+          <Stack>
             {selectedProduct ? (
-              <div className="row justify-content-around align-items-center">
-                <div className="col-sm-2">
-                  <p
-                    style={{
-                      textAlign: "center",
-                      color: "#2979ff",
-                      fontWeight: "bold",
-                    }}
-                  >{`Codigo: ${selectedProduct.producto.id}`}</p>
-                </div>
-                <div className="col-sm-2">
-                  <p
-                    style={{
-                      textAlign: "center",
-                      color: "#2979ff",
-                      fontWeight: "bold",
-                    }}
-                  >{`Existencia: ${selectedProduct.existencia}`}</p>
-                </div>
-                <div className="col-sm-2">
-                  <p
-                    style={{
-                      textAlign: "center",
-                      color: "#4caf50",
-                      fontWeight: "bold",
-                    }}
-                  >{`PVM: ${selectedProduct.precioVentaMayor.toLocaleString(
-                    "es-NI",
-                    {
+              <Stack
+                direction={{ xs: "column", sm: "column", md: "row" }}
+                justifyContent="space-between"
+              >
+                <Stack direction={"row"} spacing={1}>
+                  <Typography color={"#2979ff"} fontWeight="bold">
+                    Codigo:
+                  </Typography>
+                  <Typography>{selectedProduct.producto.id}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} spacing={1}>
+                  <Typography color={"#2979ff"} fontWeight="bold">
+                    Existencia:
+                  </Typography>
+                  <Typography>{selectedProduct.existencia}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} spacing={1}>
+                  <Tooltip title="Precio de Compra Anterior">
+                    <Typography color={"#f50057"} fontWeight="bold">
+                      PCA:
+                    </Typography>
+                  </Tooltip>
+
+                  <Typography>
+                    {selectedProduct.precioCompra.toLocaleString("es-NI", {
                       textAlign: "center",
                       style: "currency",
                       currency: "NIO",
-                    }
-                  )}`}</p>
-                </div>
-                <div className="col-sm-2">
-                  <p
-                    style={{
-                      color: "#4caf50",
-                      fontWeight: "bold",
-                    }}
-                  >{`PVD: ${selectedProduct.precioVentaDetalle.toLocaleString(
-                    "es-NI",
-                    {
+                    })}
+                  </Typography>
+                </Stack>
+
+                <Stack direction={"row"} spacing={1}>
+                  <Tooltip title="Precio de Venta al Mayor">
+                    <Typography color={"#4caf50"} fontWeight="bold">
+                      PVM:
+                    </Typography>
+                  </Tooltip>
+                  <Typography>
+                    {selectedProduct.precioVentaMayor.toLocaleString("es-NI", {
+                      textAlign: "center",
                       style: "currency",
                       currency: "NIO",
-                    }
-                  )}`}</p>
-                </div>
-              </div>
+                    })}
+                  </Typography>
+                </Stack>
+
+                <Stack direction={"row"} spacing={1}>
+                  <Tooltip title="Precio de Venta al Detalle">
+                    <Typography color={"#4caf50"} fontWeight="bold">
+                      PVD:
+                    </Typography>
+                  </Tooltip>
+                  <Typography>
+                    {selectedProduct.precioVentaDetalle.toLocaleString(
+                      "es-NI",
+                      {
+                        textAlign: "center",
+                        style: "currency",
+                        currency: "NIO",
+                      }
+                    )}
+                  </Typography>
+                </Stack>
+              </Stack>
             ) : (
               <></>
             )}
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              required
-              style={{ marginTop: 20 }}
-              variant="standard"
-              label={"Cantidad"}
-              value={cantidad}
-              onChange={(e) => funcCantidad(e.target.value)}
-            />
-          </div>
+        {/* <Divider style={{ marginTop: 10, marginBottom: 10 }} /> */}
 
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              required
-              style={{ marginTop: 20 }}
-              variant="standard"
-              label={"Monto C$"}
-              value={precioCompra}
-              onChange={(e) => funcPrecioCompra(e.target.value)}
-            />
-          </div>
+        <Stack spacing={2} marginTop={1}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            // justifyContent="space-between"
+            alignItems={"flex-end"}
+          >
+            <div style={{ flexGrow: 1 }}>
+              <TextField
+                fullWidth
+                required
+                variant="standard"
+                label={"Cantidad"}
+                value={cantidad}
+                onChange={(e) => funcCantidad(e.target.value)}
+              />
 
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              style={{ marginTop: 20 }}
-              variant="standard"
-              label={"Descuento %"}
-              value={descuento}
-              onChange={(e) => funcDescuento(e.target.value)}
-            />
-          </div>
+              <TextField
+                style={{ marginTop: 10 }}
+                fullWidth
+                required
+                variant="standard"
+                label={"Monto C$"}
+                value={precioCompra}
+                onChange={(e) => funcPrecioCompra(e.target.value)}
+              />
+            </div>
 
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              style={{ marginTop: 20 }}
-              variant="standard"
-              label={"Impuesto %"}
-              value={impuesto}
-              onChange={(e) => funcImpuesto(e.target.value)}
-            />
-          </div>
+            <Stack>
+              <Typography color="#e91e63" fontWeight="bold">
+                Sub - Total
+              </Typography>
+              <Typography>
+                {costoAntesDesc.toLocaleString("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                })}
+              </Typography>
+            </Stack>
+          </Stack>
 
-          <div className="col-sm-3">
-            <h6
-              style={{ marginTop: 20, color: "#e91e63", fontWeight: "bold" }}
-            >{`Costo = ${costo.toLocaleString("es-NI", {
-              style: "currency",
-              currency: "NIO",
-            })}`}</h6>
-          </div>
-        </div>
+          <Divider />
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems={"flex-end"}
+          >
+            <div style={{ flexGrow: 1 }}>
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Descuento %"}
+                value={descuento}
+                onChange={(e) => funcDescuento(e.target.value)}
+              />
+
+              <TextField
+                style={{ marginTop: 10 }}
+                fullWidth
+                variant="standard"
+                label={"Impuesto %"}
+                value={impuesto}
+                onChange={(e) => funcImpuesto(e.target.value)}
+              />
+            </div>
+
+            <Stack>
+              <Typography color="#e91e63" fontWeight="bold">
+                Total
+              </Typography>
+              <Typography>
+                {costo.toLocaleString("es-NI", {
+                  style: "currency",
+                  currency: "NIO",
+                })}
+              </Typography>
+            </Stack>
+          </Stack>
+        </Stack>
       </Paper>
 
       <Paper
@@ -539,98 +585,126 @@ const ProductDescription = ({
           padding: 15,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-          }}
+        <Typography variant="h5" textAlign={"left"}>
+          Precio de venta C$
+        </Typography>
+
+        <Divider style={{ marginBottom: 10 }} />
+
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          alignItems={"center"}
         >
-          <h5>Precio de venta C$</h5>
-        </div>
-
-        <div className="row justify-content-around align-items-center">
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Ganancia en %"}
-              value={baseGanancia}
-              onChange={(e) => funcPorcentGananciaMayor(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Ganancia en %"}
-              value={baseGananciaDetalle}
-              style={{
-                marginTop: 20,
-              }}
-              onChange={(e) => funcPorcentGananciaDetalle(e.target.value)}
-            />
-          </div>
-
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Ganancia en C$"}
-              value={ganancia}
-              onChange={(e) => funcGananciaMayor(e.target.value)}
-            />
-
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Ganancia en C$"}
-              value={gananciaDetalle}
-              style={{
-                marginTop: 20,
-              }}
-              onChange={(e) => funcGananciaDetalle(e.target.value)}
-            />
-          </div>
-
-          <div className="col-sm-2">
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Precio de venta C$"}
-              value={precioVenta}
-              onChange={(e) => funcPrecioVenta(e.target.value)}
-            />
-
-            <TextField
-              fullWidth
-              variant="standard"
-              label={"Precio de venta C$"}
-              value={precioVentaDetalle}
-              style={{
-                marginTop: 20,
-              }}
-              onChange={(e) => funcPrecioVentaDetalle(e.target.value)}
-            />
-          </div>
-
-          <div className="col-sm-2">
-            <h5 style={{ marginTop: 20 }}>Mayor</h5>
-            <h5 style={{ marginTop: 30 }}>Detalle</h5>
-          </div>
-
-          <div className="col-sm-3">
-            <Button
-              variant="outlined"
-              style={{ borderRadius: 20 }}
-              onClick={() => addToProductList()}
+          <Paper
+            elevation={10}
+            style={{
+              flexGrow: 1,
+              borderRadius: 30,
+              marginTop: 10,
+              padding: 15,
+            }}
+          >
+            <Typography variant="h5" textAlign={"left"}>
+              Precio de Mayor
+            </Typography>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              marginTop={1}
             >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faClipboard}
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en %"}
+                value={baseGanancia}
+                onChange={(e) => funcPorcentGananciaMayor(e.target.value)}
               />
-              Agregar al Detalle
-            </Button>
-          </div>
-        </div>
+
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en C$"}
+                value={ganancia}
+                onChange={(e) => funcGananciaMayor(e.target.value)}
+              />
+
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Precio de venta C$"}
+                value={precioVenta}
+                onChange={(e) => funcPrecioVenta(e.target.value)}
+              />
+            </Stack>
+
+            <Typography variant="h5" textAlign={"left"} marginTop={1}>
+              Precio de Detalle
+            </Typography>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              marginTop={1}
+            >
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en %"}
+                value={baseGananciaDetalle}
+                onChange={(e) => funcPorcentGananciaDetalle(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en C$"}
+                value={gananciaDetalle}
+                onChange={(e) => funcGananciaDetalle(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Precio de venta C$"}
+                value={precioVentaDetalle}
+                onChange={(e) => funcPrecioVentaDetalle(e.target.value)}
+              />
+              {/* <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en %"}
+                value={baseGanancia}
+                onChange={(e) => funcPorcentGananciaMayor(e.target.value)}
+              />
+
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Ganancia en C$"}
+                value={ganancia}
+                onChange={(e) => funcGananciaMayor(e.target.value)}
+              />
+
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Precio de venta C$"}
+                value={precioVenta}
+                onChange={(e) => funcPrecioVenta(e.target.value)}
+              /> */}
+            </Stack>
+          </Paper>
+
+          <Button
+            variant="outlined"
+            style={{ borderRadius: 20 }}
+            onClick={() => addToProductList()}
+          >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faClipboard}
+            />
+            Agregar al Detalle
+          </Button>
+        </Stack>
       </Paper>
 
       <MediumModal
