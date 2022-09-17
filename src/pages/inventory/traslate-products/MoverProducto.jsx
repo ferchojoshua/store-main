@@ -7,7 +7,7 @@ import {
   faCirclePlus,
   faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { Button, IconButton } from "@mui/material";
+import { Button, IconButton, Stack } from "@mui/material";
 import MediumModal from "../../../components/modals/MediumModal";
 
 import MoverProductoAdd from "./MoverProductoAdd";
@@ -23,6 +23,9 @@ import NoData from "../../../components/NoData";
 import moment from "moment";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { TrasladoDetails } from "./TrasladoDetails";
+import SmallModal from "../../../components/modals/SmallModal";
+import TraslateComponent from "./printTraslate/TraslateComponent";
+import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 
 const MoverProducto = () => {
   let ruta = getRuta();
@@ -49,6 +52,9 @@ const MoverProducto = () => {
 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState([]);
+
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [dataToPrint, setDataToPrint] = useState([]);
 
   const token = getToken();
 
@@ -150,15 +156,30 @@ const MoverProducto = () => {
                     <td style={{ textAlign: "left" }}>{item.concepto}</td>
                     <td style={{ textAlign: "left" }}>{item.user.fullName}</td>
                     <td>
-                      <IconButton
-                        style={{ marginRight: 10, color: "#009688" }}
-                        onClick={() => {
-                          setSelectedTransaction(item);
-                          setShowDetailsModal(true);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                      </IconButton>
+                      <Stack spacing={1} direction="row">
+                        <IconButton
+                          style={{
+                            color: "#2979ff",
+                          }}
+                          size="small"
+                          onClick={() => {
+                            setDataToPrint(item);
+                            setShowPrintModal(true);
+                          }}
+                        >
+                          <PrintRoundedIcon style={{ fontSize: 30 }} />
+                        </IconButton>
+
+                        <IconButton
+                          style={{ marginRight: 10, color: "#009688" }}
+                          onClick={() => {
+                            setSelectedTransaction(item);
+                            setShowDetailsModal(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                        </IconButton>
+                      </Stack>
                     </td>
                   </tr>
                 );
@@ -189,6 +210,14 @@ const MoverProducto = () => {
       >
         <TrasladoDetails selectedTransaction={selectedTransaction} />
       </MediumModal>
+
+      <SmallModal
+        titulo={"Reimprimir Traslado"}
+        isVisible={showPrintModal}
+        setVisible={setShowPrintModal}
+      >
+        <TraslateComponent data={dataToPrint} />
+      </SmallModal>
     </div>
   );
 };

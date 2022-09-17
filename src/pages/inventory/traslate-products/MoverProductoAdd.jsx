@@ -44,6 +44,8 @@ import {
   getProducExistanceAsync,
 } from "../../../services/ExistanceApi";
 import { isEmpty } from "lodash";
+import SmallModal from "../../../components/modals/SmallModal";
+import TraslateComponent from "./printTraslate/TraslateComponent";
 
 const MoverProductoAdd = ({ setShowModal }) => {
   let ruta = getRuta();
@@ -75,6 +77,9 @@ const MoverProductoAdd = ({ setShowModal }) => {
   const [barCodeSearch, setBarCodeSearch] = useState(false);
 
   const [productDetails, setProductDetails] = useState([]);
+
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [dataToPrint, setDataToPrint] = useState([]);
 
   const token = getToken();
 
@@ -366,11 +371,13 @@ const MoverProductoAdd = ({ setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-
+      setDataToPrint(result.data);
       setIsLoading(false);
       toastSuccess("Traslado realizado...!");
       setReload(!reload);
-      setShowModal(false);
+      setShowPrintModal(true);
+      setConcepto("");
+      setProductDetails([]);
     }
   };
 
@@ -435,95 +442,88 @@ const MoverProductoAdd = ({ setShowModal }) => {
           padding: 20,
         }}
       >
+        <Stack direction="row" spacing={2}>
+          {barCodeSearch ? (
+            <Autocomplete
+              fullWidth
+              options={productList}
+              getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
+              value={selectedProduct === "" ? null : selectedProduct}
+              onChange={(event, newValue) => {
+                handleChangeProduct(newValue);
+              }}
+              noOptionsText="Producto no encontrado..."
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.id}>
+                    {option.barCode}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  variant="standard"
+                  {...params}
+                  label="Seleccione un producto..."
+                />
+              )}
+            />
+          ) : (
+            <Autocomplete
+              fullWidth
+              options={productList}
+              getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
+              value={selectedProduct === "" ? null : selectedProduct}
+              onChange={(event, newValue) => {
+                handleChangeProduct(newValue);
+              }}
+              noOptionsText="Producto no encontrado..."
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.id}>
+                    {option.description}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  variant="standard"
+                  {...params}
+                  label="Seleccione un producto..."
+                />
+              )}
+            />
+          )}
+
+          <Tooltip
+            title={
+              barCodeSearch
+                ? "Buscar por Codigo de Barras"
+                : "Buscar por Nombre"
+            }
+            style={{ marginTop: 5 }}
+          >
+            <IconButton
+              onClick={() => {
+                setBarCodeSearch(!barCodeSearch);
+              }}
+            >
+              <FontAwesomeIcon
+                style={{
+                  fontSize: 25,
+                  color: "#2196f3",
+                }}
+                icon={barCodeSearch ? faBarcode : faSpellCheck}
+              />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+
         <Grid container spacing={2}>
           <Grid
             item
             sm={barCodeSearch ? (isEmpty(selectedProduct) ? 12 : 6) : 12}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              {barCodeSearch ? (
-                <Autocomplete
-                  fullWidth
-                  options={productList}
-                  getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
-                  value={selectedProduct === "" ? null : selectedProduct}
-                  onChange={(event, newValue) => {
-                    handleChangeProduct(newValue);
-                  }}
-                  noOptionsText="Producto no encontrado..."
-                  renderOption={(props, option) => {
-                    return (
-                      <li {...props} key={option.id}>
-                        {option.barCode}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      variant="standard"
-                      {...params}
-                      label="Seleccione un producto..."
-                    />
-                  )}
-                />
-              ) : (
-                <Autocomplete
-                  fullWidth
-                  options={productList}
-                  getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-                  value={selectedProduct === "" ? null : selectedProduct}
-                  onChange={(event, newValue) => {
-                    handleChangeProduct(newValue);
-                  }}
-                  noOptionsText="Producto no encontrado..."
-                  renderOption={(props, option) => {
-                    return (
-                      <li {...props} key={option.id}>
-                        {option.description}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      variant="standard"
-                      {...params}
-                      label="Seleccione un producto..."
-                    />
-                  )}
-                />
-              )}
-
-              <Tooltip
-                title={
-                  barCodeSearch
-                    ? "Buscar por Codigo de Barras"
-                    : "Buscar por Nombre"
-                }
-                style={{ marginTop: 5 }}
-              >
-                <IconButton
-                  onClick={() => {
-                    setBarCodeSearch(!barCodeSearch);
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#2196f3",
-                    }}
-                    icon={barCodeSearch ? faBarcode : faSpellCheck}
-                  />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </Grid>
+          ></Grid>
 
           {!isEmpty(selectedProduct) ? (
             barCodeSearch ? (
@@ -561,61 +561,57 @@ const MoverProductoAdd = ({ setShowModal }) => {
           padding: 20,
         }}
       >
+        <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ textAlign: "left" }}
+          >
+            <InputLabel id="selProc">Almacen Procedencia</InputLabel>
+            <Select
+              labelId="selProc"
+              id="demo-simple-select-standard"
+              value={selectedProcedencia}
+              onChange={handleChangeProcedencia}
+            >
+              <MenuItem value="">
+                <em>Seleccione procedencia...</em>
+              </MenuItem>
+              {storeList.map((item) => {
+                return (
+                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                    {item.almacen.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ textAlign: "left" }}
+          >
+            <InputLabel id="selDestino">Almacen Destino</InputLabel>
+            <Select
+              labelId="selDestino"
+              id="demo-simple-select-standard"
+              value={selectedDestino}
+              onChange={handleChangeDestino}
+            >
+              <MenuItem value="">
+                <em>Seleccione procedencia...</em>
+              </MenuItem>
+              {storeList.map((item) => {
+                return (
+                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                    {item.almacen.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Stack>
         <Grid container spacing={2}>
-          <Grid item sm={6}>
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ textAlign: "left" }}
-            >
-              <InputLabel id="selProc">Almacen Procedencia</InputLabel>
-              <Select
-                labelId="selProc"
-                id="demo-simple-select-standard"
-                value={selectedProcedencia}
-                onChange={handleChangeProcedencia}
-              >
-                <MenuItem value="">
-                  <em>Seleccione procedencia...</em>
-                </MenuItem>
-                {storeList.map((item) => {
-                  return (
-                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                      {item.almacen.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item sm={6}>
-            <FormControl
-              variant="standard"
-              fullWidth
-              style={{ textAlign: "left" }}
-            >
-              <InputLabel id="selDestino">Almacen Destino</InputLabel>
-              <Select
-                labelId="selDestino"
-                id="demo-simple-select-standard"
-                value={selectedDestino}
-                onChange={handleChangeDestino}
-              >
-                <MenuItem value="">
-                  <em>Seleccione procedencia...</em>
-                </MenuItem>
-                {storeList.map((item) => {
-                  return (
-                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                      {item.almacen.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-
           <Grid item sm={12}>
             {selectedProcedencia !== "" || selectedDestino !== "" ? (
               <Paper
@@ -719,16 +715,9 @@ const MoverProductoAdd = ({ setShowModal }) => {
         </Button>
       </Paper>
 
-      <div
-        style={{
-          marginTop: 20,
-          display: "flex",
-          flexDirection: "row",
-          alignContent: "center",
-        }}
-      >
-        <h6>Detalle de Traslado</h6>
-      </div>
+      <Typography variant="h6" marginTop={1}>
+        Detalle de Traslado
+      </Typography>
 
       <Divider style={{ marginBottom: 20 }} />
 
@@ -788,7 +777,12 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
       <Button
         variant="outlined"
-        style={{ borderRadius: 20, marginTop: 30 }}
+        style={{
+          borderRadius: 20,
+          marginTop: 30,
+          color: "#2979ff",
+          borderColor: "#1c54b2",
+        }}
         fullWidth
         onClick={() => addMoverProdut()}
       >
@@ -798,6 +792,17 @@ const MoverProductoAdd = ({ setShowModal }) => {
         />
         Mover Producto
       </Button>
+
+      <SmallModal
+        titulo={"Imprimir Traslado"}
+        isVisible={showPrintModal}
+        setVisible={setShowPrintModal}
+      >
+        <TraslateComponent
+          data={dataToPrint}
+          setShowModal={setShowPrintModal}
+        />
+      </SmallModal>
     </div>
   );
 };

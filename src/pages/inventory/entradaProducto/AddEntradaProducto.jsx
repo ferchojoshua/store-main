@@ -10,7 +10,6 @@ import {
   Container,
   Paper,
   Typography,
-  Grid,
   IconButton,
   Stack,
 } from "@mui/material";
@@ -129,10 +128,10 @@ const AddEntradaProducto = () => {
     const data = {
       product: selectedProduct.producto,
       cantidad,
-      costoUnitario: costo,
+      costoUnitario: costoAntesDesc,
       descuento: descuento ? descuento : 0,
       impuesto: impuesto ? impuesto : 0,
-      costAntDesc: costoAntesDesc,
+      costUnitDespDesc: costo,
       costoCompra: cantidad * costo,
       precioVentaMayor: parseFloat(precioVenta),
       precioVentaDetalle: parseFloat(precioVentaDetalle),
@@ -197,42 +196,41 @@ const AddEntradaProducto = () => {
       montoFactura,
       productInDetails: productDetailList,
     };
-    console.log("data", data);
 
-    // setIsLoading(true);
-    // const result = await addEntradaProductoAsync(token, data);
-    // if (!result.statusResponse) {
-    //   setIsLoading(false);
-    //   if (result.error.request.status === 401) {
-    //     navigate(`${ruta}/unauthorized`);
-    //     return;
-    //   }
-    //   toastError(result.error.message);
-    //   return;
-    // }
+    setIsLoading(true);
+    const result = await addEntradaProductoAsync(token, data);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
 
-    // if (result.data === "eX01") {
-    //   setIsLoading(false);
-    //   deleteUserData();
-    //   deleteToken();
-    //   setIsLogged(false);
-    //   return;
-    // }
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
 
-    // if (result.data.isDefaultPass) {
-    //   setIsLoading(false);
-    //   setIsDefaultPass(true);
-    //   return;
-    // }
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
 
-    // setReload(!reload);
-    // setNoFactura("");
-    // setTipoCompra("");
-    // setSelectedProvider("");
-    // setMontoFactura(0);
-    // setProductDetailList([]);
-    // setIsLoading(false);
-    // simpleMessage("Exito...!", "success");
+    setReload(!reload);
+    setNoFactura("");
+    setTipoCompra("");
+    setSelectedProvider("");
+    setMontoFactura(0);
+    setProductDetailList([]);
+    setIsLoading(false);
+    simpleMessage("Exito...!", "success");
   };
 
   return (
@@ -349,7 +347,7 @@ const AddEntradaProducto = () => {
                       </td>
                       <td>{item.cantidad}</td>
                       <td>
-                        {item.costAntDesc.toLocaleString("es-NI", {
+                        {item.costoUnitario.toLocaleString("es-NI", {
                           style: "currency",
                           currency: "NIO",
                         })}
@@ -357,7 +355,7 @@ const AddEntradaProducto = () => {
                       <td>{`${item.descuento}%`}</td>
                       <td>{`${item.impuesto}%`}</td>
                       <td>
-                        {item.costoUnitario.toLocaleString("es-NI", {
+                        {item.costUnitDespDesc.toLocaleString("es-NI", {
                           style: "currency",
                           currency: "NIO",
                         })}

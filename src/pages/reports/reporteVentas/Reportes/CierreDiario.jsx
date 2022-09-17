@@ -527,6 +527,36 @@ const CierreDiario = () => {
                 <Stack direction={"row"} justifyContent="space-between">
                   <Typography
                     variant="h6"
+                    style={{ color: "#ffc107", fontWeight: "bold" }}
+                  >
+                    Ventas de Credito:
+                  </Typography>
+                  <Typography variant="h6">
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumCreditoSales)}
+                  </Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between">
+                  <Typography
+                    variant="h6"
+                    style={{ color: "#ab003c", fontWeight: "bold" }}
+                  >
+                    Devoluciones:
+                  </Typography>
+                  <Typography variant="h6">
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumAnulatedSales)}
+                  </Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between">
+                  <Typography
+                    variant="h6"
                     style={{ color: "#1c54b2", fontWeight: "bold" }}
                   >
                     Ventas de Contado:
@@ -567,36 +597,6 @@ const CierreDiario = () => {
                       style: "currency",
                       currency: "NIO",
                     }).format(sumContadoSales + sumRecuperacion)}
-                  </Typography>
-                </Stack>
-
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#ffc107", fontWeight: "bold" }}
-                  >
-                    Ventas de Credito:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumCreditoSales)}
-                  </Typography>
-                </Stack>
-
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#ab003c", fontWeight: "bold" }}
-                  >
-                    Devoluciones:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumAnulatedSales)}
                   </Typography>
                 </Stack>
               </Stack>
@@ -935,6 +935,36 @@ const CierreDiario = () => {
                   <Stack direction={"row"} justifyContent="space-between">
                     <Typography
                       variant="h6"
+                      style={{ color: "#ffc107", fontWeight: "bold" }}
+                    >
+                      Ventas de Credito:
+                    </Typography>
+                    <Typography variant="h6">
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(sumCreditoSales)}
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction={"row"} justifyContent="space-between">
+                    <Typography
+                      variant="h6"
+                      style={{ color: "#ab003c", fontWeight: "bold" }}
+                    >
+                      Devoluciones:
+                    </Typography>
+                    <Typography variant="h6">
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(sumAnulatedSales)}
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction={"row"} justifyContent="space-between">
+                    <Typography
+                      variant="h6"
                       style={{ color: "#1c54b2", fontWeight: "bold" }}
                     >
                       Ventas de Contado:
@@ -975,36 +1005,6 @@ const CierreDiario = () => {
                         style: "currency",
                         currency: "NIO",
                       }).format(sumContadoSales + sumRecuperacion)}
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#ffc107", fontWeight: "bold" }}
-                    >
-                      Ventas de Credito:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(sumCreditoSales)}
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#ab003c", fontWeight: "bold" }}
-                    >
-                      Devoluciones:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(sumAnulatedSales)}
                     </Typography>
                   </Stack>
                 </Stack>

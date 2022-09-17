@@ -529,7 +529,7 @@ const SalesList = () => {
                 ) : (
                   <></>
                 )}
-                <th>Acciones</th>
+                <th style={{ textAlign: "center" }}>Acciones</th>
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -614,7 +614,7 @@ const SalesList = () => {
                       <></>
                     )}
 
-                    <td style={{ width: 150 }}>
+                    <td style={{ width: 150, textAlign: "center" }}>
                       <Stack spacing={1} direction="row">
                         <IconButton
                           style={{
@@ -623,7 +623,6 @@ const SalesList = () => {
                           size="small"
                           onClick={() => {
                             setData(item);
-                            console.log("item", item);
                             setShowPrintModal(true);
                           }}
                         >
