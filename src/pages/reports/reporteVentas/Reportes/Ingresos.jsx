@@ -200,7 +200,7 @@ const Ingresos = () => {
                   return (
                     <tr key={item.id}>
                       <td style={{ textAlign: "center" }}>
-                        {moment(fechaAbono).format("L")}
+                        {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                       </td>
                       <td style={{ textAlign: "center" }}>{store.name}</td>
                       <td style={{ textAlign: "center" }}>{id}</td>
@@ -324,7 +324,7 @@ const Ingresos = () => {
                       return (
                         <tr key={item.id}>
                           <td style={{ textAlign: "center" }}>
-                            {moment(fechaAbono).format("L")}
+                            {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                           </td>
                           <td style={{ textAlign: "center" }}>{store.name}</td>
                           <td style={{ textAlign: "center" }}>{id}</td>
