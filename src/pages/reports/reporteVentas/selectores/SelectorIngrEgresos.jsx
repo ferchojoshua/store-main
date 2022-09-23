@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DatePicker } from "@mui/lab";
+import { DatePicker, TimePicker } from "@mui/lab";
 import {
   Container,
   Paper,
@@ -10,32 +10,40 @@ import {
   MenuItem,
   Button,
   Stack,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
-import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { DataContext } from "../../../../context/DataContext";
 import {
   deleteToken,
   deleteUserData,
   getToken,
 } from "../../../../services/Account";
-import { DataContext } from "../../../../context/DataContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
+import { result } from "lodash";
 
-import moment from "moment";
-
-const SelectorCajaChica = () => {
+export const SelectorIngrEgresos = () => {
   const { setIsLoading, setIsDefaultPass, setIsLogged } =
     useContext(DataContext);
-
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
   );
+  const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
+
   const [fechaHassta, setHasstaFecha] = useState(new Date());
+  const [horaHasta, setHoraHasta] = useState(new Date(date.setHours(18, 0)));
+
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
+
+  const [selectAll, setSelectAll] = useState(true);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -71,6 +79,7 @@ const SelectorCajaChica = () => {
 
       setStoreList(resultStore.data);
       setIsLoading(false);
+
       if (resultStore.data.length < 4) {
         setSelectedStore(resultStore.data[0].id);
       }
@@ -91,18 +100,30 @@ const SelectorCajaChica = () => {
       return;
     }
 
+    let fechaD = moment(fechaDesde).format("YYYY-MM-DD");
+    let horaD = moment(horaDesde).format("HH:mm");
+    let fhDesde = new Date(`${fechaD}T${horaD}:00.00Z`);
+    fhDesde.setSeconds(0);
+
+    let fechaH = moment(fechaHassta).format("YYYY-MM-DD");
+    let horaH = moment(horaHasta).format("HH:mm");
+    let fhHasta = new Date(`${fechaH}T${horaH}:00.00Z`);
+    fhHasta.setSeconds(0);
+
     var params = {
       selectedStore,
-      desde: fechaDesde,
-      hasta: fechaHassta,
+      desde: fhDesde.toISOString(),
+      hasta: fhHasta.toISOString(),
+      horaDesde,
+      horaHasta,
     };
-    params = JSON.stringify(params);
-    window.open(`${ruta}/r-caja-chica/${params}`);
-  };
 
+    params = JSON.stringify(params);
+    window.open(`${ruta}/r-ingresos/${params}`);
+  };
   return (
     <div>
-      <Container style={{ width: 500 }}>
+      <Container style={{ width: 550 }}>
         <Paper
           elevation={10}
           style={{
@@ -134,6 +155,42 @@ const SelectorCajaChica = () => {
                 value={fechaHassta}
                 onChange={(newValue) => {
                   setHasstaFecha(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+            </Stack>
+
+            <Stack spacing={2} direction="row">
+              <TimePicker
+                label="Hora Desde"
+                value={horaDesde}
+                ampm
+                onChange={(newValue) => {
+                  setHoraDesde(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+
+              <TimePicker
+                label="Hora Hasta"
+                value={horaHasta}
+                ampm
+                onChange={(newValue) => {
+                  setHoraHasta(newValue);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -183,23 +240,21 @@ const SelectorCajaChica = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-
-            <Button
-              variant="outlined"
-              fullWidth
-              style={{ borderRadius: 20, marginTop: 30 }}
-              startIcon={<FontAwesomeIcon icon={faPrint} />}
-              onClick={() => {
-                verReport();
-              }}
-            >
-              Generar Reporte
-            </Button>
           </Stack>
+
+          <Button
+            variant="outlined"
+            fullWidth
+            style={{ borderRadius: 20, marginTop: 30 }}
+            startIcon={<FontAwesomeIcon icon={faPrint} />}
+            onClick={() => {
+              verReport();
+            }}
+          >
+            Generar Reporte
+          </Button>
         </Paper>
       </Container>
     </div>
   );
 };
-
-export default SelectorCajaChica;

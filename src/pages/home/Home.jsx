@@ -23,7 +23,6 @@ import { VentaSemanal } from "./VentaSemanal";
 import VisitedClients from "./clientsChart/VisitedClients";
 import { Especialidad } from "./clientsChart/Especialidad";
 import { LocationClients } from "./clientsChart/LocationClients";
-import { set } from "lodash";
 
 const Home = () => {
   const { setIsLoading, setIsLogged, setIsDefaultPass } =

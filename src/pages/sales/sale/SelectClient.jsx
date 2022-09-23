@@ -23,7 +23,7 @@ import {
   deleteUserData,
   getToken,
 } from "../../../services/Account";
-import { getRuta, toastError } from "../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
@@ -45,7 +45,7 @@ const SelectClient = ({
 }) => {
   let ruta = getRuta();
 
-  const { setIsLoading, setIsLogged, reload, setIsDefaultPass } =
+  const { setIsLoading, setIsLogged, reload, setIsDefaultPass, access } =
     useContext(DataContext);
   let navigate = useNavigate();
 
@@ -162,17 +162,21 @@ const SelectClient = ({
                 />
               )}
             />
-            <Tooltip title="Agregar Cliente" style={{ marginTop: 5 }}>
-              <IconButton onClick={() => setShowModal(true)}>
-                <FontAwesomeIcon
-                  style={{
-                    fontSize: 25,
-                    color: "#ff5722",
-                  }}
-                  icon={faCirclePlus}
-                />
-              </IconButton>
-            </Tooltip>
+            {isAccess(access, "CLIENTS CREATE") ? (
+              <Tooltip title="Agregar Cliente" style={{ marginTop: 5 }}>
+                <IconButton onClick={() => setShowModal(true)}>
+                  <FontAwesomeIcon
+                    style={{
+                      fontSize: 25,
+                      color: "#ff5722",
+                    }}
+                    icon={faCirclePlus}
+                  />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
           </Stack>
 
           {selectedClient ? (

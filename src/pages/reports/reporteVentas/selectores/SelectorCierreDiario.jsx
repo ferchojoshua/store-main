@@ -11,7 +11,7 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import { getStoresAsync } from "../../../../services/AlmacenApi";
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -32,7 +32,7 @@ const SelectorCierreDiario = () => {
   const [fechaDesde, setDesdeFecha] = useState(date);
   const [fechaHasta, setHastaFecha] = useState(date);
   const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
-  const [horaHasta, setHoraHasta] = useState(date.setHours(18, 0));
+  const [horaHasta, setHoraHasta] = useState(new Date(date.setHours(18, 0)));
 
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
@@ -44,7 +44,7 @@ const SelectorCierreDiario = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultStore = await getStoresAsync(token);
+      const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
         setIsLoading(false);
         if (resultStore.error.request.status === 401) {
@@ -71,6 +71,10 @@ const SelectorCierreDiario = () => {
 
       setStoreList(resultStore.data);
       setIsLoading(false);
+
+      if (resultStore.data.length < 4) {
+        setSelectedStore(resultStore.data[0].id);
+      }
     })();
   }, []);
 
@@ -95,6 +99,7 @@ const SelectorCierreDiario = () => {
       horaDesde,
       horaHasta,
     };
+
     params = JSON.stringify(params);
     window.open(`${ruta}/r-daily-close/${params}`);
   };
@@ -204,8 +209,12 @@ const SelectorCierreDiario = () => {
                 </MenuItem>
                 {storeList.map((item) => {
                   return (
-                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                      {item.almacen.name}
+                    <MenuItem
+                      key={item.id}
+                      value={item.id}
+                      disabled={storeList.length === 4 ? false : true}
+                    >
+                      {item.name}
                     </MenuItem>
                   );
                 })}

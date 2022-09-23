@@ -8,6 +8,7 @@ import {
   faSackDollar,
   faBriefcase,
   faHandshakeAltSlash,
+  faMoneyBills,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Grid, Paper, Stack } from "@mui/material";
@@ -21,6 +22,7 @@ import { SelectorArtVendidos } from "./reporteVentas/selectores/SelectorArtVendi
 import SelectorCierreDiario from "./reporteVentas/selectores/SelectorCierreDiario";
 import SelectorCajaChica from "./reporteVentas/selectores/SelectorCajaChica";
 import SelectorProdNoVendido from "./reporteVentas/selectores/SelectorProdNoVendido";
+import { SelectorIngrEgresos } from "./reporteVentas/selectores/SelectorIngrEgresos";
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -53,7 +55,7 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faCashRegister}
                   text="Master de Ventas"
-                  modalTitle="Ventas por Fecha"
+                  modalTitle="Master de Ventas"
                 >
                   <SelectorMasterVentas />
                 </ReportCaller>
@@ -67,7 +69,7 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faHandHoldingDollar}
                   text="Doc por Cobrar"
-                  modalTitle="Ver Documentos por Cobrar"
+                  modalTitle="Documentos por Cobrar"
                 >
                   <SelectorDocXCobrar />
                 </ReportCaller>
@@ -81,7 +83,7 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faDolly}
                   text="Productos Vendidos"
-                  modalTitle="Ver Productos Vendidos"
+                  modalTitle="Productos Vendidos"
                 >
                   <SelectorArtVendidos />
                 </ReportCaller>
@@ -95,7 +97,7 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faHandshakeAltSlash}
                   text="Productos no Vendidos"
-                  modalTitle="Ver Productos no Vendidos"
+                  modalTitle="Productos no Vendidos"
                 >
                   <SelectorProdNoVendido />
                 </ReportCaller>
@@ -109,7 +111,7 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faCalendarDay}
                   text="Cierre Diario"
-                  modalTitle="Ver Cierre Diario"
+                  modalTitle="Cierre Diario"
                 >
                   <SelectorCierreDiario />
                 </ReportCaller>
@@ -136,7 +138,7 @@ export const ReportsContainer = () => {
               style={{ fontSize: 40, color: "#4caf50" }}
             />
 
-            <h1>Reportes de Administrativos</h1>
+            <h1>Reportes Administrativos</h1>
           </Stack>
           <hr />
           <Grid container spacing={2}>
@@ -145,9 +147,23 @@ export const ReportsContainer = () => {
                 <ReportCaller
                   icon={faSackDollar}
                   text="Caja Chica"
-                  modalTitle="Ver Mov. de Caja Chica"
+                  modalTitle="Movimientos de Caja Chica"
                 >
                   <SelectorCajaChica />
+                </ReportCaller>
+              </Grid>
+            ) : (
+              <></>
+            )}
+            {isAccess(access, "INGRESOS VER") ? (
+              
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                <ReportCaller
+                  icon={faMoneyBills}
+                  text="Ingresos"
+                  modalTitle="Ingresos"
+                >
+                  <SelectorIngrEgresos />
                 </ReportCaller>
               </Grid>
             ) : (

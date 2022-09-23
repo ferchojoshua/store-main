@@ -22,16 +22,25 @@ import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
-import { getMasterVentasAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
+
+import { getMasterVentasAsync } from "../../../../services/ReportApi";
 
 export const MasterVentas = () => {
   const compRef = useRef();
   const { params } = useParams();
   const dataJson = JSON.parse(params);
-  const { selectedStore, desde, hasta, creditSales, contadoSales } = dataJson;
+  const {
+    selectedStore,
+    desde,
+    hasta,
+    creditSales,
+    contadoSales,
+    horaDesde,
+    horaHasta,
+  } = dataJson;
 
   const [data, setData] = useState([]);
 
@@ -51,8 +60,8 @@ export const MasterVentas = () => {
   useEffect(() => {
     (async () => {
       const datos = {
-        desde,
-        hasta,
+        desde: new Date(desde),
+        hasta: new Date(hasta),
         storeId: selectedStore === "t" ? 0 : selectedStore,
         contadoSales,
         creditSales,
@@ -158,7 +167,9 @@ export const MasterVentas = () => {
           </Typography>
           <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
             "L"
-          )} - Hasta: ${moment(hasta).format("L")}`}</span>
+          )} ${moment(horaDesde).format("hh:mm A")} - Hasta: ${moment(
+            hasta
+          ).format("L")} ${moment(horaHasta).format("hh:mm A")}`}</span>
 
           <ReactToPrint
             trigger={() => {
@@ -337,9 +348,11 @@ export const MasterVentas = () => {
       >
         <PrintReport
           ref={compRef}
-          fecha={`Desde: ${moment(desde).format("L")} - Hasta: ${moment(
-            hasta
-          ).format("L")}`}
+          fecha={`Desde: ${moment(desde).format("L")} ${moment(
+            horaDesde
+          ).format("hh:mm A")} - Hasta: ${moment(hasta).format("L")} ${moment(
+            horaHasta
+          ).format("hh:mm A")}`}
           titulo={"Master de Ventas"}
         >
           <hr />

@@ -27,7 +27,6 @@ import {
 import { getprovidersAsync } from "../../../../services/ProviderApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
-import { Grid3x3 } from "@mui/icons-material";
 
 const DetallesDeEntrada = ({
   setNoFactura,

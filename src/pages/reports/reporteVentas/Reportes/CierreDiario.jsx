@@ -190,8 +190,8 @@ const CierreDiario = () => {
             Cierre Diario
           </Typography>
           <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
-            "YYYY-MM-DD HH:mm"
-          )} - Hasta: ${moment(hasta).format("YYYY-MM-DD HH:mm")}`}</span>
+            "YYYY-MM-DD hh:mm A"
+          )} - Hasta: ${moment(hasta).format("YYYY-MM-DD hh:mm A")}`}</span>
 
           <ReactToPrint
             trigger={() => {
@@ -613,8 +613,8 @@ const CierreDiario = () => {
         <PrintReport
           ref={compRef}
           fecha={`Desde: ${moment(desde).format(
-            "YYYY-MM-DD HH:mm"
-          )} - Hasta: ${moment(hasta).format("YYYY-MM-DD HH:mm")}`}
+            "YYYY-MM-DD hh:mm A"
+          )} - Hasta: ${moment(hasta).format("YYYY-MM-DD hh:mm A")}`}
           titulo={"Cierre Diario"}
         >
           <hr />

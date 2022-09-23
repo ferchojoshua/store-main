@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { DatePicker } from "@mui/lab";
+import { DatePicker, TimePicker } from "@mui/lab";
 import {
   Container,
   Paper,
@@ -14,7 +14,8 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { getStoresAsync } from "../../../../services/AlmacenApi";
+
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -35,13 +36,17 @@ export const SelectorMasterVentas = () => {
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
   );
+  const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
+
   const [fechaHassta, setHasstaFecha] = useState(new Date());
+  const [horaHasta, setHoraHasta] = useState(new Date(date.setHours(18, 0)));
+
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
 
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectCreditSales, setSelectCreditSales] = useState(false);
-  const [selectContadoSales, setSelectContadoSales] = useState(false);
+  const [selectAll, setSelectAll] = useState(true);
+  const [selectCreditSales, setSelectCreditSales] = useState(true);
+  const [selectContadoSales, setSelectContadoSales] = useState(true);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -50,7 +55,7 @@ export const SelectorMasterVentas = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultStore = await getStoresAsync(token);
+      const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
         setIsLoading(false);
         if (resultStore.error.request.status === 401) {
@@ -76,8 +81,12 @@ export const SelectorMasterVentas = () => {
       }
 
       setStoreList(resultStore.data);
+
+      if (resultStore.data.length < 4) {
+        setSelectedStore(resultStore.data[0].id);
+      }
+
       setIsLoading(false);
-      seleccionarTodos();
     })();
   }, []);
 
@@ -99,13 +108,26 @@ export const SelectorMasterVentas = () => {
       return;
     }
 
+    let fechaD = moment(fechaDesde).format("YYYY-MM-DD");
+    let horaD = moment(horaDesde).format("HH:mm");
+    let fhDesde = new Date(`${fechaD}T${horaD}:00.00Z`);
+    fhDesde.setSeconds(0);
+
+    let fechaH = moment(fechaHassta).format("YYYY-MM-DD");
+    let horaH = moment(horaHasta).format("HH:mm");
+    let fhHasta = new Date(`${fechaH}T${horaH}:00.00Z`);
+    fhHasta.setSeconds(0);
+
     var params = {
       selectedStore,
-      desde: fechaDesde,
-      hasta: fechaHassta,
+      desde: fhDesde.toISOString(),
+      hasta: fhHasta.toISOString(),
       creditSales: selectCreditSales,
       contadoSales: selectContadoSales,
+      horaDesde,
+      horaHasta,
     };
+
     params = JSON.stringify(params);
     window.open(`${ruta}/r-master-vetas/${params}`);
   };
@@ -127,63 +149,117 @@ export const SelectorMasterVentas = () => {
             marginBottom: 10,
           }}
         >
-          <Stack spacing={2} direction="row">
-            <DatePicker
-              label="Desde"
-              value={fechaDesde}
-              onChange={(newValue) => {
-                setDesdeFecha(newValue);
-              }}
-              renderInput={(params) => (
-                <TextField required fullWidth variant="standard" {...params} />
-              )}
-            />
+          <Stack spacing={3}>
+            <Stack spacing={2} direction="row">
+              <DatePicker
+                label="Desde"
+                value={fechaDesde}
+                onChange={(newValue) => {
+                  setDesdeFecha(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
 
-            <DatePicker
-              label="Hasta"
-              value={fechaHassta}
-              onChange={(newValue) => {
-                setHasstaFecha(newValue);
-              }}
-              renderInput={(params) => (
-                <TextField required fullWidth variant="standard" {...params} />
-              )}
-            />
-          </Stack>
+              <DatePicker
+                label="Hasta"
+                value={fechaHassta}
+                onChange={(newValue) => {
+                  setHasstaFecha(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+            </Stack>
 
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ marginRight: 20, marginTop: 20 }}
-            required
-          >
-            <InputLabel id="demo-simple-select-standard-label">
-              Seleccione un Almacen
-            </InputLabel>
-            <Select
-              defaultValue=""
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={selectedStore}
-              onChange={(e) => setSelectedStore(e.target.value)}
-              label="Almacen"
-              style={{ textAlign: "left" }}
+            <Stack spacing={2} direction="row">
+              <TimePicker
+                label="Hora Desde"
+                value={horaDesde}
+                ampm
+                onChange={(newValue) => {
+                  setHoraDesde(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+
+              <TimePicker
+                label="Hora Hasta"
+                value={horaHasta}
+                ampm
+                onChange={(newValue) => {
+                  setHoraHasta(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    required
+                    fullWidth
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+            </Stack>
+
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20 }}
+              required
             >
-              <MenuItem key={-1} value="">
-                <em> Seleccione un Almacen</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                    {item.almacen.name}
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacen
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedStore}
+                onChange={(e) => setSelectedStore(e.target.value)}
+                label="Almacen"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un Almacen</em>
+                </MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+                {
+                  <MenuItem
+                    key={"t"}
+                    value={"t"}
+                    disabled={storeList.length === 4 ? false : true}
+                  >
+                    Todos...
                   </MenuItem>
-                );
-              })}
-              <MenuItem key={"t"} value={"t"}>
-                Todos...
-              </MenuItem>
-            </Select>
-          </FormControl>
+                }
+              </Select>
+            </FormControl>
+          </Stack>
 
           <Stack style={{ marginTop: 20 }}>
             <span style={{ fontWeight: "bold", color: "#2196f3" }}>
@@ -201,7 +277,9 @@ export const SelectorMasterVentas = () => {
               />
             </FormGroup>
           </Stack>
+
           <hr />
+
           <Stack direction="row" display="flex" justifyContent="space-around">
             <FormGroup>
               <FormControlLabel

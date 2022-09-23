@@ -54,6 +54,7 @@ import { ArticulosVendidos } from "./pages/reports/reporteVentas/Reportes/Articu
 import CierreDiario from "./pages/reports/reporteVentas/Reportes/CierreDiario";
 import CajaChica from "./pages/reports/reporteVentas/Reportes/CajaChica";
 import { ProdNoVendidos } from "./pages/reports/reporteVentas/Reportes/ProdNoVendidos";
+import Ingresos from "./pages/reports/reporteVentas/Reportes/Ingresos";
 
 function App() {
   let ruta = getRuta();
@@ -206,6 +207,10 @@ function App() {
                 <Route
                   path={`${ruta}/r-no-sales-prods/:params`}
                   element={<ProdNoVendidos />}
+                />
+                <Route
+                  path={`${ruta}/r-ingresos/:params`}
+                  element={<Ingresos />}
                 />
 
                 {/* Rutas Administration */}

@@ -10,9 +10,8 @@ import {
   MenuItem,
   Button,
   Stack,
-  Autocomplete,
 } from "@mui/material";
-import { getStoresAsync } from "../../../../services/AlmacenApi";
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -25,7 +24,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 
 import moment from "moment";
-import { getClientsAsync } from "../../../../services/ClientsApi";
 import {
   getFamiliasByTNAsync,
   getTipoNegocioAsync,
@@ -56,7 +54,7 @@ const SelectorProdNoVendido = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultStore = await getStoresAsync(token);
+      const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
         setIsLoading(false);
         if (resultStore.error.request.status === 401) {
@@ -82,6 +80,9 @@ const SelectorProdNoVendido = () => {
       }
 
       setStoreList(resultStore.data);
+      if (resultStore.data.length < 4) {
+        setSelectedStore(resultStore.data[0].id);
+      }
 
       const result = await getTipoNegocioAsync(token);
       if (!result.statusResponse) {
@@ -256,12 +257,16 @@ const SelectorProdNoVendido = () => {
                 </MenuItem>
                 {storeList.map((item) => {
                   return (
-                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                      {item.almacen.name}
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
                     </MenuItem>
                   );
                 })}
-                <MenuItem key={"t"} value={"t"}>
+                <MenuItem
+                  key={"t"}
+                  value={"t"}
+                  disabled={storeList.length === 4 ? false : true}
+                >
                   Todos...
                 </MenuItem>
               </Select>

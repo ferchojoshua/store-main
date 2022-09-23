@@ -228,6 +228,7 @@ const AddEntradaProducto = () => {
     setTipoCompra("");
     setSelectedProvider("");
     setMontoFactura(0);
+    setMontoFacturaADesc(0);
     setProductDetailList([]);
     setIsLoading(false);
     simpleMessage("Exito...!", "success");

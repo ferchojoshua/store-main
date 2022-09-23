@@ -316,11 +316,11 @@ const EntradaProductoDetails = () => {
                 <th>Costo de Compra</th>
                 <th>P.V. Mayor</th>
                 <th>P.V. Detalle</th>
-                {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+                {/* {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
                   <th>Acciones</th>
                 ) : (
                   <></>
-                )}
+                )} */}
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -359,7 +359,7 @@ const EntradaProductoDetails = () => {
                       })}
                     </td>
 
-                    {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
+                    {/* {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
                       <td>
                         <IconButton
                           style={{ color: "#2196f3" }}
@@ -373,7 +373,7 @@ const EntradaProductoDetails = () => {
                       </td>
                     ) : (
                       <></>
-                    )}
+                    )} */}
                   </tr>
                 );
               })}

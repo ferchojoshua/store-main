@@ -15,7 +15,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { getStoresAsync } from "../../../../services/AlmacenApi";
+import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -52,7 +52,7 @@ export const SelectorDocXCobrar = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultStore = await getStoresAsync(token);
+      const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
         setIsLoading(false);
         if (resultStore.error.request.status === 401) {
@@ -106,6 +106,9 @@ export const SelectorDocXCobrar = () => {
 
       setClientList(resultClients.data);
       setIsLoading(false);
+      if (resultStore.data.length < 4) {
+        setSelectedStore(resultStore.data[0].id);
+      }
     })();
   }, []);
 
@@ -204,12 +207,16 @@ export const SelectorDocXCobrar = () => {
                 </MenuItem>
                 {storeList.map((item) => {
                   return (
-                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                      {item.almacen.name}
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
                     </MenuItem>
                   );
                 })}
-                <MenuItem key={"t"} value={"t"}>
+                <MenuItem
+                  key={"t"}
+                  value={"t"}
+                  disabled={storeList.length === 4 ? false : true}
+                >
                   Todos...
                 </MenuItem>
               </Select>
