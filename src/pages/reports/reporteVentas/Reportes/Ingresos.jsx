@@ -41,6 +41,8 @@ const Ingresos = () => {
   const { selectedStore, desde, hasta, horaDesde, horaHasta } = dataJson;
 
   const [data, setData] = useState([]);
+  const [dataContado, setDataContado] = useState([]);
+  const [dataRecuperacion, setDataRecuperacion] = useState([]);
 
   const {
     setIsLoading,
@@ -88,7 +90,10 @@ const Ingresos = () => {
       }
 
       setData(result.data);
-
+      setDataContado(result.data.filter((item) => item.sale.isContado));
+      setDataRecuperacion(
+        result.data.filter((item) => item.sale.isContado === false)
+      );
       setIsLoading(false);
       setIsDarkMode(false);
     })();
@@ -171,10 +176,21 @@ const Ingresos = () => {
           />
         </Stack>
 
-        <hr />
-
         <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
-          {isEmpty(data) ? (
+          <hr />
+          <Typography
+            sx={{
+              color: "#00a152",
+              textAlign: "center",
+              fontWeight: "bold",
+              marginTop: 2,
+            }}
+            variant="h5"
+            component="div"
+          >
+            Ventas de Contado
+          </Typography>
+          {isEmpty(dataContado) ? (
             <NoData />
           ) : (
             <Table
@@ -183,6 +199,19 @@ const Ingresos = () => {
               responsive
               className="text-primary"
             >
+              <caption style={{ color: "#00a152" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography style={{ color: "#00a152", fontWeight: "bold" }}>
+                    Total Ventas de Contado:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#00a152" }}>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumContadoSales())}
+                  </Typography>
+                </Stack>
+              </caption>
               <thead>
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
@@ -190,12 +219,12 @@ const Ingresos = () => {
                   <th style={{ textAlign: "center" }}>#</th>
                   <th style={{ textAlign: "center" }}>Venta</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
-                  <th style={{ textAlign: "center" }}>Es Venta</th>
+                  {/* <th style={{ textAlign: "center" }}>Es Venta</th> */}
                   <th style={{ textAlign: "center" }}>Monto</th>
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {data.map((item) => {
+                {dataContado.map((item) => {
                   const { fechaAbono, id, sale, monto, store } = item;
                   return (
                     <tr key={item.id}>
@@ -210,14 +239,97 @@ const Ingresos = () => {
                           ? sale.nombreCliente
                           : sale.client.nombreCliente}
                       </td>
-                      <td style={{ textAlign: "center" }}>
+                      {/* <td style={{ textAlign: "center" }}>
                         <FontAwesomeIcon
                           style={{
                             color: sale.isContado ? "#00a152" : "#f50057",
                           }}
                           icon={sale.isContado ? faCircleCheck : faCircleXmark}
                         />
+                      </td> */}
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(monto)}
                       </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          )}
+
+          <hr />
+          <Typography
+            sx={{
+              color: "#00a152",
+              textAlign: "center",
+              fontWeight: "bold",
+              marginTop: 2,
+            }}
+            variant="h5"
+            component="div"
+          >
+            Recuperaciones
+          </Typography>
+          {isEmpty(dataRecuperacion) ? (
+            <NoData />
+          ) : (
+            <Table
+              hover={!isDarkMode}
+              size="sm"
+              responsive
+              className="text-primary"
+            >
+              <caption style={{ color: "#00a152" }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography style={{ color: "#00a152", fontWeight: "bold" }}>
+                    Total Ventas de Contado:
+                  </Typography>
+                  <Typography variant="h6" style={{ color: "#00a152" }}>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumRecuperacion())}
+                  </Typography>
+                </Stack>
+              </caption>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>Fecha</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
+                  <th style={{ textAlign: "center" }}>#</th>
+                  <th style={{ textAlign: "center" }}>Venta</th>
+                  <th style={{ textAlign: "left" }}>Cliente</th>
+                  {/* <th style={{ textAlign: "center" }}>Es Venta</th> */}
+                  <th style={{ textAlign: "center" }}>Monto</th>
+                </tr>
+              </thead>
+              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                {dataRecuperacion.map((item) => {
+                  const { fechaAbono, id, sale, monto, store } = item;
+                  return (
+                    <tr key={item.id}>
+                      <td style={{ textAlign: "center" }}>
+                        {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
+                      </td>
+                      <td style={{ textAlign: "center" }}>{store.name}</td>
+                      <td style={{ textAlign: "center" }}>{id}</td>
+                      <td style={{ textAlign: "center" }}>{sale.id}</td>
+                      <td style={{ textAlign: "left" }}>
+                        {sale.isEventual
+                          ? sale.nombreCliente
+                          : sale.client.nombreCliente}
+                      </td>
+                      {/* <td style={{ textAlign: "center" }}>
+                        <FontAwesomeIcon
+                          style={{
+                            color: sale.isContado ? "#00a152" : "#f50057",
+                          }}
+                          icon={sale.isContado ? faCircleCheck : faCircleXmark}
+                        />
+                      </td> */}
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
@@ -236,33 +348,25 @@ const Ingresos = () => {
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                Contador Ventas de Contado
+              </span>
+              <span>
+                {new Intl.NumberFormat("es-NI").format(dataContado.length)}
+              </span>
+            </Stack>
+            <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                Contador Recuperacion
+              </span>
+              <span>
+                {new Intl.NumberFormat("es-NI").format(dataRecuperacion.length)}
+              </span>
+            </Stack>
+            <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                 Total de Registros
               </span>
               <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
-            </Stack>
-
-            <Stack textAlign="center">
-              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total Ventas de Contado
-              </span>
-              <span>
-                {new Intl.NumberFormat("es-NI", {
-                  style: "currency",
-                  currency: "NIO",
-                }).format(sumContadoSales())}
-              </span>
-            </Stack>
-
-            <Stack textAlign="center">
-              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total de Recuperacion
-              </span>
-              <span>
-                {new Intl.NumberFormat("es-NI", {
-                  style: "currency",
-                  currency: "NIO",
-                }).format(sumRecuperacion())}
-              </span>
             </Stack>
 
             <Stack textAlign="center">
@@ -295,68 +399,175 @@ const Ingresos = () => {
           ).format("hh:mm A")}`}
           titulo={"Master de Ventas"}
         >
-          <hr />
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
-            {isEmpty(data) ? (
+            <hr />
+            <Typography
+              sx={{
+                color: "#00a152",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 2,
+              }}
+              variant="h5"
+              component="div"
+            >
+              Ventas de Contado
+            </Typography>
+            {isEmpty(dataContado) ? (
               <NoData />
             ) : (
-              <>
-                <Table
-                  hover={!isDarkMode}
-                  size="sm"
-                  responsive
-                  className="text-primary"
-                >
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: "center" }}>Fecha</th>
-                      <th style={{ textAlign: "center" }}>Almacen</th>
-                      <th style={{ textAlign: "center" }}>#</th>
-                      <th style={{ textAlign: "center" }}>Venta</th>
-                      <th style={{ textAlign: "left" }}>Cliente</th>
-                      <th style={{ textAlign: "center" }}>Es Venta</th>
-                      <th style={{ textAlign: "center" }}>Monto</th>
-                    </tr>
-                  </thead>
-                  <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                    {data.map((item) => {
-                      const { fechaAbono, id, sale, monto, store } = item;
-                      return (
-                        <tr key={item.id}>
-                          <td style={{ textAlign: "center" }}>
-                            {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
-                          </td>
-                          <td style={{ textAlign: "center" }}>{store.name}</td>
-                          <td style={{ textAlign: "center" }}>{id}</td>
-                          <td style={{ textAlign: "center" }}>{sale.id}</td>
-                          <td style={{ textAlign: "left" }}>
-                            {sale.isEventual
-                              ? sale.nombreCliente
-                              : sale.client.nombreCliente}
-                          </td>
-                          <td style={{ textAlign: "center" }}>
-                            <FontAwesomeIcon
-                              style={{
-                                color: sale.isContado ? "#00a152" : "#f50057",
-                              }}
-                              icon={
-                                sale.isContado ? faCircleCheck : faCircleXmark
-                              }
-                            />
-                          </td>
-                          <td style={{ textAlign: "center" }}>
-                            {new Intl.NumberFormat("es-NI", {
-                              style: "currency",
-                              currency: "NIO",
-                            }).format(monto)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </Table>
-                <div className="page-break" />
-              </>
+              <Table
+                hover={!isDarkMode}
+                size="sm"
+                responsive
+                className="text-primary"
+              >
+                <caption style={{ color: "#00a152" }}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography
+                      style={{ color: "#00a152", fontWeight: "bold" }}
+                    >
+                      Total Ventas de Contado:
+                    </Typography>
+                    <Typography variant="h6" style={{ color: "#00a152" }}>
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(sumContadoSales())}
+                    </Typography>
+                  </Stack>
+                </caption>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Almacen</th>
+                    <th style={{ textAlign: "center" }}>#</th>
+                    <th style={{ textAlign: "center" }}>Venta</th>
+                    <th style={{ textAlign: "left" }}>Cliente</th>
+                    {/* <th style={{ textAlign: "center" }}>Es Venta</th> */}
+                    <th style={{ textAlign: "center" }}>Monto</th>
+                  </tr>
+                </thead>
+                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                  {dataContado.map((item) => {
+                    const { fechaAbono, id, sale, monto, store } = item;
+                    return (
+                      <tr key={item.id}>
+                        <td style={{ textAlign: "center" }}>
+                          {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "center" }}>{id}</td>
+                        <td style={{ textAlign: "center" }}>{sale.id}</td>
+                        <td style={{ textAlign: "left" }}>
+                          {sale.isEventual
+                            ? sale.nombreCliente
+                            : sale.client.nombreCliente}
+                        </td>
+                        {/* <td style={{ textAlign: "center" }}>
+                        <FontAwesomeIcon
+                          style={{
+                            color: sale.isContado ? "#00a152" : "#f50057",
+                          }}
+                          icon={sale.isContado ? faCircleCheck : faCircleXmark}
+                        />
+                      </td> */}
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(monto)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            )}
+
+            <hr />
+            <Typography
+              sx={{
+                color: "#00a152",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 2,
+              }}
+              variant="h5"
+              component="div"
+            >
+              Recuperaciones
+            </Typography>
+            {isEmpty(dataRecuperacion) ? (
+              <NoData />
+            ) : (
+              <Table
+                hover={!isDarkMode}
+                size="sm"
+                responsive
+                className="text-primary"
+              >
+                <caption style={{ color: "#00a152" }}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography
+                      style={{ color: "#00a152", fontWeight: "bold" }}
+                    >
+                      Total Ventas de Contado:
+                    </Typography>
+                    <Typography variant="h6" style={{ color: "#00a152" }}>
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(sumRecuperacion())}
+                    </Typography>
+                  </Stack>
+                </caption>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Almacen</th>
+                    <th style={{ textAlign: "center" }}>#</th>
+                    <th style={{ textAlign: "center" }}>Venta</th>
+                    <th style={{ textAlign: "left" }}>Cliente</th>
+                    {/* <th style={{ textAlign: "center" }}>Es Venta</th> */}
+                    <th style={{ textAlign: "center" }}>Monto</th>
+                  </tr>
+                </thead>
+                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                  {dataRecuperacion.map((item) => {
+                    const { fechaAbono, id, sale, monto, store } = item;
+                    return (
+                      <tr key={item.id}>
+                        <td style={{ textAlign: "center" }}>
+                          {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "center" }}>{id}</td>
+                        <td style={{ textAlign: "center" }}>{sale.id}</td>
+                        <td style={{ textAlign: "left" }}>
+                          {sale.isEventual
+                            ? sale.nombreCliente
+                            : sale.client.nombreCliente}
+                        </td>
+                        {/* <td style={{ textAlign: "center" }}>
+                        <FontAwesomeIcon
+                          style={{
+                            color: sale.isContado ? "#00a152" : "#f50057",
+                          }}
+                          icon={sale.isContado ? faCircleCheck : faCircleXmark}
+                        />
+                      </td> */}
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(monto)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
             )}
 
             <hr />
@@ -364,34 +575,28 @@ const Ingresos = () => {
             <Stack direction="row" flex="row" justifyContent="space-around">
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Contador Ventas de Contado
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI").format(dataContado.length)}
+                </span>
+              </Stack>
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Contador Recuperacion
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI").format(
+                    dataRecuperacion.length
+                  )}
+                </span>
+              </Stack>
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total de Registros
                 </span>
                 <span>
                   {new Intl.NumberFormat("es-NI").format(data.length)}
-                </span>
-              </Stack>
-
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total Ventas de Contado
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumContadoSales())}
-                </span>
-              </Stack>
-
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Recuperacion
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumRecuperacion())}
                 </span>
               </Stack>
 

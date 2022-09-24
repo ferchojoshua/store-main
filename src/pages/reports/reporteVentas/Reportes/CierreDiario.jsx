@@ -222,15 +222,15 @@ const CierreDiario = () => {
                 responsive
                 className="text-primary"
               >
-                <caption style={{ color: "#4caf50" }}>
+                <caption style={{ color: "#00a152" }}>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography
                       variant="h6"
-                      style={{ color: "#4caf50", fontWeight: "bold" }}
+                      style={{ color: "#00a152", fontWeight: "bold" }}
                     >
                       Total Ventas de Contado:
                     </Typography>
-                    <Typography variant="h6" style={{ color: "#4caf50" }}>
+                    <Typography variant="h6" style={{ color: "#00a152" }}>
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
