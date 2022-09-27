@@ -320,6 +320,7 @@ const Facrturar = () => {
                 saldoVencido={saldoVencido}
                 setSaldoVencido={setSaldoVencido}
                 setFactVencidas={setFactVencidas}
+                typeVenta={typeVenta}
               />
 
               <SelectProduct
@@ -336,6 +337,7 @@ const Facrturar = () => {
                 typeVenta={typeVenta}
                 setTypeVenta={setTypeVenta}
                 typeClient={typeClient}
+                selectedClient={selectedClient}
               />
             </Grid>
 

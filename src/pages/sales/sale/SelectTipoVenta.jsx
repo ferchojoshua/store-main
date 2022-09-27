@@ -3,13 +3,25 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-  Stack,
 } from "@mui/material";
 import React from "react";
 import { FormLabel } from "react-bootstrap";
+import { toastError } from "../../../helpers/Helpers";
 
-const SelectTipoVenta = ({ typeVenta, setTypeVenta, typeClient }) => {
+const SelectTipoVenta = ({
+  typeVenta,
+  setTypeVenta,
+  typeClient,
+  selectedClient,
+}) => {
   const handleChange = (event) => {
+    const { limiteCredito, creditoConsumido } = selectedClient;
+    let diferencia = limiteCredito - creditoConsumido;
+    if (diferencia < 0 && event.target.value !== "contado") {
+      toastError("Limite de credito alcanzado");
+      toastError("Solo ventas de contado para este cliente");
+      return;
+    }
     setTypeVenta(event.target.value);
   };
 

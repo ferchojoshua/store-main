@@ -118,9 +118,7 @@ const CierreDiario = () => {
 
   const saleDesgloce = (datos) => {
     const { saleList } = datos;
-    let contSales = saleList.filter(
-      (item) => item.isContado === true && item.isAnulado === false
-    );
+    let contSales = saleList.filter((item) => item.isContado === true);
     let credSales = saleList.filter(
       (item) => item.isContado === false && item.isAnulado === false
     );
@@ -251,8 +249,12 @@ const CierreDiario = () => {
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                   {dataVentasContado.map((item) => {
+                    console.log("item", item);
                     return (
-                      <tr key={item.id}>
+                      <tr
+                        key={item.id}
+                        style={{ color: item.isAnulado ? "red" : "" }}
+                      >
                         <td style={{ textAlign: "center" }}>
                           {moment(item.fechaVenta).format("L")}
                         </td>
@@ -590,13 +592,15 @@ const CierreDiario = () => {
                     variant="h6"
                     style={{ color: "#1c54b2", fontWeight: "bold" }}
                   >
-                    Total Final:
+                    Efectivo en Caja:
                   </Typography>
                   <Typography variant="h6">
                     {new Intl.NumberFormat("es-NI", {
                       style: "currency",
                       currency: "NIO",
-                    }).format(sumContadoSales + sumRecuperacion)}
+                    }).format(
+                      sumContadoSales + sumRecuperacion - sumAnulatedSales
+                    )}
                   </Typography>
                 </Stack>
               </Stack>
@@ -630,15 +634,15 @@ const CierreDiario = () => {
                   responsive
                   className="text-primary"
                 >
-                  <caption style={{ color: "#4caf50" }}>
+                  <caption style={{ color: "#00a152" }}>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography
                         variant="h6"
-                        style={{ color: "#4caf50", fontWeight: "bold" }}
+                        style={{ color: "#00a152", fontWeight: "bold" }}
                       >
                         Total Ventas de Contado:
                       </Typography>
-                      <Typography variant="h6" style={{ color: "#4caf50" }}>
+                      <Typography variant="h6" style={{ color: "#00a152" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
                           currency: "NIO",
@@ -659,8 +663,12 @@ const CierreDiario = () => {
                   </thead>
                   <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                     {dataVentasContado.map((item) => {
+                      console.log("item", item);
                       return (
-                        <tr key={item.id}>
+                        <tr
+                          key={item.id}
+                          style={{ color: item.isAnulado ? "red" : "" }}
+                        >
                           <td style={{ textAlign: "center" }}>
                             {moment(item.fechaVenta).format("L")}
                           </td>
@@ -998,13 +1006,15 @@ const CierreDiario = () => {
                       variant="h6"
                       style={{ color: "#1c54b2", fontWeight: "bold" }}
                     >
-                      Total Final:
+                      Efectivo en Caja:
                     </Typography>
                     <Typography variant="h6">
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
-                      }).format(sumContadoSales + sumRecuperacion)}
+                      }).format(
+                        sumContadoSales + sumRecuperacion - sumAnulatedSales
+                      )}
                     </Typography>
                   </Stack>
                 </Stack>

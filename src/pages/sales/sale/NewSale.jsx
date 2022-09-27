@@ -317,6 +317,7 @@ const NewSale = () => {
                 saldoVencido={saldoVencido}
                 setSaldoVencido={setSaldoVencido}
                 setFactVencidas={setFactVencidas}
+                typeVenta={typeVenta}
               />
               <SelectProduct
                 selectedProductList={selectedProductList}
@@ -332,6 +333,7 @@ const NewSale = () => {
                 typeVenta={typeVenta}
                 setTypeVenta={setTypeVenta}
                 typeClient={typeClient}
+                selectedClient={selectedClient}
               />
             </Grid>
 

@@ -42,6 +42,7 @@ const SelectClient = ({
   saldoVencido,
   setSaldoVencido,
   setFactVencidas,
+  typeVenta,
 }) => {
   let ruta = getRuta();
 
@@ -95,11 +96,13 @@ const SelectClient = ({
     } else {
       const { limiteCredito, creditoConsumido } = client;
       let diferencia = limiteCredito - creditoConsumido;
-      setCreditoDisponible(diferencia);
+
+      setCreditoDisponible(diferencia < 0 ? 0 : diferencia);
       setSaldoVencido(client.saldoVencido);
       setFactVencidas(client.facturasVencidas);
-      if (diferencia < 0) {
+      if (diferencia < 0 && typeVenta !== "contado") {
         toastError("Limite de credito alcanzado");
+        toastError("Solo ventas de contado para este cliente");
         return;
       } else {
         setSelectedClient(client);

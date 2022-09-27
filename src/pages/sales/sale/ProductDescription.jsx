@@ -44,7 +44,6 @@ const ProductDescription = ({
   } = selectedProduct;
 
   useEffect(() => {
-    console.log(cantidad.length);
     if (cantidad.length > 0) {
       funcCantidad(cantidad);
     }
