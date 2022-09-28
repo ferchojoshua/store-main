@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
 import { DataContext } from "../../../../context/DataContext";
-import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getRuta, isAccess, toastError } from "../../../../helpers/Helpers";
 import {
   deleteToken,
   deleteUserData,
@@ -51,6 +51,7 @@ export const MasterVentas = () => {
     isDarkMode,
     setIsDarkMode,
     title,
+    access,
   } = useContext(DataContext);
   setIsDarkMode(false);
   let navigate = useNavigate();
@@ -131,6 +132,26 @@ export const MasterVentas = () => {
     return sum;
   };
 
+  const utilityPercent = (data) => {
+    let utilidadTotal = 0;
+    data.map((item) => {
+      if (
+        (item.costoTotal - item.costoCompra).toFixed(2) ===
+        item.ganancia.toFixed(2)
+      ) {
+        let utilidadDetail = 1 - item.costoCompra / item.costoTotal;
+        utilidadTotal += utilidadDetail;
+      } else {
+        let utilidadDetail =
+          1 - (item.costoCompra * item.cantidad) / item.costoTotal;
+        utilidadTotal += utilidadDetail;
+      }
+    });
+
+    utilidadTotal = utilidadTotal / data.length;
+    return utilidadTotal.toFixed(2);
+  };
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -209,10 +230,16 @@ export const MasterVentas = () => {
                   <th style={{ textAlign: "center" }}>M. Venta</th>
                   <th style={{ textAlign: "center" }}>T. Abonado</th>
                   <th style={{ textAlign: "center" }}>Saldo</th>
+                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                    <th style={{ textAlign: "center" }}>%Utilidad</th>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {data.map((item) => {
+                  const { saleDetails } = item;
                   return (
                     <tr key={item.id}>
                       <td style={{ textAlign: "center" }}>
@@ -246,6 +273,13 @@ export const MasterVentas = () => {
                           currency: "NIO",
                         }).format(item.saldo)}
                       </td>
+                      {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                        <td style={{ textAlign: "center" }}>
+                          {`${utilityPercent(saleDetails)}%`}
+                        </td>
+                      ) : (
+                        <></>
+                      )}
                     </tr>
                   );
                 })}

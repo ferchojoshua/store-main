@@ -68,12 +68,16 @@ const AddRol = ({ setShowModal }) => {
   const [productsUpdate, setProductsUpdate] = useState(false);
   const [productsDelete, setProductsDelete] = useState(false);
 
+  //Reportes
   const [masterVentasVer, setMasterVentasVer] = useState(false);
+  const [masterVentasUtility, setMasterVentasUtility] = useState(false);
   const [cXCobrarVer, setCXCobrarVer] = useState(false);
   const [prodVendidos, setProdVendidos] = useState(false);
+  const [prodNoVendidos, setProdNoVendidos] = useState(false);
   const [prodVendidosUtils, setProdVendidosUtils] = useState(false);
   const [cierreDiario, setCierreDiario] = useState(false);
   const [cajaChica, setCajaChica] = useState(false);
+  const [ingresos, setIngresos] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -136,12 +140,16 @@ const AddRol = ({ setShowModal }) => {
     setProductsUpdate(!isFullAccess);
     setProductsDelete(!isFullAccess);
 
+    //Reports
     setMasterVentasVer(!isFullAccess);
+    setMasterVentasUtility(!isFullAccess);
     setCXCobrarVer(!isFullAccess);
     setProdVendidos(!isFullAccess);
+    setProdNoVendidos(!isFullAccess);
     setProdVendidosUtils(!isFullAccess);
     setCierreDiario(!isFullAccess);
     setCajaChica(!isFullAccess);
+    setIngresos(!isFullAccess);
 
     setContVer(!isFullAccess);
     setContCreate(!isFullAccess);
@@ -303,12 +311,20 @@ const AddRol = ({ setShowModal }) => {
           IsEnable: masterVentasVer,
         },
         {
+          description: "MASTER VENTAS UTILIDAD",
+          IsEnable: masterVentasUtility,
+        },
+        {
           description: "CUENTASXCOBRAR VER",
           IsEnable: cXCobrarVer,
         },
         {
           description: "PRODVENDIDOS VER",
           IsEnable: prodVendidos,
+        },
+        {
+          description: "PRODNOVENDIDOS VER",
+          IsEnable: prodNoVendidos,
         },
         {
           description: "PRODVENDIDOSUTIL VER",
@@ -321,6 +337,10 @@ const AddRol = ({ setShowModal }) => {
         {
           description: "CAJACHICA VER",
           IsEnable: cajaChica,
+        },
+        {
+          description: "INGRESOS VER",
+          IsEnable: ingresos,
         },
 
         //Contabilidad
@@ -593,7 +613,7 @@ const AddRol = ({ setShowModal }) => {
       </Paper>
 
       <Grid spacing={2} container>
-        <Grid item sm={12} md={6}>
+        <Grid item xs={12} md={6}>
           {/* Modulo Caja */}
           <Paper
             elevation={10}
@@ -743,7 +763,7 @@ const AddRol = ({ setShowModal }) => {
           </Paper>
         </Grid>
 
-        <Grid item sm={12} md={6}>
+        <Grid item xs={12} md={6}>
           {/* Modulo Abonos */}
           <Paper
             elevation={10}
@@ -996,100 +1016,190 @@ const AddRol = ({ setShowModal }) => {
           marginTop: 20,
         }}
       >
-        <Typography
-          style={{
-            fontSize: 17,
-            color: "#2196f3",
-            fontWeight: 800,
-            textAlign: "center",
-          }}
-        >
-          Modulo Reportes
-        </Typography>
-        <Divider />
-        <Stack direction="row" display="flex" justifyContent="space-around">
-          <FormControlLabel
-            labelPlacement="top"
-            style={{ textAlign: "center" }}
-            control={
-              <Checkbox
-                checked={masterVentasVer}
-                onChange={() => setMasterVentasVer(!masterVentasVer)}
-              />
-            }
-            label="Master Ventas"
-          />
-
-          <FormControlLabel
-            labelPlacement="top"
-            style={{ textAlign: "center" }}
-            control={
-              <Checkbox
-                checked={cXCobrarVer}
-                onChange={() => setCXCobrarVer(!cXCobrarVer)}
-              />
-            }
-            label="C. por Cobrar"
-          />
-
-          <Paper
-            elevation={10}
+        <Stack>
+          <Typography
             style={{
-              borderRadius: 30,
-              padding: 10,
-              marginTop: 20,
+              fontSize: 17,
+              color: "#2196f3",
+              fontWeight: 800,
+              textAlign: "center",
             }}
           >
-            <Stack direction="row" justifyContent="space-around">
-              <FormControlLabel
-                labelPlacement="top"
-                style={{ textAlign: "center" }}
-                control={
-                  <Checkbox
-                    checked={prodVendidos}
-                    onChange={() => setProdVendidos(!prodVendidos)}
-                  />
-                }
-                label="Productos Vendidos"
-              />
+            Modulo Reportes
+          </Typography>
 
-              <FormControlLabel
-                labelPlacement="top"
-                style={{ textAlign: "center" }}
-                control={
-                  <Checkbox
-                    checked={prodVendidosUtils}
-                    onChange={() => setProdVendidosUtils(!prodVendidosUtils)}
-                  />
-                }
-                label="Ver Utilidad"
-              />
-            </Stack>
-          </Paper>
+          <Divider />
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            display="flex"
+            justifyContent="space-around"
+            spacing={2}
+          >
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 10,
+                marginTop: 20,
+              }}
+            >
+              <Typography
+                style={{
+                  fontSize: 17,
+                  color: "#2196f3",
+                  fontWeight: 800,
+                  textAlign: "center",
+                }}
+              >
+                Master de Ventas
+              </Typography>
 
-          <FormControlLabel
-            labelPlacement="top"
-            style={{ textAlign: "center" }}
-            control={
-              <Checkbox
-                checked={cierreDiario}
-                onChange={() => setCierreDiario(!cierreDiario)}
-              />
-            }
-            label="Cierre Diario"
-          />
+              <Divider />
 
-          <FormControlLabel
-            labelPlacement="top"
-            style={{ textAlign: "center" }}
-            control={
-              <Checkbox
-                checked={cajaChica}
-                onChange={() => setCajaChica(!cajaChica)}
-              />
-            }
-            label="Caja Chica"
-          />
+              <Stack direction="row" justifyContent="space-around">
+                <FormControlLabel
+                  labelPlacement="top"
+                  style={{ textAlign: "center" }}
+                  control={
+                    <Checkbox
+                      checked={masterVentasVer}
+                      onChange={() => setMasterVentasVer(!masterVentasVer)}
+                    />
+                  }
+                  label="Ver Reporte"
+                />
+
+                <FormControlLabel
+                  labelPlacement="top"
+                  style={{ textAlign: "center" }}
+                  control={
+                    <Checkbox
+                      checked={masterVentasUtility}
+                      onChange={() =>
+                        setMasterVentasUtility(!masterVentasUtility)
+                      }
+                    />
+                  }
+                  label="Ver % Utilidad"
+                />
+              </Stack>
+            </Paper>
+
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={cXCobrarVer}
+                  onChange={() => setCXCobrarVer(!cXCobrarVer)}
+                />
+              }
+              label="C. por Cobrar"
+            />
+
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 10,
+                marginTop: 20,
+              }}
+            >
+              <Typography
+                style={{
+                  fontSize: 17,
+                  color: "#2196f3",
+                  fontWeight: 800,
+                  textAlign: "center",
+                }}
+              >
+                Productos Vendidos
+              </Typography>
+
+              <Divider />
+
+              <Stack direction="row" justifyContent="space-around">
+                <FormControlLabel
+                  labelPlacement="top"
+                  style={{ textAlign: "center" }}
+                  control={
+                    <Checkbox
+                      checked={prodVendidos}
+                      onChange={() => setProdVendidos(!prodVendidos)}
+                    />
+                  }
+                  label="Ver Reporte"
+                />
+
+                <FormControlLabel
+                  labelPlacement="top"
+                  style={{ textAlign: "center" }}
+                  control={
+                    <Checkbox
+                      checked={prodVendidosUtils}
+                      onChange={() => setProdVendidosUtils(!prodVendidosUtils)}
+                    />
+                  }
+                  label="Ver Utilidad"
+                />
+              </Stack>
+            </Paper>
+          </Stack>
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            display="flex"
+            justifyContent="space-around"
+            spacing={2}
+            style={{ marginTop: 10 }}
+          >
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={prodNoVendidos}
+                  onChange={() => setProdNoVendidos(!prodNoVendidos)}
+                />
+              }
+              label="Productos no Vendidos"
+            />
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={cierreDiario}
+                  onChange={() => setCierreDiario(!cierreDiario)}
+                />
+              }
+              label="Cierre Diario"
+            />
+
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={cajaChica}
+                  onChange={() => setCajaChica(!cajaChica)}
+                />
+              }
+              label="Caja Chica"
+            />
+
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={ingresos}
+                  onChange={() => setIngresos(!ingresos)}
+                />
+              }
+              label="Reporte de Ingresos"
+            />
+          </Stack>
         </Stack>
       </Paper>
 
@@ -1161,7 +1271,7 @@ const AddRol = ({ setShowModal }) => {
       </Paper>
 
       <Grid spacing={2} container>
-        <Grid item sm={12} md={6}>
+        <Grid item xs={12} md={6}>
           {/* Modulo Seguridad de Usuarios */}
           <Paper
             elevation={10}
@@ -1297,7 +1407,7 @@ const AddRol = ({ setShowModal }) => {
           </Paper>
         </Grid>
 
-        <Grid item sm={12} md={6}>
+        <Grid item xs={12} md={6}>
           {/* Modulo Seguridad de Roles */}
           <Paper
             elevation={10}

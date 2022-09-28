@@ -19,6 +19,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Stack,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -277,18 +278,21 @@ const UserList = () => {
   return (
     <div>
       <Container>
-        <div
-          style={{
-            // marginTop: 10,
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          // style={{
+          //   // marginTop: 10,
+          //   display: "flex",
+          //   flexDirection: "row",
+          //   alignContent: "center",
+          //   justifyContent: "space-between",
+          //   alignItems: "center",
+          // }}
         >
           <h1>Lista de Usuarios</h1>
-          <div>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
             <FormControl
               variant="standard"
               style={{ textAlign: "left", width: 200, marginTop: 10 }}
@@ -348,13 +352,14 @@ const UserList = () => {
             ) : (
               <div />
             )}
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
         <hr />
 
         <TextField
-          style={{ marginBottom: 20, width: 600 }}
+          style={{ marginBottom: 20, maxWidth: 600 }}
+          fullWidth
           variant="standard"
           onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
           value={searchTerm}

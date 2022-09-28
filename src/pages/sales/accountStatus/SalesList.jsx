@@ -46,6 +46,7 @@ import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import SmallModal from "../../../components/modals/SmallModal";
 import { BillComponent } from "../sale/printBill/BillComponent";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import AbonoDetails from "../sale/abonoComponents/AbonoDetails";
 
 let controller = "";
 if (process.env.NODE_ENV === "production") {
@@ -109,6 +110,7 @@ const SalesList = () => {
 
   const [showRetunModal, setShowReturnModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showSaleDetailModal, setShowSaleDetailModal] = useState(false);
 
   const [active, setActive] = useState(0);
 
@@ -389,6 +391,17 @@ const SalesList = () => {
 
   start();
 
+  const saleSelected = (selected) => {
+    const { isCanceled } = selected;
+
+    setSelectedVenta(selected);
+    if (!isCanceled) {
+      setShowModal(true);
+    } else {
+      setShowSaleDetailModal(true);
+    }
+  };
+
   return (
     <div>
       <Container>
@@ -642,10 +655,9 @@ const SalesList = () => {
                                       : "#ff9100",
                                   }}
                                   onClick={() => {
-                                    setSelectedVenta(item);
-                                    setShowModal(true);
+                                    saleSelected(item);
                                   }}
-                                  disabled={item.isCanceled}
+                                  // disabled={item.isCanceled}
                                 >
                                   <FontAwesomeIcon icon={faHandHoldingDollar} />
                                 </IconButton>
@@ -693,6 +705,17 @@ const SalesList = () => {
           setActive={setActive}
           selectedStore={selectedStore}
           setSelectedStore={setSelectedStore}
+        />
+      </MediumModal>
+
+      <MediumModal
+        titulo={"Detalle de Abonos"}
+        isVisible={showSaleDetailModal}
+        setVisible={setShowSaleDetailModal}
+      >
+        <AbonoDetails
+          selectedVenta={selectedVenta}
+          setVisible={setShowSaleDetailModal}
         />
       </MediumModal>
 

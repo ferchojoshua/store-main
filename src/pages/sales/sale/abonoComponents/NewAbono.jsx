@@ -19,7 +19,11 @@ import {
   Stack,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faHandHoldingDollar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSave,
+  faHandHoldingDollar,
+  faPrint,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   getToken,
   deleteUserData,
@@ -208,6 +212,11 @@ const NewAbono = ({
     }
     setMultipleBill(true);
     setDataBill(data);
+  };
+
+  const rePrintPrint = (data) => {
+    setDataBill(data);
+    setShowprintModal(true);
   };
 
   return (
@@ -426,6 +435,7 @@ const NewAbono = ({
                   <th style={{ textAlign: "center" }}>Monto Abono</th>
                   <th style={{ textAlign: "center" }}># Factura</th>
                   <th style={{ textAlign: "left" }}>Realizado por</th>
+                  <th style={{ textAlign: "center" }}>Reimprimir</th>
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -445,6 +455,16 @@ const NewAbono = ({
                       <td style={{ textAlign: "center" }}>{item.sale.id}</td>
                       <td style={{ textAlign: "left" }}>
                         {item.realizedBy ? item.realizedBy.fullName : ""}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          style={{ color: "#2979ff" }}
+                          onClick={() => {
+                            rePrintPrint(item);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPrint} />
+                        </IconButton>
                       </td>
                     </tr>
                   );
