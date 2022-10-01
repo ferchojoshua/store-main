@@ -142,9 +142,10 @@ const ProductExistences = () => {
         <Divider style={{ marginBottom: 10, marginTop: 10 }} />
 
         <TextField
-          style={{ marginBottom: 20, width: 600 }}
+          style={{ marginBottom: 20, maxWidth: 600 }}
           variant="standard"
           onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
+          fullWidth
           value={searchTerm}
           label={"Buscar Producto"}
           InputProps={{

@@ -10,7 +10,9 @@ export const DataProvider = ({ children }) => {
   const [reload, setReload] = useState(false);
   const [user, setUser] = useState([]);
   const [access, setAccess] = useState([]);
+  const [serverAccess, setServerAccess] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [version, setVersion] = useState("2.1.0");
 
   return (
     <DataContext.Provider
@@ -31,6 +33,10 @@ export const DataProvider = ({ children }) => {
         setIsDefaultPass,
         isDarkMode,
         setIsDarkMode,
+        version,
+        setVersion,
+        serverAccess,
+        setServerAccess,
       }}
     >
       {children}

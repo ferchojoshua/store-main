@@ -31,6 +31,7 @@ import AddRol from "./AddRol";
 import EditRol from "./EditRol";
 import NoData from "../../../components/NoData";
 import { useNavigate } from "react-router-dom";
+import moment from "moment/moment";
 
 const RolList = () => {
   let ruta = getRuta();
@@ -126,9 +127,9 @@ const RolList = () => {
             setIsLogged(false);
             return;
           }
+          toastSuccess("Rol Eliminado!");
         })();
         setReload(!reload);
-        toastSuccess("Rol Eliminado!");
       }
     });
   };
@@ -181,18 +182,40 @@ const RolList = () => {
           >
             <thead>
               <tr>
-                <th style={{ textAlign: "left" }}>#</th>
+                <th style={{ textAlign: "center" }}>#</th>
                 <th style={{ textAlign: "left" }}>Nombre de rol</th>
-
+                <th style={{ textAlign: "center" }}>Inicio Operaciones</th>
+                <th style={{ textAlign: "center" }}>Fin Operaciones</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
               {currentItem.map((item) => {
+                let inicio = new Date();
+                inicio.setHours(0);
+                inicio.setMinutes(0);
+                inicio.setSeconds(0);
+
+                let fin = new Date();
+                fin.setHours(12);
+                fin.setMinutes(0);
+                fin.setSeconds(0);
+
                 return (
                   <tr key={item.id}>
-                    <td style={{ textAlign: "left" }}>{item.id}</td>
+                    <td style={{ textAlign: "center" }}>{item.id}</td>
                     <td style={{ textAlign: "left" }}>{item.roleName}</td>
+                    <td style={{ textAlign: "center" }}>
+                      {item.startOperations === null ||
+                      item.startOperations === ""
+                        ? moment(inicio).format("hh:mm A")
+                        : moment(item.startOperations).format("hh:mm A")}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      {item.endOperations === null || item.endOperations === ""
+                        ? moment(fin).format("hh:mm A")
+                        : moment(item.endOperations).format("hh:mm A")}
+                    </td>
                     <td>
                       <IconButton
                         style={{ marginRight: 10, color: "#009688" }}

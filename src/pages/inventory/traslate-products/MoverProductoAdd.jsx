@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  isAccess,
+  toastError,
+  toastSuccess,
+} from "../../../helpers/Helpers";
 import { getProductsAsync } from "../../../services/ProductsApi";
 import { Table } from "react-bootstrap";
 
@@ -26,6 +31,7 @@ import {
   IconButton,
   Stack,
   Typography,
+  Container,
 } from "@mui/material";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,6 +41,7 @@ import {
   faBarcode,
   faCirclePlus,
   faTrashAlt,
+  faCircleChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { getStoresAsync } from "../../../services/AlmacenApi";
@@ -46,7 +53,7 @@ import { isEmpty } from "lodash";
 import SmallModal from "../../../components/modals/SmallModal";
 import TraslateComponent from "./printTraslate/TraslateComponent";
 
-const MoverProductoAdd = ({ setShowModal }) => {
+const MoverProductoAdd = () => {
   let ruta = getRuta();
 
   const {
@@ -56,6 +63,7 @@ const MoverProductoAdd = ({ setShowModal }) => {
     setIsLoading,
     setIsLogged,
     setIsDefaultPass,
+    access,
   } = useContext(DataContext);
   let navigate = useNavigate();
 
@@ -83,63 +91,67 @@ const MoverProductoAdd = ({ setShowModal }) => {
   const token = getToken();
 
   useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      const resultStores = await getStoresAsync(token);
-      if (!resultStores.statusResponse) {
-        setIsLoading(false);
-        if (resultStores.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
+    if (isAccess(access, "PRODUCT TRANSLATE CREATE")) {
+      (async () => {
+        setIsLoading(true);
+        const resultStores = await getStoresAsync(token);
+        if (!resultStores.statusResponse) {
+          setIsLoading(false);
+          if (resultStores.error.request.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(resultStores.error.message);
           return;
         }
-        toastError(resultStores.error.message);
-        return;
-      }
 
-      if (resultStores.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (resultStores.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setStoreList(resultStores.data);
-
-      const resultProducts = await getProductsAsync(token);
-      if (!resultProducts.statusResponse) {
-        setIsLoading(false);
-        if (resultProducts.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
+        if (resultStores.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
           return;
         }
-        toastError(resultProducts.error);
-        return;
-      }
 
-      if (resultProducts.data === "eX01") {
+        if (resultStores.data.isDefaultPass) {
+          setIsLoading(false);
+          setIsDefaultPass(true);
+          return;
+        }
+
+        setStoreList(resultStores.data);
+
+        const resultProducts = await getProductsAsync(token);
+        if (!resultProducts.statusResponse) {
+          setIsLoading(false);
+          if (resultProducts.error.request.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(resultProducts.error);
+          return;
+        }
+
+        if (resultProducts.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+
+        if (resultProducts.data.isDefaultPass) {
+          setIsLoading(false);
+          setIsDefaultPass(true);
+          return;
+        }
+
+        setProductList(resultProducts.data);
         setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (resultProducts.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-
-      setProductList(resultProducts.data);
-      setIsLoading(false);
-    })();
+      })();
+    } else {
+      navigate(`${ruta}/unauthorized`);
+    }
   }, [reload]);
 
   const handleChangeProduct = async (newValue) => {
@@ -431,366 +443,389 @@ const MoverProductoAdd = ({ setShowModal }) => {
 
   return (
     <div>
-      <Divider />
-
-      <Paper
-        elevation={10}
-        style={{
-          marginTop: 20,
-          borderRadius: 30,
-          padding: 20,
-        }}
-      >
-        <Stack direction="row" spacing={2}>
-          {barCodeSearch ? (
-            <Autocomplete
-              fullWidth
-              options={productList}
-              getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
-              value={selectedProduct === "" ? null : selectedProduct}
-              onChange={(event, newValue) => {
-                handleChangeProduct(newValue);
-              }}
-              noOptionsText="Producto no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.barCode}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label="Seleccione un producto..."
-                />
-              )}
-            />
-          ) : (
-            <Autocomplete
-              fullWidth
-              options={productList}
-              getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
-              value={selectedProduct === "" ? null : selectedProduct}
-              onChange={(event, newValue) => {
-                handleChangeProduct(newValue);
-              }}
-              noOptionsText="Producto no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.description}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label="Seleccione un producto..."
-                />
-              )}
-            />
-          )}
-
-          <Tooltip
-            title={
-              barCodeSearch
-                ? "Buscar por Codigo de Barras"
-                : "Buscar por Nombre"
-            }
-            style={{ marginTop: 5 }}
-          >
-            <IconButton
+      <Container maxWidth="lg">
+        <Paper
+          elevation={10}
+          style={{
+            borderRadius: 30,
+            padding: 20,
+          }}
+        >
+          <Stack direction={"row"}>
+            <Button
               onClick={() => {
-                setBarCodeSearch(!barCodeSearch);
+                navigate(`${ruta}/inventory/`);
               }}
+              style={{ marginRight: 20, borderRadius: 20 }}
+              variant="outlined"
             >
               <FontAwesomeIcon
-                style={{
-                  fontSize: 25,
-                  color: "#2196f3",
-                }}
-                icon={barCodeSearch ? faBarcode : faSpellCheck}
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faCircleChevronLeft}
               />
-            </IconButton>
-          </Tooltip>
-        </Stack>
+              Regresar
+            </Button>
+            <h1>Agregar Traslado de Productos</h1>
+          </Stack>
 
-        <Grid container spacing={2}>
-          <Grid
-            item
-            sm={barCodeSearch ? (isEmpty(selectedProduct) ? 12 : 6) : 12}
-          ></Grid>
+          <hr />
 
-          {!isEmpty(selectedProduct) ? (
-            barCodeSearch ? (
-              <Grid item sm={6}>
-                <div
-                  style={{
-                    marginTop: 20,
-                    display: "flex",
-                    flexDirection: "row",
-                    alignContent: "center",
-                  }}
-                >
-                  <span style={{ color: "#2196f3", marginRight: 10 }}>
-                    Producto:
-                  </span>
-                  <span>
-                    {selectedProduct ? selectedProduct.description : ""}
-                  </span>
-                </div>
-              </Grid>
+          <Stack direction="row" spacing={2}>
+            {barCodeSearch ? (
+              <Autocomplete
+                fullWidth
+                options={productList}
+                getOptionLabel={(op) => (op ? `${op.barCode}` || "" : "")}
+                value={selectedProduct === "" ? null : selectedProduct}
+                onChange={(event, newValue) => {
+                  handleChangeProduct(newValue);
+                }}
+                noOptionsText="Producto no encontrado..."
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.id}>
+                      {option.barCode}
+                    </li>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Seleccione un producto..."
+                  />
+                )}
+              />
             ) : (
-              <></>
-            )
-          ) : (
-            <></>
-          )}
-        </Grid>
-      </Paper>
+              <Autocomplete
+                fullWidth
+                options={productList}
+                getOptionLabel={(op) => (op ? `${op.description}` || "" : "")}
+                value={selectedProduct === "" ? null : selectedProduct}
+                onChange={(event, newValue) => {
+                  handleChangeProduct(newValue);
+                }}
+                noOptionsText="Producto no encontrado..."
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.id}>
+                      {option.description}
+                    </li>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Seleccione un producto..."
+                  />
+                )}
+              />
+            )}
 
-      <Paper
-        elevation={10}
-        style={{
-          marginTop: 20,
-          borderRadius: 30,
-          padding: 20,
-        }}
-      >
-        <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ textAlign: "left" }}
-          >
-            <InputLabel id="selProc">Almacen Procedencia</InputLabel>
-            <Select
-              labelId="selProc"
-              id="demo-simple-select-standard"
-              value={selectedProcedencia}
-              onChange={handleChangeProcedencia}
+            <Tooltip
+              title={
+                barCodeSearch
+                  ? "Buscar por Codigo de Barras"
+                  : "Buscar por Nombre"
+              }
+              style={{ marginTop: 5 }}
             >
-              <MenuItem value="">
-                <em>Seleccione procedencia...</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                    {item.almacen.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ textAlign: "left" }}
-          >
-            <InputLabel id="selDestino">Almacen Destino</InputLabel>
-            <Select
-              labelId="selDestino"
-              id="demo-simple-select-standard"
-              value={selectedDestino}
-              onChange={handleChangeDestino}
-            >
-              <MenuItem value="">
-                <em>Seleccione procedencia...</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.almacen.id} value={item.almacen.id}>
-                    {item.almacen.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-        </Stack>
-        <Grid container spacing={2}>
-          <Grid item sm={12}>
-            {selectedProcedencia !== "" || selectedDestino !== "" ? (
-              <Paper
-                elevation={10}
-                style={{
-                  borderRadius: 30,
-                  padding: 20,
+              <IconButton
+                onClick={() => {
+                  setBarCodeSearch(!barCodeSearch);
                 }}
               >
-                <Grid
-                  container
-                  spacing={2}
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <Grid item sm={4}>
-                    {selectedProcedencia !== "" ? (
-                      <Stack>
-                        <Typography
-                          style={{
-                            color: "#2196f3",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                          }}
-                        >
-                          Existencia Procedencia:
-                        </Typography>
-                        <Typography
-                          style={{
-                            textAlign: "center",
-                          }}
-                        >
-                          {existenceProcedencia}
-                        </Typography>
-                      </Stack>
-                    ) : (
-                      <></>
-                    )}
-                  </Grid>
-                  <Grid item sm={4}>
-                    {selectedDestino !== "" ? (
-                      <Stack>
-                        <Typography
-                          style={{
-                            color: "#2196f3",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                          }}
-                        >
-                          Existencia Destino:
-                        </Typography>
-                        <Typography
-                          style={{
-                            textAlign: "center",
-                          }}
-                        >
-                          {existenceDestino}
-                        </Typography>
-                      </Stack>
-                    ) : (
-                      <></>
-                    )}
-                  </Grid>
+                <FontAwesomeIcon
+                  style={{
+                    fontSize: 25,
+                    color: "#2196f3",
+                  }}
+                  icon={barCodeSearch ? faBarcode : faSpellCheck}
+                />
+              </IconButton>
+            </Tooltip>
+          </Stack>
 
-                  {selectedProcedencia !== "" && selectedDestino !== "" ? (
-                    <Grid item sm={4}>
-                      <TextField
-                        variant="standard"
-                        fullWidth
-                        value={cantidad}
-                        onChange={(e) => funcCantidad(e)}
-                        label="Cantidad a Trasladar"
-                      />
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
+          <Grid container spacing={2} style={{ marginTop: 10 }}>
+            {/* <Grid
+              item
+              sm={barCodeSearch ? (isEmpty(selectedProduct) ? 12 : 6) : 12}
+            ></Grid> */}
+
+            {!isEmpty(selectedProduct) ? (
+              barCodeSearch ? (
+                <Grid item sm={6}>
+                  <div
+                    style={{
+                      marginTop: 20,
+                      display: "flex",
+                      flexDirection: "row",
+                      alignContent: "center",
+                    }}
+                  >
+                    <span style={{ color: "#2196f3", marginRight: 10 }}>
+                      Producto:
+                    </span>
+                    <span>
+                      {selectedProduct ? selectedProduct.description : ""}
+                    </span>
+                  </div>
                 </Grid>
-              </Paper>
+              ) : (
+                <></>
+              )
             ) : (
               <></>
             )}
           </Grid>
-        </Grid>
 
-        <Button
-          variant="outlined"
-          style={{
-            borderRadius: 20,
-            marginTop: 10,
-            borderColor: "#ffc107",
-            color: "#ffc107",
-          }}
-          fullWidth
-          onClick={() => addToDetail()}
-        >
-          <FontAwesomeIcon
-            style={{ marginRight: 10, fontSize: 20 }}
-            icon={faCirclePlus}
-          />
-          Agregar al detalle
-        </Button>
-      </Paper>
-
-      <Typography variant="h6" marginTop={1}>
-        Detalle de Traslado
-      </Typography>
-
-      <Divider style={{ marginBottom: 20 }} />
-
-      <Table hover={!isDarkMode} size="sm" responsive className="text-primary">
-        <thead>
-          <tr>
-            <th style={{ textAlign: "center" }}>#</th>
-            <th style={{ textAlign: "left" }}>Producto</th>
-            <th style={{ textAlign: "center" }}>Procedencia</th>
-            <th style={{ textAlign: "center" }}>Cantidad</th>
-            <th style={{ textAlign: "center" }}>Destino</th>
-            <th style={{ textAlign: "center" }}>Eliminar</th>
-          </tr>
-        </thead>
-        <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-          {productDetails ? (
-            productDetails.map((item) => {
-              return (
-                <tr key={productDetails.indexOf(item) + 1}>
-                  <td style={{ textAlign: "center" }}>
-                    {productDetails.indexOf(item) + 1}
-                  </td>
-                  <td>{item.description}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {getStoreName(item.almacenProcedenciaId)}
-                  </td>
-                  <td style={{ textAlign: "center" }}>{item.cantidad}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {getStoreName(item.almacenDestinoId)}
-                  </td>
-                  <td style={{ textAlign: "center" }}>
-                    <IconButton
-                      style={{ color: "#f50057" }}
-                      onClick={() => deleteFromProductDetailList(item)}
+          <Paper
+            elevation={10}
+            style={{
+              marginTop: 20,
+              borderRadius: 30,
+              padding: 20,
+            }}
+          >
+            <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ textAlign: "left" }}
+              >
+                <InputLabel id="selProc">Almacen Procedencia</InputLabel>
+                <Select
+                  labelId="selProc"
+                  id="demo-simple-select-standard"
+                  value={selectedProcedencia}
+                  onChange={handleChangeProcedencia}
+                >
+                  <MenuItem value="">
+                    <em>Seleccione procedencia...</em>
+                  </MenuItem>
+                  {storeList.map((item) => {
+                    return (
+                      <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                        {item.almacen.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+              <FormControl
+                variant="standard"
+                fullWidth
+                style={{ textAlign: "left" }}
+              >
+                <InputLabel id="selDestino">Almacen Destino</InputLabel>
+                <Select
+                  labelId="selDestino"
+                  id="demo-simple-select-standard"
+                  value={selectedDestino}
+                  onChange={handleChangeDestino}
+                >
+                  <MenuItem value="">
+                    <em>Seleccione procedencia...</em>
+                  </MenuItem>
+                  {storeList.map((item) => {
+                    return (
+                      <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                        {item.almacen.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Stack>
+            <Grid container spacing={2}>
+              <Grid item sm={12}>
+                {selectedProcedencia !== "" || selectedDestino !== "" ? (
+                  <Paper
+                    elevation={10}
+                    style={{
+                      borderRadius: 30,
+                      padding: 20,
+                    }}
+                  >
+                    <Grid
+                      container
+                      spacing={2}
+                      style={{ display: "flex", alignItems: "center" }}
                     >
-                      <FontAwesomeIcon icon={faTrashAlt} />
-                    </IconButton>
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
-            <></>
-          )}
-        </tbody>
-      </Table>
+                      <Grid item sm={4}>
+                        {selectedProcedencia !== "" ? (
+                          <Stack>
+                            <Typography
+                              style={{
+                                color: "#2196f3",
+                                fontWeight: "bold",
+                                textAlign: "center",
+                              }}
+                            >
+                              Existencia Procedencia:
+                            </Typography>
+                            <Typography
+                              style={{
+                                textAlign: "center",
+                              }}
+                            >
+                              {existenceProcedencia}
+                            </Typography>
+                          </Stack>
+                        ) : (
+                          <></>
+                        )}
+                      </Grid>
+                      <Grid item sm={4}>
+                        {selectedDestino !== "" ? (
+                          <Stack>
+                            <Typography
+                              style={{
+                                color: "#2196f3",
+                                fontWeight: "bold",
+                                textAlign: "center",
+                              }}
+                            >
+                              Existencia Destino:
+                            </Typography>
+                            <Typography
+                              style={{
+                                textAlign: "center",
+                              }}
+                            >
+                              {existenceDestino}
+                            </Typography>
+                          </Stack>
+                        ) : (
+                          <></>
+                        )}
+                      </Grid>
 
-      <TextField
-        variant="standard"
-        fullWidth
-        multiline
-        value={concepto}
-        label="Concepto"
-        style={{ marginBottom: 20 }}
-        onChange={(e) => setConcepto(e.target.value.toUpperCase())}
-      />
+                      {selectedProcedencia !== "" && selectedDestino !== "" ? (
+                        <Grid item sm={4}>
+                          <TextField
+                            variant="standard"
+                            fullWidth
+                            value={cantidad}
+                            onChange={(e) => funcCantidad(e)}
+                            label="Cantidad a Trasladar"
+                          />
+                        </Grid>
+                      ) : (
+                        <></>
+                      )}
+                    </Grid>
+                  </Paper>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
 
-      <Button
-        variant="outlined"
-        style={{
-          borderRadius: 20,
-          marginTop: 30,
-          color: "#2979ff",
-          borderColor: "#1c54b2",
-        }}
-        fullWidth
-        onClick={() => addMoverProdut()}
-      >
-        <FontAwesomeIcon
-          style={{ marginRight: 10, fontSize: 20 }}
-          icon={faSave}
-        />
-        Mover Producto
-      </Button>
+            <Button
+              variant="outlined"
+              style={{
+                borderRadius: 20,
+                marginTop: 10,
+                borderColor: "#ffc107",
+                color: "#ffc107",
+              }}
+              fullWidth
+              onClick={() => addToDetail()}
+            >
+              <FontAwesomeIcon
+                style={{ marginRight: 10, fontSize: 20 }}
+                icon={faCirclePlus}
+              />
+              Agregar al detalle
+            </Button>
+          </Paper>
+
+          <Typography variant="h6" marginTop={1}>
+            Detalle de Traslado
+          </Typography>
+
+          <Divider style={{ marginBottom: 20 }} />
+
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
+            <thead>
+              <tr>
+                <th style={{ textAlign: "center" }}>#</th>
+                <th style={{ textAlign: "left" }}>Producto</th>
+                <th style={{ textAlign: "center" }}>Procedencia</th>
+                <th style={{ textAlign: "center" }}>Cantidad</th>
+                <th style={{ textAlign: "center" }}>Destino</th>
+                <th style={{ textAlign: "center" }}>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+              {productDetails ? (
+                productDetails.map((item) => {
+                  return (
+                    <tr key={productDetails.indexOf(item) + 1}>
+                      <td style={{ textAlign: "center" }}>
+                        {productDetails.indexOf(item) + 1}
+                      </td>
+                      <td>{item.description}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {getStoreName(item.almacenProcedenciaId)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>{item.cantidad}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {getStoreName(item.almacenDestinoId)}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          style={{ color: "#f50057" }}
+                          onClick={() => deleteFromProductDetailList(item)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <></>
+              )}
+            </tbody>
+          </Table>
+
+          <TextField
+            variant="standard"
+            fullWidth
+            multiline
+            value={concepto}
+            label="Concepto"
+            style={{ marginBottom: 20 }}
+            onChange={(e) => setConcepto(e.target.value.toUpperCase())}
+          />
+
+          <Button
+            variant="outlined"
+            style={{
+              borderRadius: 20,
+              marginTop: 30,
+              color: "#2979ff",
+              borderColor: "#1c54b2",
+            }}
+            fullWidth
+            onClick={() => addMoverProdut()}
+          >
+            <FontAwesomeIcon
+              style={{ marginRight: 10, fontSize: 20 }}
+              icon={faSave}
+            />
+            Mover Producto
+          </Button>
+        </Paper>
+      </Container>
 
       <SmallModal
         titulo={"Imprimir Traslado"}

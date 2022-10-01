@@ -31,6 +31,8 @@ import {
 } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
+import { TimePicker } from "@mui/lab";
+import moment from "moment/moment";
 
 const EditRol = ({ setShowModal, selectedRol }) => {
   let ruta = getRuta();
@@ -45,6 +47,10 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   } = useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
+
+  const { startOperations, endOperations } = selectedRol;
+  const [horaDesde, setHoraDesde] = useState("");
+  const [horaHasta, setHoraHasta] = useState("");
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -320,6 +326,8 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
       }
     });
+
+    confHora();
   }, [reload]);
 
   const saveRol = async () => {
@@ -327,7 +335,30 @@ const EditRol = ({ setShowModal, selectedRol }) => {
       toastError("No puede dejar el campo nombre vacio!");
       return;
     }
+
+    if (!moment(horaDesde).isValid()) {
+      toastError("Ingrese una fecha de inicio valida");
+      return;
+    }
+
+    if (!moment(horaHasta).isValid()) {
+      toastError("Ingrese una fecha de final valida");
+      return;
+    }
+
+    let fechaD = moment(new Date()).format("YYYY-MM-DD");
+    let horaD = moment(horaDesde).format("HH:mm");
+    let fhDesde = new Date(`${fechaD}T${horaD}:00.00Z`);
+    fhDesde.setSeconds(0);
+
+    let fechaH = moment(new Date()).format("YYYY-MM-DD");
+    let horaH = moment(horaHasta).format("HH:mm");
+    let fhHasta = new Date(`${fechaH}T${horaH}:00.00Z`);
+    fhHasta.setSeconds(0);
+
     editedRol.roleName = rolName;
+    editedRol.startOperations = new Date(fhDesde);
+    editedRol.endOperations = new Date(fhHasta);
     editedRol.permissions.map((item) => {
       switch (item.description) {
         //Ventas Producto
@@ -561,6 +592,19 @@ const EditRol = ({ setShowModal, selectedRol }) => {
     setShowModal(false);
   };
 
+  const confHora = () => {
+    let fechaD = moment(startOperations).format("YYYY-MM-DD HH:mm");
+    let fechaH = moment(endOperations).format("YYYY-MM-DD HH:mm");
+
+    let fhDesde = new Date(fechaD);
+    let fhHasta = new Date(fechaH);
+
+    fhDesde.setSeconds(0);
+    fhHasta.setSeconds(0);
+    setHoraDesde(new Date(fhDesde));
+    setHoraHasta(new Date(fhHasta));
+  };
+
   return (
     <div>
       <Divider />
@@ -576,7 +620,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
         >
           <Stack
             spacing={3}
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             display="flex"
             justifyContent="space-around"
           >
@@ -612,6 +656,38 @@ const EditRol = ({ setShowModal, selectedRol }) => {
             ) : (
               <></>
             )}
+          </Stack>
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            marginTop={2}
+          >
+            <TimePicker
+              disabled={isEdit ? false : true}
+              label="Inicia Operaciones"
+              value={horaDesde}
+              ampm
+              onChange={(newValue) => {
+                setHoraDesde(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField required fullWidth variant="standard" {...params} />
+              )}
+            />
+
+            <TimePicker
+              disabled={isEdit ? false : true}
+              label="Termina Operaciones"
+              value={horaHasta}
+              ampm
+              onChange={(newValue) => {
+                setHoraHasta(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField required fullWidth variant="standard" {...params} />
+              )}
+            />
           </Stack>
         </Paper>
       ) : (

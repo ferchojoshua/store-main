@@ -54,6 +54,7 @@ const NavbarComponent = () => {
     access,
     isDarkMode,
     setIsDarkMode,
+    version,
   } = useContext(DataContext);
 
   let navigate = useNavigate();
@@ -147,9 +148,9 @@ const NavbarComponent = () => {
             height="30"
             className="d-inline-block align-top"
             style={{ marginRight: 10 }}
-            alt="Auto&Moto logo"
+            alt="AutoMoto logo"
           />
-          Auto&Moto
+          AutoMoto
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -157,7 +158,7 @@ const NavbarComponent = () => {
           <Nav
             className="ms-auto"
             onSelect={(selectedKey) => setActive(selectedKey)}
-            style={{ maxHeight: "100px" }}
+            // style={{ maxHeight: "100px" }}
             navbarScroll
           >
             <Nav.Link
@@ -433,12 +434,12 @@ const NavbarComponent = () => {
               </span>
             </MenuItem>
             <Divider />
-            <MenuItem>
-              {/* <ListItemIcon> */}
-              {/* <PersonAdd fontSize="small" /> */}
-              {/* </ListItemIcon> */}
-              Add another account
-            </MenuItem>
+            {/* <MenuItem> */}
+            {/* <ListItemIcon> */}
+            {/* <PersonAdd fontSize="small" /> */}
+            {/* </ListItemIcon> */}
+            {/* Notificaciones */}
+            {/* </MenuItem> */}
           </Menu>
 
           <div>
@@ -511,7 +512,7 @@ const NavbarComponent = () => {
                   icon={faCodeBranch}
                   style={{ marginRight: 20 }}
                 />
-                Version - 2.0
+                {`Version - ${version}`}
               </MenuItem>
             </Menu>
           </div>

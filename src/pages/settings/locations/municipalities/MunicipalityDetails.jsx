@@ -265,7 +265,8 @@ const MunicipalityDetails = () => {
           <Divider />
 
           <TextField
-            style={{ marginBottom: 20, width: 600, marginTop: 20 }}
+            style={{ marginBottom: 20, maxWidth: 600, marginTop: 20 }}
+            fullWidth
             variant="standard"
             onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
             value={searchTerm}

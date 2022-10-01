@@ -13,26 +13,13 @@ import { DataContext } from "../../context/DataContext";
 import { useContext } from "react";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import ReactToPrint from "react-to-print";
-import { PrintReport } from "./PrintReport";
-import { useParams } from "react-router-dom";
 import moment from "moment/moment";
-// const Transition = React.forwardRef(function Transition(props, ref) {
-//   return <Slide direction="up" ref={ref} {...props} />;
-// });
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
-const FullScreenModal = (props) => {
-  const { data } = useParams();
-  const dataJson = JSON.parse(data);
-  const { titulo, desde, hasta } = dataJson;
-  const compRef = useRef();
+const FullScreenModal = () => {
   const { title } = useContext(DataContext);
-  // { titulo, children, fecha }=
-
-  // const [showModal, setShowModal] = useState(false);
-
-  //   useEffect(() => {
-  // windo
-  //   }, []);
 
   return (
     <div>
@@ -81,27 +68,11 @@ const FullScreenModal = (props) => {
             variant="h5"
             component="div"
           >
-            {titulo}
+            Servidor Durmiendo
           </Typography>
-          <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
+          {/* <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
             "L"
-          )} - Hasta: ${moment(hasta).format("L")}`}</span>
-
-          <ReactToPrint
-            trigger={() => {
-              return (
-                <IconButton
-                  variant="outlined"
-                  style={{ position: "fixed", right: 50, top: 75 }}
-                >
-                  <PrintRoundedIcon
-                    style={{ fontSize: 50, color: "#2979ff", width: 50 }}
-                  />
-                </IconButton>
-              );
-            }}
-            content={() => compRef.current}
-          />
+          )} - Hasta: ${moment(hasta).format("L")}`}</span> */}
         </Stack>
 
         {/* <DialogContent>{children}</DialogContent> */}

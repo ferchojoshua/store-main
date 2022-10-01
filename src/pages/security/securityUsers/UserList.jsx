@@ -23,14 +23,20 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCircleCheck,
   faCirclePlus,
+  faCircleUser,
+  faCircleXmark,
   faExternalLinkAlt,
   faKey,
   faSearch,
   faTrashAlt,
+  faUser,
   faUserCheck,
   faUserLargeSlash,
   faUsers,
+  faUserSlash,
+  faUsersSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
 import {
@@ -282,14 +288,6 @@ const UserList = () => {
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          // style={{
-          //   // marginTop: 10,
-          //   display: "flex",
-          //   flexDirection: "row",
-          //   alignContent: "center",
-          //   justifyContent: "space-between",
-          //   alignItems: "center",
-          // }}
         >
           <h1>Lista de Usuarios</h1>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
@@ -391,9 +389,9 @@ const UserList = () => {
               <tr>
                 <th style={{ textAlign: "left" }}>Usuario</th>
                 <th style={{ textAlign: "left" }}>Nombre</th>
-                <th style={{ textAlign: "left" }}>Correo</th>
                 <th style={{ textAlign: "left" }}>Telefono</th>
                 <th style={{ textAlign: "left" }}>Rol</th>
+                <th style={{ textAlign: "center" }}>En Linea</th>
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
             </thead>
@@ -403,14 +401,24 @@ const UserList = () => {
                   <tr key={item.id}>
                     <td style={{ textAlign: "left" }}>{item.userName}</td>
                     <td style={{ textAlign: "left" }}>{item.fullName}</td>
-                    <td style={{ textAlign: "left" }}>{item.email}</td>
+
                     <td style={{ textAlign: "left" }}>{item.phoneNumber}</td>
                     <td style={{ textAlign: "left" }}>
                       {item.rol ? item.rol.roleName : ""}
                     </td>
+                    <td style={{ textAlign: "center" }}>
+                      <FontAwesomeIcon
+                        icon={item.isActiveSession ? faCircleUser : faUserSlash}
+                        style={{
+                          fontSize: 20,
+                          marginTop: 10,
+                          color: item.isActiveSession ? "#00a152" : "#ab003c",
+                        }}
+                      />
+                    </td>
                     <td style={{ width: 150 }}>
                       <IconButton
-                        style={{ marginRight: 5, color: "#009688" }}
+                        style={{ marginRight: 5, color: "#00a152" }}
                         onClick={() => {
                           userEdit(item);
                         }}

@@ -25,8 +25,9 @@ import {
   getToken,
   getUser,
   getUserAsync,
+  onCloseNavigatorAsync,
 } from "./services/Account";
-import { getRuta, simpleMessage } from "./helpers/Helpers";
+import { getController, getRuta, simpleMessage } from "./helpers/Helpers";
 import MyAccount from "./pages/account/MyAccount";
 import SecurityContiner from "./pages/security/SecurityContiner";
 import { useNavigate } from "react-router-dom";
@@ -47,7 +48,6 @@ import AdmonContainer from "./pages/admon/AdmonContainer";
 import { NoConectionServer } from "./components/errorPages/NoConectionServer";
 import { serverMessages } from "./services/SignalRService";
 import { ReportsContainer } from "./pages/reports/ReportsContainer";
-import FullScreenModal from "./components/modals/FullScreenModal";
 import { MasterVentas } from "./pages/reports/reporteVentas/Reportes/MasterVentas";
 import { DocumentosXCobrar } from "./pages/reports/reporteVentas/Reportes/DocumentosXCobrar";
 import { ArticulosVendidos } from "./pages/reports/reporteVentas/Reportes/ArticulosVendidos";
@@ -55,6 +55,11 @@ import CierreDiario from "./pages/reports/reporteVentas/Reportes/CierreDiario";
 import CajaChica from "./pages/reports/reporteVentas/Reportes/CajaChica";
 import { ProdNoVendidos } from "./pages/reports/reporteVentas/Reportes/ProdNoVendidos";
 import Ingresos from "./pages/reports/reporteVentas/Reportes/Ingresos";
+import MoverProductoAdd from "./pages/inventory/traslate-products/MoverProductoAdd";
+
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+
+let controller = getController();
 
 function App() {
   let ruta = getRuta();
@@ -122,7 +127,7 @@ function App() {
     setIsLogged(true);
 
     setIsLoading(false);
-  }, [isLogged]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLogged]);
 
   const darkTheme = createTheme({
     palette: {
@@ -131,8 +136,53 @@ function App() {
   });
 
   window.addEventListener("beforeunload", function (event) {
-    event.returnValue = "o/";
+    (async () => {
+      const result = await onCloseNavigatorAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+
+        simpleMessage("No se pudo conectar con el servidor", "error");
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+    })();
   });
+
+  const connection = new HubConnectionBuilder()
+    .withUrl(`${controller}serverHub`)
+    // .configureLogging(LogLevel.Information)
+    .build();
+
+  async function start() {
+    try {
+      await connection.start();
+      connection.on("serverAccess", () => {
+        serverAccess();
+      });
+    } catch (err) {
+      setTimeout(start, 5000);
+    }
+  }
+
+  connection.onclose(async () => {
+    await start();
+  });
+
+  start();
+
+  const serverAccess = async () => {
+    console.log("entra al acceso")
+  };
 
   if (isLogged === null || isDefaultPass === null || access === []) {
     return <Loading />;
@@ -168,6 +218,10 @@ function App() {
                 <Route
                   path={`${ruta}/inventory`}
                   element={<InventoryContainer />}
+                />
+                <Route
+                  path={`${ruta}/traslado/add`}
+                  element={<MoverProductoAdd />}
                 />
 
                 <Route

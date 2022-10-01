@@ -34,6 +34,8 @@ export const VentaSemanal = ({ selectedStore }) => {
   const [credito, setCredito] = useState([]);
   const [recuperacion, setRecuperacion] = useState([]);
 
+  const [ancho] = useState(window.screen.availWidth);
+
   const dayName = (fecha) =>
     ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][
       new Date(fecha).getDay()
@@ -77,7 +79,7 @@ export const VentaSemanal = ({ selectedStore }) => {
 
   const options = {
     responsive: true,
-    aspectRatio: 5,
+    aspectRatio: ancho < 1024 ? 2 : 5,
 
     plugins: {
       datalabels: {

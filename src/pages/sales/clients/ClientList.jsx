@@ -196,7 +196,8 @@ const ClientList = () => {
         <hr />
 
         <TextField
-          style={{ marginBottom: 20, width: 600 }}
+          style={{ marginBottom: 20, maxWidth: 600 }}
+          fullWidth
           variant="standard"
           onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
           value={searchTerm}

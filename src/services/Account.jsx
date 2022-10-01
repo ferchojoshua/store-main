@@ -173,3 +173,27 @@ export const updateMyAccountAsync = async (token, data) => {
   }
   return result;
 };
+
+export const onCloseNavigatorAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}OnCloseNavigator`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.status;
+      }
+      result.data = resp.data;
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error.message;
+  }
+  return result;
+};

@@ -1,5 +1,7 @@
 import React, { useContext, useState } from "react";
 import { DataContext } from "../../../context/DataContext";
+import { TimePicker } from "@mui/lab";
+
 import {
   TextField,
   Button,
@@ -23,6 +25,7 @@ import { createRolAsync } from "../../../services/RolApi";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
+import moment from "moment";
 
 const AddRol = ({ setShowModal }) => {
   let ruta = getRuta();
@@ -32,6 +35,10 @@ const AddRol = ({ setShowModal }) => {
   let navigate = useNavigate();
   const [rolName, setRolName] = useState("");
   const token = getToken();
+
+  var date = new Date();
+  const [horaDesde, setHoraDesde] = useState(new Date(date.setHours(6, 0)));
+  const [horaHasta, setHoraHasta] = useState(new Date(date.setHours(18, 0)));
 
   const [isFullAccess, setIsFullAccess] = useState(false);
 
@@ -182,6 +189,27 @@ const AddRol = ({ setShowModal }) => {
       toastError("Ingrese una nombre al nuevo rol");
       return;
     }
+    if (!moment(horaDesde).isValid()) {
+      toastError("Ingrese una fecha de inicio valida");
+      return;
+    }
+    if (!moment(horaHasta).isValid()) {
+      toastError("Ingrese una fecha de final valida");
+      return;
+    }
+
+    let fechaD = moment(horaDesde).format("YYYY-MM-DD");
+    let horaD = moment(horaDesde).format("HH:mm");
+    let fhDesde = new Date(`${fechaD}T${horaD}:00.00Z`);
+    fhDesde.setSeconds(0);
+    fhDesde.toISOString();
+
+    let fechaH = moment(horaHasta).format("YYYY-MM-DD");
+    let horaH = moment(horaHasta).format("HH:mm");
+    let fhHasta = new Date(`${fechaH}T${horaH}:00.00Z`);
+    fhHasta.setSeconds(0);
+    fhHasta.toISOString();
+
     const data = {
       permissions: [
         //Venta Producto
@@ -431,6 +459,8 @@ const AddRol = ({ setShowModal }) => {
         },
       ],
       roleName: rolName,
+      startOperations: new Date(fhDesde),
+      endOperations: new Date(fhHasta),
     };
 
     setIsLoading(true);
@@ -467,24 +497,49 @@ const AddRol = ({ setShowModal }) => {
 
   return (
     <div>
-      <Divider />
+      <hr />
 
       <Paper
         elevation={10}
         style={{
           borderRadius: 30,
           padding: 20,
-          marginTop: 20,
         }}
       >
-        <TextField
-          fullWidth
-          style={{ marginBottom: 10 }}
-          variant="standard"
-          onChange={(e) => setRolName(e.target.value.toUpperCase())}
-          label={"Nombre rol"}
-          value={rolName}
-        />
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          <TextField
+            fullWidth
+            // style={{ marginBottom: 10 }}
+            variant="standard"
+            onChange={(e) => setRolName(e.target.value.toUpperCase())}
+            label={"Nombre rol"}
+            value={rolName}
+          />
+
+          <TimePicker
+            label="Inicia Operaciones"
+            value={horaDesde}
+            ampm
+            onChange={(newValue) => {
+              setHoraDesde(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField required fullWidth variant="standard" {...params} />
+            )}
+          />
+
+          <TimePicker
+            label="Termina Operaciones"
+            value={horaHasta}
+            ampm
+            onChange={(newValue) => {
+              setHoraHasta(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField required fullWidth variant="standard" {...params} />
+            )}
+          />
+        </Stack>
       </Paper>
 
       <Typography

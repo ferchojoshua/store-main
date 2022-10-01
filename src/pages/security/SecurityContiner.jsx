@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
 
@@ -8,7 +8,8 @@ import { Container } from "react-bootstrap";
 import UserList from "./securityUsers/UserList";
 import RolList from "./securityRoles/RolList";
 import { DataContext } from "../../context/DataContext";
-import { isAccess } from "../../helpers/Helpers";
+import { getRuta, isAccess } from "../../helpers/Helpers";
+import { useNavigate } from "react-router-dom";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,12 +41,21 @@ function a11yProps(index) {
 }
 
 const SecurityContiner = () => {
-  const { access } = React.useContext(DataContext);
-  const [value, setValue] = React.useState(0);
+  const { access } = useContext(DataContext);
+  const [value, setValue] = useState(0);
+  let ruta = getRuta();
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAccess(access, "USER VER") && !isAccess(access, "ROLES VER")) {
+      navigate(`${ruta}/unauthorized`);
+    }
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   return (
     <Container>
       <Paper

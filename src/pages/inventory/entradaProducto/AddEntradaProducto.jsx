@@ -1,8 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { getRuta, simpleMessage, toastError } from "../../../helpers/Helpers";
+import {
+  getRuta,
+  simpleMessage,
+  toastError,
+  isAccess,
+} from "../../../helpers/Helpers";
 
 import {
   Button,
@@ -41,6 +46,7 @@ const AddEntradaProducto = () => {
     reload,
     setReload,
     setIsDefaultPass,
+    access,
   } = useContext(DataContext);
   let navigate = useNavigate();
   const [tipoCompra, setTipoCompra] = useState("");
@@ -70,6 +76,12 @@ const AddEntradaProducto = () => {
   const [precioVentaDetalle, setPrecioVentaDetalle] = useState("");
 
   const [productDetailList, setProductDetailList] = useState([]);
+
+  useEffect(() => {
+    if (!isAccess(access, "ENTRADAPRODUCTOS CREATE")) {
+      navigate(`${ruta}/unauthorized`);
+    }
+  }, []);
 
   const token = getToken();
 

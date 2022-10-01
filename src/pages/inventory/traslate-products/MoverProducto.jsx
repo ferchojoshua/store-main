@@ -110,7 +110,8 @@ const MoverProducto = () => {
               style={{ borderRadius: 20 }}
               startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
               onClick={() => {
-                setShowModal(true);
+                navigate(`${ruta}/traslado/add`);
+                // setShowModal(true);
               }}
             >
               Agregar Movimiento
@@ -195,13 +196,13 @@ const MoverProducto = () => {
         />
       </Container>
 
-      <MediumModal
+      {/* <MediumModal
         titulo={"Agregar Traslado de Productos"}
         isVisible={showModal}
         setVisible={setShowModal}
       >
         <MoverProductoAdd setShowModal={setShowModal} />
-      </MediumModal>
+      </MediumModal> */}
 
       <MediumModal
         titulo={"Detalles de Traslado"}

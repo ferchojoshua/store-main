@@ -72,42 +72,46 @@ const EntradaProductoDetails = () => {
   const token = getToken();
 
   useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      const result = await getEntradaByIdAsync(token, id);
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
+    if (isAccess(access, "ENTRADAPRODUCTOS VER")) {
+      (async () => {
+        setIsLoading(true);
+        const result = await getEntradaByIdAsync(token, id);
+        if (!result.statusResponse) {
+          setIsLoading(false);
+          if (result.error.request.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(result.error.message);
           return;
         }
-        toastError(result.error.message);
-        return;
-      }
 
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
+        if (result.data === "eX01") {
+          setIsLoading(false);
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
 
-      if (result.data.isDefaultPass) {
+        if (result.data.isDefaultPass) {
+          setIsLoading(false);
+          setIsDefaultPass(true);
+          return;
+        }
         setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-      setIsLoading(false);
-      setNoFactura(result.data.noFactura);
-      setTipoEntrada(result.data.tipoEntrada);
-      setTipoCompra(result.data.tipoPago);
-      setSelectedProvider(result.data.provider.id);
-      setSelectedStore(result.data.almacen.id);
-      setMontoFactura(result.data.montoFactura);
-      setProductList(result.data.productInDetails);
-      setFechaIngreso(result.data.fechaIngreso);
-    })();
+        setNoFactura(result.data.noFactura);
+        setTipoEntrada(result.data.tipoEntrada);
+        setTipoCompra(result.data.tipoPago);
+        setSelectedProvider(result.data.provider.id);
+        setSelectedStore(result.data.almacen.id);
+        setMontoFactura(result.data.montoFactura);
+        setProductList(result.data.productInDetails);
+        setFechaIngreso(result.data.fechaIngreso);
+      })();
+    } else {
+      navigate(`${ruta}/unauthorized`);
+    }
   }, []);
 
   const saveChanges = async () => {
