@@ -10,9 +10,6 @@ import {
   MenuItem,
   Button,
   Stack,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
@@ -26,7 +23,6 @@ import {
   getToken,
 } from "../../../../services/Account";
 import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
-import { result } from "lodash";
 
 export const SelectorIngrEgresos = () => {
   const { setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -43,7 +39,6 @@ export const SelectorIngrEgresos = () => {
   const [storeList, setStoreList] = useState([]);
   const [selectedStore, setSelectedStore] = useState("t");
 
-  const [selectAll, setSelectAll] = useState(true);
 
   let navigate = useNavigate();
   let ruta = getRuta();

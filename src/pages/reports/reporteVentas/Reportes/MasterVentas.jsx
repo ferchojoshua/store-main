@@ -222,7 +222,7 @@ export const MasterVentas = () => {
             >
               <thead>
                 <tr>
-                  <th style={{ textAlign: "center" }}>Fecha</th>
+                  <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                   <th style={{ textAlign: "center" }}>Factura</th>
                   <th style={{ textAlign: "left" }}>Cliente</th>
                   <th style={{ textAlign: "center" }}>Almacen</th>
@@ -243,7 +243,7 @@ export const MasterVentas = () => {
                   return (
                     <tr key={item.id}>
                       <td style={{ textAlign: "center" }}>
-                        {moment(item.fechaVenta).format("L")}
+                        {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
                       </td>
                       <td style={{ textAlign: "center" }}>{item.id}</td>
                       <td style={{ textAlign: "left" }}>

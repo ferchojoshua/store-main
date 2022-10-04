@@ -38,14 +38,8 @@ import moment from "moment";
 export const ProductKardex = ({ productList }) => {
   let ruta = getRuta();
 
-  const {
-    reload,
-    setIsLoading,
-    setIsDefaultPass,
-    setIsLogged,
-    access,
-    isDarkMode,
-  } = useContext(DataContext);
+  const { reload, setIsLoading, setIsDefaultPass, setIsLogged, isDarkMode } =
+    useContext(DataContext);
 
   const [desde, setDesde] = useState(new Date());
   const [hasta, setHasta] = useState(new Date());
@@ -97,6 +91,23 @@ export const ProductKardex = ({ productList }) => {
   }, [reload]);
 
   const generarKardex = async () => {
+    if (!moment(desde).isValid()) {
+      toastError("Ingrese una fecha de inicio valida");
+      return;
+    }
+    if (!moment(hasta).isValid()) {
+      toastError("Ingrese una fecha de final valida");
+      return;
+    }
+    if (selectedStore.length === 0) {
+      toastError("Debe seleccionar un almacen");
+      return;
+    }
+    if (isEmpty(selectedProduct)) {
+      toastError("Debe seleccionar un producto");
+      return;
+    }
+
     const data = {
       desde,
       hasta,
@@ -170,6 +181,29 @@ export const ProductKardex = ({ productList }) => {
     setKardex(result.data);
     setIsLoading(false);
     setIsVisible(true);
+  };
+
+  const getDocument = (item) => {
+    const {
+      ajusteInventario,
+      entradaProduct,
+      sale,
+      saleAnulation,
+      trasladoInventario,
+    } = item;
+    if (ajusteInventario) {
+      return `AJUSTE INVENTARIO: ${ajusteInventario}`;
+    } else if (entradaProduct) {
+      return `ENTRADA DE PRODUCTO: ${entradaProduct}`;
+    } else if (sale) {
+      return `VENTA DE PRODUCTO: ${sale}`;
+    } else if (saleAnulation) {
+      return `ANULACION DE VENTA: ${saleAnulation}`;
+    } else if (trasladoInventario) {
+      return `TRASLADO DE INVENTARIO: ${trasladoInventario}`;
+    } else {
+      return "NO GUARDADO";
+    }
   };
 
   return (
@@ -346,6 +380,7 @@ export const ProductKardex = ({ productList }) => {
               <thead>
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
+                  <th style={{ textAlign: "left" }}>Documento</th>
                   <th style={{ textAlign: "left" }}>Concepto</th>
                   <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "center" }}>Entradas</th>
@@ -359,6 +394,9 @@ export const ProductKardex = ({ productList }) => {
                   return (
                     <tr key={item.id}>
                       <td>{moment(item.fecha).format("L")}</td>
+                      <td style={{ textAlign: "center" }}>
+                        {getDocument(item)}
+                      </td>
                       <td style={{ textAlign: "left" }}>{item.concepto}</td>
                       <td style={{ textAlign: "center" }}>
                         {item.almacen.name}

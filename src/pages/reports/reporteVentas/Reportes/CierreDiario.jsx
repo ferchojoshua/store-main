@@ -238,7 +238,7 @@ const CierreDiario = () => {
                 </caption>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
                     <th style={{ textAlign: "left" }}>Cliente</th>
@@ -249,14 +249,13 @@ const CierreDiario = () => {
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                   {dataVentasContado.map((item) => {
-                    console.log("item", item);
                     return (
                       <tr
                         key={item.id}
                         style={{ color: item.isAnulado ? "red" : "" }}
                       >
                         <td style={{ textAlign: "center" }}>
-                          {moment(item.fechaVenta).format("L")}
+                          {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "center" }}>
@@ -319,7 +318,7 @@ const CierreDiario = () => {
                 </caption>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Abono</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
@@ -334,7 +333,7 @@ const CierreDiario = () => {
                     return (
                       <tr key={id}>
                         <td style={{ textAlign: "center" }}>
-                          {moment(fechaAbono).format("L")}
+                          {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>{id}</td>
                         <td style={{ textAlign: "center" }}>{sale.id}</td>
@@ -384,7 +383,7 @@ const CierreDiario = () => {
                 </caption>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
                     <th style={{ textAlign: "left" }}>Cliente</th>
@@ -409,7 +408,7 @@ const CierreDiario = () => {
                     return (
                       <tr key={id}>
                         <td style={{ textAlign: "center" }}>
-                          {moment(fechaVenta).format("L")}
+                          {moment(fechaVenta).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>{id}</td>
                         <td style={{ textAlign: "center" }}>{store.name}</td>
@@ -473,7 +472,7 @@ const CierreDiario = () => {
                 </caption>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
                     <th style={{ textAlign: "left" }}>Cliente</th>
@@ -494,7 +493,7 @@ const CierreDiario = () => {
                     return (
                       <tr key={id}>
                         <td style={{ textAlign: "center" }}>
-                          {moment(fechaAnulacion).format("L")}
+                          {moment(fechaAnulacion).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>
                           {ventaAfectada.id}
@@ -798,7 +797,7 @@ const CierreDiario = () => {
                   </caption>
                   <thead>
                     <tr>
-                      <th style={{ textAlign: "center" }}>Fecha</th>
+                      <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                       <th style={{ textAlign: "center" }}>#.Factura</th>
                       <th style={{ textAlign: "center" }}>Almacen</th>
                       <th style={{ textAlign: "left" }}>Cliente</th>
@@ -823,7 +822,7 @@ const CierreDiario = () => {
                       return (
                         <tr key={id}>
                           <td style={{ textAlign: "center" }}>
-                            {moment(fechaVenta).format("L")}
+                            {moment(fechaVenta).format("D/M/yyyy hh:mm A")}
                           </td>
                           <td style={{ textAlign: "center" }}>{id}</td>
                           <td style={{ textAlign: "center" }}>{store.name}</td>
@@ -887,7 +886,7 @@ const CierreDiario = () => {
                   </caption>
                   <thead>
                     <tr>
-                      <th style={{ textAlign: "center" }}>Fecha</th>
+                      <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                       <th style={{ textAlign: "center" }}>#.Factura</th>
                       <th style={{ textAlign: "center" }}>Almacen</th>
                       <th style={{ textAlign: "left" }}>Cliente</th>
@@ -908,7 +907,7 @@ const CierreDiario = () => {
                       return (
                         <tr key={id}>
                           <td style={{ textAlign: "center" }}>
-                            {moment(fechaAnulacion).format("L")}
+                            {moment(fechaAnulacion).format("D/M/yyyy hh:mm A")}
                           </td>
                           <td style={{ textAlign: "center" }}>
                             {ventaAfectada.id}

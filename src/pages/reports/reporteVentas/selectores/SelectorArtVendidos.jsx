@@ -11,6 +11,9 @@ import {
   Button,
   Stack,
   Autocomplete,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 import { useNavigate } from "react-router-dom";
@@ -50,6 +53,8 @@ export const SelectorArtVendidos = () => {
 
   const [familiaList, setFamiliaList] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState("t");
+
+  const [includeUncanceledSales, setIncludeUncanceledSales] = useState(true);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -176,6 +181,7 @@ export const SelectorArtVendidos = () => {
       selectedClient,
       selectedTNegocio,
       selectedFamilia,
+      includeUncanceledSales,
     };
     params = JSON.stringify(params);
     window.open(`${ruta}/r-sales-prods/${params}`);
@@ -231,7 +237,7 @@ export const SelectorArtVendidos = () => {
             marginBottom: 10,
           }}
         >
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Stack spacing={2} direction="row">
               <DatePicker
                 label="Desde"
@@ -409,10 +415,31 @@ export const SelectorArtVendidos = () => {
               )}
             />
 
+            <Stack style={{ marginTop: 20 }}>
+              <span style={{ fontWeight: "bold", color: "#2196f3" }}>
+                Tipo de Venta
+              </span>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={includeUncanceledSales}
+                      onChange={() =>
+                        setIncludeUncanceledSales(!includeUncanceledSales)
+                      }
+                    />
+                  }
+                  label="Incluir Ventas no Canceladas"
+                />
+              </FormGroup>
+            </Stack>
+
+            <hr />
+
             <Button
               variant="outlined"
               fullWidth
-              style={{ borderRadius: 20, marginTop: 30 }}
+              style={{ borderRadius: 20 }}
               startIcon={<FontAwesomeIcon icon={faPrint} />}
               onClick={() => {
                 verReport();

@@ -1,33 +1,34 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Dialog, DialogContent, Stack } from "@mui/material";
+import React, { useContext } from "react";
+import { Dialog, Stack, Divider, Container } from "@mui/material";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
+
 import Typography from "@mui/material/Typography";
 
 import Slide from "@mui/material/Slide";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+
 import { DataContext } from "../../context/DataContext";
-import { useContext } from "react";
-import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
-import ReactToPrint from "react-to-print";
-import moment from "moment/moment";
+
+import Lottie from "react-lottie";
+import noAccess from "../media/animations/noAccess.json";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const FullScreenModal = () => {
-  const { title } = useContext(DataContext);
+  const { title, serverAccess } = useContext(DataContext);
+
+  const defaultOptions = {
+    loop: true,
+    autoPlay: true,
+    animationData: noAccess,
+  };
 
   return (
     <div>
-      <Dialog
-        fullScreen
-        open={true}
-        // TransitionComponent={Transition}
-      >
+      <Dialog fullScreen open={serverAccess} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             <img
@@ -43,48 +44,43 @@ const FullScreenModal = () => {
             >
               {`${title} - Chinandega`}
             </Typography>
-            {/* <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setShowModal(false)}
-              aria-label="close"
-            >
-              <FontAwesomeIcon
-                icon={faCircleXmark}
-                style={{ color: "#ff9800" }}
-              />
-            </IconButton> */}
           </Toolbar>
         </AppBar>
 
-        <Stack display="flex" justifyContent="center">
-          <Typography
-            sx={{
-              color: "#2196f3",
-              textAlign: "center",
-              fontWeight: "bold",
-              marginTop: 2,
-            }}
-            variant="h5"
-            component="div"
-          >
-            Servidor Durmiendo
-          </Typography>
-          {/* <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
-            "L"
-          )} - Hasta: ${moment(hasta).format("L")}`}</span> */}
-        </Stack>
+        <Container>
+          <Stack display="flex" justifyContent="center">
+            <Typography
+              sx={{
+                color: "#2196f3",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 2,
+              }}
+              variant="h5"
+              component="div"
+            >
+              Servidor Fuera de Acceso
+            </Typography>
+            <Divider />
 
-        {/* <DialogContent>{children}</DialogContent> */}
-        {/* <div
-          style={{
-            display: "none",
-          }}
-        >
-          <PrintReport ref={compRef} fecha={fecha} titulo={titulo}>
-            {children}
-          </PrintReport>
-        </div> */}
+            <Lottie options={defaultOptions} style={{ width: 400 }} />
+
+            <Typography
+              variant="h6"
+              textAlign={"center"}
+              style={{ color: "#03a9f4" }}
+            >
+              Estas Fuera de Horas Habiles!
+            </Typography>
+            <Typography
+              variant="h6"
+              textAlign={"center"}
+              style={{ color: "#03a9f4" }}
+            >
+              Comunicate con Sistemas!
+            </Typography>
+          </Stack>
+        </Container>
       </Dialog>
     </div>
   );

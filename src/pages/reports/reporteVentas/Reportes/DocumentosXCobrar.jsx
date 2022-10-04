@@ -183,8 +183,8 @@ export const DocumentosXCobrar = () => {
           />
         </Stack>
 
-        <hr />
         <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+          <hr />
           {isEmpty(data) ? (
             <NoData />
           ) : (
@@ -331,8 +331,8 @@ export const DocumentosXCobrar = () => {
           ).format("L")}`}
           titulo={"Documentos por Cobrar"}
         >
-          <hr />
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+            <hr />
             {isEmpty(data) ? (
               <NoData />
             ) : (

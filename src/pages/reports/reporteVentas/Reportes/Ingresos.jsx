@@ -26,11 +26,7 @@ import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import { getIngresosAsync } from "../../../../services/ReportApi";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleCheck,
-  faCircleXmark,
-} from "@fortawesome/free-solid-svg-icons";
+
 import "./estilo.css";
 moment.locale("es");
 
@@ -52,6 +48,7 @@ const Ingresos = () => {
     setIsDarkMode,
     title,
   } = useContext(DataContext);
+
   setIsDarkMode(false);
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -214,7 +211,7 @@ const Ingresos = () => {
               </caption>
               <thead>
                 <tr>
-                  <th style={{ textAlign: "center" }}>Fecha</th>
+                  <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                   <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "center" }}>#</th>
                   <th style={{ textAlign: "center" }}>Venta</th>

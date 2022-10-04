@@ -58,6 +58,9 @@ import Ingresos from "./pages/reports/reporteVentas/Reportes/Ingresos";
 import MoverProductoAdd from "./pages/inventory/traslate-products/MoverProductoAdd";
 
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { getRolAsync } from "./services/RolApi";
+import FullScreenModal from "./components/modals/FullScreenModal";
+import Compras from "./pages/reports/reporteVentas/Reportes/Compras";
 
 let controller = getController();
 
@@ -75,6 +78,7 @@ function App() {
     setAccess,
     isDarkMode,
     setIsDarkMode,
+    setServerAccess,
   } = useContext(DataContext);
 
   let navigate = useNavigate();
@@ -122,6 +126,9 @@ function App() {
       setIsLoading(false);
 
       const notifications = serverMessages();
+
+      const resultRol = await getRolAsync(token);
+      setServerAccess(!resultRol.data.isServerAccess);
     })();
     setUser(user);
     setIsLogged(true);
@@ -181,7 +188,8 @@ function App() {
   start();
 
   const serverAccess = async () => {
-    console.log("entra al acceso")
+    const result = await getRolAsync(token);
+    setServerAccess(!result.data.isServerAccess);
   };
 
   if (isLogged === null || isDefaultPass === null || access === []) {
@@ -266,6 +274,10 @@ function App() {
                   path={`${ruta}/r-ingresos/:params`}
                   element={<Ingresos />}
                 />
+                <Route
+                  path={`${ruta}/r-compras/:params`}
+                  element={<Compras />}
+                />
 
                 {/* Rutas Administration */}
                 <Route path={`${ruta}/admon`} element={<AdmonContainer />} />
@@ -316,6 +328,7 @@ function App() {
           </LocalizationProvider>
         )}
       </Box>
+      <FullScreenModal />
     </ThemeProvider>
   ) : (
     <Login />

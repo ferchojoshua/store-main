@@ -9,6 +9,7 @@ import {
   faBriefcase,
   faHandshakeAltSlash,
   faMoneyBills,
+  faCartArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Grid, Paper, Stack } from "@mui/material";
@@ -23,6 +24,7 @@ import SelectorCierreDiario from "./reporteVentas/selectores/SelectorCierreDiari
 import SelectorCajaChica from "./reporteVentas/selectores/SelectorCajaChica";
 import SelectorProdNoVendido from "./reporteVentas/selectores/SelectorProdNoVendido";
 import { SelectorIngrEgresos } from "./reporteVentas/selectores/SelectorIngrEgresos";
+import SelectorCompras from "./reporteVentas/selectores/SelectorCompras";
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -122,55 +124,72 @@ export const ReportsContainer = () => {
           </Grid>
         </Paper>
 
-        <Paper
-          elevation={20}
-          style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
-        >
-          <Stack
-            spacing={3}
-            direction="row"
-            display="flex"
-            justifyContent="center"
+        {isAccess(access, "CAJACHICA VER") ||
+        isAccess(access, "INGRESOS VER") ? (
+          <Paper
+            elevation={20}
+            style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
           >
-            <FontAwesomeIcon
-              icon={faBriefcase}
-              className="fa-beat-fade"
-              style={{ fontSize: 40, color: "#4caf50" }}
-            />
+            <Stack
+              spacing={3}
+              direction="row"
+              display="flex"
+              justifyContent="center"
+            >
+              <FontAwesomeIcon
+                icon={faBriefcase}
+                className="fa-beat-fade"
+                style={{ fontSize: 40, color: "#4caf50" }}
+              />
 
-            <h1>Reportes Administrativos</h1>
-          </Stack>
-          <hr />
-          <Grid container spacing={2}>
-            {isAccess(access, "CAJACHICA VER") ? (
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                <ReportCaller
-                  icon={faSackDollar}
-                  text="Caja Chica"
-                  modalTitle="Movimientos de Caja Chica"
-                >
-                  <SelectorCajaChica />
-                </ReportCaller>
-              </Grid>
-            ) : (
-              <></>
-            )}
-            {isAccess(access, "INGRESOS VER") ? (
-              
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                <ReportCaller
-                  icon={faMoneyBills}
-                  text="Ingresos"
-                  modalTitle="Ingresos"
-                >
-                  <SelectorIngrEgresos />
-                </ReportCaller>
-              </Grid>
-            ) : (
-              <></>
-            )}
-          </Grid>
-        </Paper>
+              <h1>Reportes Administrativos</h1>
+            </Stack>
+            <hr />
+            <Grid container spacing={2}>
+              {isAccess(access, "CAJACHICA VER") ? (
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <ReportCaller
+                    icon={faSackDollar}
+                    text="Caja Chica"
+                    modalTitle="Movimientos de Caja Chica"
+                  >
+                    <SelectorCajaChica />
+                  </ReportCaller>
+                </Grid>
+              ) : (
+                <></>
+              )}
+              {isAccess(access, "INGRESOS VER") ? (
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <ReportCaller
+                    icon={faMoneyBills}
+                    text="Ingresos"
+                    modalTitle="Ingresos"
+                  >
+                    <SelectorIngrEgresos />
+                  </ReportCaller>
+                </Grid>
+              ) : (
+                <></>
+              )}
+              {isAccess(access, "REPORTECOMPRAS VER") ? (
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <ReportCaller
+                    icon={faCartArrowDown}
+                    text="Compras"
+                    modalTitle="Compras"
+                  >
+                    <SelectorCompras />
+                  </ReportCaller>
+                </Grid>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Paper>
+        ) : (
+          <></>
+        )}
       </Stack>
     </Container>
   );

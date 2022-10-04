@@ -41,6 +41,7 @@ export const ArticulosVendidos = () => {
     selectedClient,
     selectedTNegocio,
     selectedFamilia,
+    includeUncanceledSales,
   } = dataJson;
 
   const {
@@ -63,6 +64,7 @@ export const ArticulosVendidos = () => {
       const datos = {
         desde,
         hasta,
+        includeUncanceledSales,
         storeId: selectedStore === "t" ? 0 : selectedStore,
         tipoNegocioId: selectedTNegocio === "t" ? 0 : selectedTNegocio,
         familiaId: selectedFamilia === "t" ? 0 : selectedFamilia,
