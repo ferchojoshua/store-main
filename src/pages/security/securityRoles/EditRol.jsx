@@ -101,6 +101,8 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [cierreDiario, setCierreDiario] = useState(false);
   const [cajaChica, setCajaChica] = useState(false);
   const [ingresos, setIngresos] = useState(false);
+  const [compras, setCompras] = useState(false);
+  const [trasladoInventario, setTrasladoInventario] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -250,6 +252,12 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "INGRESOS VER":
           setIngresos(item.isEnable);
+          break;
+        case "REPORTECOMPRAS VER":
+          setCompras(item.isEnable);
+          break;
+        case "REPORTETRASLADOS VER":
+          setTrasladoInventario(item.isEnable);
           break;
 
         //Contabilidad
@@ -483,6 +491,12 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "INGRESOS VER":
           item.isEnable = ingresos;
+          break;
+        case "REPORTECOMPRAS VER":
+          item.isEnable = compras;
+          break;
+        case "REPORTETRASLADOS VER":
+          item.isEnable = trasladoInventario;
           break;
 
         //Contabilidad
@@ -1304,6 +1318,19 @@ const EditRol = ({ setShowModal, selectedRol }) => {
               label="C. por Cobrar"
             />
 
+            <FormControlLabel
+              style={{ textAlign: "center" }}
+              labelPlacement="top"
+              control={
+                <Checkbox
+                  disabled={!isEdit}
+                  checked={prodNoVendidos}
+                  onChange={() => setProdNoVendidos(!prodNoVendidos)}
+                />
+              }
+              label="Productos no Vendidos"
+            />
+
             <Paper
               elevation={10}
               style={{
@@ -1365,19 +1392,6 @@ const EditRol = ({ setShowModal, selectedRol }) => {
               control={
                 <Checkbox
                   disabled={!isEdit}
-                  checked={prodNoVendidos}
-                  onChange={() => setProdNoVendidos(!prodNoVendidos)}
-                />
-              }
-              label="Productos no Vendidos"
-            />
-
-            <FormControlLabel
-              style={{ textAlign: "center" }}
-              labelPlacement="top"
-              control={
-                <Checkbox
-                  disabled={!isEdit}
                   checked={cierreDiario}
                   onChange={() => setCierreDiario(!cierreDiario)}
                 />
@@ -1406,6 +1420,32 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                   disabled={!isEdit}
                   checked={ingresos}
                   onChange={() => setInterval(!ingresos)}
+                />
+              }
+              label="Reporte de Ingresos"
+            />
+
+            <FormControlLabel
+              style={{ textAlign: "center" }}
+              labelPlacement="top"
+              control={
+                <Checkbox
+                  disabled={!isEdit}
+                  checked={compras}
+                  onChange={() => setCompras(!compras)}
+                />
+              }
+              label="Reporte de Ingresos"
+            />
+
+            <FormControlLabel
+              style={{ textAlign: "center" }}
+              labelPlacement="top"
+              control={
+                <Checkbox
+                  disabled={!isEdit}
+                  checked={trasladoInventario}
+                  onChange={() => setTrasladoInventario(!trasladoInventario)}
                 />
               }
               label="Reporte de Ingresos"

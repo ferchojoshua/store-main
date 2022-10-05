@@ -10,6 +10,7 @@ import {
   faHandshakeAltSlash,
   faMoneyBills,
   faCartArrowDown,
+  faTruckFast,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Grid, Paper, Stack } from "@mui/material";
@@ -25,6 +26,7 @@ import SelectorCajaChica from "./reporteVentas/selectores/SelectorCajaChica";
 import SelectorProdNoVendido from "./reporteVentas/selectores/SelectorProdNoVendido";
 import { SelectorIngrEgresos } from "./reporteVentas/selectores/SelectorIngrEgresos";
 import SelectorCompras from "./reporteVentas/selectores/SelectorCompras";
+import SelectorTrasladoInventario from "./reporteVentas/selectores/SelectorTrasladoInventario";
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -125,7 +127,8 @@ export const ReportsContainer = () => {
         </Paper>
 
         {isAccess(access, "CAJACHICA VER") ||
-        isAccess(access, "INGRESOS VER") ? (
+        isAccess(access, "INGRESOS VER") ||
+        isAccess(access, "REPORTECOMPRAS VER") ? (
           <Paper
             elevation={20}
             style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
@@ -180,6 +183,19 @@ export const ReportsContainer = () => {
                     modalTitle="Compras"
                   >
                     <SelectorCompras />
+                  </ReportCaller>
+                </Grid>
+              ) : (
+                <></>
+              )}
+              {isAccess(access, "REPORTETRASLADOS VER") ? (
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <ReportCaller
+                    icon={faTruckFast}
+                    text="Traslado de Inventario"
+                    modalTitle="Traslado de Inventario"
+                  >
+                    <SelectorTrasladoInventario />
                   </ReportCaller>
                 </Grid>
               ) : (

@@ -10,7 +10,6 @@ import {
 import { Button, IconButton, Stack } from "@mui/material";
 import MediumModal from "../../../components/modals/MediumModal";
 
-import MoverProductoAdd from "./MoverProductoAdd";
 import { getProdMovmtsAsync } from "../../../services/ProductMovementsApi";
 import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
 import {
@@ -47,8 +46,6 @@ const MoverProducto = () => {
   const indexFirst = indexLast - itemsperPage;
   const currentItem = movimientosList.slice(indexFirst, indexLast);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const [showModal, setShowModal] = useState(false);
 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState([]);
@@ -111,7 +108,6 @@ const MoverProducto = () => {
               startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
               onClick={() => {
                 navigate(`${ruta}/traslado/add`);
-                // setShowModal(true);
               }}
             >
               Agregar Movimiento
@@ -195,14 +191,6 @@ const MoverProducto = () => {
           itemsperPage={itemsperPage}
         />
       </Container>
-
-      {/* <MediumModal
-        titulo={"Agregar Traslado de Productos"}
-        isVisible={showModal}
-        setVisible={setShowModal}
-      >
-        <MoverProductoAdd setShowModal={setShowModal} />
-      </MediumModal> */}
 
       <MediumModal
         titulo={"Detalles de Traslado"}

@@ -85,6 +85,8 @@ const AddRol = ({ setShowModal }) => {
   const [cierreDiario, setCierreDiario] = useState(false);
   const [cajaChica, setCajaChica] = useState(false);
   const [ingresos, setIngresos] = useState(false);
+  const [compras, setCompras] = useState(false);
+  const [trasladoInventario, setTrasladoInventario] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -157,6 +159,8 @@ const AddRol = ({ setShowModal }) => {
     setCierreDiario(!isFullAccess);
     setCajaChica(!isFullAccess);
     setIngresos(!isFullAccess);
+    setCompras(!isFullAccess);
+    setTrasladoInventario(!isFullAccess);
 
     setContVer(!isFullAccess);
     setContCreate(!isFullAccess);
@@ -370,6 +374,14 @@ const AddRol = ({ setShowModal }) => {
           description: "INGRESOS VER",
           IsEnable: ingresos,
         },
+        {
+          description: "REPORTECOMPRAS VER",
+          IsEnable: compras,
+        },
+        {
+          description: "REPORTETRASLADOS VER",
+          IsEnable: trasladoInventario,
+        },
 
         //Contabilidad
         {
@@ -509,7 +521,6 @@ const AddRol = ({ setShowModal }) => {
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             fullWidth
-            // style={{ marginBottom: 10 }}
             variant="standard"
             onChange={(e) => setRolName(e.target.value.toUpperCase())}
             label={"Nombre rol"}
@@ -1152,6 +1163,18 @@ const AddRol = ({ setShowModal }) => {
               label="C. por Cobrar"
             />
 
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={prodNoVendidos}
+                  onChange={() => setProdNoVendidos(!prodNoVendidos)}
+                />
+              }
+              label="Productos no Vendidos"
+            />
+
             <Paper
               elevation={10}
               style={{
@@ -1213,17 +1236,6 @@ const AddRol = ({ setShowModal }) => {
               style={{ textAlign: "center" }}
               control={
                 <Checkbox
-                  checked={prodNoVendidos}
-                  onChange={() => setProdNoVendidos(!prodNoVendidos)}
-                />
-              }
-              label="Productos no Vendidos"
-            />
-            <FormControlLabel
-              labelPlacement="top"
-              style={{ textAlign: "center" }}
-              control={
-                <Checkbox
                   checked={cierreDiario}
                   onChange={() => setCierreDiario(!cierreDiario)}
                 />
@@ -1253,6 +1265,30 @@ const AddRol = ({ setShowModal }) => {
                 />
               }
               label="Reporte de Ingresos"
+            />
+
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={compras}
+                  onChange={() => setCompras(!compras)}
+                />
+              }
+              label="Reporte de Compras"
+            />
+
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={trasladoInventario}
+                  onChange={() => setTrasladoInventario(!trasladoInventario)}
+                />
+              }
+              label="Traslado de Inventario"
             />
           </Stack>
         </Stack>

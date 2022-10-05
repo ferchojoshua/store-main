@@ -282,7 +282,7 @@ const Ingresos = () => {
               <caption style={{ color: "#00a152" }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography style={{ color: "#00a152", fontWeight: "bold" }}>
-                    Total Ventas de Contado:
+                    Total de Recuperaciones:
                   </Typography>
                   <Typography variant="h6" style={{ color: "#00a152" }}>
                     {new Intl.NumberFormat("es-NI", {
@@ -509,7 +509,7 @@ const Ingresos = () => {
                     <Typography
                       style={{ color: "#00a152", fontWeight: "bold" }}
                     >
-                      Total Ventas de Contado:
+                      Total de Recuperaciones:
                     </Typography>
                     <Typography variant="h6" style={{ color: "#00a152" }}>
                       {new Intl.NumberFormat("es-NI", {

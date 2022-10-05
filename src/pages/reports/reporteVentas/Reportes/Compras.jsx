@@ -294,6 +294,96 @@ const Compras = () => {
         >
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
             <hr />
+            {isEmpty(data) ? (
+              <NoData />
+            ) : (
+              <Table
+                hover={!isDarkMode}
+                size="sm"
+                responsive
+                className="text-primary"
+              >
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "center" }}>Fecha</th>
+                    <th style={{ textAlign: "center" }}>N° Factura</th>
+                    <th style={{ textAlign: "left" }}>Proveedor</th>
+                    <th style={{ textAlign: "center" }}>Tipo Pago</th>
+                    <th style={{ textAlign: "center" }}>Antes Descuento</th>
+                    <th style={{ textAlign: "center" }}>Despues Descuento</th>
+                  </tr>
+                </thead>
+                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                  {data.map((item) => {
+                    return (
+                      <tr key={item.id}>
+                        <td style={{ textAlign: "center" }}>
+                          {moment(item.fechaIngreso).format("L")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {item.noFactura}
+                        </td>
+                        <td style={{ textAlign: "left" }}>
+                          {item.provider.nombre}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {item.tipoPago.toUpperCase()}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(item.montFactAntDesc)}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(item.montoFactura)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            )}
+
+            <hr />
+            <Stack direction="row" flex="row" justifyContent="space-around">
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Total de Ventas
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI").format(data.length)}
+                </span>
+              </Stack>
+
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Total de Compra Antes Descuento
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumComprasADesc())}
+                </span>
+              </Stack>
+
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Total de Compra Despues Descuento
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumComprasDDesc())}
+                </span>
+              </Stack>
+            </Stack>
+            <hr />
           </Container>
         </PrintReport>
       </div>

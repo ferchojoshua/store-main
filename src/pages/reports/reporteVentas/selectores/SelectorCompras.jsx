@@ -1,15 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
-import { DatePicker, TimePicker } from "@mui/lab";
+import React, { useState } from "react";
+import { DatePicker } from "@mui/lab";
 import {
   Container,
   Paper,
   TextField,
   FormGroup,
   FormControlLabel,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
   Stack,
   Checkbox,
@@ -17,19 +13,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
-import { DataContext } from "../../../../context/DataContext";
-import {
-  deleteToken,
-  deleteUserData,
-  getToken,
-} from "../../../../services/Account";
 
 const SelectorCompras = () => {
-  const { setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
-
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(
     new Date(date.getFullYear(), date.getMonth(), 1)
@@ -41,7 +27,6 @@ const SelectorCompras = () => {
   const [selectCreditSales, setSelectCreditSales] = useState(true);
   const [selectContadoSales, setSelectContadoSales] = useState(true);
 
-  let navigate = useNavigate();
   let ruta = getRuta();
 
   const verReport = () => {

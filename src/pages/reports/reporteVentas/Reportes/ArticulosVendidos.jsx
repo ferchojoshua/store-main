@@ -177,8 +177,8 @@ export const ArticulosVendidos = () => {
           />
         </Stack>
 
-        <hr />
         <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+          <hr />
           {isEmpty(data) ? (
             <NoData />
           ) : (
@@ -307,8 +307,8 @@ export const ArticulosVendidos = () => {
           ).format("L")}`}
           titulo={"Productos Vendidos"}
         >
-          <hr />
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+            <hr />
             {isEmpty(data) ? (
               <NoData />
             ) : (

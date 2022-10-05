@@ -57,10 +57,11 @@ import { ProdNoVendidos } from "./pages/reports/reporteVentas/Reportes/ProdNoVen
 import Ingresos from "./pages/reports/reporteVentas/Reportes/Ingresos";
 import MoverProductoAdd from "./pages/inventory/traslate-products/MoverProductoAdd";
 
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import { getRolAsync } from "./services/RolApi";
 import FullScreenModal from "./components/modals/FullScreenModal";
 import Compras from "./pages/reports/reporteVentas/Reportes/Compras";
+import TrasladoInventario from "./pages/reports/reporteVentas/Reportes/TrasladoInventario";
 
 let controller = getController();
 
@@ -128,6 +129,7 @@ function App() {
       const notifications = serverMessages();
 
       const resultRol = await getRolAsync(token);
+
       setServerAccess(!resultRol.data.isServerAccess);
     })();
     setUser(user);
@@ -277,6 +279,11 @@ function App() {
                 <Route
                   path={`${ruta}/r-compras/:params`}
                   element={<Compras />}
+                />
+
+                <Route
+                  path={`${ruta}/r-traslado-inventario/:params`}
+                  element={<TrasladoInventario />}
                 />
 
                 {/* Rutas Administration */}
