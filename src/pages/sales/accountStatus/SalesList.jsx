@@ -219,6 +219,7 @@ const SalesList = () => {
       }
       setIsLoading(false);
       setListaVentas(result.data);
+  
     } else if (active === 1) {
       setIsLoading(true);
       const result = await getCreditoSalesByStoreAsync(
@@ -657,7 +658,6 @@ const SalesList = () => {
                                   onClick={() => {
                                     saleSelected(item);
                                   }}
-                                  // disabled={item.isCanceled}
                                 >
                                   <FontAwesomeIcon icon={faHandHoldingDollar} />
                                 </IconButton>

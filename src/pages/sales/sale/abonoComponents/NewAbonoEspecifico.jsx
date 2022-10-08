@@ -8,6 +8,9 @@ import {
   Typography,
   Paper,
   InputAdornment,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
@@ -20,8 +23,9 @@ import {
 import { addAbonoEspecificoAsync } from "../../../../services/SalesApi";
 import SmallModal from "../../../../components/modals/SmallModal";
 import { AbonoBillComponent } from "./AbonoBillComponent";
+import { Stack } from "react-bootstrap";
 
-export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
+export const NewAbonoEspecifico = ({ selectedVenta, client, tipopagoList }) => {
   let ruta = getRuta();
 
   const { reload, setReload, setIsLoading, setIsDefaultPass, setIsLogged } =
@@ -37,6 +41,10 @@ export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
 
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [dataBill, setDataBill] = useState([]);
+
+  const [selectedTipopago, setSelectedTipoPago] = useState(1);
+
+  const [reference, setReference] = useState("");
 
   const funcCantidad = (value) => {
     if (/^\d*\.?\d*$/.test(value.toString()) || value === "") {
@@ -58,7 +66,10 @@ export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
     const data = {
       IdSale: id,
       monto: newAbono,
+      idTipoPago: selectedTipopago,
+      reference,
     };
+
     setIsLoading(true);
     const result = await addAbonoEspecificoAsync(token, data);
     if (!result.statusResponse) {
@@ -87,11 +98,15 @@ export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
 
     setIsLoading(false);
     setDataBill(result.data);
-  
+
     setShowPrintModal(true);
     setReload(!reload);
     setNewAbono("");
     toastSuccess("Abono Agregado...");
+  };
+
+  const handleChangeTipoPago = (event) => {
+    setSelectedTipoPago(event.target.value);
   };
 
   return (
@@ -148,20 +163,59 @@ export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
           </div>
         </div>
 
-        <TextField
-          fullWidth
-          required
-          variant="standard"
-          onChange={(e) => funcCantidad(e.target.value)}
-          label={"Ingrese Abono"}
-          value={newAbono}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">C$</InputAdornment>
-            ),
-          }}
-          style={{ marginTop: 20 }}
-        />
+        <hr />
+        <Stack spacing={2}>
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{
+              textAlign: "left",
+            }}
+          >
+            <Select
+              labelId="selProc"
+              id="demo-simple-select-standard"
+              value={selectedTipopago}
+              onChange={handleChangeTipoPago}
+            >
+              {tipopagoList.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.description}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+
+          {selectedTipopago != 1 ? (
+            <TextField
+              fullWidth
+              style={{ marginTop: 20 }}
+              variant="standard"
+              label={"Documento de Referencia"}
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+            />
+          ) : (
+            <></>
+          )}
+
+          <TextField
+            fullWidth
+            required
+            variant="standard"
+            onChange={(e) => funcCantidad(e.target.value)}
+            label={"Ingrese Abono"}
+            value={newAbono}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">C$</InputAdornment>
+              ),
+            }}
+            style={{ marginTop: 20 }}
+          />
+        </Stack>
 
         <Button
           onClick={() => {
@@ -236,7 +290,6 @@ export const NewAbonoEspecifico = ({ selectedVenta, client }) => {
           data={dataBill}
           client={client}
           multipleBill={false}
-          
         />
       </SmallModal>
     </div>

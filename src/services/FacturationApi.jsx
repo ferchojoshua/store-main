@@ -34,6 +34,32 @@ export const getFactUncancelledByStoreAsync = async (token, id) => {
   return result;
 };
 
+export const getTipoPagosAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetTipoPagos`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
 export const getFactCancelledByStoreAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetFactCancelled/`;
@@ -85,6 +111,7 @@ export const getReprintSaleAsync = async (token, id) => {
   }
   return result;
 };
+
 export const getFactAnulatedByStoreAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetFactAnulated/`;

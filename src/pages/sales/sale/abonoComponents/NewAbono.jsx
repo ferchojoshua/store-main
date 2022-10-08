@@ -17,6 +17,9 @@ import {
   InputAdornment,
   IconButton,
   Stack,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -40,6 +43,7 @@ import { Table } from "react-bootstrap";
 import SmallModal from "../../../../components/modals/SmallModal";
 import { NewAbonoEspecifico } from "./NewAbonoEspecifico";
 import { AbonoBillComponent } from "./AbonoBillComponent";
+import { getTipoPagosAsync } from "../../../../services/FacturationApi";
 
 const NewAbono = ({
   selectedVenta,
@@ -81,6 +85,10 @@ const NewAbono = ({
   const [showprintModal, setShowprintModal] = useState(false);
   const [dataBill, setDataBill] = useState([]);
   const [multipleBill, setMultipleBill] = useState(false);
+
+  const [tipopagoList, setTipoPagoList] = useState([]);
+  const [selectedTipopago, setSelectedTipoPago] = useState(1);
+  const [reference, setReference] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -129,6 +137,33 @@ const NewAbono = ({
 
       setQuoteList(abonoList);
 
+      const resultStores = await getTipoPagosAsync(token);
+      if (!resultStores.statusResponse) {
+        setIsLoading(false);
+        if (resultStores.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultStores.error.message);
+        return;
+      }
+
+      if (resultStores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultStores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setTipoPagoList(resultStores.data);
+
       setIsLoading(false);
     })();
   }, [reload]);
@@ -154,6 +189,8 @@ const NewAbono = ({
       idClient: client.id,
       idStore: store.id,
       monto: newAbono,
+      idTipoPago: selectedTipopago,
+      reference,
     };
     setIsLoading(true);
     const result = await addAbonoAsync(token, data);
@@ -217,6 +254,10 @@ const NewAbono = ({
   const rePrintPrint = (data) => {
     setDataBill(data);
     setShowprintModal(true);
+  };
+
+  const handleChangeTipoPago = (event) => {
+    setSelectedTipoPago(event.target.value);
   };
 
   return (
@@ -474,20 +515,56 @@ const NewAbono = ({
           )}
 
           <hr />
+          <Stack spacing={2}>
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+              }}
+            >
+              <Select
+                labelId="selProc"
+                id="demo-simple-select-standard"
+                value={selectedTipopago}
+                onChange={handleChangeTipoPago}
+              >
+                {tipopagoList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
 
-          <TextField
-            fullWidth
-            required
-            variant="standard"
-            onChange={(e) => funcCantidad(e.target.value)}
-            label={"Ingrese Abono"}
-            value={newAbono}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">C$</InputAdornment>
-              ),
-            }}
-          />
+            {selectedTipopago != 1 ? (
+              <TextField
+                fullWidth
+                variant="standard"
+                label={"Documento de Referencia"}
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+              />
+            ) : (
+              <></>
+            )}
+
+            <TextField
+              fullWidth
+              required
+              variant="standard"
+              onChange={(e) => funcCantidad(e.target.value)}
+              label={"Ingrese Abono"}
+              value={newAbono}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">C$</InputAdornment>
+                ),
+              }}
+            />
+          </Stack>
 
           <Button
             onClick={() => {
@@ -527,7 +604,11 @@ const NewAbono = ({
         isVisible={showModal}
         setVisible={setShowModal}
       >
-        <NewAbonoEspecifico selectedVenta={selectedSale} client={client} />
+        <NewAbonoEspecifico
+          selectedVenta={selectedSale}
+          client={client}
+          tipopagoList={tipopagoList}
+        />
       </SmallModal>
 
       <SmallModal

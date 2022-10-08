@@ -80,6 +80,9 @@ const NewSale = () => {
   const [saldoVencido, setSaldoVencido] = useState("");
   const [factVencidas, setFactVencidas] = useState("");
 
+  const [selectedTipopago, setSelectedTipoPago] = useState(1);
+  const [reference, setReference] = useState("");
+
   useEffect(() => {
     setTypeClient(true);
     setTypeVenta("contado");
@@ -208,6 +211,8 @@ const NewSale = () => {
       descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
       codigoDescuento: descuentoCod,
       montoVentaAntesDescuento,
+      tipoPagoId: selectedTipopago,
+      reference,
     };
 
     setIsLoading(true);
@@ -244,6 +249,8 @@ const NewSale = () => {
     setDescuentoGlobalPercent("");
     setMontoVentaAntesDescuento(0);
     setMontoVentaDespuesDescuento(0);
+    setSelectedTipoPago(1);
+    setReference("");
     setSelectedStore("");
     setSelectedProductList([]);
     setIsLoading(false);
@@ -426,6 +433,10 @@ const NewSale = () => {
           setMontoVentaAntesDescuento={setMontoVentaAntesDescuento}
           selectedProductList={selectedProductList}
           typeVenta={typeVenta}
+          setSelectedTipoPago={setSelectedTipoPago}
+          selectedTipopago={selectedTipopago}
+          reference={reference}
+          setReference={setReference}
         />
       </SmallModal>
     </div>

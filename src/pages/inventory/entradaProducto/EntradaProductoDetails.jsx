@@ -16,17 +16,20 @@ import {
   Paper,
   IconButton,
   Typography,
+  Stack,
 } from "@mui/material";
 
 import {
   faCancel,
   faCircleArrowLeft,
+  faMoneyBill1Wave,
   faPenToSquare,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   getEntradaByIdAsync,
+  pagarFacturaAsync,
   putProductInAsync,
 } from "../../../services/ProductIsApi";
 import {
@@ -68,6 +71,7 @@ const EntradaProductoDetails = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState([]);
+  const [isCanceled, setIscancelled] = useState(true);
 
   const token = getToken();
 
@@ -108,11 +112,12 @@ const EntradaProductoDetails = () => {
         setMontoFactura(result.data.montoFactura);
         setProductList(result.data.productInDetails);
         setFechaIngreso(result.data.fechaIngreso);
+        setIscancelled(result.data.isCanceled);
       })();
     } else {
       navigate(`${ruta}/unauthorized`);
     }
-  }, []);
+  }, [reload]);
 
   const saveChanges = async () => {
     if (!noFactura) {
@@ -181,6 +186,43 @@ const EntradaProductoDetails = () => {
     setIsLoading(false);
     setIsEdit(false);
     toastSuccess("Cambios Relizados...!");
+  };
+
+  const pagarFactura = async () => {
+    if (!noFactura) {
+      toastError("Ingrese numero de factura");
+      return;
+    }
+
+    setIsLoading(true);
+    const result = await pagarFacturaAsync(token, id);
+    if (!result.statusResponse) {
+      setIsLoading(false);
+      if (result.error.request.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+        return;
+      }
+      toastError(result.error.message);
+      return;
+    }
+
+    if (result.data === "eX01") {
+      setIsLoading(false);
+      deleteUserData();
+      deleteToken();
+      setIsLogged(false);
+      return;
+    }
+
+    if (result.data.isDefaultPass) {
+      setIsLoading(false);
+      setIsDefaultPass(true);
+      return;
+    }
+
+    setReload(!reload);
+    setIsLoading(false);
+    toastSuccess("Factura Pagada...!");
   };
 
   const editDetail = (data) => {
@@ -446,17 +488,39 @@ const EntradaProductoDetails = () => {
 
             {isAccess(access, "ENTRADAPRODUCTOS UPDATE") ? (
               <div className="col-sm-4 ">
-                <Button
-                  variant="outlined"
-                  style={{ borderRadius: 20 }}
-                  onClick={() => saveChanges()}
-                >
-                  <FontAwesomeIcon
-                    style={{ marginRight: 10, fontSize: 20 }}
-                    icon={faSave}
-                  />
-                  Guardar Cambios
-                </Button>
+                <Stack spacing={1} direction={{ xs: "column", sm: "row" }}>
+                  {isCanceled ? (
+                    <></>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      style={{
+                        borderRadius: 20,
+                        color: "#ffc400",
+                        borderColor: "#ffc400",
+                      }}
+                      onClick={() => pagarFactura()}
+                    >
+                      <FontAwesomeIcon
+                        style={{ marginRight: 10, fontSize: 20 }}
+                        icon={faMoneyBill1Wave}
+                      />
+                      Pagar Factura
+                    </Button>
+                  )}
+
+                  <Button
+                    variant="outlined"
+                    style={{ borderRadius: 20 }}
+                    onClick={() => saveChanges()}
+                  >
+                    <FontAwesomeIcon
+                      style={{ marginRight: 10, fontSize: 20 }}
+                      icon={faSave}
+                    />
+                    Guardar Cambios
+                  </Button>
+                </Stack>
               </div>
             ) : (
               <></>

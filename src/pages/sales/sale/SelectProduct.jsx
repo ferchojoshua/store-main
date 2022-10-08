@@ -35,7 +35,6 @@ const SelectProduct = ({
   setSelectedStore,
   barCodeSearch,
   setBarCodeSearch,
-  recalculate,
 }) => {
   let ruta = getRuta();
 

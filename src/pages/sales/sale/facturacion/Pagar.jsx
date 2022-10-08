@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 
 import {
   Divider,
@@ -8,6 +8,9 @@ import {
   Stack,
   TextField,
   InputAdornment,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +18,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import { isEmpty } from "lodash";
-import { paidFacturaAsync } from "../../../../services/FacturationApi";
+import {
+  getTipoPagosAsync,
+  paidFacturaAsync,
+} from "../../../../services/FacturationApi";
 import { DataContext } from "../../../../context/DataContext";
 import {
   deleteToken,
@@ -45,6 +51,9 @@ const Pagar = ({
   const [descuentoGlobalMonto, setDescuentoGlobalMonto] = useState("");
   const [descuentoGlobalPercent, setDescuentoGlobalPercent] = useState("");
   const [descuentoCod, setDescuentoCod] = useState("");
+  const [tipopagoList, setTipoPagoList] = useState([]);
+  const [selectedTipopago, setSelectedTipoPago] = useState(1);
+  const [reference, setReference] = useState("");
 
   const token = getToken();
   let navigate = useNavigate();
@@ -122,14 +131,17 @@ const Pagar = ({
     }
 
     const data = {
-      FacturaId: id,
+      facturaId: id,
+      tipoPagoId: selectedTipopago,
       montoVenta: montoVentaDespuesDescuento,
       isDescuento: descuentoGlobal ? true : false,
       descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
       descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
       codigoDescuento: descuentoCod,
       montoVentaAntesDescuento,
+      reference,
     };
+
     setIsLoading(true);
     const result = await paidFacturaAsync(token, data);
     if (!result.statusResponse) {
@@ -160,6 +172,43 @@ const Pagar = ({
     setVisible(false);
   };
 
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      const resultStores = await getTipoPagosAsync(token);
+      if (!resultStores.statusResponse) {
+        setIsLoading(false);
+        if (resultStores.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultStores.error.message);
+        return;
+      }
+
+      if (resultStores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultStores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setTipoPagoList(resultStores.data);
+      setIsLoading(false);
+    })();
+  }, []);
+
+  const handleChangeTipoPago = (event) => {
+    setSelectedTipoPago(event.target.value);
+  };
+
   return (
     <div
       style={{
@@ -167,108 +216,142 @@ const Pagar = ({
       }}
     >
       <Divider />
-      <Stack direction={"row"} spacing={2} style={{ marginTop: 20 }}>
-        <Typography style={{ fontWeight: "bold" }}>
-          Monto a Pagar Antes Descuento:
-        </Typography>
+      <Stack spacing={2}>
+        <Stack direction={"row"} spacing={2} style={{ marginTop: 20 }}>
+          <Typography style={{ fontWeight: "bold" }}>
+            Monto a Pagar Antes Descuento:
+          </Typography>
 
-        <Typography style={{ color: "#2979ff" }}>
-          {montoVentaAntesDescuento.toLocaleString("es-NI", {
-            style: "currency",
-            currency: "NIO",
-          })}
-        </Typography>
-      </Stack>
+          <Typography style={{ color: "#2979ff" }}>
+            {montoVentaAntesDescuento.toLocaleString("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            })}
+          </Typography>
+        </Stack>
 
-      <Stack spacing={2} direction="row">
-        <TextField
-          style={{ marginTop: 5 }}
-          fullWidth
-          variant="standard"
-          label={isDescPercent ? "Descuento en %" : "Descuento en C$"}
-          value={descuentoGlobal}
-          onChange={(e) => funcDescuento(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => changeTipoDescuento()}
-                  style={{ width: 40, height: 40 }}
-                >
-                  {isDescPercent ? "C$" : "%"}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        {descuentoGlobal ? (
+        <Stack spacing={2} direction="row">
           <TextField
-            style={{ marginTop: 5 }}
             fullWidth
             variant="standard"
-            type={"password"}
-            label={"Codigo de Descuento"}
-            value={descuentoCod}
-            autoComplete="nope"
-            onChange={(e) =>
-              setDescuentoCod(e.target.value.toLocaleUpperCase())
-            }
+            label={isDescPercent ? "Descuento en %" : "Descuento en C$"}
+            value={descuentoGlobal}
+            onChange={(e) => funcDescuento(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => changeTipoDescuento()}
+                    style={{ width: 40, height: 40 }}
+                  >
+                    {isDescPercent ? "C$" : "%"}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          {descuentoGlobal ? (
+            <TextField
+              fullWidth
+              variant="standard"
+              type={"password"}
+              label={"Codigo de Descuento"}
+              value={descuentoCod}
+              autoComplete="nope"
+              onChange={(e) =>
+                setDescuentoCod(e.target.value.toLocaleUpperCase())
+              }
+            />
+          ) : (
+            <></>
+          )}
+        </Stack>
+
+        <Stack direction={"row"} spacing={2} style={{ marginTop: 20 }}>
+          <Typography style={{ fontWeight: "bold" }}>
+            Monto a Pagar Despues Descuento:
+          </Typography>
+          <Typography style={{ color: "#2979ff" }}>
+            {montoVentaDespuesDescuento.toLocaleString("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            })}
+          </Typography>
+        </Stack>
+
+        <Divider />
+
+        <FormControl
+          variant="standard"
+          fullWidth
+          style={{
+            textAlign: "left",
+          }}
+        >
+          <Select
+            labelId="selProc"
+            id="demo-simple-select-standard"
+            value={selectedTipopago}
+            onChange={handleChangeTipoPago}
+          >
+            {tipopagoList.map((item) => {
+              return (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.description}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+
+        {selectedTipopago != 1 ? (
+          <TextField
+            fullWidth
+            variant="standard"
+            label={"Documento de Referencia"}
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
           />
         ) : (
           <></>
         )}
-      </Stack>
 
-      <Stack direction={"row"} spacing={2} style={{ marginTop: 20 }}>
-        <Typography style={{ fontWeight: "bold" }}>
-          Monto a Pagar Despues Descuento:
-        </Typography>
-        <Typography style={{ color: "#2979ff" }}>
-          {montoVentaDespuesDescuento.toLocaleString("es-NI", {
-            style: "currency",
-            currency: "NIO",
-          })}
-        </Typography>
-      </Stack>
-
-      <Divider />
-
-      <TextField
-        style={{ marginTop: 20, marginBottom: 20 }}
-        fullWidth
-        variant="standard"
-        label={"Monto Recibido"}
-        value={montoRecibido}
-        onChange={(e) => funcMontoRecibido(e.target.value)}
-      />
-
-      <Stack spacing={2} direction="row">
-        <Typography style={{ fontWeight: "bold" }}>Cambio:</Typography>
-        <Typography style={{ color: cambio < 0 ? "#f50057" : "#2979ff" }}>
-          {cambio.toLocaleString("es-NI", {
-            style: "currency",
-            currency: "NIO",
-          })}
-        </Typography>
-      </Stack>
-
-      <Button
-        variant="outlined"
-        fullWidth
-        style={{
-          borderRadius: 20,
-          borderColor: "#00a152",
-          color: "#00a152",
-          marginTop: 20,
-        }}
-        onClick={() => addNewVenta()}
-      >
-        <FontAwesomeIcon
-          style={{ marginRight: 10, fontSize: 20 }}
-          icon={faSave}
+        <TextField
+          fullWidth
+          variant="standard"
+          label={"Monto Recibido"}
+          value={montoRecibido}
+          onChange={(e) => funcMontoRecibido(e.target.value)}
         />
-        Pagar
-      </Button>
+
+        <Stack spacing={2} direction="row">
+          <Typography style={{ fontWeight: "bold" }}>Cambio:</Typography>
+          <Typography style={{ color: cambio < 0 ? "#f50057" : "#2979ff" }}>
+            {cambio.toLocaleString("es-NI", {
+              style: "currency",
+              currency: "NIO",
+            })}
+          </Typography>
+        </Stack>
+
+        <Button
+          variant="outlined"
+          fullWidth
+          style={{
+            borderRadius: 20,
+            borderColor: "#00a152",
+            color: "#00a152",
+            marginTop: 20,
+          }}
+          onClick={() => addNewVenta()}
+        >
+          <FontAwesomeIcon
+            style={{ marginRight: 10, fontSize: 20 }}
+            icon={faSave}
+          />
+          Pagar
+        </Button>
+      </Stack>
     </div>
   );
 };

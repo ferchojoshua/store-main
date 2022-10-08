@@ -174,7 +174,7 @@ const AddEntradaProducto = () => {
 
     setMontoFactura(montoFactura - item.costoCompra);
     setMontoFacturaADesc(
-      montoFacturaADesc - item.costAntDesc * parseInt(item.cantidad)
+      montoFacturaADesc - item.costoUnitario * parseInt(item.cantidad)
     );
     setProductDetailList(filtered);
   };

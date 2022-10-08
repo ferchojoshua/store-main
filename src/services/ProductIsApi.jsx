@@ -108,3 +108,29 @@ export const putProductInAsync = async (token, data) => {
   }
   return result;
 };
+
+export const pagarFacturaAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}PagarFactura/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};

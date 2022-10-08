@@ -83,6 +83,7 @@ const MoverProducto = () => {
         return;
       }
       setMovimientosList(result.data);
+      console.log(result.data);
       setIsLoading(false);
     })();
   }, [reload]);
