@@ -43,11 +43,11 @@ export const ReportsContainer = () => {
             display="flex"
             justifyContent="center"
           >
-            <FontAwesomeIcon
+         /*   <FontAwesomeIcon
               icon={faChartLine}
               className="fa-beat-fade"
               style={{ fontSize: 40, color: "#4caf50" }}
-            />
+            />*/
 
             <h1>Reportes de Ventas</h1>
           </Stack>
