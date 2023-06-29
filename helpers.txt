@@ -1,0 +1,22 @@
+anumaciones react
+
+fa-beat
+
+fa-fade
+
+fa-beat-fade
+
+fa-bounce -> aplica un salto
+
+fa-flip
+
+fa-shake
+
+fa-spin
+
+fa-spin-pulse
+
+fa-spin-reverse
+
+ventaCode
+CALDERON.2022*
