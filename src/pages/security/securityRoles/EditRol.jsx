@@ -109,6 +109,14 @@ const [warehousesCreate, setWarehousesCreate] = useState(false);
 const [warehousesUpdate, setWarehousesUpdate] = useState(false);
 const [warehousesDelete, setWarehousesDelete] = useState(false);
 
+    
+     //PRODUCTS RECAL
+     const [productsrecalVer, setProductsRecalVer] = useState(false);
+     const [productsrecalCreate, setProductsRecalCreate] = useState(false);
+     const [productsrecalUpdate, setProductsRecalUpdate] = useState(false);
+     const [productsrecalDelete, setProductsRecalDelete] = useState(false);
+       
+
   //Reportes
   const [masterVentasVer, setMasterVentasVer] = useState(false);
   const [masterVentasUtility, setMasterVentasUtility] = useState(false);
@@ -284,6 +292,20 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "WAREHOUSES DELETE":
           setWarehousesDelete(item.isEnable);
+          break;
+
+             //PRODUCTS RECAL
+        case "PRODUCTS RECAL VER":
+          setProductsRecalVer(item.isEnable);
+          break;
+        case "PRODUCTS RECAL CREATE":
+          setProductsRecalCreate(item.isEnable);
+          break;
+        case "PRODUCTS RECAL UPDATE":
+          setProductsRecalUpdate(item.isEnable);
+          break;
+        case "PRODUCTS RECAL DELETE":
+          setProductsRecalDelete(item.isEnable);
           break;
 
         //Reportes
@@ -567,6 +589,20 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "WAREHOUSES DELETE":
           item.isEnable = warehousesDelete;
+          break;
+
+         //WAREHOUSES
+        case "PRODUCTS RECAL VER":
+          item.isEnable = productsrecalVer;
+          break;
+        case "PRODUCTS RECAL CREATE":
+          item.isEnable = productsrecalCreate;
+          break;
+        case "PRODUCTS RECAL UPDATE":
+          item.isEnable = productsrecalUpdate;
+          break;
+        case "PRODUCTS RECAL DELETE":
+          item.isEnable = productsrecalDelete;
           break;
 
 
@@ -1465,6 +1501,77 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
                     disabled={!isEdit}
                     checked={productsDelete}
                     onChange={() => setProductsDelete(!productsDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper>
+
+                {/* Modulo Products Recal */}
+                <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+             Modulo Incremento de Valor 
+            </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalVer}
+                    onChange={() => setProductsRecalVer(!productsrecalVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalCreate}
+                    onChange={() => setProductsRecalCreate(!productsrecalCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalUpdate}
+                    onChange={() => setProductsRecalUpdate(!productsrecalUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalDelete}
+                    onChange={() => setProductsRecalDelete(!productsrecalDelete)}
                   />
                 }
                 label="Eliminar"

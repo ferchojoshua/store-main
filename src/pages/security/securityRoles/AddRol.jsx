@@ -93,7 +93,13 @@ const AddRol = ({ setShowModal }) => {
     const [warehousesVer, setWarehousesVer] = useState(false);
     const [warehousesCreate, setWarehousesCreate] = useState(false);
     const [warehousesUpdate, setWarehousesUpdate] = useState(false);
-    const [warehousesDelete, setWarehousesDelete] = useState(false);
+    const [warehousesDelete, setWarehousesDelete] = useState(false);   
+    
+     //PRODUCTS RECAL
+    const [productsrecalVer, setProductsRecalVer] = useState(false);
+    const [productsrecalCreate, setProductsRecalCreate] = useState(false);
+    const [productsrecalUpdate, setProductsRecalUpdate] = useState(false);
+    const [productsrecalDelete, setProductsRecalDelete] = useState(false);
       
 
   //Reportes
@@ -187,6 +193,12 @@ setWarehousesVer(!isFullAccess);
 setWarehousesCreate(!isFullAccess);
 setWarehousesUpdate(!isFullAccess);
 setWarehousesDelete(!isFullAccess);
+
+//PRODUCTS RECAL
+setProductsRecalVer(!isFullAccess);
+setProductsRecalCreate(!isFullAccess);
+setProductsRecalUpdate(!isFullAccess);
+setProductsRecalDelete(!isFullAccess);
 
 
 
@@ -378,7 +390,6 @@ setWarehousesDelete(!isFullAccess);
           IsEnable: rolesDelete,
         },
 
-
           //PROVIDERS
           {
             description: "PROVIDERS VER",
@@ -432,6 +443,26 @@ setWarehousesDelete(!isFullAccess);
                 description: "WAREHOUSES DELETE",
                 IsEnable: rolesDelete,
               },
+
+              
+                //Products Recall
+                {
+                  description: "PRODUCTS RECAL VER",
+                  IsEnable: rolesVer,
+                },
+                {
+                  description: "PRODUCTS RECAL CREATE",
+                  IsEnable: rolesCreate,
+                },
+                {
+                  description: "PRODUCTS RECAL UPDATE",
+                  IsEnable: rolesUpdate,
+                },
+                {
+                  description: "PRODUCTS RECAL DELETE",
+                  IsEnable: rolesDelete,
+                },
+
 
         //Reportes
         {
@@ -1298,7 +1329,73 @@ setWarehousesDelete(!isFullAccess);
               />
             </Stack>
           </Paper>        
-          {/* Modulo Productos */}
+          {/* Modulo Products Recal */}
+          <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+              Modulo Incremento de Valor
+              </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    checked={productsrecalVer}
+                    onChange={() => setProductsRecalVer(!productsrecalVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    checked={productsrecalCreate}
+                    onChange={() => setProductsRecalCreate(!productsrecalCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    checked={productsrecalUpdate}
+                    onChange={() => setProductsRecalUpdate(!productsrecalUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                    checked={productsrecalDelete}
+                    onChange={() => setProductsRecalDelete(!productsrecalDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper> 
+          {/* Modulo Tipo Negocio */}
           <Paper
             elevation={10}
             style={{
