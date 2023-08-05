@@ -123,7 +123,6 @@ const SalesList = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-
       const resultStores = await getStoresByUserAsync(token);
       if (!resultStores.statusResponse) {
         setIsLoading(false);
@@ -153,11 +152,9 @@ const SalesList = () => {
 
       if (selectedStore === "") {
         setSelectedStore(resultStores.data[0].id);
+      
 
-        const result = await getContadoSalesByStoreAsync(
-          token,
-          resultStores.data[0].id
-        );
+        const result = await getContadoSalesByStoreAsync(token, resultStores.data[0].id);
         if (!result.statusResponse) {
           setIsLoading(false);
           if (result.error.request.status === 401) {

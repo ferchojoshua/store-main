@@ -8,7 +8,11 @@ import {
   MenuItem,
   FormControl,
   Paper,
+  FormLabel,
 } from "@mui/material";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { updateProductAsync } from "../../../services/ProductsApi";
@@ -29,7 +33,7 @@ import {
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ProductsDetails = ({ selectedProduct, setShowModal }) => {
+const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   let ruta = getRuta();
 
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -166,7 +170,7 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
     }
     setIsLoading(true);
     setReload(!reload);
-    toastSuccess("Productos Actualizado...!");
+    toastSuccess("Producto Actualizado...!");
     setIsEdit(false);
     setShowModal(false);
   };
@@ -221,6 +225,18 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
         }}
       >
         <Container>
+        <FormControl>
+      <FormLabel id="demo-radio-buttons-group-label">Choose Gender</FormLabel>
+      <RadioGroup
+        aria-labelledby="demo-radio-buttons-group-label"
+        defaultValue="female"
+        name="radio-buttons-group"
+      >
+        <FormControlLabel value="female" control={<Radio />} label="Female" />
+        <FormControlLabel value="male" control={<Radio />} label="Male" />
+        <FormControlLabel value="other" control={<Radio />} label="Other" />
+      </RadioGroup>
+    </FormControl>
           <FormControl
             variant="standard"
             fullWidth
@@ -406,4 +422,4 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
   );
 };
 
-export default ProductsDetails;
+export default ProductsRecalDetails;

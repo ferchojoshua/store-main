@@ -591,7 +591,7 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           item.isEnable = warehousesDelete;
           break;
 
-         //WAREHOUSES
+         //PRODUCTS RECALL
         case "PRODUCTS RECAL VER":
           item.isEnable = productsrecalVer;
           break;
@@ -1525,7 +1525,7 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
                 textAlign: "center",
               }}
             >
-             Modulo Incremento de Valor 
+             Modulo Ajuste de Valor 
             </Typography>
             <Divider />
             <Stack direction="row" display="flex" justifyContent="space-around">

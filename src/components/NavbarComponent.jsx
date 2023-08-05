@@ -206,7 +206,8 @@ const NavbarComponent = () => {
             {isAccess(access, "ENTRADAPRODUCTOS VER") ||
             isAccess(access, "EXISTANCE VER") ||
             isAccess(access, "PRODUCT TRANSLATE VER") ||
-            isAccess(access, "PRODUCTS VER") ? (
+            isAccess(access, "PRODUCTS VER") ||
+            isAccess(access, "PPRODUCTS RECAL VER") ? (
               <Nav.Link
                 eventKey="inventario"
                 style={{

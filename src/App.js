@@ -10,6 +10,7 @@ import DateAdapter from "@mui/lab/AdapterMoment";
 import "react-toastify/dist/ReactToastify.min.css";
 
 import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";
+//import EntradaProductoRecalDetails from "./pages/inventory/modificarProductoRecal/EntradaProductoRecalDetails";
 
 import Stores from "./pages/settings/stores/Stores";
 import StoreDetails from "./pages/settings/stores/StoreDetails";
@@ -232,16 +233,27 @@ function App() {
                 <Route
                   path={`${ruta}/traslado/add`}
                   element={<MoverProductoAdd />}
+                /> 
+                
+                 <Route
+                  path={`${ruta}/traslado/add`}
+                  element={<MoverProductoAdd />}
                 />
 
                 <Route
                   path={`${ruta}/entrada/add`}
                   element={<AddEntradaProducto />}
-                />
-                <Route
+                />            
+               <Route
                   path={`${ruta}/entrada/:id`}
                   element={<EntradaProductoDetails />}
                 />
+            
+              {/*
+                <Route
+                  path={`${ruta}/entrada/:id`}
+                  element={<EntradaProductoRecalDetails />}
+                />  */}
 
                 {/* Rutas Reportes */}
                 <Route

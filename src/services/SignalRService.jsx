@@ -12,6 +12,7 @@ export const serverMessages = async () => {
     const connection = new HubConnectionBuilder()
       .withUrl(`${controller}notificationHub`)
       .configureLogging(LogLevel.Information)
+      .withAutomaticReconnect()
       .build();
 
     connection.on("alertaCampana", (message) => {

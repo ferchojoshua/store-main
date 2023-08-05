@@ -1346,7 +1346,7 @@ setProductsRecalDelete(!isFullAccess);
                 textAlign: "center",
               }}
             >
-              Modulo Incremento de Valor
+              Modulo Ajustes de Valor
               </Typography>
             <Divider />
             <Stack direction="row" display="flex" justifyContent="space-around">
