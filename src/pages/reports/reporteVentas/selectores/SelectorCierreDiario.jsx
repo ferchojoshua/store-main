@@ -207,7 +207,7 @@ const SelectorCierreDiario = () => {
                 <MenuItem key={-1} value="">
                   <em> Seleccione un Almacen</em>
                 </MenuItem>
-                {storeList.map((item) => {
+                {storeList.map((item) => {  
                   return (
                     <MenuItem
                       key={item.id}

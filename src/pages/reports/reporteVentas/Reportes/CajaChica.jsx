@@ -25,6 +25,9 @@ import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import moment from "moment";
 import { Table } from "react-bootstrap";
 import { getGetCajaChicaAsync } from "../../../../services/ReportApi";
+import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faDownload, } from "@fortawesome/free-solid-svg-icons";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { PrintReport } from "../../../../components/modals/PrintReport";
 
 const CajaChica = () => {
@@ -151,12 +154,30 @@ const CajaChica = () => {
             "L"
           )} - Hasta: ${moment(hasta).format("L")}`}</span>
 
+          <Stack
+              spacing={3}
+              direction="row"              
+              display="flex"
+              justifyContent="right"> 
+                  <IconButton  
+                  spacing={3}
+                  direction="row"              
+                  display="flex"
+                  justifyContent="right"
+                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
+                  <FontAwesomeIcon icon={faDownload}
+                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
+     
+                  />
+                  </IconButton>
+         </Stack> 
+
           <ReactToPrint
             trigger={() => {
               return (
                 <IconButton
                   variant="outlined"
-                  style={{ position: "fixed", right: 50, top: 75 }}
+                  style={{ position: "fixed", right: 105, top: 75 }}
                 >
                   <PrintRoundedIcon
                     style={{ fontSize: 50, color: "#2979ff", width: 50 }}
@@ -174,6 +195,7 @@ const CajaChica = () => {
             <NoData />
           ) : (
             <Table
+             id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -298,6 +320,7 @@ const CajaChica = () => {
                 <NoData />
               ) : (
                 <Table
+                 id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -407,6 +430,15 @@ const CajaChica = () => {
               </Stack>
             </Container>
           </PrintReport>
+          
+ <ReactHTMLTableToExcel
+                    id="test-table-xls-button"
+                    className="btn btn-success"
+                    table="table-to-xls"
+                    filename="Reporte de Caja Chica"
+                    sheet="Pagina 1"
+                                           
+                    />
         </div>
       </Dialog>
     </div>
