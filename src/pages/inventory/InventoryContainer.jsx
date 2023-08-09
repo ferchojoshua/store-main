@@ -11,10 +11,10 @@ import {
   faTruckRampBox,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
-
 import EntradaProduto from "./entradaProducto/EntradaProduto";
 import MoverProducto from "./traslate-products/MoverProducto";
 import Products from "./products/Products";
+import ProductsRecal from "./productsRecal/ProductsRecal";
 import ProductExistences from "./productExistences/ProductExistences";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
@@ -114,12 +114,26 @@ const InventoryContainer = () => {
             ""
           )}
 
+
           {isAccess(access, "PRODUCTS VER") ? (
             <Tab
               icon={
                 <FontAwesomeIcon icon={faDollyBox} style={{ fontSize: 20 }} />
               }
               label="Productos"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
+
+          {isAccess(access, "PRODUCTS RECAL VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faLeftRight} style={{ fontSize: 20 }} />
+              }
+              label="Productos Ajuste Valor"
               {...a11yProps(0)}
               style={{ fontSize: 12 }}
             />
@@ -140,8 +154,7 @@ const InventoryContainer = () => {
 
         {isAccess(access, "EXISTANCE VER") ? (
           <TabPanel
-            value={value}
-            index={isAccess(access, "ENTRADAPRODUCTOS VER") ? 1 : 0}
+            value={value} index={isAccess(access, "ENTRADAPRODUCTOS VER") ? 1 : 0}
           >
             <ProductExistences />
           </TabPanel>
@@ -155,10 +168,8 @@ const InventoryContainer = () => {
             index={
               isAccess(access, "ENTRADAPRODUCTOS VER") ||
               isAccess(access, "EXISTANCE VER")
-                ? 2
-                : isAccess(access, "ENTRADAPRODUCTOS VER")
-                ? 1
-                : isAccess(access, "EXISTANCE VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER")
+                ? 1 : isAccess(access, "EXISTANCE VER")
                 ? 1
                 : 0
             }
@@ -173,29 +184,45 @@ const InventoryContainer = () => {
           <TabPanel
             value={value}
             index={
-              isAccess(access, "ENTRADAPRODUCTOS VER") &&
-              isAccess(access, "EXISTANCE VER") &&
-              isAccess(access, "PRODUCT TRANSLATE VER")
-                ? 3
-                : isAccess(access, "ENTRADAPRODUCTOS VER") &&
-                  isAccess(access, "EXISTANCE VER")
-                ? 2
-                : isAccess(access, "ENTRADAPRODUCTOS VER") &&
-                  isAccess(access, "PRODUCT TRANSLATE VER")
-                ? 2
-                : isAccess(access, "EXISTANCE VER") &&
-                  isAccess(access, "PRODUCT TRANSLATE VER")
-                ? 2
-                : isAccess(access, "ENTRADAPRODUCTOS VER")
-                ? 1
-                : isAccess(access, "EXISTANCE VER")
-                ? 1
-                : isAccess(access, "PRODUCT TRANSLATE VER")
+              isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 3  : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 2 : isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER")
+                ? 1 : isAccess(access, "EXISTANCE VER")
+                ? 1 : isAccess(access, "PRODUCT TRANSLATE VER")
                 ? 1
                 : 0
             }
           >
             <Products />
+          </TabPanel>
+        ) : (
+          <></>
+        )}
+        {isAccess(access, "PRODUCTS RECAL VER") ? (
+          <TabPanel
+            value={value}
+            index={
+                          isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCT TRANSLATE VER") && isAccess(access, "PRODUCTS VER")
+                ? 4 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 3 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCTS VER")
+                ? 3 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "PRODUCT TRANSLATE VER") && isAccess(access, "PRODUCTS VER")
+                ? 3 : isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCT TRANSLATE VER") && isAccess(access, "PRODUCTS VER")
+                ? 3 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "EXISTANCE VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER") && isAccess(access, "PRODUCTS VER")
+                ? 2 : isAccess(access, "EXISTANCE VER") && isAccess(access, "PRODUCTS VER")
+                ? 2 : isAccess(access, "PRODUCT TRANSLATE VER") && isAccess(access, "PRODUCTS VER")
+                ? 2 : isAccess(access, "ENTRADAPRODUCTOS VER")
+                ? 1 : isAccess(access, "EXISTANCE VER")
+                ? 1 : isAccess(access, "PRODUCT TRANSLATE VER")
+                ? 1 : isAccess(access, "PRODUCTS VER")
+                ? 1
+                : 0
+            }
+          >
+            <ProductsRecal />
           </TabPanel>
         ) : (
           <></>

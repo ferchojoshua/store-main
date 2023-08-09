@@ -14,6 +14,7 @@ export const MetaClientes = ({ selectedStore }) => {
   const [falta, setFalta] = useState(0);
   const [percent, setPercent] = useState(0);
 
+   //Cambiar el Datos a la meta
   const metas = [
     { id: 1, meta: 15 },
     { id: 2, meta: 16 },

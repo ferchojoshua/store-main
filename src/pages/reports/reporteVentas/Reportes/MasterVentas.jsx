@@ -11,6 +11,7 @@ import {
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, isAccess, toastError } from "../../../../helpers/Helpers";
 import {
@@ -54,6 +55,16 @@ export const MasterVentas = () => {
     access,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
+// Pagination
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsperPage] = useState(20);
+const indexLast = currentPage * itemsperPage;
+const indexFirst = indexLast - itemsperPage;
+const currentItem = data.slice(indexFirst, indexLast);
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+
   let navigate = useNavigate();
   let ruta = getRuta();
   const token = getToken();
@@ -238,7 +249,7 @@ export const MasterVentas = () => {
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {data.map((item) => {
+                {currentItem.map((item) => {
                   const { saleDetails } = item;
                   return (
                     <tr key={item.id}>
@@ -286,6 +297,11 @@ export const MasterVentas = () => {
               </tbody>
             </Table>
           )}
+          <PaginationComponent
+            data={data}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
           <hr />
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">

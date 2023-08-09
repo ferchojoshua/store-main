@@ -56,7 +56,7 @@ const ClientList = () => {
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [clientList, setClientList] = useState([]);
-
+  const [dialog, setDialog] = useState(false) 
   const [searchTerm, setSearchTerm] = useState("");
   const withSearch = clientList.filter((val) => {
     if (searchTerm === "") {

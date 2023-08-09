@@ -29,7 +29,7 @@ export const TableComponent = ({ data, columns }) => {
     if (searchTerm === "") {
       return val;
     } else if (
-      console.log(val)
+      // console.log(val)
       //   val.descripcion.toString().includes(searchTerm)
       //   ||
       //   val.countNumber.toString().includes(searchTerm)

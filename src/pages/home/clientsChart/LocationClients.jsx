@@ -110,7 +110,7 @@ export const LocationClients = ({ selectedStore }) => {
       <Typography variant="h6">Clientes por Ubicacion</Typography>
 
       {isEmpty(datos) ? (
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 29 }}>
           <NoData />
         </div>
       ) : (

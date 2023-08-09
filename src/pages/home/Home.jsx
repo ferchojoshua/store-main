@@ -133,7 +133,7 @@ const Home = () => {
           <FontAwesomeIcon
             icon={faChartLine}
             style={{ fontSize: 60, marginRight: 40, color: "#2196f3" }}
-            className="fa-beat-fade"
+            // className="fa-beat-fade"
           />
           <Typography variant="h4" className="d-none d-sm-block">
             Ventas y Clientes Nuevos
@@ -259,7 +259,7 @@ const Home = () => {
           <FontAwesomeIcon
             icon={faChartColumn}
             style={{ fontSize: 60, marginRight: 40, color: "#4caf50" }}
-            className="fa-beat-fade"
+            // className="fa-beat-fade"
           />
           <Typography variant="h4" className="d-none d-sm-block">
             Venta Semanal

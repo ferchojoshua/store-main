@@ -91,6 +91,32 @@ const EditRol = ({ setShowModal, selectedRol }) => {
   const [productsUpdate, setProductsUpdate] = useState(false);
   const [productsDelete, setProductsDelete] = useState(false);
 
+  //PROVIDERS
+  const [providerVer, setProviderVer] = useState(false);
+  const [providerCreate, setProviderCreate] = useState(false);
+  const [providerUpdate, setProviderUpdate] = useState(false);
+  const [providerDelete, setProviderDelete] = useState(false);
+
+//TYPEBUSINESS
+const [typeBusinessVer, setTypeBusinessVer] = useState(false);
+const [typeBusinessCreate, setTypeBusinessCreate] = useState(false);
+const [typeBusinessUpdate, setTypeBusinessUpdate] = useState(false);
+const [typeBusinessDelete, setTypeBusinessDelete] = useState(false);
+
+//WAREHOUSES
+const [warehousesVer, setWarehousesVer] = useState(false);
+const [warehousesCreate, setWarehousesCreate] = useState(false);
+const [warehousesUpdate, setWarehousesUpdate] = useState(false);
+const [warehousesDelete, setWarehousesDelete] = useState(false);
+
+    
+     //PRODUCTS RECAL
+     const [productsrecalVer, setProductsRecalVer] = useState(false);
+     const [productsrecalCreate, setProductsRecalCreate] = useState(false);
+     const [productsrecalUpdate, setProductsRecalUpdate] = useState(false);
+     const [productsrecalDelete, setProductsRecalDelete] = useState(false);
+       
+
   //Reportes
   const [masterVentasVer, setMasterVentasVer] = useState(false);
   const [masterVentasUtility, setMasterVentasUtility] = useState(false);
@@ -223,6 +249,63 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           break;
         case "PRODUCTS DELETE":
           setProductsDelete(item.isEnable);
+          break;
+
+          //PROVIDERS
+        case "PROVIDERS VER":
+          setProviderVer(item.isEnable);
+          break;
+        case "PROVIDERS CREATE":
+          setProviderCreate(item.isEnable);
+          break;
+        case "PROVIDERS UPDATE":
+          setProviderUpdate(item.isEnable);
+          break;
+        case "PROVIDERS DELETE":
+          setProviderDelete(item.isEnable);
+          break;
+
+          
+          //TYPEBUSINESS
+        case "TYPEBUSINESS VER":
+          setTypeBusinessVer(item.isEnable);
+          break;
+        case "TYPEBUSINESS CREATE":
+          setTypeBusinessCreate(item.isEnable);
+          break;
+        case "TYPEBUSINESS UPDATE":
+          setTypeBusinessUpdate(item.isEnable);
+          break;
+        case "TYPEBUSINESS DELETE":
+          setTypeBusinessDelete(item.isEnable);
+          break;  
+          
+          //WAREHOUSES
+        case "WAREHOUSES VER":
+          setWarehousesVer(item.isEnable);
+          break;
+        case "WAREHOUSES CREATE":
+          setWarehousesCreate(item.isEnable);
+          break;
+        case "WAREHOUSES UPDATE":
+          setWarehousesUpdate(item.isEnable);
+          break;
+        case "WAREHOUSES DELETE":
+          setWarehousesDelete(item.isEnable);
+          break;
+
+             //PRODUCTS RECAL
+        case "PRODUCTS RECAL VER":
+          setProductsRecalVer(item.isEnable);
+          break;
+        case "PRODUCTS RECAL CREATE":
+          setProductsRecalCreate(item.isEnable);
+          break;
+        case "PRODUCTS RECAL UPDATE":
+          setProductsRecalUpdate(item.isEnable);
+          break;
+        case "PRODUCTS RECAL DELETE":
+          setProductsRecalDelete(item.isEnable);
           break;
 
         //Reportes
@@ -464,6 +547,65 @@ const EditRol = ({ setShowModal, selectedRol }) => {
           item.isEnable = productsDelete;
           break;
 
+          //PROVIDERS
+        case "PROVIDERS VER":
+          item.isEnable = providerVer;
+          break;
+        case "PROVIDERS CREATE":
+          item.isEnable = providerCreate;
+          break;
+        case "PROVIDERS UPDATE":
+          item.isEnable = providerUpdate;
+          break;
+        case "PROVIDERS DELETE":
+          item.isEnable = providerDelete;
+          break;
+
+
+               //TYPEBUSINESS
+        case "TYPEBUSINESS VER":
+          item.isEnable = typeBusinessVer;
+          break;
+        case "TYPEBUSINESS CREATE":
+          item.isEnable = typeBusinessCreate;
+          break;
+        case "TYPEBUSINESS UPDATE":
+          item.isEnable = typeBusinessUpdate;
+          break;
+        case "TYPEBUSINESS DELETE":
+          item.isEnable = typeBusinessDelete;
+          break;
+
+
+         //WAREHOUSES
+        case "WAREHOUSES VER":
+          item.isEnable = warehousesVer;
+          break;
+        case "WAREHOUSES CREATE":
+          item.isEnable = warehousesCreate;
+          break;
+        case "WAREHOUSES UPDATE":
+          item.isEnable = warehousesUpdate;
+          break;
+        case "WAREHOUSES DELETE":
+          item.isEnable = warehousesDelete;
+          break;
+
+         //PRODUCTS RECALL
+        case "PRODUCTS RECAL VER":
+          item.isEnable = productsrecalVer;
+          break;
+        case "PRODUCTS RECAL CREATE":
+          item.isEnable = productsrecalCreate;
+          break;
+        case "PRODUCTS RECAL UPDATE":
+          item.isEnable = productsrecalUpdate;
+          break;
+        case "PRODUCTS RECAL DELETE":
+          item.isEnable = productsrecalDelete;
+          break;
+
+
         //Reportes
         case "MASTER VENTAS VER":
           item.isEnable = masterVentasVer;
@@ -660,6 +802,7 @@ const EditRol = ({ setShowModal, selectedRol }) => {
                   startIcon={
                     <FontAwesomeIcon
                       icon={isEdit ? faCircleXmark : faPenToSquare}
+                      style={{ borderRadius: 20, marginTop: 20 }}
                     />
                   }
                   onClick={() => setIsEdit(!isEdit)}
@@ -968,6 +1111,147 @@ const EditRol = ({ setShowModal, selectedRol }) => {
               />
             </Stack>
           </Paper>
+                 {/* Modulo Proveedores */}
+                 <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+              Modulo Proveedores
+            </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={providerVer}
+                    onChange={() => setProviderVer(!providerVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={providerCreate}
+                    onChange={() => setProviderCreate(!providerCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={providerUpdate}
+                    onChange={() => setProviderUpdate(!providerUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={providerDelete}
+                    onChange={() => setProviderDelete(!providerDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper>
+             {/* Modulo Almacen */}
+             <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+              Modulo Almacen
+            </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={warehousesVer}
+                    onChange={() => setWarehousesVer(!warehousesVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={warehousesCreate}
+                    onChange={() => setWarehousesCreate(!warehousesCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={warehousesUpdate}
+                    onChange={() => setWarehousesUpdate(!warehousesUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                    checked={warehousesDelete}
+                    onChange={() => setWarehousesDelete(!warehousesDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper>
+     
         </Grid>
         <Grid item xs={12} md={6}>
           {/* Modulo Abonos */}
@@ -1223,8 +1507,155 @@ const EditRol = ({ setShowModal, selectedRol }) => {
               />
             </Stack>
           </Paper>
+
+                {/* Modulo Products Recal */}
+                <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+             Modulo Ajuste de Valor 
+            </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalVer}
+                    onChange={() => setProductsRecalVer(!productsrecalVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalCreate}
+                    onChange={() => setProductsRecalCreate(!productsrecalCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalUpdate}
+                    onChange={() => setProductsRecalUpdate(!productsrecalUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={productsrecalDelete}
+                    onChange={() => setProductsRecalDelete(!productsrecalDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper>
+
+
+
+             {/* Modulo Tipo Negocio */}
+              <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+            <Typography
+              style={{
+                fontSize: 17,
+                color: "#2196f3",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+              Modulo Tipo Negocio
+            </Typography>
+            <Divider />
+            <Stack direction="row" display="flex" justifyContent="space-around">
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={typeBusinessVer}
+                  onChange={() => setTypeBusinessVer(!typeBusinessVer)}
+                  />
+                }
+                label="Ver"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={typeBusinessCreate}
+                  onChange={() => setTypeBusinessCreate(!typeBusinessCreate)}
+                  />
+                }
+                label="Crear"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={typeBusinessUpdate}
+                  onChange={() => setTypeBusinessUpdate(!typeBusinessUpdate)}
+                  />
+                }
+                label="Editar"
+              />
+
+              <FormControlLabel
+                labelPlacement="top"
+                control={
+                  <Checkbox
+                  disabled={!isEdit}
+                  checked={typeBusinessDelete}
+                  onChange={() => setTypeBusinessDelete(!typeBusinessDelete)}
+                  />
+                }
+                label="Eliminar"
+              />
+            </Stack>
+          </Paper>  
+          
         </Grid>
       </Grid>
+
+      
 
       {/* Modulo Reportes */}
       <Paper
@@ -1244,6 +1675,9 @@ const EditRol = ({ setShowModal, selectedRol }) => {
               textAlign: "center",
             }}
           >
+
+
+            
             Modulo Reportes
           </Typography>
           <Divider />

@@ -61,11 +61,12 @@ const EntradaProductoDetails = () => {
   const [tipoEntrada, setTipoEntrada] = useState("");
   const [tipoCompra, setTipoCompra] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("");
+  const [selectedStore, setSelectedStore] = useState("");
 
   const [montoFactura, setMontoFactura] = useState("");
   const [productList, setProductList] = useState([]);
 
-  const [selectedStore, setSelectedStore] = useState("");
+
 
   const [fechaIngreso, setFechaIngreso] = useState("");
 
@@ -140,6 +141,11 @@ const EntradaProductoDetails = () => {
       return;
     }
 
+    if (!selectedStore === "") {
+      toastError("Seleccione un almacen" , "error");
+      return;
+    }
+
     if (!montoFactura) {
       toastError("Ingrese al menos un producto para guardar");
       return;
@@ -151,6 +157,7 @@ const EntradaProductoDetails = () => {
       tipoEntrada,
       tipoPago: tipoCompra,
       providerId: selectedProvider,
+      almacenId: selectedStore.almacen.id, // Linea Agregada GCHAVEZ
       montoFactura,
       productInDetails: productList,
       fechaIngreso,
@@ -325,11 +332,12 @@ const EntradaProductoDetails = () => {
             setTipoCompra={setTipoCompra}
             selectedProvider={selectedProvider}
             setSelectedProvider={setSelectedProvider}
+            selectedStore={selectedStore}
+            setSelectedStore={setSelectedStore}
             fechaIngreso={fechaIngreso}
             setFechaIngreso={setFechaIngreso}
             isEdit={isEdit}
-            selectedStore={selectedStore}
-            setSelectedStore={setSelectedStore}
+       
           />
 
           <div

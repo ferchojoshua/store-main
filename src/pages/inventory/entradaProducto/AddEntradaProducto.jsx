@@ -51,9 +51,9 @@ const AddEntradaProducto = () => {
   let navigate = useNavigate();
   const [tipoCompra, setTipoCompra] = useState("");
   const [noFactura, setNoFactura] = useState("");
-
+  const [selectedStore, setSelectedStore] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("");
-
+ 
   const [montoFactura, setMontoFactura] = useState(0);
   const [montoFacturaADesc, setMontoFacturaADesc] = useState(0);
 
@@ -89,7 +89,13 @@ const AddEntradaProducto = () => {
     if (!selectedProduct) {
       simpleMessage("Seleccione un producto", "error");
       return;
-    }
+    }    
+
+    if (!selectedStore) {
+      simpleMessage("Seleccione un Almacen", "error");
+      return;
+    }    
+
 
     if (!cantidad) {
       simpleMessage("Ingrese cantidad de productos", "error");
@@ -195,6 +201,11 @@ const AddEntradaProducto = () => {
       return;
     }
 
+    if (!selectedStore) {
+      simpleMessage("Seleccione un Almacen" , "error");
+      return;
+    }
+
     if (!montoFactura) {
       simpleMessage("Ingrese al menos un producto para guardar", "error");
       return;
@@ -204,6 +215,7 @@ const AddEntradaProducto = () => {
       noFactura,
       tipoPago: tipoCompra,
       providerId: selectedProvider.id,
+      almacenId: selectedStore.almacen.id, // Linea Agregada GCHAVEZ
       montFactAntDesc: montoFacturaADesc,
       montoFactura,
       productInDetails: productDetailList,
@@ -239,6 +251,7 @@ const AddEntradaProducto = () => {
     setNoFactura("");
     setTipoCompra("");
     setSelectedProvider("");
+    setSelectedStore("");
     setMontoFactura(0);
     setMontoFacturaADesc(0);
     setProductDetailList([]);
@@ -289,6 +302,8 @@ const AddEntradaProducto = () => {
               setTipoCompra={setTipoCompra}
               selectedProvider={selectedProvider}
               setSelectedProvider={setSelectedProvider}
+              selectedStore={selectedStore}
+              setSelectedStore={setSelectedStore}
             />
 
             <ProductDescription

@@ -1,3 +1,6 @@
 .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
-    z-index: 11000;
+    z-index: 30000;
   }
+.css-1oqqzyl-MuiContainer-root {
+  max-width: '';
+}

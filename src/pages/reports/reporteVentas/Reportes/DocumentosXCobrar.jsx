@@ -11,6 +11,7 @@ import {
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -45,6 +46,18 @@ export const DocumentosXCobrar = () => {
     title,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
+   // Pagination
+   const [currentPage, setCurrentPage] = useState(1);
+   const [itemsperPage] = useState(20);
+   const indexLast = currentPage * itemsperPage;
+   const indexFirst = indexLast - itemsperPage;
+   const currentItem = data.slice(indexFirst, indexLast);
+   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+ 
+
+   
+
   let navigate = useNavigate();
   let ruta = getRuta();
   const token = getToken();
@@ -257,7 +270,11 @@ export const DocumentosXCobrar = () => {
               </tbody>
             </Table>
           )}
-
+          <PaginationComponent
+            data={data}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
           <hr />
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">

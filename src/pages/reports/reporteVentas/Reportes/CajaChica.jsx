@@ -11,6 +11,7 @@ import {
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -34,6 +35,15 @@ const CajaChica = () => {
 
   const [data, setData] = useState([]);
   const [saldoAnterior, setSaldoAnterior] = useState(0);
+
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsperPage] = useState(20);
+    const indexLast = currentPage * itemsperPage;
+    const indexFirst = indexLast - itemsperPage;
+    const currentItem = data.slice(indexFirst, indexLast);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -179,7 +189,7 @@ const CajaChica = () => {
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {data.map((item) => {
+                {currentItem.map((item) => {
                   const { id, fecha, description, entradas, salidas, saldo } =
                     item;
 
@@ -213,9 +223,12 @@ const CajaChica = () => {
               </tbody>
             </Table>
           )}
-
+          <PaginationComponent
+            data={data}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
           <hr />
-
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>

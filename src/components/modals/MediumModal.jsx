@@ -9,6 +9,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const MediumModal = ({ titulo, isVisible, setVisible, children }) => {
   return (
     <div>
+    
       <Dialog
         PaperProps={{ style: { borderRadius: 25 } }}
         TransitionComponent={Transition}

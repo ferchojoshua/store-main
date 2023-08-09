@@ -3,7 +3,7 @@ import { faDatabase } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typography } from "@mui/material";
 
-const NoData = () => {
+const Consulting = () => {
   return (
     <div
       style={{
@@ -13,7 +13,7 @@ const NoData = () => {
       }}
     >
       <Typography style={{ color: "#ff5722", marginBottom: 20 }} variant="h6">
-        No hay Registros 
+        Favor espere un momento......
       </Typography>
       <FontAwesomeIcon
         style={{ color: "#ff5722", fontSize: 100 }}
@@ -23,4 +23,4 @@ const NoData = () => {
   );
 };
 
-export default NoData;
+export default Consulting;

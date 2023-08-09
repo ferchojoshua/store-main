@@ -16,7 +16,7 @@ const ReportWatcher = (props) => {
       newWindow.current = window.open(
         "",
         "",
-        "width=600,height=400,left=200,top=200"
+        "width=00,height=400,left=200,top=200"
       );
       newWindow.current.document.body.appendChild(container);
       const curWindow = newWindow.current;

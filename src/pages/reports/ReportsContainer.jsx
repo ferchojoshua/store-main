@@ -43,11 +43,11 @@ export const ReportsContainer = () => {
             display="flex"
             justifyContent="center"
           >
-         /*   <FontAwesomeIcon
+            <FontAwesomeIcon
               icon={faChartLine}
-              className="fa-beat-fade"
+              // className="fa-beat-fade"
               style={{ fontSize: 40, color: "#4caf50" }}
-            />*/
+            />
 
             <h1>Reportes de Ventas</h1>
           </Stack>
@@ -97,7 +97,7 @@ export const ReportsContainer = () => {
             )}
 
             {isAccess(access, "PRODNOVENDIDOS VER") ? (
-              <Grid item xs={12} sm={6} md={4} lg={3}>
+              <Grid item xs={6} sm={6} md={3} lg={3}>
                 <ReportCaller
                   icon={faHandshakeAltSlash}
                   text="Productos no Vendidos"
@@ -141,7 +141,7 @@ export const ReportsContainer = () => {
             >
               <FontAwesomeIcon
                 icon={faBriefcase}
-                className="fa-beat-fade"
+                // className="fa-beat-fade"
                 style={{ fontSize: 40, color: "#4caf50" }}
               />
 

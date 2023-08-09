@@ -27,6 +27,7 @@ import {
 import { getprovidersAsync } from "../../../../services/ProviderApi";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getStoresAsync } from "../../../../services/AlmacenApi";
 
 const DetallesDeEntrada = ({
   setNoFactura,
@@ -35,6 +36,8 @@ const DetallesDeEntrada = ({
   setTipoCompra,
   selectedProvider,
   setSelectedProvider,
+  selectedStore,
+  setSelectedStore,
 }) => {
   let ruta = getRuta();
 
@@ -43,6 +46,7 @@ const DetallesDeEntrada = ({
   const token = getToken();
   const [providerList, setProviderList] = useState([]);
   const [showProviderModal, setShowProvidermodal] = useState(false);
+  const [storeList, setStoreList] = useState([]);
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -71,6 +75,30 @@ const DetallesDeEntrada = ({
         return;
       }
       setProviderList(resultProviders.data);
+      const resultStore = await getStoresAsync(token);
+      if (!resultStore.statusResponse) {
+        setIsLoading(false);
+        if (resultStore.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultStore.error.message);
+        return;
+      }
+      if (resultStore.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultStore.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setStoreList(resultStore.data);
+      setIsLoading(false);
       setIsLoading(false);
     })();
   }, [reload]);
@@ -93,7 +121,7 @@ const DetallesDeEntrada = ({
         <Divider style={{ marginTop: 10, marginBottom: 10 }} />
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <TextField
               fullWidth
               required
@@ -103,7 +131,7 @@ const DetallesDeEntrada = ({
               value={noFactura}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <FormControl variant="standard" fullWidth>
               <InputLabel id="demo-simple-select-standard-label">
                 Tipo de pago...
@@ -129,7 +157,7 @@ const DetallesDeEntrada = ({
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <Stack direction={"row"} spacing={2}>
               <Autocomplete
                 id="combo-box-demo"
@@ -149,7 +177,6 @@ const DetallesDeEntrada = ({
                   />
                 )}
               />
-
               <Tooltip title="Agregar Proveedor" style={{ marginTop: 5 }}>
                 <IconButton onClick={() => setShowProvidermodal(true)}>
                   <FontAwesomeIcon
@@ -163,6 +190,28 @@ const DetallesDeEntrada = ({
               </Tooltip>
             </Stack>
           </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <Stack direction={"row"} spacing={2}>
+              <Autocomplete
+                id="combo-box-demo"
+                fullWidth
+                options={storeList}
+                getOptionLabel={(st) => (st ? `${st.almacen.name}` : "")}
+                value={selectedStore === "" ? null : selectedStore}
+                onChange={(event, newValue) => {
+                  setSelectedStore(newValue);
+                }}noOptionsText="Almacen no encontrado..."
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Almacen..."
+                  />
+                )}
+              />
+              </Stack>
+          </Grid>     
         </Grid>
       </Paper>
 

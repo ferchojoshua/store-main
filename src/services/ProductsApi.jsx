@@ -59,7 +59,7 @@ export const addProductAsync = async (token, data) => {
   return result;
 };
 
-export const getProductByIdAsync = async (token, id) => {
+export const ProductsRecalByIdAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
   const authAxios = axios.create({
     baseURL: controller,

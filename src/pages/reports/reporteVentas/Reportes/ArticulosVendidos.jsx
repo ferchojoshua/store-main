@@ -11,13 +11,10 @@ import {
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, isAccess, toastError } from "../../../../helpers/Helpers";
-import {
-  deleteToken,
-  deleteUserData,
-  getToken,
-} from "../../../../services/Account";
+import { deleteToken, deleteUserData, getToken,} from "../../../../services/Account";
 import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
@@ -54,6 +51,15 @@ export const ArticulosVendidos = () => {
     title,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
+
+    // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(20);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = data.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -203,7 +209,7 @@ export const ArticulosVendidos = () => {
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {data.map((item) => {
+                {currentItem.map((item) => {
                   return (
                     <tr key={item.barCode}>
                       <td style={{ textAlign: "right" }}>{item.barCode}</td>
@@ -239,9 +245,12 @@ export const ArticulosVendidos = () => {
               </tbody>
             </Table>
           )}
-
+          <PaginationComponent
+            data={data}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />    
           <hr />
-
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>

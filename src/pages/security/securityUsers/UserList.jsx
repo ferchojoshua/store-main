@@ -97,7 +97,7 @@ const UserList = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const [selectedUser, setSelectedUser] = useState([]);
+  const [selectedUser, setSelectedUser] = useState([]); 
 
   const [active, setActive] = useState(0);
 
@@ -229,11 +229,11 @@ const UserList = () => {
         })();
         toastSuccess("Contraseña reseteada, por defecto es: 123456");
       }
-    });
+    })
   };
 
-  const userEdit = (item) => {
-    setSelectedUser(item);
+  const userEdit = (value) => {
+    setSelectedUser(value);
     setShowEditModal(true);
   };
 
@@ -301,6 +301,7 @@ const UserList = () => {
                 onChange={(e) => onSelectChange(e.target.value)}
                 value={active}
               >
+              
                 <MenuItem key={0} value={0}>
                   <FontAwesomeIcon
                     icon={faUserCheck}
@@ -375,6 +376,7 @@ const UserList = () => {
             ),
           }}
         />
+       
 
         {isEmpty(withSearch) ? (
           <NoData />
@@ -416,15 +418,32 @@ const UserList = () => {
                         }}
                       />
                     </td>
+
+                   
                     <td style={{ width: 150 }}>
                       <IconButton
                         style={{ marginRight: 5, color: "#00a152" }}
                         onClick={() => {
                           userEdit(item);
+                         
                         }}
                       >
                         <FontAwesomeIcon icon={faExternalLinkAlt} />
                       </IconButton>
+                        
+                                              {/* {isAccess(access, "USER UPDATE") && (
+                        <IconButton
+                          style={{  marginRight: 5,color: "#f50057" }}
+                          // onClick={() => userEdit(item) } 
+                          onClick={() => userEdit(item)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faExternalLinkAlt}
+                          />
+                        </IconButton>
+                      )} */}
+
+
 
                       {isAccess(access, "USER UPDATE") ? (
                         item.isActive ? (
@@ -455,9 +474,11 @@ const UserList = () => {
                       ) : (
                         <></>
                       )}
+                      {/* {JSON.stringify(item)} */} 
                     </td>
                   </tr>
                 );
+                
               })}
             </tbody>
           </Table>
@@ -477,7 +498,8 @@ const UserList = () => {
       </MediumModal>
 
       <MediumModal
-        titulo={`Usuario ${selectedUser.fullName}`}
+        // titulo={`Usuario ${selectedUser.fullName}`}
+        titulo={`Editar Usuario`}
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >

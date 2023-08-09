@@ -174,7 +174,7 @@ const NavbarComponent = () => {
               <FontAwesomeIcon
                 icon={faHome}
                 style={{ marginRight: 10 }}
-                className={active === "home" ? "fa-beat-fade" : ""}
+                // className={active === "home" ? "fa-beat-fade" : ""}
               />
               Inicio
             </Nav.Link>
@@ -195,7 +195,7 @@ const NavbarComponent = () => {
                 <FontAwesomeIcon
                   icon={faChartLine}
                   style={{ marginRight: 10 }}
-                  className={active === "ventas" ? "fa-beat-fade" : ""}
+                  // className={active === "ventas" ? "fa-beat-fade" : ""}
                 />
                 Ventas
               </Nav.Link>
@@ -206,7 +206,8 @@ const NavbarComponent = () => {
             {isAccess(access, "ENTRADAPRODUCTOS VER") ||
             isAccess(access, "EXISTANCE VER") ||
             isAccess(access, "PRODUCT TRANSLATE VER") ||
-            isAccess(access, "PRODUCTS VER") ? (
+            isAccess(access, "PRODUCTS VER") ||
+            isAccess(access, "PPRODUCTS RECAL VER") ? (
               <Nav.Link
                 eventKey="inventario"
                 style={{
@@ -220,7 +221,7 @@ const NavbarComponent = () => {
                 <FontAwesomeIcon
                   icon={faBoxesStacked}
                   style={{ marginRight: 10 }}
-                  className={active === "inventario" ? "fa-beat-fade" : ""}
+                  // className={active === "inventario" ? "fa-beat-fade" : ""}
                 />
                 Inventario
               </Nav.Link>
@@ -241,7 +242,7 @@ const NavbarComponent = () => {
               <FontAwesomeIcon
                 icon={faScroll}
                 style={{ marginRight: 10 }}
-                className={active === "reports" ? "fa-beat-fade" : ""}
+                // className={active === "reports" ? "fa-beat-fade" : ""}
               />
               Reportes
             </Nav.Link>
@@ -260,35 +261,78 @@ const NavbarComponent = () => {
                 <FontAwesomeIcon
                   icon={faBook}
                   style={{ marginRight: 10 }}
-                  className={active === "admon" ? "fa-beat-fade" : ""}
+                  // className={active === "admon" ? "fa-beat-fade" : ""}
                 />
                 Contabilidad
               </Nav.Link>
             ) : (
               <></>
             )}
-            {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+         {isAccess(access, "WAREHOUSES VER") ? (
               <Nav.Link
                 style={{
-                  fontWeight: active === "security" ? "bold" : "",
-                  color: active === "security" ? "#bbdefb" : "#9e9e9e",
+                  fontWeight: active === "misc" ? "bold" : "",
+                  color: active === "misc" ? "#bbdefb" : "#9e9e9e",
                   fontSize: 17,
                 }}
-                eventKey="security"
+                eventKey="misc"
                 as={Link}
-                to={`${ruta}/security`}
+                to={`${ruta}/stores`}
               >
                 <FontAwesomeIcon
-                  icon={faShield}
+                  icon={faWarehouse}
                   style={{ marginRight: 10 }}
-                  className={active === "security" ? "fa-beat-fade" : ""}
+                  // className={active === "security" ? "fa-beat-fade" : ""}
                 />
-                Seguridad
+                Almacenes
               </Nav.Link>
             ) : (
               <></>
             )}
 
+
+          {isAccess(access, "PROVIDERS VER") ? (
+              <Nav.Link
+                style={{
+                  fontWeight: active === "admon" ? "bold" : "",
+                  color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                eventKey="misc"
+                as={Link}
+                to={`${ruta}/providers`}
+              >
+                <FontAwesomeIcon
+                  icon={faPeopleCarryBox}
+                  style={{ marginRight: 10 }}
+                  // className={active === "admon" ? "fa-beat-fade" : ""}
+                />
+                Proveedores
+              </Nav.Link>
+            ) : (
+              <></>
+            )}       
+            {isAccess(access, "TYPEBUSINESS VER") ? (
+              <Nav.Link
+                style={{
+                  fontWeight: active === "admon" ? "bold" : "",
+                  color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                  fontSize: 17,
+                }}
+                eventKey="misc"
+                as={Link}
+                to={`${ruta}/tipo-negocio`}
+              >
+                <FontAwesomeIcon
+                  icon={faSitemap}
+                  style={{ marginRight: 10 }}
+                  // className={active === "admon" ? "fa-beat-fade" : ""}
+                />
+                Tipo Negocio
+              </Nav.Link>
+            ) : (
+              <></>
+            )}
             <NavDropdown
               drop="start"
               title={
@@ -302,15 +346,15 @@ const NavbarComponent = () => {
                   }}
                 />
               }
-              id="navbarScrollingDropdown"
-              onSelect={(selectedKey) => setActive(selectedKey)}
+              // id="navbarScrollingDropdown"
+              // onSelect={(selectedKey) => setActive(selectedKey)}
             >
-              <NavDropdown.Header>
+              {/* <NavDropdown.Header>
                 <FontAwesomeIcon icon={faSliders} style={{ marginRight: 10 }} />
                 Miscelaneos
               </NavDropdown.Header>
-              <NavDropdown.Divider />
-
+              <NavDropdown.Divider /> */}
+{/* 
               {isAccess(access, "MISCELANEOS VER") ? (
                 <NavDropdown.Item
                   as={Link}
@@ -325,9 +369,25 @@ const NavbarComponent = () => {
                 </NavDropdown.Item>
               ) : (
                 <></>
-              )}
+              )} */}
 
-              {isAccess(access, "MISCELANEOS VER") ? (
+
+                  {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/security`}
+                  eventKey="security"
+                >
+                  <FontAwesomeIcon
+                    icon={faShield}
+                    style={{ marginRight: 10 }}
+                  />
+                  Seguridad
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
+              {/* {isAccess(access, "MISCELANEOS VER") ? (
                 <NavDropdown.Item
                   as={Link}
                   to={`${ruta}/providers`}
@@ -341,9 +401,9 @@ const NavbarComponent = () => {
                 </NavDropdown.Item>
               ) : (
                 <></>
-              )}
+              )} */}
 
-              {isAccess(access, "MISCELANEOS VER") ? (
+              {/* {isAccess(access, "MISCELANEOS VER") ? (
                 <NavDropdown.Item
                   as={Link}
                   to={`${ruta}/tipo-negocio`}
@@ -357,7 +417,7 @@ const NavbarComponent = () => {
                 </NavDropdown.Item>
               ) : (
                 <></>
-              )}
+              )} */}
 
               {isAccess(access, "COMMUNITIES VER") ? (
                 <NavDropdown.Item
@@ -506,14 +566,14 @@ const NavbarComponent = () => {
                 />
                 Cerrar Sesion
               </MenuItem>
-              <Divider />
+              {/* <Divider />
               <MenuItem disabled style={{ color: "#2196f3" }}>
                 <FontAwesomeIcon
                   icon={faCodeBranch}
                   style={{ marginRight: 20 }}
                 />
                 {`Version - ${version}`}
-              </MenuItem>
+              </MenuItem> */}
             </Menu>
           </div>
         </Navbar.Collapse>

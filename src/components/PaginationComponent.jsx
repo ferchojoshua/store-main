@@ -13,10 +13,12 @@ const PaginationComponent = ({ data, paginate, itemsperPage }) => {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <div style={{ display: "flex", justifyContent: "flex-end"  }}>
       <Pagination
-        style={{ marginRight: 20 }}
+        style={{ marginRight: 15 }}
         count={pageNumber.length}
+        defaultPage={6}
+         siblingCount={0}
         variant="outlined"
         color="primary"
         onChange={handleChange}

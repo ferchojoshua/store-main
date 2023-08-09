@@ -11,6 +11,7 @@ import {
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../../../components/NoData";
+import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import {
@@ -44,6 +45,18 @@ const TrasladoInventario = () => {
     title,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(20);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = data.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+
+
   let navigate = useNavigate();
   let ruta = getRuta();
   const token = getToken();
@@ -172,7 +185,7 @@ const TrasladoInventario = () => {
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {data.map((item) => {
+                {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>
                       <td style={{ textAlign: "center" }}>
@@ -207,6 +220,11 @@ const TrasladoInventario = () => {
               </tbody>
             </Table>
           )}
+          <PaginationComponent
+            data={data}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
 
           <hr />
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+//import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +24,7 @@ import {
   faExternalLinkAlt,
   faHandHoldingDollar,
   faMoneyBillTransfer,
+  faHandshakeAltSlash,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
@@ -52,7 +54,7 @@ let controller = "";
 if (process.env.NODE_ENV === "production") {
   controller = "http://20.231.75.97:8090/";
 } else {
-  controller = "https://localhost:7015/";
+  controller = "http://localhost:7015/";
 }
 
 const SalesList = () => {
@@ -76,8 +78,7 @@ const SalesList = () => {
 
   const withSearch = listaVentas.filter((val) => {
     if (isEmpty(val.client)) {
-      if (searchTerm === "") {
-        return val;
+      if (searchTerm === "") {return val;
       } else if (
         val.id.toString().includes(searchTerm) ||
         val.nombreCliente.toString().includes(searchTerm)
@@ -492,6 +493,17 @@ const SalesList = () => {
                   />
                   Devoluciones
                 </MenuItem>
+                {/* <MenuItem key={3} value={3}>
+                  <FontAwesomeIcon
+                    icon={faHandshakeAltSlash}
+                    style={{
+                      marginRight: 10,
+                      marginLeft: 10,
+                      color: "#f50057",
+                    }}
+                  />
+                  Anuladas
+                </MenuItem>                  */}
               </Select>
             </FormControl>
           </div>

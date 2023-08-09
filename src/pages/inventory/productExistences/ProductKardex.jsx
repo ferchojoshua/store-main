@@ -28,6 +28,7 @@ import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import DatePicker from "@mui/lab/DatePicker";
 
 import NoData from "../../../components/NoData";
+import PaginationComponent from "../../../components/PaginationComponent";
 import {
   getAllStoresKardexAsync,
   getKardexAsync,
@@ -52,6 +53,16 @@ export const ProductKardex = ({ productList }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const [kardex, setKardex] = useState([]);
+
+
+
+     // Pagination
+     const [currentPage, setCurrentPage] = useState(1);
+     const [itemsperPage] = useState(5);
+     const indexLast = currentPage * itemsperPage;
+     const indexFirst = indexLast - itemsperPage;
+     const currentItem = kardex.slice(indexFirst, indexLast);
+     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   let navigate = useNavigate();
   const token = getToken();
@@ -213,6 +224,7 @@ export const ProductKardex = ({ productList }) => {
         style={{
           borderRadius: 30,
           padding: 30,
+          margin: 60,
           marginBottom: 10,
         }}
       >
@@ -319,7 +331,7 @@ export const ProductKardex = ({ productList }) => {
             Ver Kardex
           </Button>
         </div>
-      </Paper>
+      </Paper>  
 
       {isVisible ? (
         <div>
@@ -342,7 +354,7 @@ export const ProductKardex = ({ productList }) => {
                 justifyContent: "space-between",
               }}
             >
-              <Tooltip title="Imprimir">
+              {/* <Tooltip title="Imprimir">
                 <IconButton
                   size="large"
                   //   onClick={() => {
@@ -354,7 +366,7 @@ export const ProductKardex = ({ productList }) => {
                     style={{ color: "#1769aa" }}
                   />
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
             </div>
           </div>
 
@@ -390,7 +402,7 @@ export const ProductKardex = ({ productList }) => {
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {kardex.map((item) => {
+                {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>
                       <td>{moment(item.fecha).format("L")}</td>
@@ -413,6 +425,11 @@ export const ProductKardex = ({ productList }) => {
               </tbody>
             </Table>
           )}
+            <PaginationComponent
+            data={kardex}
+            paginate={paginate}
+            itemsperPage={itemsperPage}
+          />
         </div>
       ) : (
         <></>

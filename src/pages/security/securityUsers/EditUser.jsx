@@ -49,6 +49,8 @@ const EditUser = ({ selectedUser, setShowModal }) => {
   } = useContext(DataContext);
   let navigate = useNavigate();
   const token = getToken();
+
+
   const [rolesList, setRolesList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -132,7 +134,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
   }, []);
 
   const updateUser = async () => {
-    const filtered = value.filter((s) => s.id !== undefined);
+    const filtered = value.filter((s) => s.id !== null);
 
     if (validate()) {
       const data = {
@@ -264,10 +266,8 @@ const EditUser = ({ selectedUser, setShowModal }) => {
                 fullWidth
                 style={{ marginBottom: 10, marginTop: 10 }}
                 variant="standard"
-                onChange={(e) =>
-                  setSecondLastName(e.target.value.toUpperCase())
-                }
-                label={"Agundo Apellido"}
+                onChange={(e) => setSecondLastName(e.target.value.toUpperCase())                }
+                label={"Segundo Apellido"}
                 value={secondLastName}
                 disabled={isEdit ? false : true}
               />
@@ -333,6 +333,7 @@ const EditUser = ({ selectedUser, setShowModal }) => {
                       </MenuItem>
                     );
                   })}
+                  
                 </Select>
               </FormControl>
             </Grid>
@@ -344,11 +345,13 @@ const EditUser = ({ selectedUser, setShowModal }) => {
             style={{ marginTop: 20, marginBottom: 20 }}
             fullWidth
             id="fixed-tags-demo"
-            value={value}
+             value={value ||[]} // Se agrego el array porque no comprendia los datos Vacios GCHAVEZ 13062023          
             onChange={(event, newValue) => {
               let result = uniqBy(newValue, "id");
               setValue(result);
+              // JSON.stringify(result); Asi imprimi en Pantalla
             }}
+            
             options={storeList}
             getOptionLabel={(op) => (op ? `${op.name}` || "" : "")}
             renderOption={(props, option) => {

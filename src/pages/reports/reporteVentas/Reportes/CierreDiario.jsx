@@ -228,7 +228,7 @@ const CierreDiario = () => {
                     >
                       Total Ventas de Contado:
                     </Typography>
-                    <Typography variant="h6" style={{ color: "#00a152" }}>
+                    <Typography variant="h5" style={{ color: "#00a152" }}>
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
@@ -599,6 +599,7 @@ const CierreDiario = () => {
                       currency: "NIO",
                     }).format(
                       sumContadoSales + sumRecuperacion - sumAnulatedSales
+                       
                     )}
                   </Typography>
                 </Stack>
@@ -1012,7 +1013,8 @@ const CierreDiario = () => {
                         style: "currency",
                         currency: "NIO",
                       }).format(
-                        sumContadoSales + sumRecuperacion - sumAnulatedSales
+                         sumContadoSales + sumRecuperacion - sumAnulatedSales
+                     
                       )}
                     </Typography>
                   </Stack>

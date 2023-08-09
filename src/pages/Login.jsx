@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../context/DataContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Button,
   CssBaseline,

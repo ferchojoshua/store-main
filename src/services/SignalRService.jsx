@@ -4,7 +4,7 @@ let controller = "";
 if (process.env.NODE_ENV === "production") {
   controller = "http://20.231.75.97:8090/";
 } else {
-  controller = "https://localhost:7015/";
+  controller = "http://localhost:7015/";
 }
 
 export const serverMessages = async () => {

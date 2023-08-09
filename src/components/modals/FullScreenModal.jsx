@@ -63,7 +63,7 @@ const FullScreenModal = () => {
             </Typography>
             <Divider />
 
-            <Lottie options={defaultOptions} style={{ width: 400 }} />
+            <Lottie options={defaultOptions} style={{ width: 1200 }} />
 
             <Typography
               variant="h6"

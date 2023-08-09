@@ -15,17 +15,23 @@ import {
   deleteProductAsync,
   getProductsAsync,
 } from "../../../services/ProductsApi";
+import { getStoresByUserAsync } from "../../../services/AlmacenApi";
+import { getFamiliaByIdAsync, getTipoNegocioByIdAsync, } from "../../../services/TipoNegocioApi";
 import {
+  FormControl,
   Button,
+  Select,
+  MenuItem,
   IconButton,
   InputAdornment,
   TextField,
   Stack,
+  InputLabel
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBoxesPacking,
-  faCirclePlus,
+  // faCirclePlus,
   faExternalLinkAlt,
   faSearch,
   faTrashAlt,
@@ -39,11 +45,12 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
-import Productsadd from "./Productsadd";
-import ProductsDetails from "./ProductsDetails";
+import Productsadd from "../products/Productsadd";
+// import ProductsDetails from "../products/ProductsDetails";
+import ProductsRecalDetails from "./ProductsRecalDetails";
 import { ProductKardex } from "../productExistences/ProductKardex";
 
-const Products = () => {
+const ProductsRecal = () => {
   let ruta = getRuta();
 
   const {
@@ -58,6 +65,13 @@ const Products = () => {
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const [productList, setProductList] = useState([]);
+  const [storeList, setStoreList] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("");
+  const [active, setActive] = useState(0);
+  const [tipoNegocio, setTipoNegocio] = useState([]);
+  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState("");
+  const [familia, setFamilia] = useState([]);
+  const [selectedFamilia, setSelectedFamilia] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const withSearch = productList.filter((val) => {
@@ -90,7 +104,137 @@ const Products = () => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
+      const resultStores = await getStoresByUserAsync(token);
+      if (!resultStores.statusResponse) {
+        setIsLoading(false);
+        if (resultStores.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultStores.error.message);
+        return;
+      }
+
+      if (resultStores.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultStores.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setStoreList(resultStores.data);
+      if (resultStores.data.length < 4) {
+        setSelectedStore(resultStores.data[0].id);
+      }
+      const resultTipoNegocio = await getTipoNegocioByIdAsync(token);
+      if (!resultTipoNegocio.statusResponse) {
+        setIsLoading(false);
+        if (resultTipoNegocio.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultTipoNegocio.error.message);
+        return;
+      }
+
+      if (resultTipoNegocio.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultTipoNegocio.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setTipoNegocio(resultTipoNegocio.data);
+
       const result = await getProductsAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setProductList(result.data);
+      setIsLoading(false);      
+    })();
+  }, [reload]);
+
+  const handleChangeStore = async (event) => {
+    setSelectedStore(event.target.value);
+    if (active === 0) {
+      setIsLoading(true);
+      const result = await getStoresByUserAsync(
+        token,
+        event.target.value
+      );
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setStoreList(result.data);
+
+      setIsLoading(true);
+      setProductList(result.data);
+    }
+
+  };
+
+  const onChangeTN = async (value) => {
+    setFamilia([]);
+    setSelectedFamilia("");
+    setSelectedTipoNegocio(value);
+
+    if (value !== "") {
+      setIsLoading(true);
+      const result = await getFamiliaByIdAsync(token, value);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -115,9 +259,12 @@ const Products = () => {
         return;
       }
       setIsLoading(false);
-      setProductList(result.data);
-    })();
-  }, [reload]);
+      setFamilia(result.data);
+    } else {
+      setFamilia([]);
+    }
+  };
+
 
   const deleteProduct = async (item) => {
     MySwal.fire({
@@ -171,6 +318,7 @@ const Products = () => {
 
   return (
     <div>
+         <h1>Modificar Precio Masivo  </h1>
       <Container>
         <div
           style={{
@@ -181,7 +329,116 @@ const Products = () => {
             alignItems: "center",
           }}
         >
-          <h1>Lista de Productos</h1>
+      
+          <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+              }}
+            >
+
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacen
+              </InputLabel>
+              <Select
+                labelId="selProc"
+                id="demo-simple-select-standard"
+                value={selectedStore}
+                onChange={handleChangeStore}
+                label="Almacen"
+                style={{ textAlign: "left" }}
+              >
+               <MenuItem key={-1} value="">
+                  <em> Seleccione una Almacen</em>
+                </MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            <FormControl
+           variant="standard"
+              fullWidth
+              style={{                
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+              }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Tipo de Negocio
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedTipoNegocio}
+                onChange={(e) => onChangeTN(e.target.value)}
+                label="Tipo de Negocio"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un Tipo de Negocio</em>
+                </MenuItem>
+
+                {tipoNegocio.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <FormControl
+             variant="standard"
+              fullWidth
+              style={{   
+                textAlign: "left",
+                width: 200,
+                 marginTop: 20,
+              }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione una Familia
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedFamilia}
+                onChange={(e) => {
+                  if (e.target.value.length === 0) {
+                    setSelectedFamilia("t");
+                    return;
+                  }
+                  setSelectedFamilia(e.target.value);
+                }}
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione una Familia</em>
+                </MenuItem>
+
+                {familia.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+            
+              </Select>
+            </FormControl>
+            
 
           <div
             style={{
@@ -191,30 +448,23 @@ const Products = () => {
               justifyContent: "space-between",
             }}
           >
-            {isAccess(access, "PRODUCTS CREATE") ? (
-              <Button
-                variant="outlined"
-                style={{ borderRadius: 20 }}
-                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
-                onClick={() => {
-                  setShowModal(true);
-                }}
-              >
-                Agregar Producto
-              </Button>
-            ) : (
-              <></>
-            )}
-            <></>
-
-            {isAccess(access, "KARDEX VER") ? (
+          
+          {isAccess(access, "KARDEX VER") ? (
               <Button
                 variant="outlined"
                 style={{
                   borderRadius: 20,
                   color: "#ff5722",
-                  borderColor: "#ff5722",
-                  marginLeft: 10,
+                  borderColor: "#009688",
+                   bottom: 0, 
+                   right: '50%', 
+                  paddingHorizontal: 8,
+                  paddingVertical: 6,
+                  alignSelf: 'Center',
+                  marginHorizontal: '1%',
+                  marginBottom: 6,   
+                      flex: 1,
+                     marginTop: 38,               
                 }}
                 startIcon={
                   <FontAwesomeIcon
@@ -228,11 +478,27 @@ const Products = () => {
                   setShowKardexModal(true);
                 }}
               >
-                Consultar Kardex
+                Actualizar Precio
+              </Button>
+            ) : (
+              <></>
+            )} 
+            {/* {isAccess(access, "PRODUCTS CREATE") ? (
+              <Button
+                variant="outlined"
+                style={{ borderRadius: 20 }}
+                startIcon={<FontAwesomeIcon icon={faCirclePlus} />}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Agregar Producto
               </Button>
             ) : (
               <></>
             )}
+            <></> */}
+
           </div>
         </div>
 
@@ -268,6 +534,7 @@ const Products = () => {
             responsive
             className="text-primary"
           >
+          
             <thead>
               <tr>
                 <th>#</th>
@@ -356,7 +623,7 @@ const Products = () => {
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >
-        <ProductsDetails
+        <ProductsRecalDetails
           selectedProduct={selectedProduct}
           setShowModal={setShowEditModal}
         />
@@ -373,4 +640,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductsRecal;

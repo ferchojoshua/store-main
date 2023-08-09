@@ -139,9 +139,9 @@ const SelectorProdNoVendido = () => {
     }
 
     var params = {
-      selectedStore,
       desde: fechaDesde,
       hasta: fechaHassta,
+      selectedStore,
       selectedTNegocio,
       selectedFamilia,
     };
@@ -247,8 +247,7 @@ const SelectorProdNoVendido = () => {
                 defaultValue=""
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
-                value={selectedStore}
-                onChange={(e) => setSelectedStore(e.target.value)}
+                value={selectedStore}onChange={(e) => setSelectedStore(e.target.value)}
                 label="Almacen"
                 style={{ textAlign: "left" }}
               >
