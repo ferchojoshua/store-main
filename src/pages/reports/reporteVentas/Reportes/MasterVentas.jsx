@@ -218,7 +218,9 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                   justifyContent="right"
                   style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
                   <FontAwesomeIcon icon={faDownload}
+
                 onClick={() => { document.getElementById('test-table-xls-button').click(); }}
+
      
                   />
                   </IconButton>
@@ -247,6 +249,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <NoData />
           ) : (
             <Table
+            id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -496,7 +499,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <hr />
             <Stack direction="row" flex="row" justifyContent="space-around">
               <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
                   Total de Ventas
                 </span>
                 <span>
@@ -505,7 +508,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               </Stack>
 
               <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
                   Total de Ventas
                 </span>
                 <span>
@@ -588,7 +591,6 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
-                    filename="Master de Ventas"
                     sheet="Pagina 1"
                     />
       </div>

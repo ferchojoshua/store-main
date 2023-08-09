@@ -85,6 +85,7 @@ const ProductsRecal = () => {
   const [selectedTipoNegocio, setSelectedTipoNegocio] = useState("");
   const [familia, setFamilia] = useState(null);
   const [selectedFamilia, setSelectedFamilia] = useState("");
+  
 
   const [searchTerm, setSearchTerm] = useState("");
   const withSearch = productList.filter((val) => {
@@ -165,6 +166,7 @@ const ProductsRecal = () => {
          return;
        }
 
+     
        if (resultStores.data === "eX01") {
          setIsLoading(false);
          deleteUserData();
@@ -180,6 +182,13 @@ const ProductsRecal = () => {
        }
 
        setStoreList(resultStores.data);
+
+       if (resultStores.data === 'Todos'){
+        onChangeTN(true);
+      } else {
+        onChangeTN(false);
+      }
+
 
 
   //     if (resultStores === null){
@@ -219,6 +228,7 @@ const ProductsRecal = () => {
 
    const handleChangeStore = async ( event ) =>{
     // console.log( event.target.value)
+    
     setSelectedStore(event.target.value);
     const result = await getProductsRecalByIdAsync(token, event.target.value);
     if (!result.statusResponse) {
@@ -243,6 +253,9 @@ const ProductsRecal = () => {
                    return;
                  }
 
+                //  if(setProductList(result.data).val() !== "0"){$('#onChangeTN').prop('disabled', false);
+                // }
+   
     // console.log(result)
           setIsLoading(true);
     setProductList(result.data)
@@ -284,7 +297,7 @@ const ProductsRecal = () => {
 
    useEffect(() => {
      (async () => {
-       setIsLoading(true);  
+       setIsLoading(true);         
       const resultTipoNegocio = await getTipoNegocioAsync(token);
       if (!resultTipoNegocio.statusResponse) {
         setIsLoading(false);
@@ -469,6 +482,9 @@ const ProductsRecal = () => {
                   </MenuItem>
                 );
               })}
+              <MenuItem key={-1} value={-1}>
+                  Todos...
+                </MenuItem>
             </Select>
           </FormControl>
 

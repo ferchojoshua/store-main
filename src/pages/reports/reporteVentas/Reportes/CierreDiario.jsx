@@ -968,7 +968,8 @@ const CierreDiario = () => {
                 </Table>
                 <Divider />
 
-                <Stack spacing={1}>
+                <Stack spacing={1} id="table-to-xls">
+                
                   <Stack direction={"row"} justifyContent="space-between">
                     <Typography
                       variant="h6"
@@ -1057,7 +1058,7 @@ const CierreDiario = () => {
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
-                    filename="Productos NO Vendidos"
+                    filename="Cierre Diario"
                     sheet="Pagina 1"
                                            
                     />
