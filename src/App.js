@@ -62,6 +62,7 @@ import { getRolAsync } from "./services/RolApi";
 import FullScreenModal from "./components/modals/FullScreenModal";
 import Compras from "./pages/reports/reporteVentas/Reportes/Compras";
 import TrasladoInventario from "./pages/reports/reporteVentas/Reportes/TrasladoInventario";
+import { InventarioProductos } from "./pages/reports/reporteVentas/Reportes/InventarioProductos";
 
 let controller = getController();
 
@@ -284,6 +285,12 @@ function App() {
                 <Route
                   path={`${ruta}/r-traslado-inventario/:params`}
                   element={<TrasladoInventario />}
+                />
+
+                {/* M. Sc. Mario Talavera */}
+                <Route
+                  path={`${ruta}/r-inventario-prods/:params`}
+                  element={<InventarioProductos />}
                 />
 
                 {/* Rutas Administration */}

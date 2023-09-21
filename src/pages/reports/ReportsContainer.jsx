@@ -27,6 +27,8 @@ import SelectorProdNoVendido from "./reporteVentas/selectores/SelectorProdNoVend
 import { SelectorIngrEgresos } from "./reporteVentas/selectores/SelectorIngrEgresos";
 import SelectorCompras from "./reporteVentas/selectores/SelectorCompras";
 import SelectorTrasladoInventario from "./reporteVentas/selectores/SelectorTrasladoInventario";
+/* M. Sc. Mario Talavera - Fecha: 21 de septiembre de 2023 */
+import { SelectorReporteInventario } from "./reporteVentas/selectores/SelectorReporteInventario";
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -196,6 +198,47 @@ export const ReportsContainer = () => {
                     modalTitle="Traslado de Inventario"
                   >
                     <SelectorTrasladoInventario />
+                  </ReportCaller>
+                </Grid>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Paper>
+        ) : (
+          <></>
+        )}
+
+      {/* M. Sc. Mario Talavera - Fecha: 21 de septiembre de 2023 */}
+      {isAccess(access, "INVENTARIO VER") ? (
+          <Paper
+            elevation={20}
+            style={{ textAlign: "center", padding: 20, borderRadius: 20 }}
+          >
+            <Stack
+              spacing={3}
+              direction="row"
+              display="flex"
+              justifyContent="center"
+            >
+              <FontAwesomeIcon
+                icon={faBriefcase}
+                className="fa-beat-fade"
+                style={{ fontSize: 40, color: "#4caf50" }}
+              />
+
+              <h1>Reportes Inventarios</h1>
+            </Stack>
+            <hr />
+            <Grid container spacing={2}>
+              {isAccess(access, "INVENTARIO VER") ? (
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <ReportCaller
+                    icon={faSackDollar}
+                    text="Reporte Inventario"
+                    modalTitle="Reporte Inventario Productos"
+                  >
+                    <SelectorReporteInventario />
                   </ReportCaller>
                 </Grid>
               ) : (
