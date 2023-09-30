@@ -142,10 +142,20 @@ export const SelectorReporteInventario = () => {
     }, []);
 
     const verReportInventario = () => {
-        if (selectedStore === "") {
-            toastError("Seleccione un almacén");
+        // if (!moment(selectedProduct === "").isValid()) {
+        //     toastError("Seleccione al menos un producto ");
+        //     return;
+        //   }
+
+        // if(!moment(selectedStore.length === 0).isValid()) {
+        //     toastError("Seleccione un almacén");
+        //     return;
+        //}
+
+        if (selectedProduct.length === 0) {
+            setSelectedProduct("t");
             return;
-        }
+          }
     
         if (setSelectedTNegocio.length === 0) {
             setSelectedTNegocio("t");
@@ -176,14 +186,16 @@ export const SelectorReporteInventario = () => {
                 >
 
                     {/* Selector de los productos */}
+                    <InputLabel id="demo-simple-select-standard-label">
+                            Seleccione un Tipo de Negocio
+                        </InputLabel>
                     <Autocomplete
                         id="combo-box-demo"
                         fullWidth
                         options={productList}
                         getOptionLabel={(op) => (op ? `${op.description}` : "")}
-                        value={selectedProduct === "" ? null : selectedProduct}
-                        onChange={(event, newValue) => {
-                            setSelectedProduct(newValue);
+                        value={selectedProduct === "t" ? 0  : selectedProduct}
+                        onChange={(event, newValue) => {setSelectedProduct(newValue);
                         }}
                         renderOption={(props, option) => {
                             return (
@@ -197,8 +209,7 @@ export const SelectorReporteInventario = () => {
                             <TextField
                                 variant="standard"
                                 {...params}
-                                label={
-                                    selectedProduct === "" || selectedProduct === null ? "Todos los productos" : "Productos"
+                                label={selectedProduct === "" || selectedProduct === null ? "Todos los productos" : "Productos"
                                 }
                             />
                         )}
@@ -299,3 +310,4 @@ export const SelectorReporteInventario = () => {
     );
 
 };
+export default SelectorReporteInventario;

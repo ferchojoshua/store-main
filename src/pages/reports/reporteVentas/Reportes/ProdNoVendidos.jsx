@@ -207,8 +207,8 @@ export const ProdNoVendidos = () => {
                   return (
                     <tr key={id}>
                       <td style={{ textAlign: "center" }}>{producto.barCode}</td>
-                      <td style={{ textAlign: "center" }}> {producto.description}</td>
-                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{almacen.name} </td>
+                      <td style={{ textAlign: "center" , width: "1%",whiteSpace: "nowrap", }}> {producto.description}</td>
+                      <td style={{ textAlign: "center" }}>{almacen.name} </td>
                       <td style={{ textAlign: "center" }}>{existencia}</td>
                       <td style={{ textAlign: "center" }}> {new Intl.NumberFormat("es-NI", { style: "currency",currency: "NIO", }).format(precioVentaMayor)} </td>
                       <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency",  currency: "NIO",}).format(precioVentaDetalle)} </td>

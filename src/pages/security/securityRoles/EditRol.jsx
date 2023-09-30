@@ -129,6 +129,7 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
   const [ingresos, setIngresos] = useState(false);
   const [compras, setCompras] = useState(false);
   const [trasladoInventario, setTrasladoInventario] = useState(false);
+  const [ReporteInventario , setReporteInventario ] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -341,6 +342,9 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "REPORTETRASLADOS VER":
           setTrasladoInventario(item.isEnable);
+          break;
+          case "INVENTARIO VER":
+            setReporteInventario(item.isEnable);
           break;
 
         //Contabilidad
@@ -639,6 +643,9 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "REPORTETRASLADOS VER":
           item.isEnable = trasladoInventario;
+          break;
+             case "INVENTARIO VER":
+          item.isEnable = ReporteInventario;
           break;
 
         //Contabilidad
@@ -1832,6 +1839,19 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
               }
               label="Cierre Diario"
             />
+            
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={ReporteInventario}
+                  onChange={() => setReporteInventario(!ReporteInventario)}
+                />
+              }
+              label="Reportes Inventarios"
+            />
+
 
             <FormControlLabel
               style={{ textAlign: "center" }}

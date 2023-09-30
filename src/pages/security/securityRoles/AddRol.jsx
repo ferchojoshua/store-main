@@ -114,6 +114,7 @@ const AddRol = ({ setShowModal }) => {
   const [ingresos, setIngresos] = useState(false);
   const [compras, setCompras] = useState(false);
   const [trasladoInventario, setTrasladoInventario] = useState(false);
+  const [ReporteInventario , setReporteInventario ] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -214,6 +215,7 @@ setProductsRecalDelete(!isFullAccess);
     setIngresos(!isFullAccess);
     setCompras(!isFullAccess);
     setTrasladoInventario(!isFullAccess);
+    setReporteInventario(!isFullAccess);
 
     setContVer(!isFullAccess);
     setContCreate(!isFullAccess);
@@ -508,6 +510,10 @@ setProductsRecalDelete(!isFullAccess);
         {
           description: "REPORTETRASLADOS VER",
           IsEnable: trasladoInventario,
+        },
+        {
+          description: "INVENTARIO VER",
+          IsEnable: ReporteInventario,
         },
 
         //Contabilidad
@@ -1632,6 +1638,18 @@ setProductsRecalDelete(!isFullAccess);
                 />
               }
               label="Cierre Diario"
+            />
+            
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={ReporteInventario}
+                  onChange={() => setReporteInventario(!ReporteInventario)}
+                />
+              }
+              label="Reportes Inventarios"
             />
 
             <FormControlLabel
