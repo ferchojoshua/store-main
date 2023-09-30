@@ -77,10 +77,7 @@ export const ArticulosVendidos = () => {
         storeId: selectedStore === "t" ? 0 : selectedStore,
         tipoNegocioId: selectedTNegocio === "t" ? 0 : selectedTNegocio,
         familiaId: selectedFamilia === "t" ? 0 : selectedFamilia,
-        clientId:
-          selectedClient === "" || selectedClient === null
-            ? 0
-            : selectedClient.id,
+        clientId: selectedClient === "" || selectedClient === null ? 0 : selectedClient.id,
       };
 
       setIsLoading(true);
@@ -333,18 +330,20 @@ export const ArticulosVendidos = () => {
       >
         <PrintReport
           ref={compRef}
+         
           fecha={`Desde: ${moment(desde).format("L")} - Hasta: ${moment(
             hasta
           ).format("L")}`}
           titulo={"Productos Vendidos"}
         >
-          <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+          <Container id="table-to-xls" fixed maxWidth="xl" sx={{ textAlign: "center" }}>
             <hr />
+            
             {isEmpty(data) ? (
               <NoData />
             ) : (
               <Table
-               id="table-to-xls"
+               
                 hover={!isDarkMode}
                 size="sm"
                 responsive

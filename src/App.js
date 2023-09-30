@@ -6,18 +6,13 @@ import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { LocalizationProvider } from "@mui/lab";
 import DateAdapter from "@mui/lab/AdapterMoment";
-
 import "react-toastify/dist/ReactToastify.min.css";
-
 import EntradaProductoDetails from "./pages/inventory/entradaProducto/EntradaProductoDetails";
 //import EntradaProductoRecalDetails from "./pages/inventory/modificarProductoRecal/EntradaProductoRecalDetails";
-
 import Stores from "./pages/settings/stores/Stores";
 import StoreDetails from "./pages/settings/stores/StoreDetails";
 import Providers from "./pages/settings/provider/Providers";
-
 import TipoNegocioDetails from "./pages/settings/tipoNegocio/TipoNegocioDetails";
-
 import Loading from "./components/Loading";
 import Login from "./pages/Login";
 import {
@@ -57,12 +52,12 @@ import CajaChica from "./pages/reports/reporteVentas/Reportes/CajaChica";
 import { ProdNoVendidos } from "./pages/reports/reporteVentas/Reportes/ProdNoVendidos";
 import Ingresos from "./pages/reports/reporteVentas/Reportes/Ingresos";
 import MoverProductoAdd from "./pages/inventory/traslate-products/MoverProductoAdd";
-
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { getRolAsync } from "./services/RolApi";
 import FullScreenModal from "./components/modals/FullScreenModal";
 import Compras from "./pages/reports/reporteVentas/Reportes/Compras";
 import TrasladoInventario from "./pages/reports/reporteVentas/Reportes/TrasladoInventario";
+import { InventarioProductos } from "./pages/reports/reporteVentas/Reportes/InventarioProductos";
 
 let controller = getController();
 
@@ -168,6 +163,7 @@ function App() {
     })();
   });
 
+   useEffect(() => {
   const connection = new HubConnectionBuilder()
     .withUrl(`${controller}serverHub`)
     // .configureLogging(LogLevel.Information)
@@ -180,7 +176,8 @@ function App() {
         serverAccess();
       });
     } catch (err) {
-      setTimeout(start, 5000);
+      // setTimeout(start, 5000);
+      console.error(start, err);
     }
   }
 
@@ -189,6 +186,18 @@ function App() {
   });
 
   start();
+
+
+    return () => {
+      connection.stop()
+        .then(() => {
+          console.log('SignalR connection stopped.');
+        })
+        .catch(error => {
+          console.error('Error stopping SignalR connection:', error);
+        });
+    };
+  }, []);
 
   const serverAccess = async () => {
     const result = await getRolAsync(token);
@@ -296,6 +305,13 @@ function App() {
                 <Route
                   path={`${ruta}/r-traslado-inventario/:params`}
                   element={<TrasladoInventario />}
+                />
+
+                
+                {/* M. Sc. Mario Talavera */}
+                <Route
+                  path={`${ruta}/r-inventario-prods/:params`}
+                  element={<InventarioProductos />}
                 />
 
                 {/* Rutas Administration */}

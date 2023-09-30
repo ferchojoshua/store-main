@@ -19,6 +19,13 @@ export const serverMessages = async () => {
       // console.log("Recepcion: ", message);
     });
 
+
+
+
+
+
+    
+
     await connection.start();
     await connection.invoke("SendMessage");
   } catch (error) {

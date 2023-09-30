@@ -21,12 +21,16 @@ import { SelectorDocXCobrar } from "./reporteVentas/selectores/SelectorDocXCobra
 import { SelectorMasterVentas } from "./reporteVentas/selectores/SelectorMasterVentas";
 import { isAccess } from "../../helpers/Helpers";
 import { SelectorArtVendidos } from "./reporteVentas/selectores/SelectorArtVendidos";
+import SelectorReporteInventario from "./reporteVentas/selectores/SelectorReporteInventario";  
 import SelectorCierreDiario from "./reporteVentas/selectores/SelectorCierreDiario";
 import SelectorCajaChica from "./reporteVentas/selectores/SelectorCajaChica";
 import SelectorProdNoVendido from "./reporteVentas/selectores/SelectorProdNoVendido";
 import { SelectorIngrEgresos } from "./reporteVentas/selectores/SelectorIngrEgresos";
 import SelectorCompras from "./reporteVentas/selectores/SelectorCompras";
 import SelectorTrasladoInventario from "./reporteVentas/selectores/SelectorTrasladoInventario";
+/* M. Sc. Mario Talavera - Fecha: 21 de septiembre de 2023 */
+/*import SelectorReporteInventario from "./reporteVentas/selectores/SelectorReporteInventario";*/
+
 
 export const ReportsContainer = () => {
   const { access } = useContext(DataContext);
@@ -123,6 +127,22 @@ export const ReportsContainer = () => {
             ) : (
               <></>
             )}
+            
+             {isAccess(access, "INVENTARIO VER") ? (
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                <ReportCaller
+                  icon={faCalendarDay}
+                  text="Reporte Inventario"
+                  modalTitle="Reporte Inventario Productos"
+                >
+                  <SelectorReporteInventario />
+                </ReportCaller>
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+
           </Grid>
         </Paper>
 

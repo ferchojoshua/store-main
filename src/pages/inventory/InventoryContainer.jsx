@@ -129,7 +129,7 @@ const InventoryContainer = () => {
             ""
           )}
 
-          {/* {isAccess(access, "PRODUCTS RECAL VER") ? (
+           {isAccess(access, "PRODUCTS RECAL VER") ? (
             <Tab
               icon={
                 <FontAwesomeIcon icon={faMoneyCheckAlt} style={{ fontSize: 20 }} />
@@ -140,7 +140,7 @@ const InventoryContainer = () => {
             />
           ) : (
             ""
-          )} */}
+          )}
         </Tabs>
 
         <Divider style={{ marginTop: 10 }} />

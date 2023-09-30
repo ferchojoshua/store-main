@@ -18,7 +18,7 @@ import {
   // getProductsAsync,
   getProductsRecalByIdAsync,
 } from "../../../services/ProductsApi";
-import { getStoresByUserAsync } from "../../../services/AlmacenApi";
+import { getStoresAsync } from "../../../services/AlmacenApi";
 import {
   // getFamiliaByIdAsync,
   getFamiliasByTNAsync,
@@ -79,7 +79,7 @@ const ProductsRecal = () => {
   // const MySwal = withReactContent(Swal);
   const [productList, setProductList] = useState([]);
   const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState("selectedStroe");
+  const [selectedStore, setSelectedStore] = useState("selectedStore");
   const [active, setActive] = useState(0);
   const [tipoNegocio, setTipoNegocio] = useState([]);
   const [selectedTipoNegocio, setSelectedTipoNegocio] = useState("");
@@ -113,6 +113,7 @@ const ProductsRecal = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectedradio, setSelectedRadio] = useState(null);
+  
 
   const [showKardexModal, setShowKardexModal] = useState(false);
 
@@ -145,49 +146,49 @@ const ProductsRecal = () => {
       }
       setIsLoading(false);
       setProductList(result.data);
-     console.log( "products")
-     console.log(result.data)
+    //  console.log( "products")
+    //  console.log(result.data)
     })();
   },[])
 
     useEffect(() => {
       (async () => {
         setIsLoading(true);
-       const resultStores = await getStoresByUserAsync(token);
-       console.log(resultStores)
-       console.log( "resultStores")
-      if (!resultStores.statusResponse) {
-         setIsLoading(false);
-         if (resultStores.error.request.status === 401) {
-           navigate(`${ruta}/unauthorized`);
-           return;
-         }
-         toastError(resultStores.error.message);
-         return;
-       }
+      //  const resultStores = await getStoresByUserAsync(token);
+      //  console.log(resultStores)
+      //  console.log( "resultStores")
+      // if (!resultStores.statusResponse) {
+      //    setIsLoading(false);
+      //    if (resultStores.error.request.status === 401) {
+      //      navigate(`${ruta}/unauthorized`);
+      //      return;
+      //    }
+      //    toastError(resultStores.error.message);
+      //    return;
+      //  }
 
      
-       if (resultStores.data === "eX01") {
-         setIsLoading(false);
-         deleteUserData();
-         deleteToken();
-         setIsLogged(false);
-         return;
-      }
+      //  if (resultStores.data === "eX01") {
+      //    setIsLoading(false);
+      //    deleteUserData();
+      //    deleteToken();
+      //    setIsLogged(false);
+      //    return;
+      // }
 
-       if (resultStores.data.isDefaultPass) {
-         setIsLoading(false);
-         setIsDefaultPass(true);
-         return;
-       }
+      //  if (resultStores.data.isDefaultPass) {
+      //    setIsLoading(false);
+      //    setIsDefaultPass(true);
+      //    return;
+      //  }
 
-       setStoreList(resultStores.data);
+      //  setStoreList(resultStores.data);
 
-       if (resultStores.data === 'Todos'){
-        onChangeTN(true);
-      } else {
-        onChangeTN(false);
-      }
+      //  if (resultStores.data === 'Todos'){
+      //   onChangeTN(true);
+      // } else {
+      //   onChangeTN(false);
+      // }
 
 
 
@@ -223,13 +224,42 @@ const ProductsRecal = () => {
   //       onSelectChange(active);
   //     }
   //     setIsLoading(false);  
+       const result = await getStoresAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setStoreList(
+        result.data.map((item) => {
+          return item.almacen;
+        })
+      );
       })();
    }, [reload]);
 
    const handleChangeStore = async ( event ) =>{
-    // console.log( event.target.value)
-    
-    setSelectedStore(event.target.value);
+        // console.log( event.target.value)
+        setSelectedStore(event.target.value);
     const result = await getProductsRecalByIdAsync(token, event.target.value);
     if (!result.statusResponse) {
              setIsLoading(false);
@@ -322,7 +352,7 @@ const ProductsRecal = () => {
         setIsDefaultPass(true);
         return;
       }
-      setIsLoading(false);
+      setIsLoading(true);
       setTipoNegocio(resultTipoNegocio.data);
 
      })();
@@ -405,7 +435,7 @@ const ProductsRecal = () => {
   const handleChangeRadio = (event) => {
     setSelectedRadio(event.target.value);
   };
-
+  const record = { id: 0, name: "Todos" };
   return (
     <div>
       <h1>Modificar Precio Masivo </h1>
@@ -463,28 +493,29 @@ const ProductsRecal = () => {
           >
             <InputLabel id="demo-simple-select-standard-label">
               Seleccione un Almacen
-            </InputLabel>
+         </InputLabel>
             <Select
-              labelId="selProc"
+              defaultValue=""
+              labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
               value={selectedStore}
-              onChange={handleChangeStore}
-              label="Almacen"
-              style={{ textAlign: "left" }}
-            >
-              <MenuItem key={-1} value="">
-                <em> Seleccione una Almacen</em>
-              </MenuItem>
-              {storeList.map((item) => {
-                return (
-                  <MenuItem key={item.id} value={item.id}>
+              onChange={(e) => {
+                if (e.target.value.length === 0) {
+                  setSelectedStore("TODOS");
+                  return;
+                }
+                setSelectedStore(e.target.value);
+              }}
+              style={{ textAlign: "left" }} >
+
+              <option value={record.id}>{record.name}</option>
+                    {storeList && storeList.map((item) => {
+                            return (
+                  <MenuItem key={item.id } value={item.id}>
                     {item.name}
                   </MenuItem>
                 );
               })}
-              <MenuItem key={-1} value={-1}>
-                  Todos...
-                </MenuItem>
             </Select>
           </FormControl>
 

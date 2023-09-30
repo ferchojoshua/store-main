@@ -525,10 +525,7 @@ const CierreDiario = () => {
                         </td>
                         <td style={{ textAlign: "center" }}>{store.name}</td>
                         <td style={{ textAlign: "left" }}>
-                          {ventaAfectada.client
-                            ? ventaAfectada.client.nombreCliente
-                            : ventaAfectada.nombreCliente === ""
-                            ? "CLIENTE EVENTUAL"
+                          {ventaAfectada.client ? ventaAfectada.client.nombreCliente: ventaAfectada.nombreCliente === "" ? "CLIENTE EVENTUAL"
                             : ventaAfectada.nombreCliente}
                         </td>
 
@@ -968,7 +965,7 @@ const CierreDiario = () => {
                 </Table>
                 <Divider />
 
-                <Stack spacing={1} id="table-to-xls">
+                <Stack spacing={1}>
                 
                   <Stack direction={"row"} justifyContent="space-between">
                     <Typography
