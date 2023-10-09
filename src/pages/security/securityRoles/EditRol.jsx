@@ -129,6 +129,8 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
   const [ingresos, setIngresos] = useState(false);
   const [compras, setCompras] = useState(false);
   const [trasladoInventario, setTrasladoInventario] = useState(false);
+  const [reporteInventario , setReporteInventario ] = useState(false);
+    const [costover, setCostoVer] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -341,6 +343,12 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "REPORTETRASLADOS VER":
           setTrasladoInventario(item.isEnable);
+          break;
+          case "INVENTARIO VER":
+            setReporteInventario(item.isEnable);
+          break;
+           case "COSTO VER":
+            setCostoVer(item.isEnable);
           break;
 
         //Contabilidad
@@ -639,6 +647,12 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           break;
         case "REPORTETRASLADOS VER":
           item.isEnable = trasladoInventario;
+          break;
+        case "INVENTARIO VER":
+          item.isEnable = reporteInventario;
+          break;
+          case "COSTO VER":
+          item.isEnable = costover;
           break;
 
         //Contabilidad
@@ -1675,9 +1689,6 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
               textAlign: "center",
             }}
           >
-
-
-            
             Modulo Reportes
           </Typography>
           <Divider />
@@ -1832,6 +1843,69 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
               }
               label="Cierre Diario"
             />
+              <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 10,
+                marginTop: 20,
+              }}
+            >
+              <Typography
+                style={{
+                  fontSize: 17,
+                  color: "#2196f3",
+                  fontWeight: 800,
+                  textAlign: "center",
+                }}
+              >
+                Reporte Inventario
+              </Typography>
+
+              <Divider />
+
+              <Stack direction="row" justifyContent="space-around">
+              <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                 disabled={!isEdit}
+                  checked={reporteInventario}
+                  onChange={() => setReporteInventario(!reporteInventario)}
+                />
+              }
+              label="Reportes Inventario"
+            />
+
+            <FormControlLabel
+                          labelPlacement="top"
+                          style={{ textAlign: "center" }}
+                          control={
+                            <Checkbox
+                            disabled={!isEdit}
+                              checked={costover}
+                              onChange={() => setCostoVer(!costover)}
+                            />
+                          }
+                          label="Ver Costos"
+                        />
+              </Stack>
+            </Paper>
+            
+            <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                disabled={!isEdit}
+                  checked={reporteInventario}
+                  onChange={() => setReporteInventario(!reporteInventario)}
+                />
+              }
+              label="Reportes Inventarios"
+            />
+
 
             <FormControlLabel
               style={{ textAlign: "center" }}

@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "production") {
 } else {
   controller = `${REACT_APP_URL}Productos/`;
 }
- export const getProductsRecalByIdAsync = async (token, id, value) => {
+ export const getProductsRecalByIdAsync = async (token, id) => {
     const result = { statusResponse: true, data: [], error: null };
     let service = `${controller}GetProductsRecalById/`;
     const authAxios = axios.create({
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "production") {
       },
     });
     try {
-      await authAxios.get(service + id + value).then((resp) => {
+      await authAxios.get(service + id).then((resp) => {
         if (resp.status !== 200 && resp.status >= 299) {
           result.statusResponse = false;
           result.error = resp.title;

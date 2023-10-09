@@ -264,7 +264,7 @@ const SelectorProdNoVendido = () => {
                 <MenuItem
                   key={"t"}
                   value={"t"}
-                  disabled={storeList.length === 4 ? false : true}
+                  disabled={storeList.length === 5 ? false : true}
                 >
                   Todos...
                 </MenuItem>

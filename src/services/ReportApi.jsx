@@ -143,7 +143,6 @@ export const getGetCajaChicaAsync = async (token, data) => {
 
   return result;
 };
-
 export const getIngresosAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetIngresos`;
@@ -154,6 +153,7 @@ export const getIngresosAsync = async (token, data) => {
     },
   });
   try {
+
     await authAxios.post(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
@@ -170,6 +170,8 @@ export const getIngresosAsync = async (token, data) => {
 
   return result;
 };
+
+
 
 export const getProductosNoVendidosAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };

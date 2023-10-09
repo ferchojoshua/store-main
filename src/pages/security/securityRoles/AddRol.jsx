@@ -114,6 +114,8 @@ const AddRol = ({ setShowModal }) => {
   const [ingresos, setIngresos] = useState(false);
   const [compras, setCompras] = useState(false);
   const [trasladoInventario, setTrasladoInventario] = useState(false);
+  const [reporteInventario , setReporteInventario ] = useState(false);
+    const [costover, setCostoVer] = useState(false);
 
   const [contVer, setContVer] = useState(false);
   const [contCreate, setContCreate] = useState(false);
@@ -214,6 +216,7 @@ setProductsRecalDelete(!isFullAccess);
     setIngresos(!isFullAccess);
     setCompras(!isFullAccess);
     setTrasladoInventario(!isFullAccess);
+    setReporteInventario(!isFullAccess);
 
     setContVer(!isFullAccess);
     setContCreate(!isFullAccess);
@@ -508,6 +511,14 @@ setProductsRecalDelete(!isFullAccess);
         {
           description: "REPORTETRASLADOS VER",
           IsEnable: trasladoInventario,
+        },
+        {
+          description: "INVENTARIO VER",
+          IsEnable: reporteInventario,
+        },
+        {
+        description: "COSTO VER",
+        IsEnable: costover,
         },
 
         //Contabilidad
@@ -1542,6 +1553,8 @@ setProductsRecalDelete(!isFullAccess);
               </Stack>
             </Paper>
 
+            
+
             <FormControlLabel
               labelPlacement="top"
               style={{ textAlign: "center" }}
@@ -1633,6 +1646,54 @@ setProductsRecalDelete(!isFullAccess);
               }
               label="Cierre Diario"
             />
+            
+            <Paper
+              elevation={10}
+              style={{
+                borderRadius: 30,
+                padding: 10,
+                marginTop: 20,
+              }}
+            >
+              <Typography
+                style={{
+                  fontSize: 17,
+                  color: "#2196f3",
+                  fontWeight: 800,
+                  textAlign: "center",
+                }}
+              >
+                Reporte Inventario
+              </Typography>
+
+              <Divider />
+
+              <Stack direction="row" justifyContent="space-around">
+              <FormControlLabel
+              labelPlacement="top"
+              style={{ textAlign: "center" }}
+              control={
+                <Checkbox
+                  checked={reporteInventario}
+                  onChange={() => setReporteInventario(!reporteInventario)}
+                />
+              }
+              label="Reportes Inventario"
+            />
+                 <FormControlLabel
+                  labelPlacement="top"
+                  style={{ textAlign: "center" }}
+                  control={
+                    <Checkbox
+                      checked={costover}
+                      onChange={() => setCostoVer(!costover)}
+                    />
+                  }
+                  label="Ver Costos"
+                />
+              </Stack>
+            </Paper>
+    
 
             <FormControlLabel
               labelPlacement="top"
