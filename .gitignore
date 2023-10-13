@@ -25,3 +25,5 @@ yarn-error.log*
 
 #vscode
 .vscode
+*.jsx
+src/pages/reports/reporteVentas/Reportes/ProdNoVendidos.jsx

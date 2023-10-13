@@ -345,8 +345,7 @@ export const ProdNoVendidos = () => {
                     );
                   })}
                 </tbody>
-              </Table>
-                        
+              </Table>                        
             )}
             <hr />
             <Stack direction="row" flex="row" justifyContent="space-around">
