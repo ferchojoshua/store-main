@@ -9,14 +9,16 @@ import {
   MenuItem,
   Button,
   Autocomplete,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { getStoresByUserAsync } from "../../../../services/AlmacenApi";
 /* M. Sc. Mario Talavera - Importamos el servico API para los productos, marcas y familias (grupos) */
 import { getProductsAsync } from "../../../../services/ProductsApi";
-import { getTipoNegocioAsync } from "../../../../services/TipoNegocioApi";
+import { getTipoNegocioAsync, getFamiliasByTNAsync } from "../../../../services/TipoNegocioApi";
 /*************************************************************************************** */
 import { useNavigate } from "react-router-dom";
-import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getRuta, isAccess,toastError } from "../../../../helpers/Helpers";
 import {
   deleteToken,
   deleteUserData,
@@ -29,7 +31,7 @@ import moment from "moment";
 
 export const SelectorReporteInventario = () => {
 
-    const { setIsLoading, setIsDefaultPass, setIsLogged } =
+    const { setIsLoading, setIsDefaultPass, setIsLogged, access, } =
     useContext(DataContext);
 
     const [storeList, setStoreList] = useState([]); //Array de Almacenes
@@ -37,7 +39,12 @@ export const SelectorReporteInventario = () => {
     const [tNegocioList, setTNegocioList] = useState([]); //Array de Tipos de Negocios
     const [selectedTNegocio, setSelectedTNegocio] = useState("t"); //Tipo de Negocio seleccionado o Todos
     const [productList, setProductList] = useState([]); //Array de Productos
-    const [selectedProduct, setSelectedProduct] = useState(""); //Producto seleccionado o Todos
+    const [selectedProduct, setSelectedProduct] = useState(); //Producto seleccionado o Todos
+    const [omitirStock, setOmitirStock] = useState(false); 
+    const [showCost, setshowCost] = useState(false); 
+    const [showststore, setstorehide] = useState(false); 
+    const [familiaList, setFamiliaList] = useState([]);
+    const [selectedFamilia, setSelectedFamilia] = useState("t");
 
     let navigate = useNavigate();
     let ruta = getRuta();
@@ -78,6 +85,9 @@ export const SelectorReporteInventario = () => {
             if (resultProducts.data.length < 4) {
                 setSelectedProduct(resultProducts.data[0].id);
             }
+
+
+
 
             /**Traemos los datos de los Alamacenes */
             const resultStore = await getStoresByUserAsync(token);
@@ -140,32 +150,74 @@ export const SelectorReporteInventario = () => {
 
         })();
     }, []);
+              
+    
+  const onChangeTN = async (value) => {
+    setSelectedTNegocio(value);
+    if (value === "t") {
+      setSelectedFamilia("t");
+      return;
+    } else if (value === "") {
+      setSelectedFamilia("");
+      return;
+    } else {
+      setSelectedFamilia("t");
+      setIsLoading(true);
+      
+      const resultFamilias = await getFamiliasByTNAsync(token, value);
+      if (!resultFamilias.statusResponse) {
+        setIsLoading(false);
+        if (resultFamilias.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultFamilias.error.message);
+        return;
+      }
+
+      if (resultFamilias.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultFamilias.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setFamiliaList(resultFamilias.data);
+    }
+  };
+
+
 
     const verReportInventario = () => {
-        // if (!moment(selectedProduct === "").isValid()) {
-        //     toastError("Seleccione al menos un producto ");
-        //     return;
-        //   }
-
-        // if(!moment(selectedStore.length === 0).isValid()) {
-        //     toastError("Seleccione un almacén");
-        //     return;
-        //}
-
-        if (selectedProduct.length === 0) {
+        if (!selectedProduct || selectedProduct.length === 0) {
             setSelectedProduct("t");
             return;
-          }
-    
+        }
         if (setSelectedTNegocio.length === 0) {
             setSelectedTNegocio("t");
             return;
         }
 
+        if (setSelectedFamilia.length === 0) {
+            setSelectedFamilia("t");
+            return;
+          }
+
+
         var params = {
             selectedStore,
             selectedProduct,
             selectedTNegocio,
+            selectedFamilia,
+            showststore,
+            showCost,
+            omitirStock,
         };
         params = JSON.stringify(params);
         window.open(`${ruta}/r-inventario-prods/${params}`);
@@ -186,34 +238,50 @@ export const SelectorReporteInventario = () => {
                 >
 
                     {/* Selector de los productos */}
-                    <InputLabel id="demo-simple-select-standard-label">
-                            Seleccione un Tipo de Negocio
-                        </InputLabel>
-                    <Autocomplete
-                        id="combo-box-demo"
-                        fullWidth
-                        options={productList}
-                        getOptionLabel={(op) => (op ? `${op.description}` : "")}
-                        value={selectedProduct === "t" ? 0  : selectedProduct}
-                        onChange={(event, newValue) => {setSelectedProduct(newValue);
-                        }}
-                        renderOption={(props, option) => {
-                            return (
-                            <li {...props} key={option.id}>
-                                {option.description}
-                            </li>
-                            );
-                        }}
-                        noOptionsText="Producto no encontrado..."
-                        renderInput={(params) => (
-                            <TextField
-                                variant="standard"
-                                {...params}
-                                label={selectedProduct === "" || selectedProduct === null ? "Todos los productos" : "Productos"
-                                }
-                            />
-                        )}
-                    />
+                    {/* <InputLabel id="demo-simple-select-standard-label">
+                            Seleccione un Producto
+                        </InputLabel> */}
+                        <Autocomplete
+                                id="demo-simple-select-standard-label"
+                                
+                                fullWidth
+                                style={{ marginRight: 20 }}
+                                options={productList}
+                                getOptionLabel={(op) => (op ? `${op.description}` : "")}
+                                value={selectedProduct === "t" ? 0 : selectedProduct}
+                                onChange={(event, newValue) => {
+                                    setSelectedProduct(newValue ? newValue.id : "0");
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                    {...params}
+                                    label="Seleccione un Producto"
+                                    variant="standard"
+                                    margin="normal"
+                                    InputLabelProps={{
+                                        ...params.InputLabelProps,
+                                    }}
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        style: { border: 'none' },
+                                    }}
+                                    />
+                                )}
+                                >
+                                <MenuItem key={-1} value="">
+                                    <em>Seleccione un Producto</em>
+                                </MenuItem>
+
+                                {productList.map((item) => (
+                                    <MenuItem key={item.id} value={item}>
+                                    {item.description}
+                                    </MenuItem>
+                                ))}
+
+                                <MenuItem key={"t"} value={"t"}>
+                                Todos...
+                                </MenuItem>
+                                </Autocomplete>
 
                     <FormControl
                         variant="standard"
@@ -229,7 +297,7 @@ export const SelectorReporteInventario = () => {
                             labelId="demo-simple-select-standard-label"
                             id="demo-simple-select-standard"
                             value={selectedTNegocio}
-                            onChange={(e) => setSelectedTNegocio(e.target.value)}
+                            onChange={(e) => onChangeTN(e.target.value)}
                             label="Tipo de Negocio"
                             style={{ textAlign: "left" }}
                         >
@@ -249,6 +317,47 @@ export const SelectorReporteInventario = () => {
                             </MenuItem>
                         </Select>
                     </FormControl>
+
+
+                    <FormControl
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20 }}
+              required
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione una Familia
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedFamilia}
+                onChange={(i) => {
+                  if (i.target.value.length === 0) {
+                    setSelectedFamilia("t");
+                    return;
+                  }
+                  setSelectedFamilia(i.target.value);
+                }}
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione una Familia</em>
+                </MenuItem>
+
+                {familiaList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem key={"t"} value={"t"}>
+                  Todos...
+                </MenuItem>
+              </Select>
+            </FormControl>
                     
                     {/* Selector de los almacenes */}
                     <FormControl
@@ -282,14 +391,54 @@ export const SelectorReporteInventario = () => {
                             <MenuItem
                                 key={"t"}
                                 value={"t"}
-                                disabled={storeList.length === 4 ? false : true}
+                                disabled={storeList.length === 5 ? false : true}
                             >
                                 Todos...
                             </MenuItem>
                         </Select>
                     </FormControl>
 
-                    <hr />
+                    <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={omitirStock}
+                      onChange={(e) => setOmitirStock(e.target.checked)
+                      }
+                      color="primary"
+                    />
+                  }
+                  label="Omitir Existencias Cero"
+                />      
+                 {isAccess(access, "COSTO VER") ? (<FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showCost}
+                      onChange={(i) => setshowCost(i.target.checked)
+                      }
+                      color="primary"
+                    />
+                  }
+                  label="Con costos"
+                />   
+                ) : (
+              <></>
+            )}
+                
+
+
+                 <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showststore}
+                      onChange={(s) => setstorehide(s.target.checked)
+                      }
+                      color="primary"
+                    />
+                  }
+                  label="A. Por Almacen"
+                />   
+                
+                       <hr />
 
                     <Button
                         variant="outlined"

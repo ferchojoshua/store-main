@@ -21,6 +21,9 @@ import {
 } from "../../../../services/Account";
 import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
+import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faDownload, } from "@fortawesome/free-solid-svg-icons";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
 import moment from "moment";
@@ -203,12 +206,32 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             hasta
           ).format("L")} ${moment(horaHasta).format("hh:mm A")}`}</span>
 
+          <Stack
+              spacing={3}
+              direction="row"              
+              display="flex"
+              justifyContent="right"> 
+                  <IconButton  
+                  spacing={3}
+                  direction="row"              
+                  display="flex"
+                  justifyContent="right"
+                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
+                  <FontAwesomeIcon icon={faDownload}
+
+                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
+
+     
+                  />
+                  </IconButton>
+         </Stack> 
+
           <ReactToPrint
             trigger={() => {
               return (
                 <IconButton
                   variant="outlined"
-                  style={{ position: "fixed", right: 50, top: 75 }}
+                  style={{ position: "fixed", right: 105, top: 75 }}
                 >
                   <PrintRoundedIcon
                     style={{ fontSize: 50, color: "#2979ff", width: 50 }}
@@ -226,6 +249,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <NoData />
           ) : (
             <Table
+            id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -411,6 +435,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               <NoData />
             ) : (
               <Table
+              id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -474,7 +499,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <hr />
             <Stack direction="row" flex="row" justifyContent="space-around">
               <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
                   Total de Ventas
                 </span>
                 <span>
@@ -483,7 +508,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               </Stack>
 
               <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
                   Total de Ventas
                 </span>
                 <span>
@@ -561,6 +586,13 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <hr />
           </Container>
         </PrintReport>
+        
+ <ReactHTMLTableToExcel
+                    id="test-table-xls-button"
+                    className="btn btn-success"
+                    table="table-to-xls"
+                    sheet="Pagina 1"
+                    />
       </div>
     </div>
   );

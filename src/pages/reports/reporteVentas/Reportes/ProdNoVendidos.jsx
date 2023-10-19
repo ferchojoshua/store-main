@@ -17,8 +17,8 @@ import PaginationComponent from "../../../../components/PaginationComponent";
 import { DataContext } from "../../../../context/DataContext";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import { deleteToken, deleteUserData, getToken,} from "../../../../services/Account";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleChevronLeft, } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { faCircleChevronLeft, faDownload, } from "@fortawesome/free-solid-svg-icons";
 import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
@@ -27,6 +27,7 @@ import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
 import { getProductosNoVendidosAsync } from "../../../../services/ReportApi";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 export const ProdNoVendidos = () => {
   const [data, setData] = useState([]);
@@ -154,23 +155,47 @@ export const ProdNoVendidos = () => {
           <span style={{ textAlign: "center"  }}>{`Desde: ${moment(desde).format(
             "L"
           )} - Hasta: ${moment(hasta).format("L")}`}</span>
+    <Stack
+              spacing={3}
+              direction="row"              
+              display="flex"
+              justifyContent="right"> 
+                  <IconButton  
+                  spacing={3}
+                  direction="row"              
+                  display="flex"
+                  justifyContent="right"
+                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
+                  <FontAwesomeIcon icon={faDownload}
+                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
+     
+                  />
+                  </IconButton>
+         </Stack> 
 
           <ReactToPrint
             trigger={() => {
               return (
+                
                 <IconButton
                   variant="outlined"
-                  style={{ position: "fixed", right: 50, top: 75 }}
+                  style={{ position: "fixed", right: 105, top: 75 }}
                 >
+             
                   <PrintRoundedIcon
                     style={{ fontSize: 50, color: "#2979ff", width: 50 }}
                   />
+                  
+          
                 </IconButton>
+                
               );
             }}
             content={() => compRef.current}
           />
         </Stack>
+
+  
 
         <hr />
 
@@ -178,6 +203,7 @@ export const ProdNoVendidos = () => {
           { isEmpty(data) ? (isEmpty(data) ? (<Consulting/>) :(<NoData/>)) : (
       <div>
         <Table
+         id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -207,8 +233,8 @@ export const ProdNoVendidos = () => {
                   return (
                     <tr key={id}>
                       <td style={{ textAlign: "center" }}>{producto.barCode}</td>
-                      <td style={{ textAlign: "center" , width: "1%",whiteSpace: "nowrap", }}> {producto.description}</td>
-                      <td style={{ textAlign: "center" }}>{almacen.name} </td>
+                      <td style={{ textAlign: "center" }}> {producto.description}</td>
+                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{almacen.name} </td>
                       <td style={{ textAlign: "center" }}>{existencia}</td>
                       <td style={{ textAlign: "center" }}> {new Intl.NumberFormat("es-NI", { style: "currency",currency: "NIO", }).format(precioVentaMayor)} </td>
                       <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency",  currency: "NIO",}).format(precioVentaDetalle)} </td>
@@ -281,6 +307,7 @@ export const ProdNoVendidos = () => {
               <NoData />
             ) : (
               <Table
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -318,7 +345,7 @@ export const ProdNoVendidos = () => {
                     );
                   })}
                 </tbody>
-              </Table>
+              </Table>                        
             )}
             <hr />
             <Stack direction="row" flex="row" justifyContent="space-around">
@@ -349,6 +376,15 @@ export const ProdNoVendidos = () => {
             <hr />
           </Container>
         </PrintReport>
+
+ <ReactHTMLTableToExcel
+                    id="test-table-xls-button"
+                    className="btn btn-success"
+                    table="table-to-xls"
+                    filename="Productos NO Vendidos"
+                    sheet="Pagina 1"
+                                           
+                    />
         <Button
               onClick={() => {
                 navigate(`${ruta}/reports/`);

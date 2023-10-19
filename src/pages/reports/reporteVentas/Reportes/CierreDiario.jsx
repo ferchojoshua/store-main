@@ -23,6 +23,9 @@ import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
+import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faDownload, } from "@fortawesome/free-solid-svg-icons";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { getGetCierreDiarioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
@@ -191,12 +194,30 @@ const CierreDiario = () => {
             "YYYY-MM-DD hh:mm A"
           )} - Hasta: ${moment(hasta).format("YYYY-MM-DD hh:mm A")}`}</span>
 
+          <Stack
+              spacing={3}
+              direction="row"              
+              display="flex"
+              justifyContent="right"> 
+                  <IconButton  
+                  spacing={3}
+                  direction="row"              
+                  display="flex"
+                  justifyContent="right"
+                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
+                  <FontAwesomeIcon icon={faDownload}
+                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
+     
+                  />
+                  </IconButton>
+         </Stack> 
+
           <ReactToPrint
             trigger={() => {
               return (
                 <IconButton
                   variant="outlined"
-                  style={{ position: "fixed", right: 50, top: 75 }}
+                  style={{ position: "fixed", right: 105, top: 75 }}
                 >
                   <PrintRoundedIcon
                     style={{ fontSize: 50, color: "#2979ff", width: 50 }}
@@ -215,6 +236,7 @@ const CierreDiario = () => {
             <Stack spacing={2}>
               <Typography variant="h5">Ventas de Contado</Typography>
               <Table
+               id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -295,6 +317,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
               <Table
+               id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -360,6 +383,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Ventas de Credito</Typography>
               <Table
+               id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -449,6 +473,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Devoluciones</Typography>
               <Table
+               id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -500,10 +525,7 @@ const CierreDiario = () => {
                         </td>
                         <td style={{ textAlign: "center" }}>{store.name}</td>
                         <td style={{ textAlign: "left" }}>
-                          {ventaAfectada.client
-                            ? ventaAfectada.client.nombreCliente
-                            : ventaAfectada.nombreCliente === ""
-                            ? "CLIENTE EVENTUAL"
+                          {ventaAfectada.client ? ventaAfectada.client.nombreCliente: ventaAfectada.nombreCliente === "" ? "CLIENTE EVENTUAL"
                             : ventaAfectada.nombreCliente}
                         </td>
 
@@ -629,6 +651,7 @@ const CierreDiario = () => {
               <Stack spacing={2}>
                 <Typography variant="h5">Ventas de Contado</Typography>
                 <Table
+                 id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -710,6 +733,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
                 <Table
+                 id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -775,6 +799,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Ventas de Credito</Typography>
                 <Table
+                 id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -864,6 +889,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Devoluciones</Typography>
                 <Table
+                 id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -940,6 +966,7 @@ const CierreDiario = () => {
                 <Divider />
 
                 <Stack spacing={1}>
+                
                   <Stack direction={"row"} justifyContent="space-between">
                     <Typography
                       variant="h6"
@@ -1023,6 +1050,15 @@ const CierreDiario = () => {
             )}
           </Container>
         </PrintReport>
+        
+ <ReactHTMLTableToExcel
+                    id="test-table-xls-button"
+                    className="btn btn-success"
+                    table="table-to-xls"
+                    filename="Cierre Diario"
+                    sheet="Pagina 1"
+                                           
+                    />
       </div>
     </div>
   );
