@@ -240,7 +240,7 @@ export const InventarioProductos = () => {
                             hover={!isDarkMode}
                             size="sm"
                             responsive
-                            className="text-primary"
+                            className="text-primary w-100"
                         >
                                 <thead class="table-dark">
                                 <tr>
@@ -376,7 +376,7 @@ export const InventarioProductos = () => {
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary tableFixHead"
+                className="text-primary w-100 tableFixHead"
               >
                 <thead>
                   <tr>

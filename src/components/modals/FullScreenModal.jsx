@@ -18,7 +18,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const FullScreenModal = () => {
-  const { title, serverAccess } = useContext(DataContext);
+  const {open = false,  title, serverAccess } = useContext(DataContext);
 
   const defaultOptions = {
     loop: true,

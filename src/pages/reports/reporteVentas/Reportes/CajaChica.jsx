@@ -199,7 +199,7 @@ const CajaChica = () => {
               hover={!isDarkMode}
               size="sm"
               responsive
-              className="text-primary"
+              className="text-primary w-100"
             >
               <thead>
                 <tr>
@@ -324,7 +324,7 @@ const CajaChica = () => {
                   hover={!isDarkMode}
                   size="sm"
                   responsive
-                  className="text-primary"
+                  className="text-primary w-100"
                 >
                   <thead>
                     <tr>

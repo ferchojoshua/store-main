@@ -212,7 +212,11 @@ const SelectorCierreDiario = () => {
                     <MenuItem
                       key={item.id}
                       value={item.id}
-                      disabled={storeList.length === 5 ? false : true}
+                      disabled={
+                        storeList.length > 6 || storeList.length > 5 || storeList.length > 4 || storeList.length > 3 || storeList.length > 2
+                          ? false
+                          : true
+                      }
                     >
                       {item.name}
                     </MenuItem>
