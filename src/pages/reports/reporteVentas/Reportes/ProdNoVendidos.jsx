@@ -207,7 +207,7 @@ export const ProdNoVendidos = () => {
               hover={!isDarkMode}
               size="sm"
               responsive
-              className="text-primary tableFixHead table table-striped"
+              className="text-primary text-primary w-100 tableFixHead table table-striped"
 
             >
               <thead class="table-dark">
@@ -311,7 +311,7 @@ export const ProdNoVendidos = () => {
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary tableFixHead"
+                className="text-primary text-primary w-100 tableFixHead"
               >
                 <thead>
                   <tr>

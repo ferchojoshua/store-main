@@ -12,7 +12,24 @@ export const PrintReport = React.forwardRef((props, ref) => {
       margin: 0mm 10mm 0mm 10mm;
       padding-top:15mm;
       padding-bottom:15mm;
-    }`;
+    }
+   #table-to-xls{
+    width:100%;
+   }
+   .w-100{
+    width:100% !important;
+   }
+   @media screen, print {
+    table {width: 100%}
+    .w-100{
+      width:100% !important;
+     }
+.css-spazkk-MuiContainer-root {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+}
+    `;
   };
 
   return (

@@ -253,7 +253,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               hover={!isDarkMode}
               size="sm"
               responsive
-              className="text-primary"
+              className="text-primary w-100"
             >
               <thead>
                 <tr>
@@ -439,7 +439,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary"
+                className="text-primary w-100"
               >
                 <thead>
                   <tr>

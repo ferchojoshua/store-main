@@ -211,7 +211,7 @@ export const ArticulosVendidos = () => {
               hover={!isDarkMode}
               size="sm"
               responsive
-              className="text-primary"
+              className="text-primary w-100"
             >
               <thead>
                 <tr>
@@ -347,7 +347,7 @@ export const ArticulosVendidos = () => {
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary"
+                className="text-primary w-100"
               >
                 <thead>
                   <tr>

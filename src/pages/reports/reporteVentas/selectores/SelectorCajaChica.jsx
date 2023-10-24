@@ -177,7 +177,11 @@ const SelectorCajaChica = () => {
                 <MenuItem
                   key={"t"}
                   value={"t"}
-                  disabled={storeList.length === 4 ? false : true}
+                  disabled={
+                        storeList.length > 6 || storeList.length > 5 || storeList.length > 4 || storeList.length > 3 || storeList.length > 2
+                          ? false
+                          : true
+                      }
                 >
                   Todos...
                 </MenuItem>

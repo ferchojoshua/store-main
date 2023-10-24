@@ -441,7 +441,7 @@ const Ingresos = () => {
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary"
+                className="text-primary w-100"
               >
                 <caption style={{ color: "#00a152" }}>
                   <Stack direction="row" justifyContent="space-between">
@@ -527,7 +527,7 @@ const Ingresos = () => {
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary"
+                className="text-primary w-100"
               >
                 <caption style={{ color: "#00a152" }}>
                   <Stack direction="row" justifyContent="space-between">
