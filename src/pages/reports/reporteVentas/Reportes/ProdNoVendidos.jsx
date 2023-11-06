@@ -27,7 +27,12 @@ import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
 import { getProductosNoVendidosAsync } from "../../../../services/ReportApi";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
+// ...
+
+// import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 export const ProdNoVendidos = () => {
   const [data, setData] = useState([]);
@@ -48,6 +53,10 @@ export const ProdNoVendidos = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
+
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Productos NO Vendidos", data.length, sumPVM(), sumPVD());
+  };
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,7 +124,40 @@ export const ProdNoVendidos = () => {
     return sum;
   };
 
-
+  
+  // const exportExcel = (tableId, filename) => {
+  //   const table = document.getElementById(tableId);
+  //   const ws_data = XLSX.utils.table_to_sheet(table);
+  
+  //   const wb = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws_data, "Sheet 1");
+  
+  //   XLSX.writeFile(wb, `${filename}.xlsx`);
+  // };
+  
+  const exportExcel = (tableId, filename, totalProductos, totalPVM, totalPVD) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+  
+    // Add a row for total values
+    const totalRow = [
+      { t: "s", v: "Total Productos", s: { font: { bold: true } } },
+      { t: "n", v: totalProductos },
+      { t: "s", v: "Total PVM", s: { font: { bold: true } } },
+      { t: "n", v: totalPVM },
+      { t: "s", v: "Total PVD", s: { font: { bold: true } } },
+      { t: "n", v: totalPVD },
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Productos No vendidos");
+  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+  
+  
+  
 
   return (
     <div>
@@ -161,16 +203,16 @@ export const ProdNoVendidos = () => {
               display="flex"
               justifyContent="right"> 
                   <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            // onClick={() => SheetJS.downloadExcel()}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
+
          </Stack> 
 
           <ReactToPrint
@@ -377,27 +419,15 @@ export const ProdNoVendidos = () => {
           </Container>
         </PrintReport>
 
- <ReactHTMLTableToExcel
+ {/* <ReactHTMLTableToExcel
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
                     filename="Productos NO Vendidos"
                     sheet="Pagina 1"
                                            
-                    />
-        <Button
-              onClick={() => {
-                navigate(`${ruta}/reports/`);
-              }}
-              style={{ marginRight: 20, borderRadius: 20 }}
-              variant="outlined"
-            >
-              <FontAwesomeIcon
-                style={{ marginRight: 10, fontSize: 20 }}
-                icon={faCircleChevronLeft}
-              />
-              Regresar
-            </Button>
+                    /> */}
+        
       </div>
     </div>
   );

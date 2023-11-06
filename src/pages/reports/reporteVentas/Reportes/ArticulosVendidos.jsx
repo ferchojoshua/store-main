@@ -466,6 +466,7 @@ export const ArticulosVendidos = () => {
                     sheet="Pagina 1"
                                            
                     />
+                    
       </div>
     </div>
   );

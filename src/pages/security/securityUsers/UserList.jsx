@@ -393,7 +393,7 @@ const UserList = () => {
                 <th style={{ textAlign: "left" }}>Nombre</th>
                 <th style={{ textAlign: "left" }}>Telefono</th>
                 <th style={{ textAlign: "left" }}>Rol</th>
-                <th style={{ textAlign: "left", display: "none" }}>StoreAccess</th>
+                <th style={{ textAlign: "left", display: "none" }}>Almacen</th>
                 <th style={{ textAlign: "center" }}>En Linea</th>
                 <th style={{ width: 150 }}>Acciones</th>
               </tr>
@@ -406,7 +406,7 @@ const UserList = () => {
                     <td style={{ textAlign: "left" }}>{item.fullName}</td>
                     <td style={{ textAlign: "left" }}>{item.phoneNumber}</td>
                     <td style={{ textAlign: "left" }}>{item.rol ? item.rol.roleName : ""}</td>
-                    <td style={{ textAlign: "left" }}>{item.storeAccess ? item.storeAccess.name : ""}</td>
+                    <td style={{ textAlign: "left" }}>{item.storeAccess ? item.storeAccess.id : ""}</td>
                     <td style={{ textAlign: "center" }}>
                       <FontAwesomeIcon
                         icon={item.isActiveSession ? faCircleUser : faUserSlash}
