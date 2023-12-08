@@ -25,8 +25,8 @@ import { Table } from "react-bootstrap";
 import { getProductosVendidosAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
-
 import "../../../../components/styles/estilo.css";
+import XLSX from 'xlsx';
 
 export const ArticulosVendidos = () => {
   const [data, setData] = useState([]);
@@ -55,6 +55,10 @@ export const ArticulosVendidos = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
+   
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Articulos Vendidos", data.length,  sumCostoCompra(), sumVentaNeta(), sumUtilidad());
+  };
 
     // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -128,6 +132,31 @@ export const ArticulosVendidos = () => {
     return sum;
   };
 
+    
+  const exportExcel = (tableId, filename, TotalPVendidos, sumCostoCompra, sumVentaNeta, sumUtilidad) => {
+    const table = document.getElementById(tableId);
+    const colWidths = Array.from(table.rows[0].cells).map(cell => ({ wch: cell.clientWidth / 8 }));
+    const ws_data = XLSX.utils.table_to_sheet(table, { sheet: "Productos vendidos", raw: true, columnDefs: colWidths });
+    const totalRow = [
+      { t: "s", v: "Total Productos Vendidos", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: TotalPVendidos },
+      { t: "s", v: "Total Costo de Compra", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumCostoCompra },
+      { t: "s", v: "Total Ventas Netas", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumVentaNeta },
+      { t: "s", v: "Utilidad Neta", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumUtilidad},
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Productos vendidos");
+  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
+
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -160,7 +189,7 @@ export const ArticulosVendidos = () => {
             variant="h5"
             component="div"
           >
-            Productos Vendidos
+            Articulos Vendidos
           </Typography>
           <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
             "L"
@@ -171,17 +200,15 @@ export const ArticulosVendidos = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                   <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint

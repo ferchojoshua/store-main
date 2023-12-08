@@ -30,6 +30,9 @@ import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { PrintReport } from "../../../../components/modals/PrintReport";
+import XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 const TrasladoInventario = () => {
   const compRef = useRef();
@@ -48,6 +51,12 @@ const TrasladoInventario = () => {
     title,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
+
+  
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Traslados de Inventario", data.length,  sumCostoNeto());
+  };
 
 
   // Pagination
@@ -109,6 +118,25 @@ const TrasladoInventario = () => {
     data.map((item) => (sum += item.sumCostoCompra));
     return sum;
   };
+  const exportExcel = (tableId, filename, TotalTraslados, sumCostoNeto) => {
+    const table = document.getElementById(tableId);
+    const colWidths = Array.from(table.rows[0].cells).map(cell => ({ wch: cell.clientWidth / 8 }));
+    const ws_data = XLSX.utils.table_to_sheet(table, { sheet: "Traslados de Inventario", raw: true, columnDefs: colWidths });
+    const totalRow = [
+      { t: "s", v: "Total de Traslados", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: TotalTraslados, s: { alignment: { horizontal: "center" } } },
+      { t: "s", v: "Total de Costos", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumCostoNeto, s: { alignment: { horizontal: "center" } } },
+    ];
+  
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Traslados de Inventario");
+  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+  
 
   return (
     <div>
@@ -152,17 +180,16 @@ const TrasladoInventario = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                    <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            // onClick={() => SheetJS.downloadExcel()}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint

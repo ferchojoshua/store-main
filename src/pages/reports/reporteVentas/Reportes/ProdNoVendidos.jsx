@@ -124,16 +124,7 @@ export const ProdNoVendidos = () => {
     return sum;
   };
 
-  
-  // const exportExcel = (tableId, filename) => {
-  //   const table = document.getElementById(tableId);
-  //   const ws_data = XLSX.utils.table_to_sheet(table);
-  
-  //   const wb = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(wb, ws_data, "Sheet 1");
-  
-  //   XLSX.writeFile(wb, `${filename}.xlsx`);
-  // };
+
   
   const exportExcel = (tableId, filename, totalProductos, totalPVM, totalPVD) => {
     const table = document.getElementById(tableId);
