@@ -27,8 +27,10 @@ import { Table } from "react-bootstrap";
 import { getGetCajaChicaAsync } from "../../../../services/ReportApi";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+////import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { PrintReport } from "../../../../components/modals/PrintReport";
+import XLSX from 'xlsx';
+
 
 const CajaChica = () => {
   const compRef = useRef();
@@ -115,6 +117,40 @@ const CajaChica = () => {
     data.map((item) => (sum += item.salidas));
     return sum;
   };
+  
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Caja Chica", data.length, sumEntradas(), sumSalidas(), saldoAnterior(), (sumEntradas() - sumSalidas() + saldoAnterior));
+
+  };
+
+
+  //const exportExcel = (tableId, filename, sumEntradas, sumSalidas, saldoAnterior, (sumEntradas() - sumSalidas() + saldoAnterior)) => {
+    const exportExcel = (tableId, filename, sumEntradas, sumSalidas, saldoAnterior, totalValue) => {
+      const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+   //// const dynamicCurrencyFormat = new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format;
+    
+   
+
+        // Add a row for total values
+        const totalRow = [
+          { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
+          { t: "n", v: sumEntradas },
+          { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
+          { t: "n", v: sumSalidas},
+          { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
+          { t: "n", v: saldoAnterior }, 
+          { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
+          { t: "n", v: (sumEntradas() - sumSalidas() + saldoAnterior) },  
+             ];
+        XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+      
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
+      
+        XLSX.writeFile(wb, `${filename}.xlsx`); 
+           };
+
 
   return (
     <div>
@@ -159,17 +195,15 @@ const CajaChica = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint
@@ -430,15 +464,6 @@ const CajaChica = () => {
               </Stack>
             </Container>
           </PrintReport>
-          
- <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="Reporte de Caja Chica"
-                    sheet="Pagina 1"
-                                           
-                    />
         </div>
       </Dialog>
     </div>

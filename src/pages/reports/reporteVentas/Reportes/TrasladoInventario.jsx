@@ -31,8 +31,6 @@ import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
-
 
 const TrasladoInventario = () => {
   const compRef = useRef();
@@ -118,6 +116,7 @@ const TrasladoInventario = () => {
     data.map((item) => (sum += item.sumCostoCompra));
     return sum;
   };
+
   const exportExcel = (tableId, filename, TotalTraslados, sumCostoNeto) => {
     const table = document.getElementById(tableId);
     const colWidths = Array.from(table.rows[0].cells).map(cell => ({ wch: cell.clientWidth / 8 }));

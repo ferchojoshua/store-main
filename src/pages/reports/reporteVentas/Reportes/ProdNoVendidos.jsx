@@ -28,7 +28,6 @@ import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
 import { getProductosNoVendidosAsync } from "../../../../services/ReportApi";
 import XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
 
 // ...
 
@@ -227,11 +226,7 @@ export const ProdNoVendidos = () => {
             content={() => compRef.current}
           />
         </Stack>
-
-  
-
         <hr />
-
         <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
           { isEmpty(data) ? (isEmpty(data) ? (<Consulting/>) :(<NoData/>)) : (
       <div>
