@@ -23,12 +23,13 @@ import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
-import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { getGetCierreDiarioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
+import XLSX from "xlsx";
 
 const CierreDiario = () => {
   const compRef = useRef();
@@ -155,6 +156,46 @@ const CierreDiario = () => {
     data.map((item) => (result += item.montoAnulado));
     setSumAnulatedSales(result);
   };
+  const downloadExcel = () => {
+    exportExcel(
+      "table-to-xls",
+      "Cierre Diario",
+      data.length,
+      sumContado(),
+      sumCredito(),
+      sumRec(),
+      sumAnulated(),
+    );
+  };
+
+  const exportExcel = (
+    tableId,
+    filename,
+    sumContado,
+    sumCredito,
+    sumRec,
+    sumAnulated,
+  ) => {
+    // const calculatedTotalValue = sumEntradas - sumSalidas + saldoAnterior;
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+    const totalRow = [
+      { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
+      { t: "n", v: sumContado },
+      { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
+      { t: "n", v: sumCredito },
+      { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
+      { t: "n", v: sumRec },
+      { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
+      { t: "n", v: sumAnulated },
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
+
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
 
   return (
     <div>
@@ -195,22 +236,28 @@ const CierreDiario = () => {
           )} - Hasta: ${moment(hasta).format("YYYY-MM-DD hh:mm A")}`}</span>
 
           <Stack
+            spacing={3}
+            direction="row"
+            display="flex"
+            justifyContent="right"
+          >
+            <IconButton
               spacing={3}
-              direction="row"              
+              direction="row"
               display="flex"
-              justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
-         </Stack> 
+              justifyContent="right"
+              style={{
+                fontSize: 40,
+                position: "fixed",
+                color: "#4caf50",
+                right: 50,
+                top: 75,
+                width: 50,
+              }}
+            >
+              <FontAwesomeIcon icon={faDownload} onClick={downloadExcel} />
+            </IconButton>
+          </Stack>
 
           <ReactToPrint
             trigger={() => {
@@ -236,7 +283,7 @@ const CierreDiario = () => {
             <Stack spacing={2}>
               <Typography variant="h5">Ventas de Contado</Typography>
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -280,14 +327,8 @@ const CierreDiario = () => {
                           {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
-                        <td style={{ textAlign: "center" }}>
-                          {item.store.name}
-                        </td>
-                        <td style={{ textAlign: "left" }}>
-                          {item.client
-                            ? item.client.nombreCliente
-                            : item.nombreCliente === ""
-                            ? "CLIENTE EVENTUAL"
+                        <td style={{ textAlign: "center" }}>{item.store?.name}</td>
+                        <td style={{ textAlign: "left" }}>{item.client ? item.client.nombreCliente : item.nombreCliente === "" ? "CLIENTE EVENTUAL"
                             : item.nombreCliente}
                         </td>
                         <td style={{ textAlign: "center" }}>
@@ -317,7 +358,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -360,7 +401,7 @@ const CierreDiario = () => {
                         </td>
                         <td style={{ textAlign: "center" }}>{id}</td>
                         <td style={{ textAlign: "center" }}>{sale.id}</td>
-                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "center" }}>{store?.name}</td>
                         <td style={{ textAlign: "left" }}>
                           {sale.client
                             ? sale.client.nombreCliente
@@ -383,7 +424,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Ventas de Credito</Typography>
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -473,7 +514,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Devoluciones</Typography>
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -525,7 +566,10 @@ const CierreDiario = () => {
                         </td>
                         <td style={{ textAlign: "center" }}>{store.name}</td>
                         <td style={{ textAlign: "left" }}>
-                          {ventaAfectada.client ? ventaAfectada.client.nombreCliente: ventaAfectada.nombreCliente === "" ? "CLIENTE EVENTUAL"
+                          {ventaAfectada.client
+                            ? ventaAfectada.client.nombreCliente
+                            : ventaAfectada.nombreCliente === ""
+                            ? "CLIENTE EVENTUAL"
                             : ventaAfectada.nombreCliente}
                         </td>
 
@@ -621,7 +665,6 @@ const CierreDiario = () => {
                       currency: "NIO",
                     }).format(
                       sumContadoSales + sumRecuperacion - sumAnulatedSales
-                       
                     )}
                   </Typography>
                 </Stack>
@@ -651,7 +694,7 @@ const CierreDiario = () => {
               <Stack spacing={2}>
                 <Typography variant="h5">Ventas de Contado</Typography>
                 <Table
-                 id="table-to-xls"
+                  id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -696,10 +739,7 @@ const CierreDiario = () => {
                             {moment(item.fechaVenta).format("L")}
                           </td>
                           <td style={{ textAlign: "center" }}>{item.id}</td>
-                          <td style={{ textAlign: "center" }}>
-                            {item.store.name}
-                          </td>
-                          <td style={{ textAlign: "left" }}>
+                          <td style={{ textAlign: "center" }}>{item.store?.name}<td style={{ textAlign: "left" }}></td>                          
                             {item.client
                               ? item.client.nombreCliente
                               : item.nombreCliente === ""
@@ -733,7 +773,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
                 <Table
-                 id="table-to-xls"
+                  id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -776,7 +816,7 @@ const CierreDiario = () => {
                           </td>
                           <td style={{ textAlign: "center" }}>{id}</td>
                           <td style={{ textAlign: "center" }}>{sale.id}</td>
-                          <td style={{ textAlign: "center" }}>{store.name}</td>
+                          <td style={{ textAlign: "center" }}>{store?.name}</td>
                           <td style={{ textAlign: "left" }}>
                             {sale.client
                               ? sale.client.nombreCliente
@@ -799,7 +839,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Ventas de Credito</Typography>
                 <Table
-                 id="table-to-xls"
+                  id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -851,7 +891,7 @@ const CierreDiario = () => {
                             {moment(fechaVenta).format("D/M/yyyy hh:mm A")}
                           </td>
                           <td style={{ textAlign: "center" }}>{id}</td>
-                          <td style={{ textAlign: "center" }}>{store.name}</td>
+                          <td style={{ textAlign: "center" }}>{store?.name}</td>
                           <td style={{ textAlign: "left" }}>
                             {client
                               ? client.nombreCliente
@@ -889,7 +929,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Devoluciones</Typography>
                 <Table
-                 id="table-to-xls"
+                  id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -966,7 +1006,6 @@ const CierreDiario = () => {
                 <Divider />
 
                 <Stack spacing={1}>
-                
                   <Stack direction={"row"} justifyContent="space-between">
                     <Typography
                       variant="h6"
@@ -1040,8 +1079,7 @@ const CierreDiario = () => {
                         style: "currency",
                         currency: "NIO",
                       }).format(
-                         sumContadoSales + sumRecuperacion - sumAnulatedSales
-                     
+                        sumContadoSales + sumRecuperacion - sumAnulatedSales
                       )}
                     </Typography>
                   </Stack>
@@ -1050,7 +1088,7 @@ const CierreDiario = () => {
             )}
           </Container>
         </PrintReport>
-        
+        {/*         
  <ReactHTMLTableToExcel
                     id="test-table-xls-button"
                     className="btn btn-success"
@@ -1058,7 +1096,7 @@ const CierreDiario = () => {
                     filename="Cierre Diario"
                     sheet="Pagina 1"
                                            
-                    />
+                    /> */}
       </div>
     </div>
   );

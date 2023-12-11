@@ -25,12 +25,10 @@ import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import moment from "moment";
 import { Table } from "react-bootstrap";
 import { getGetCajaChicaAsync } from "../../../../services/ReportApi";
-import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-////import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { PrintReport } from "../../../../components/modals/PrintReport";
-import XLSX from 'xlsx';
-
+import XLSX from "xlsx";
 
 const CajaChica = () => {
   const compRef = useRef();
@@ -41,14 +39,13 @@ const CajaChica = () => {
   const [data, setData] = useState([]);
   const [saldoAnterior, setSaldoAnterior] = useState(0);
 
-
-    // Pagination
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsperPage] = useState(20);
-    const indexLast = currentPage * itemsperPage;
-    const indexFirst = indexLast - itemsperPage;
-    const currentItem = data.slice(indexFirst, indexLast);
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(20);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = data.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -117,40 +114,45 @@ const CajaChica = () => {
     data.map((item) => (sum += item.salidas));
     return sum;
   };
-  
-  const downloadExcel = () => {
-    exportExcel("table-to-xls", "Caja Chica", data.length, sumEntradas(), sumSalidas(), saldoAnterior(), (sumEntradas() - sumSalidas() + saldoAnterior));
 
+  const downloadExcel = () => {
+    exportExcel(
+      "table-to-xls",
+      "Caja Chica",
+      data.length,
+      sumEntradas(),
+      sumSalidas(),
+      saldoAnterior
+    );
   };
 
-
-  //const exportExcel = (tableId, filename, sumEntradas, sumSalidas, saldoAnterior, (sumEntradas() - sumSalidas() + saldoAnterior)) => {
-    const exportExcel = (tableId, filename, sumEntradas, sumSalidas, saldoAnterior, totalValue) => {
-      const table = document.getElementById(tableId);
+  const exportExcel = (
+    tableId,
+    filename,
+    sumEntradas,
+    sumSalidas,
+    saldoAnterior
+  ) => {
+    const calculatedTotalValue = sumEntradas - sumSalidas + saldoAnterior;
+    const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
-   //// const dynamicCurrencyFormat = new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format;
-    
-   
+    const totalRow = [
+      { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
+      { t: "n", v: sumEntradas },
+      { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
+      { t: "n", v: sumSalidas },
+      { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
+      { t: "n", v: saldoAnterior },
+      { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
+      { t: "n", v: calculatedTotalValue },
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
 
-        // Add a row for total values
-        const totalRow = [
-          { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
-          { t: "n", v: sumEntradas },
-          { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
-          { t: "n", v: sumSalidas},
-          { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
-          { t: "n", v: saldoAnterior }, 
-          { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
-          { t: "n", v: (sumEntradas() - sumSalidas() + saldoAnterior) },  
-             ];
-        XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
-      
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
-      
-        XLSX.writeFile(wb, `${filename}.xlsx`); 
-           };
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
 
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
 
   return (
     <div>
@@ -191,20 +193,28 @@ const CajaChica = () => {
           )} - Hasta: ${moment(hasta).format("L")}`}</span>
 
           <Stack
+            spacing={3}
+            direction="row"
+            display="flex"
+            justifyContent="right"
+          >
+            <IconButton
               spacing={3}
-              direction="row"              
+              direction="row"
               display="flex"
-              justifyContent="right"> 
-                <IconButton  
-                            spacing={3}
-                            direction="row"              
-                            display="flex"
-                            justifyContent="right"
-                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
-                            >
-                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
-                          </IconButton>
-         </Stack> 
+              justifyContent="right"
+              style={{
+                fontSize: 40,
+                position: "fixed",
+                color: "#4caf50",
+                right: 50,
+                top: 75,
+                width: 50,
+              }}
+            >
+              <FontAwesomeIcon icon={faDownload} onClick={downloadExcel} />
+            </IconButton>
+          </Stack>
 
           <ReactToPrint
             trigger={() => {
@@ -229,7 +239,7 @@ const CajaChica = () => {
             <NoData />
           ) : (
             <Table
-             id="table-to-xls"
+              id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -354,7 +364,7 @@ const CajaChica = () => {
                 <NoData />
               ) : (
                 <Table
-                 id="table-to-xls"
+                  id="table-to-xls"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
