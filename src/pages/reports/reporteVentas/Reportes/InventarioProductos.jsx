@@ -24,9 +24,10 @@ import PaginationComponent from "../../../../components/PaginationComponent";
 import { Table } from "react-bootstrap";
 import { getProductosInventrioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
+import XLSX from 'xlsx';
 
 
 export const InventarioProductos = () => {
@@ -154,6 +155,34 @@ export const InventarioProductos = () => {
     }, 0);
   };
   
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Inventario de Productos", data.length, sumexistencia(), precioDetalle(), totalPrecioMayor(), costototal());
+  };
+
+  const exportExcel = (tableId, filename, totalProductos, sumexistencia, precioDetalle, totalPrecioMayor, costototal) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+
+    const totalRow = [
+      { t: "s", v: "Total Productos", s: { font: { bold: true } } },
+      { t: "n", v: totalProductos  },
+      { t: "s", v: "Total Existencia", s: { font: { bold: true } } },
+      { t: "n", v: sumexistencia , z: '"C$"#,##0.00'},
+      { t: "s", v: "Total Precio Detalle", s: { font: { bold: true } } },
+      { t: "n", v: precioDetalle , z: '"C$"#,##0.00'},
+      { t: "s", v: "Total Precio Mayor", s: { font: { bold: true } } },
+      { t: "n", v: totalPrecioMayor , z: '"C$"#,##0.00'},
+      { t: "s", v: "Total Costo Total", s: { font: { bold: true } } },
+      { t: "n", v: costototal , z: '"C$"#,##0.00'},
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Inventario de Productos");
+  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+  
 
 
     return (
@@ -198,17 +227,16 @@ export const InventarioProductos = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+              <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            // onClick={() => SheetJS.downloadExcel()}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack>
 
          <ReactToPrint
@@ -484,15 +512,6 @@ export const InventarioProductos = () => {
             <hr />
            </Container>
         </PrintReport>
-
-        <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="|Inventario de Productos"
-                    sheet="Pagina 1"
-                                           
-                    />
       </div>
     </div>
   );

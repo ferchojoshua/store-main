@@ -50,13 +50,6 @@ const TrasladoInventario = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
-
-  
-  const downloadExcel = () => {
-    exportExcel("table-to-xls", "Traslados de Inventario", data.length,  sumCostoNeto());
-  };
-
-
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(20);
@@ -115,6 +108,10 @@ const TrasladoInventario = () => {
     let sum = 0;
     data.map((item) => (sum += item.sumCostoCompra));
     return sum;
+  };
+  
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Traslados de Inventario", data.length,  sumCostoNeto());
   };
 
   const exportExcel = (tableId, filename, TotalTraslados, sumCostoNeto) => {

@@ -138,13 +138,13 @@ const CajaChica = () => {
     const ws_data = XLSX.utils.table_to_sheet(table);
     const totalRow = [
       { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
-      { t: "n", v: sumEntradas },
+      { t: "n", v: sumEntradas, z: '#,##0.00'   },
       { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
-      { t: "n", v: sumSalidas },
+      { t: "n", v: sumSalidas, z: '#,##0.00'  },
       { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
-      { t: "n", v: saldoAnterior },
+      { t: "n", v: saldoAnterior , z: '#,##0.00' },
       { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
-      { t: "n", v: calculatedTotalValue },
+      { t: "n", v: calculatedTotalValue, z: '#,##0.00'  },
     ];
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
 

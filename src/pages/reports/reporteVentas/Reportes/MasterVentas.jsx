@@ -23,7 +23,7 @@ import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
 import moment from "moment";
@@ -31,6 +31,7 @@ import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 
 import { getMasterVentasAsync } from "../../../../services/ReportApi";
+import XLSX from "xlsx";
 
 export const MasterVentas = () => {
   const compRef = useRef();
@@ -166,6 +167,39 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     return utilidadTotal.toFixed(2);
   };
 
+
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(),sumSaldo());
+  };
+
+  
+  const exportExcel = (tableId, filename, totalMaster, sumSales, sumContadoSales, sumCreditoSales ,sumAbonado ,sumSaldo) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+  
+    // Add a row for total values
+    const totalRow = [
+      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+      { t: "n", v: totalMaster  },
+      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+      { t: "n", v: sumSales , z: '"C$"#,##0.00'},
+      { t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
+      { t: "n", v: sumContadoSales , z: '"C$"#,##0.00'}, 
+      { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
+      { t: "n", v: sumCreditoSales , z: '"C$"#,##0.00'}, 
+      { t: "s", v: "Total de Abonado", s: { font: { bold: true } } },
+      { t: "n", v: sumAbonado , z: '"C$"#,##0.00'},
+      { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
+      { t: "n", v: sumSaldo , z: '"C$"#,##0.00'},
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Master de Ventas");
+  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -212,18 +246,15 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               display="flex"
               justifyContent="right"> 
                   <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-
-     
-                  />
-                  </IconButton>
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            // onClick={() => SheetJS.downloadExcel()}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint
@@ -587,12 +618,12 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
           </Container>
         </PrintReport>
         
- <ReactHTMLTableToExcel
+ {/* <ReactHTMLTableToExcel
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
                     sheet="Pagina 1"
-                    />
+                    /> */}
       </div>
     </div>
   );

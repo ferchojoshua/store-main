@@ -144,11 +144,11 @@ export const ArticulosVendidos = () => {
       { t: "s", v: "Total Productos Vendidos", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
       { t: "n", v: TotalPVendidos },
       { t: "s", v: "Total Costo de Compra", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
-      { t: "n", v: sumCostoCompra },
+      { t: "n", v: sumCostoCompra, z: '"C$"#,##0.00'  },
       { t: "s", v: "Total Ventas Netas", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
-      { t: "n", v: sumVentaNeta },
+      { t: "n", v: sumVentaNeta, z: '"C$"#,##0.00'  },
       { t: "s", v: "Utilidad Neta", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
-      { t: "n", v: sumUtilidad},
+      { t: "n", v: sumUtilidad, z: '"C$"#,##0.00' },
     ];
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
   

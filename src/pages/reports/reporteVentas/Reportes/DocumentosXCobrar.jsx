@@ -148,7 +148,6 @@ export const DocumentosXCobrar = () => {
     return result;
   };
 
-
   
 
   const downloadExcel = () => {
@@ -159,25 +158,19 @@ export const DocumentosXCobrar = () => {
   const exportExcel = (tableId, filename, DocpoCobrar, sumSales, sumCreditoSales,sumAbonado,sumSaldo) => {
     const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
-    const dynamicCurrencyFormat = new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format;
-    
-
-    
-
-        // Add a row for total values
+       
         const totalRow = [
           { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
           { t: "n", v: DocpoCobrar },
           { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
-          { t: "n", v: sumSales },
+          { t: "n", v: sumSales, z: '"C$"#,##0.00'},
           { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
-          { t: "n", v: sumCreditoSales }, 
+          { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00'}, 
           { t: "s", v: "Total de Abonado", s: { font: { bold: true } } },
-          { t: "n", v: sumAbonado },  
+          { t: "n", v: sumAbonado, z: '"C$"#,##0.00' },  
           { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
-          ///{ t: "s", v: sumSaldo },
-          { t: "n", v: sumSaldo, s: { numFmt: dynamicCurrencyFormat } },
-        ];
+          { t: "s", v: sumSaldo, z: '"C$"#,##0.00'},
+ ];
         XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
       
         const wb = XLSX.utils.book_new();

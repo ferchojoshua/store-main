@@ -53,9 +53,6 @@ export const ProdNoVendidos = () => {
   setIsDarkMode(false);
 
 
-  const downloadExcel = () => {
-    exportExcel("table-to-xls", "Productos NO Vendidos", data.length, sumPVM(), sumPVD());
-  };
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -123,6 +120,9 @@ export const ProdNoVendidos = () => {
     return sum;
   };
 
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Productos NO Vendidos", data.length, sumPVM(), sumPVD());
+  };
 
   
   const exportExcel = (tableId, filename, totalProductos, totalPVM, totalPVD) => {
@@ -132,11 +132,11 @@ export const ProdNoVendidos = () => {
     // Add a row for total values
     const totalRow = [
       { t: "s", v: "Total Productos", s: { font: { bold: true } } },
-      { t: "n", v: totalProductos },
+      { t: "n", v: totalProductos  },
       { t: "s", v: "Total PVM", s: { font: { bold: true } } },
-      { t: "n", v: totalPVM },
+      { t: "n", v: totalPVM , z: '"C$"#,##0.00'},
       { t: "s", v: "Total PVD", s: { font: { bold: true } } },
-      { t: "n", v: totalPVD },
+      { t: "n", v: totalPVD , z: '"C$"#,##0.00'},
     ];
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
   

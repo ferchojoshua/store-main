@@ -156,46 +156,141 @@ const CierreDiario = () => {
     data.map((item) => (result += item.montoAnulado));
     setSumAnulatedSales(result);
   };
+  
+  
   const downloadExcel = () => {
-    exportExcel(
-      "table-to-xls",
-      "Cierre Diario",
-      data.length,
-      sumContado(),
-      sumCredito(),
-      sumRec(),
-      sumAnulated(),
-    );
-  };
+    exportExcel("Cierre Diario", "Cierre Diario",
+    sumContadoSales,
+    sumCreditoSales,
+    sumRecuperacion,
+    sumAnulatedSales
+  );
+};
 
-  const exportExcel = (
-    tableId,
-    filename,
-    sumContado,
-    sumCredito,
-    sumRec,
-    sumAnulated,
-  ) => {
-    // const calculatedTotalValue = sumEntradas - sumSalidas + saldoAnterior;
-    const table = document.getElementById(tableId);
-    const ws_data = XLSX.utils.table_to_sheet(table);
-    const totalRow = [
-      { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
-      { t: "n", v: sumContado },
-      { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
-      { t: "n", v: sumCredito },
-      { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
-      { t: "n", v: sumRec },
-      { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
-      { t: "n", v: sumAnulated },
+const exportExcel = (
+   filename,
+   sheetName,
+  sumContadoSales,
+  sumCreditoSales,
+  sumRecuperacion,
+  sumAnulatedSales
+
+) => {
+  const calculatedEfect =  sumContadoSales + sumRecuperacion - sumAnulatedSales;
+    const ws_data = XLSX.utils.book_new();
+  // const table = document.getElementById(tableId);
+
+  // // Convierte la tabla en una hoja de cálculo
+  // const ws_data = XLSX.utils.table_to_sheet(table);
+
+ 
+     // Agrega los datos de Ventas de Contado
+     const ws_contado = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls"));
+     XLSX.utils.book_append_sheet(ws_data, ws_contado, "Ventas de Contado");
+        
+     // Agrega los datos de Credito
+     const ws_credito = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls2"));
+     XLSX.utils.book_append_sheet(ws_data, ws_credito, "Ventas de Credito");
+
+    // Agrega los datos de Recuperaciones
+    const ws_recuperacion = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls1"));
+    XLSX.utils.book_append_sheet(ws_data, ws_recuperacion, "Recuperacion Sobre Ventas"); 
+
+  // Agrega los datos de Total de Devoluciones:
+     const ws_devoluciones = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls3"));
+     XLSX.utils.book_append_sheet(ws_data, ws_devoluciones, "Devoluciones");
+
+     const totalContadoSales = [
+      { t: "s", v: "Total Ventas de Contado", s: { font: { bold: true } } },
+    { t: "n", v: sumContadoSales, z: '"C$"#,##0.00'},
     ];
-    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
+  const totalrowContadoSales = [
+    { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
+    { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00' },
+    { t: "s", v: "Devoluciones", s: { font: { bold: true } } },
+    { t: "n", v: sumAnulatedSales, z: '"C$"#,##0.00' },
+    { t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
+    { t: "n", v: sumContadoSales, z: '"C$"#,##0.00' },
+    { t: "s", v: "Recuperacion Sobre Ventas", s: { font: { bold: true } } },
+    { t: "n", v: sumRecuperacion, z: '"C$"#,##0.00' },
+    { t: "s", v: "Efectivo en Caja:", s: { font: { bold: true } } },
+    { t: "n", v: calculatedEfect, z: '"C$"#,##0.00'},
+  ];
+  XLSX.utils.sheet_add_aoa(ws_data.Sheets["Total Ventas de Contado"], [totalContadoSales], { origin: -1, skipHeader: true, raw: true });
+  XLSX.utils.sheet_add_aoa(ws_data.Sheets["Ventas de Contado"], [totalrowContadoSales], { origin: -1 });
 
-    XLSX.writeFile(wb, `${filename}.xlsx`);
-  };
+  const totalsumcredSales = [
+    { t: "s", v: "Total de Ventas de Credito", s: { font: { bold: true } } },
+  { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00'},
+  ];
+
+const totalrowcredSales = [
+  { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
+  { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Devoluciones", s: { font: { bold: true } } },
+  { t: "n", v: sumAnulatedSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
+  { t: "n", v: sumContadoSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Recuperacion Sobre Ventas", s: { font: { bold: true } } },
+  { t: "n", v: sumRecuperacion , z: '"C$"#,##0.00'},
+  { t: "s", v: "Efectivo en Caja:", s: { font: { bold: true } } },
+  { t: "n", v: calculatedEfect, z: '"C$"#,##0.00' },
+];
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Total de Ventas de Credito"], [totalsumcredSales], { origin: -1, skipHeader: true, raw: true });
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Ventas de Credito"], [totalrowcredSales], { origin: -1 });
+
+  const totalsumrecupSales = [
+    { t: "s", v: "Total de Recuperacion", s: { font: { bold: true } } },
+  { t: "n", v: sumRecuperacion, z: '"C$"#,##0.00'},
+  ];
+
+const totalrowrecupSales = [
+  { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
+  { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Devoluciones", s: { font: { bold: true } } },
+  { t: "n", v: sumAnulatedSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
+  { t: "n", v: sumContadoSales, z: '"C$"#,##0.00' },
+  { t: "s", v: "Recuperacion Sobre Ventas", s: { font: { bold: true } } },
+  { t: "n", v: sumRecuperacion , z: '"C$"#,##0.00'},
+  { t: "s", v: "Efectivo en Caja:", s: { font: { bold: true } } },
+  { t: "n", v: calculatedEfect, z: '"C$"#,##0.00' },
+];
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Total de Recuperacion"], [totalsumrecupSales], { origin: -1, skipHeader: true, raw: true });
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Recuperacion Sobre Ventas"], [totalrowrecupSales], { origin: -1 });
+
+
+
+const totalDevSale = [
+  { t: "s", v: "Total de Devoluciones", s: { font: { bold: true } } },
+{ t: "n", v: sumAnulatedSales, z: '"C$"#,##0.00'},
+];
+
+const totalrowDevSales = [
+{ t: "s", v: "Ventas de Credito:", s: { font: { bold: true } } },
+{ t: "n", v: sumCreditoSales, z: '"C$"#,##0.00' },
+{ t: "s", v: "Devoluciones", s: { font: { bold: true } } },
+{ t: "n", v: sumAnulatedSales, z: '"C$"#,##0.00' },
+{ t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
+{ t: "n", v: sumContadoSales, z: '"C$"#,##0.00' },
+{ t: "s", v: "Recuperacion Sobre Ventas", s: { font: { bold: true } } },
+{ t: "n", v: sumRecuperacion, z: '"C$"#,##0.00' },
+{ t: "s", v: "Efectivo en Caja:", s: { font: { bold: true } } },
+{ t: "n", v: calculatedEfect , z: '"C$"#,##0.00' },
+];
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Total de Devoluciones"], [totalDevSale], { origin: -1, skipHeader: true, raw: true });
+XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { origin: -1 });
+
+  // // Crea un nuevo libro de trabajo
+  // const wb = XLSX.utils.book_new();
+
+  // // Añade la hoja de cálculo al libro de trabajo
+  // XLSX.utils.book_append_sheet(wb, ws_data, "Cierre Diario");
+ 
+  // Descarga el archivo Excel
+  XLSX.writeFile(ws_data, `${filename}.xlsx`);
+};
 
   return (
     <div>
@@ -358,7 +453,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
               <Table
-                id="table-to-xls"
+                id="table-to-xls1"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -424,7 +519,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Ventas de Credito</Typography>
               <Table
-                id="table-to-xls"
+                id="table-to-xls2"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -514,7 +609,7 @@ const CierreDiario = () => {
 
               <Typography variant="h5">Devoluciones</Typography>
               <Table
-                id="table-to-xls"
+                id="table-to-xls3"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -773,7 +868,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Recuperacion Sobre Ventas</Typography>
                 <Table
-                  id="table-to-xls"
+                  id="table-to-xls1"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -839,7 +934,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Ventas de Credito</Typography>
                 <Table
-                  id="table-to-xls"
+                  id="table-to-xls2"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -929,7 +1024,7 @@ const CierreDiario = () => {
 
                 <Typography variant="h5">Devoluciones</Typography>
                 <Table
-                  id="table-to-xls"
+                  id="table-to-xls3"
                   hover={!isDarkMode}
                   size="sm"
                   responsive
@@ -1088,15 +1183,6 @@ const CierreDiario = () => {
             )}
           </Container>
         </PrintReport>
-        {/*         
- <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="Cierre Diario"
-                    sheet="Pagina 1"
-                                           
-                    /> */}
       </div>
     </div>
   );
