@@ -178,13 +178,8 @@ const exportExcel = (
 ) => {
   const calculatedEfect =  sumContadoSales + sumRecuperacion - sumAnulatedSales;
     const ws_data = XLSX.utils.book_new();
-  // const table = document.getElementById(tableId);
 
-  // // Convierte la tabla en una hoja de cálculo
-  // const ws_data = XLSX.utils.table_to_sheet(table);
-
- 
-     // Agrega los datos de Ventas de Contado
+    // Agrega los datos de Ventas de Contado
      const ws_contado = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls"));
      XLSX.utils.book_append_sheet(ws_data, ws_contado, "Ventas de Contado");
         
@@ -281,14 +276,6 @@ const totalrowDevSales = [
 ];
 XLSX.utils.sheet_add_aoa(ws_data.Sheets["Total de Devoluciones"], [totalDevSale], { origin: -1, skipHeader: true, raw: true });
 XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { origin: -1 });
-
-  // // Crea un nuevo libro de trabajo
-  // const wb = XLSX.utils.book_new();
-
-  // // Añade la hoja de cálculo al libro de trabajo
-  // XLSX.utils.book_append_sheet(wb, ws_data, "Cierre Diario");
- 
-  // Descarga el archivo Excel
   XLSX.writeFile(ws_data, `${filename}.xlsx`);
 };
 
@@ -423,26 +410,10 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "center" }}>{item.store?.name}</td>
-                        <td style={{ textAlign: "left" }}>{item.client ? item.client.nombreCliente : item.nombreCliente === "" ? "CLIENTE EVENTUAL"
-                            : item.nombreCliente}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.montoVentaAntesDescuento)}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.descuentoXMonto)}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.montoVenta)}
+                        <td style={{ textAlign: "left" }}>{item.client ? item.client.nombreCliente : item.nombreCliente === "" ? "CLIENTE EVENTUAL" : item.nombreCliente}</td>
+                        <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.montoVentaAntesDescuento)}</td>
+                        <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.descuentoXMonto)} </td>
+                        <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.montoVenta)}
                         </td>
                       </tr>
                     );
@@ -834,7 +805,10 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                             {moment(item.fechaVenta).format("L")}
                           </td>
                           <td style={{ textAlign: "center" }}>{item.id}</td>
-                          <td style={{ textAlign: "center" }}>{item.store?.name}<td style={{ textAlign: "left" }}></td>                          
+                          <td style={{ textAlign: "center" }}>
+                            {item.store.name}
+                          </td>
+                          <td style={{ textAlign: "left" }}>
                             {item.client
                               ? item.client.nombreCliente
                               : item.nombreCliente === ""
