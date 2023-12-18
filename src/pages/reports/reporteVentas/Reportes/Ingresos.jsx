@@ -26,9 +26,10 @@ import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import { getIngresosAsync } from "../../../../services/ReportApi";
-import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+////import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import XLSX from "xlsx";
 
 import "./estilo.css";
 moment.locale("es");
@@ -119,6 +120,68 @@ const Ingresos = () => {
     return sum;
   };
 
+  const downloadExcel = () => {
+    exportExcel("Ingresos", "Ingresos", dataContado.length, dataRecuperacion.length, data.length, sumSales(), sumContadoSales(), sumRecuperacion());
+  };
+  
+
+  const exportExcel = (filename, sheetName, dataContado, dataRecuperacion, data, sumSales, sumContadoSales, sumRecuperacion) => {
+    const ws_data = XLSX.utils.book_new();
+  
+    // Agrega los datos de Ventas de Contado
+    const ws_contado = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls"));
+    XLSX.utils.book_append_sheet(ws_data, ws_contado, "Ventas de Contado");
+  
+    // Agrega los datos de Recuperaciones
+    const ws_recuperacion = XLSX.utils.table_to_sheet(document.getElementById("table-to-xls2"));
+    XLSX.utils.book_append_sheet(ws_data, ws_recuperacion, "Recuperaciones");
+
+
+    const totalsumContadoSales = [
+      { t: "s", v: "Total Ventas de Contado", s: { font: { bold: true } } },
+    { t: "n", v: sumContadoSales, z: '"C$"#,##0.00'},
+    ];
+  
+    // Agrega la fila de totales en Ventas de Contado
+    const totalRowContado = [
+      { t: "s", v: "Contador Ventas de Contado", s: { font: { bold: true } } },
+      { t: "n", v: dataContado },
+      { t: "s", v: "Contador Recuperacion", s: { font: { bold: true } } },
+      { t: "n", v: dataRecuperacion },
+      { t: "s", v: " Total de Registros", s: { font: { bold: true } } },
+      { t: "n", v: data },
+      { t: "s", v: "Total de Ingresos", s: { font: { bold: true } } },
+       { t: "n", v: sumSales, z:'"C$"#,##0.00'},
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data.Sheets["Ventas de Contado"], [totalsumContadoSales], { origin: -1, skipHeader: true, raw: true });
+    XLSX.utils.sheet_add_aoa(ws_data.Sheets["Ventas de Contado"], [totalRowContado], { origin: -1 });
+
+
+    const  totalsumRecuperacion = [
+      { t: "s", v: "Total de Recuperaciones:", s: { font: { bold: true } } },
+    { t: "n", v: sumRecuperacion, z: '"C$"#,##0.00'},
+    ];  
+  
+    // Agrega la fila de totales en Recuperaciones
+    const totalRowRecuperacion = [
+      { t: "s", v: "Contador Ventas de Contado", s: { font: { bold: true } } },
+      { t: "n", v: dataContado },
+      { t: "s", v: "Contador Recuperacion", s: { font: { bold: true } } },
+      { t: "n", v: dataRecuperacion },
+      { t: "s", v: " Total de Registros", s: { font: { bold: true } } },
+      { t: "n", v: data  },
+      { t: "s", v: "Total de Ingresos", s: { font: { bold: true } } },
+     { t: "n", v: sumSales, z: '"C$"#,##0.00'},
+ 
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data.Sheets["Recuperaciones"], [totalsumRecuperacion], { origin: -1, skipHeader: true  });
+    XLSX.utils.sheet_add_aoa(ws_data.Sheets["Recuperaciones"], [totalRowRecuperacion], { origin: -1 });
+  
+    XLSX.writeFile(ws_data, `${filename}.xlsx`);
+  };
+
+  
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -160,22 +223,28 @@ const Ingresos = () => {
           ).format("L")} ${moment(horaHasta).format("hh:mm A")}`}</span>
 
           <Stack
+            spacing={3}
+            direction="row"
+            display="flex"
+            justifyContent="right"
+          >
+            <IconButton
               spacing={3}
-              direction="row"              
+              direction="row"
               display="flex"
-              justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
-         </Stack> 
+              justifyContent="right"
+              style={{
+                fontSize: 40,
+                position: "fixed",
+                color: "#4caf50",
+                right: 50,
+                top: 75,
+                width: 50,
+              }}
+            >
+              <FontAwesomeIcon icon={faDownload} onClick={downloadExcel} />
+            </IconButton>
+          </Stack>
 
           <ReactToPrint
             trigger={() => {
@@ -212,7 +281,7 @@ const Ingresos = () => {
             <NoData />
           ) : (
             <Table
-             id="table-to-xls"
+              id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -250,7 +319,7 @@ const Ingresos = () => {
                       <td style={{ textAlign: "center" }}>
                         {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                       </td>
-                      <td style={{ textAlign: "center" }}>{store.name}</td>
+                      <td style={{ textAlign: "center" }}>{store?.name}</td>
                       <td style={{ textAlign: "center" }}>{id}</td>
                       <td style={{ textAlign: "center" }}>{sale.id}</td>
                       <td style={{ textAlign: "left" }}>
@@ -296,7 +365,7 @@ const Ingresos = () => {
             <NoData />
           ) : (
             <Table
-             id="table-to-xls"
+              id="table-to-xls2"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -334,7 +403,7 @@ const Ingresos = () => {
                       <td style={{ textAlign: "center" }}>
                         {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                       </td>
-                      <td style={{ textAlign: "center" }}>{store.name}</td>
+                      <td style={{ textAlign: "center" }}>{store?.name}</td>
                       <td style={{ textAlign: "center" }}>{id}</td>
                       <td style={{ textAlign: "center" }}>{sale.id}</td>
                       <td style={{ textAlign: "left" }}>
@@ -437,7 +506,7 @@ const Ingresos = () => {
               <NoData />
             ) : (
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -477,7 +546,7 @@ const Ingresos = () => {
                         <td style={{ textAlign: "center" }}>
                           {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                         </td>
-                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "center" }}>{store?.name}</td>
                         <td style={{ textAlign: "center" }}>{id}</td>
                         <td style={{ textAlign: "center" }}>{sale.id}</td>
                         <td style={{ textAlign: "left" }}>
@@ -523,7 +592,7 @@ const Ingresos = () => {
               <NoData />
             ) : (
               <Table
-               id="table-to-xls"
+                id="table-to-xls2"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -563,7 +632,7 @@ const Ingresos = () => {
                         <td style={{ textAlign: "center" }}>
                           {moment(fechaAbono).format("D/M/yyyy hh:mm A")}
                         </td>
-                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "center" }}>{store?.name}</td>
                         <td style={{ textAlign: "center" }}>{id}</td>
                         <td style={{ textAlign: "center" }}>{sale.id}</td>
                         <td style={{ textAlign: "left" }}>
@@ -583,7 +652,7 @@ const Ingresos = () => {
                           {new Intl.NumberFormat("es-NI", {
                             style: "currency",
                             currency: "NIO",
-                          }).format(monto)}
+                          }).format(sumSales())}
                         </td>
                       </tr>
                     );
@@ -637,15 +706,6 @@ const Ingresos = () => {
             <hr />
           </Container>
         </PrintReport>
-        
- <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="Reporte de Ingresos"
-                    sheet="Pagina 1"
-                                           
-                    />
       </div>
     </div>
   );

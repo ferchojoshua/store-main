@@ -26,10 +26,10 @@ import { Table } from "react-bootstrap";
 import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
-import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import XLSX from "xlsx";
 import "./estilo.css";
 import { getComprasAsync } from "../../../../services/ReportApi";
 moment.locale("es");
@@ -54,8 +54,6 @@ const Compras = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
-
-
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(20);
@@ -63,8 +61,6 @@ const Compras = () => {
   const indexFirst = indexLast - itemsperPage;
   const currentItem = data.slice(indexFirst, indexLast);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -124,6 +120,45 @@ const Compras = () => {
     return sum;
   };
 
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Compras", data.length, sumComprasADesc(), sumComprasDDesc());
+  };
+
+
+  const exportExcel = (
+    tableId,
+    filename,
+    Totalcompras,
+    sumComprasADesc,
+    sumComprasDDesc
+  ) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+
+    const totalRow = [
+      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+      { t: "n", v: Totalcompras },
+      {
+        t: "s",
+        v: "Total de Compra Antes Descuento",
+        s: { font: { bold: true } },
+      },
+      { t: "n", v: sumComprasADesc, z: '"C$"#,##0.00' },
+      {
+        t: "s",
+        v: "Total de Compra Despues Descuento",
+        s: { font: { bold: true } },
+      },
+      { t: "n", v: sumComprasDDesc, z: '"C$"#,##0.00' },
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Compras");
+
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -164,23 +199,28 @@ const Compras = () => {
           )}  - Hasta: ${moment(hasta).format("L")} `}</span>
 
           <Stack
+            spacing={3}
+            direction="row"
+            display="flex"
+            justifyContent="right"
+          >
+            <IconButton
               spacing={3}
-              direction="row"              
+              direction="row"
               display="flex"
-              justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
-         </Stack> 
-
+              justifyContent="right"
+              style={{
+                fontSize: 40,
+                position: "fixed",
+                color: "#4caf50",
+                right: 50,
+                top: 75,
+                width: 50,
+              }}
+            >
+              <FontAwesomeIcon icon={faDownload} onClick={downloadExcel} />
+            </IconButton>
+          </Stack>
 
           <ReactToPrint
             trigger={() => {
@@ -205,7 +245,7 @@ const Compras = () => {
             <NoData />
           ) : (
             <Table
-             id="table-to-xls"
+              id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
@@ -339,7 +379,7 @@ const Compras = () => {
               <NoData />
             ) : (
               <Table
-               id="table-to-xls"
+                id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
@@ -428,15 +468,6 @@ const Compras = () => {
             <hr />
           </Container>
         </PrintReport>
-        
- <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="Reporte de Compras"
-                    sheet="Pagina 1"
-                                           
-                    />
       </div>
     </div>
   );

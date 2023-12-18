@@ -20,13 +20,13 @@ import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { Table } from "react-bootstrap";
 import { getProductosVendidosAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
-
 import "../../../../components/styles/estilo.css";
+import XLSX from 'xlsx';
 
 export const ArticulosVendidos = () => {
   const [data, setData] = useState([]);
@@ -55,6 +55,11 @@ export const ArticulosVendidos = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
+   
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Articulos Vendidos", data.length, sumCostoCompra(), sumVentaNeta(), sumUtilidad());
+
+  };
 
     // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -128,6 +133,32 @@ export const ArticulosVendidos = () => {
     return sum;
   };
 
+    
+  const exportExcel = (tableId, filename, TotalPVendidos, sumCostoCompra, sumVentaNeta, sumUtilidad) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+    //////////const colWidths = Array.from(table.rows[0]?.cells).map(cell => ({ wch: cell.clientWidth / 8 }));
+    ///const colWidths = Array.from(table.rows[0].cells).map(cell => ({ wch: cell.clientWidth / 8 }));
+    ///const ws_data = XLSX.utils.table_to_sheet(table, { sheet: "Productos vendidos", raw: true, columnDefs: colWidths });
+    const totalRow = [
+      { t: "s", v: "Total Productos Vendidos", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: TotalPVendidos },
+      { t: "s", v: "Total Costo de Compra", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumCostoCompra, z: '"C$"#,##0.00'  },
+      { t: "s", v: "Total Ventas Netas", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumVentaNeta, z: '"C$"#,##0.00'  },
+      { t: "s", v: "Utilidad Neta", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
+      { t: "n", v: sumUtilidad, z: '"C$"#,##0.00' },
+    ];
+    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws_data, "Productos vendidos");  
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
+
+
   return (
     <div>
       <Dialog fullScreen open={true}>
@@ -160,7 +191,7 @@ export const ArticulosVendidos = () => {
             variant="h5"
             component="div"
           >
-            Productos Vendidos
+           Reporte de Articulos Vendidos
           </Typography>
           <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
             "L"
@@ -171,17 +202,15 @@ export const ArticulosVendidos = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                   <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint
@@ -200,20 +229,21 @@ export const ArticulosVendidos = () => {
             content={() => compRef.current}
           />
         </Stack>
-
+        <hr />
         <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
-          <hr />
           {isEmpty(data) ? (
             <NoData />
           ) : (
+            <div>
             <Table
              id="table-to-xls"
               hover={!isDarkMode}
               size="sm"
               responsive
-              className="text-primary w-100"
+              className="text-primary text-primary w-100 tableFixHead table table-striped"
             >
-              <thead>
+               
+               <thead class="table-dark">
                 <tr>
                   <th style={{ textAlign: "right" }}>C. Barras</th>
                   <th style={{ textAlign: "left" }}>Producto</th>
@@ -233,9 +263,7 @@ export const ArticulosVendidos = () => {
                     <tr key={item.barCode}>
                       <td style={{ textAlign: "right" }}>{item.barCode}</td>
                       <td style={{ textAlign: "left" }}>{item.producto}</td>
-                      <td style={{ textAlign: "center" }}>
-                        {item.cantidadVendida}
-                      </td>
+                      <td style={{ textAlign: "center" }}>{item.cantidadVendida}</td>
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
@@ -263,6 +291,7 @@ export const ArticulosVendidos = () => {
                 })}
               </tbody>
             </Table>
+            </div>
           )}
           <PaginationComponent
             data={data}
@@ -315,11 +344,11 @@ export const ArticulosVendidos = () => {
                     currency: "NIO",
                   }).format(sumUtilidad())}
                 </span>
-              </Stack>
-            ) : (
+              </Stack>) : (
               <></>
             )}
           </Stack>
+          <hr />
         </Container>
       </Dialog>
 
@@ -336,18 +365,18 @@ export const ArticulosVendidos = () => {
           ).format("L")}`}
           titulo={"Productos Vendidos"}
         >
-          <Container id="table-to-xls" fixed maxWidth="xl" sx={{ textAlign: "center" }}>
+          <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
             <hr />
             
             {isEmpty(data) ? (
               <NoData />
             ) : (
               <Table
-               
+               id="table-to-xls"
                 hover={!isDarkMode}
                 size="sm"
                 responsive
-                className="text-primary w-100"
+                className="text-primary text-primary w-100 tableFixHead"
               >
                 <thead>
                   <tr>
@@ -457,15 +486,7 @@ export const ArticulosVendidos = () => {
             </Stack>
           </Container>
         </PrintReport>
-        
- <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    filename="Productos Vendidos"
-                    sheet="Pagina 1"
-                                           
-                    />
+                   
       </div>
     </div>
   );

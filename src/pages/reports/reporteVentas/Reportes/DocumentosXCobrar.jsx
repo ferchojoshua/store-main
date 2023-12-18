@@ -26,10 +26,11 @@ import { getCuentasXCobrarAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { PrintReport } from "../../../../components/modals/PrintReport";
+import XLSX from 'xlsx';
 
 export const DocumentosXCobrar = () => {
   const compRef = useRef();
@@ -49,6 +50,7 @@ export const DocumentosXCobrar = () => {
     title,
   } = useContext(DataContext);
   setIsDarkMode(false);
+
 
    // Pagination
    const [currentPage, setCurrentPage] = useState(1);
@@ -112,6 +114,8 @@ export const DocumentosXCobrar = () => {
     })();
   }, []);
 
+
+
   const sumSales = () => {
     let sum = 0;
     data.map((item) => (sum += item.montoVenta));
@@ -143,6 +147,36 @@ export const DocumentosXCobrar = () => {
     var result = moment(fVencimiento).diff(moment(new Date()), "days");
     return result;
   };
+
+  
+
+  const downloadExcel = () => {
+    exportExcel("table-to-xls", "Documentos por Cobrar", data.length, sumSales(), sumCreditoSales(), sumAbonado(), sumSaldo());
+  };
+
+
+  const exportExcel = (tableId, filename, DocpoCobrar, sumSales, sumCreditoSales,sumAbonado,sumSaldo) => {
+    const table = document.getElementById(tableId);
+    const ws_data = XLSX.utils.table_to_sheet(table);
+       
+        const totalRow = [
+          { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+          { t: "n", v: DocpoCobrar },
+          { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+          { t: "n", v: sumSales, z: '"C$"#,##0.00'},
+          { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
+          { t: "n", v: sumCreditoSales, z: '"C$"#,##0.00'}, 
+          { t: "s", v: "Total de Abonado", s: { font: { bold: true } } },
+          { t: "n", v: sumAbonado, z: '"C$"#,##0.00' },  
+          { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
+          { t: "s", v: sumSaldo, z: '"C$"#,##0.00'},
+ ];
+        XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
+      
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
+      
+        XLSX.writeFile(wb, `${filename}.xlsx`);      };
 
   return (
     <div>
@@ -176,7 +210,7 @@ export const DocumentosXCobrar = () => {
             variant="h5"
             component="div"
           >
-            Documentos por Cobrar
+            Reporte de Documentos por Cobrar
           </Typography>
           <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
             "L"
@@ -187,17 +221,15 @@ export const DocumentosXCobrar = () => {
               direction="row"              
               display="flex"
               justifyContent="right"> 
-                  <IconButton  
-                  spacing={3}
-                  direction="row"              
-                  display="flex"
-                  justifyContent="right"
-                  style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}>
-                  <FontAwesomeIcon icon={faDownload}
-                onClick={() => { document.getElementById('test-table-xls-button').click(); }}
-     
-                  />
-                  </IconButton>
+                           <IconButton  
+                            spacing={3}
+                            direction="row"              
+                            display="flex"
+                            justifyContent="right"
+                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
+                            >
+                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
+                          </IconButton>
          </Stack> 
 
           <ReactToPrint
@@ -509,14 +541,14 @@ export const DocumentosXCobrar = () => {
           </Container>
         </PrintReport>
         
- <ReactHTMLTableToExcel
+ {/* <ReactHTMLTableToExcel
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
                     filename="Documentos por Cobrar"
                     sheet="Pagina 1"
                                            
-                    />
+                    /> */}
       </div>
     </div>
   );
