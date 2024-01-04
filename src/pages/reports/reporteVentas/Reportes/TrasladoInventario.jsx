@@ -217,11 +217,12 @@ const TrasladoInventario = () => {
               responsive
               className="text-primary w-100"
             >
-              <thead>
+              <thead class="table-dark">
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "left" }}>Concepto</th>
                   <th style={{ textAlign: "center" }}>Productos</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "center" }}>Σ Costo Compra</th>
                   <th style={{ textAlign: "center" }}>Σ PVM</th>
                   <th style={{ textAlign: "center" }}>Σ PVD</th>
@@ -236,9 +237,8 @@ const TrasladoInventario = () => {
                         {moment(item.fecha).format("L")}
                       </td>
                       <td style={{ textAlign: "left" }}>{item.concepto}</td>
-                      <td style={{ textAlign: "center" }}>
-                        {item.productCount}
-                      </td>
+                      <td style={{ textAlign: "center" }}>{item.productCount}</td>
+                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.name} </td>
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
@@ -323,6 +323,7 @@ const TrasladoInventario = () => {
                       <th style={{ textAlign: "center" }}>Fecha</th>
                       <th style={{ textAlign: "left" }}>Concepto</th>
                       <th style={{ textAlign: "center" }}>Productos</th>
+                      <th style={{ textAlign: "center" }}>Almacen</th>
                       <th style={{ textAlign: "center" }}>Σ Costo Compra</th>
                       <th style={{ textAlign: "center" }}>Σ PVM</th>
                       <th style={{ textAlign: "center" }}>Σ PVD</th>
@@ -337,9 +338,8 @@ const TrasladoInventario = () => {
                             {moment(item.fecha).format("L")}
                           </td>
                           <td style={{ textAlign: "left" }}>{item.concepto}</td>
-                          <td style={{ textAlign: "center" }}>
-                            {item.productCount}
-                          </td>
+                          <td style={{ textAlign: "center" }}>{item.productCount}</td>
+                          <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.name} </td>
                           <td style={{ textAlign: "center" }}>
                             {new Intl.NumberFormat("es-NI", {
                               style: "currency",

@@ -341,7 +341,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                       </td>
                       {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
                         <td style={{ textAlign: "center" }}>
-                          {`${utilityPercent(saleDetails)}%`}
+                        {`${(utilityPercent(saleDetails) * 100).toFixed(2)}%`}
                         </td>
                       ) : (
                         <></>
@@ -482,14 +482,20 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     <th style={{ textAlign: "center" }}>M. Venta</th>
                     <th style={{ textAlign: "center" }}>T. Abonado</th>
                     <th style={{ textAlign: "center" }}>Saldo</th>
+                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                    <th style={{ textAlign: "center" }}>%Utilidad</th>
+                  ) : (
+                    <></>
+                  )}
                   </tr>
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                   {data.map((item) => {
+                    const { saleDetails } = item;
                     return (
                       <tr key={item.id}>
                         <td style={{ textAlign: "center" }}>
-                          {moment(item.fechaVenta).format("L")}
+                          {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "left" }}>
@@ -521,6 +527,13 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                             currency: "NIO",
                           }).format(item.saldo)}
                         </td>
+                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                        <td style={{ textAlign: "center" }}>
+                        {`${(utilityPercent(saleDetails) * 100).toFixed(2)}%`}
+                        </td>
+                      ) : (
+                        <></>
+                      )}
                       </tr>
                     );
                   })}

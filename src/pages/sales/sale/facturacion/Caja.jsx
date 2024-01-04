@@ -222,6 +222,9 @@ const Caja = () => {
       setFacturaList(result.data);
     } else {
       setIsLoading(true);
+
+
+      
       const result = await getFactCancelledByStoreAsync(
         token,
         event.target.value

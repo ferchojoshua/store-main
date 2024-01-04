@@ -172,8 +172,10 @@ export const InventarioProductos = () => {
       { t: "n", v: precioDetalle , z: '"C$"#,##0.00'},
       { t: "s", v: "Total Precio Mayor", s: { font: { bold: true } } },
       { t: "n", v: totalPrecioMayor , z: '"C$"#,##0.00'},
-      { t: "s", v: "Total Costo Total", s: { font: { bold: true } } },
-      { t: "n", v: costototal , z: '"C$"#,##0.00'},
+      // { t: "s", v: "Total Costo Total", s: { font: { bold: true } } },
+      // { t: "n", v: costototal , z: '"C$"#,##0.00'},
+      showCost ? { t: "s", v: "Total Costo Total", s: { font: { bold: true } } } : { t: "s", v: "", s: { font: { bold: true } } },
+      showCost ? { t: "n", v: costototal, z: '"C$"#,##0.00' } : null,
     ];
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
   
