@@ -137,7 +137,7 @@ const Compras = () => {
     const ws_data = XLSX.utils.table_to_sheet(table);
 
     const totalRow = [
-      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+      { t: "s", v: "Total Compras", s: { font: { bold: true } } },
       { t: "n", v: Totalcompras },
       {
         t: "s",
@@ -305,7 +305,7 @@ const Compras = () => {
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total de Ventas
+              Total de Compras
               </span>
               <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
             </Stack>
@@ -373,7 +373,7 @@ const Compras = () => {
           fecha={`Desde: ${moment(desde).format("L")} - Hasta: ${moment(
             hasta
           ).format("L")}`}
-          titulo={"Documentos por Cobrar"}
+          titulo={"Reporte de Compras"}
         >
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
             <hr />
@@ -432,7 +432,7 @@ const Compras = () => {
             <Stack direction="row" flex="row" justifyContent="space-around">
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Ventas
+                  Total de Compras
                 </span>
                 <span>
                   {new Intl.NumberFormat("es-NI").format(data.length)}

@@ -146,8 +146,12 @@ const Ingresos = () => {
     const totalRowContado = [
       { t: "s", v: "Contador Ventas de Contado", s: { font: { bold: true } } },
       { t: "n", v: dataContado },
+      { t: "s", v: "Total Contado", s: { font: { bold: true } } },
+      { t: "n", v: sumContadoSales, z: '"C$"#,##0.00'},   
       { t: "s", v: "Contador Recuperacion", s: { font: { bold: true } } },
       { t: "n", v: dataRecuperacion },
+      { t: "s", v: "Total Recuperaciones:", s: { font: { bold: true } } },
+      { t: "n", v: sumRecuperacion, z: '"C$"#,##0.00'}, 
       { t: "s", v: " Total de Registros", s: { font: { bold: true } } },
       { t: "n", v: data },
       { t: "s", v: "Total de Ingresos", s: { font: { bold: true } } },
@@ -166,8 +170,12 @@ const Ingresos = () => {
     const totalRowRecuperacion = [
       { t: "s", v: "Contador Ventas de Contado", s: { font: { bold: true } } },
       { t: "n", v: dataContado },
+      { t: "s", v: "Total Contado", s: { font: { bold: true } } },
+      { t: "n", v: sumContadoSales, z: '"C$"#,##0.00'},      
       { t: "s", v: "Contador Recuperacion", s: { font: { bold: true } } },
       { t: "n", v: dataRecuperacion },
+      { t: "s", v: "Total Recuperaciones:", s: { font: { bold: true } } },
+      { t: "n", v: sumRecuperacion, z: '"C$"#,##0.00'}, 
       { t: "s", v: " Total de Registros", s: { font: { bold: true } } },
       { t: "n", v: data  },
       { t: "s", v: "Total de Ingresos", s: { font: { bold: true } } },
@@ -406,9 +414,7 @@ const Ingresos = () => {
                       <td style={{ textAlign: "center" }}>{store?.name}</td>
                       <td style={{ textAlign: "center" }}>{id}</td>
                       <td style={{ textAlign: "center" }}>{sale.id}</td>
-                      <td style={{ textAlign: "left" }}>
-                        {sale.isEventual
-                          ? sale.nombreCliente
+                      <td style={{ textAlign: "left" }}>{sale.isEventual ? sale.nombreCliente
                           : sale.client.nombreCliente}
                       </td>
                       {/* <td style={{ textAlign: "center" }}>
@@ -445,12 +451,34 @@ const Ingresos = () => {
             </Stack>
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                    Total Contado:
+                    </span>
+                     <span>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumContadoSales())}
+                    </span>
+                </Stack>
+            <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                 Contador Recuperacion
               </span>
               <span>
                 {new Intl.NumberFormat("es-NI").format(dataRecuperacion.length)}
               </span>
             </Stack>
+            <Stack textAlign="center">
+                    <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                    Total Recuperaciones:
+                    </span>
+                    <span>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumRecuperacion())}
+                    </span>
+             </Stack>
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                 Total de Registros
@@ -648,12 +676,12 @@ const Ingresos = () => {
                           icon={sale.isContado ? faCircleCheck : faCircleXmark}
                         />
                       </td> */}
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(sumSales())}
-                        </td>
+                      <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                        }).format(monto)}
+                      </td>
                       </tr>
                     );
                   })}
@@ -673,6 +701,17 @@ const Ingresos = () => {
                 </span>
               </Stack>
               <Stack textAlign="center">
+              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                    Total Contado:
+                    </span>
+                     <span>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumContadoSales())}
+                    </span>
+                </Stack>
+              <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Contador Recuperacion
                 </span>
@@ -682,6 +721,17 @@ const Ingresos = () => {
                   )}
                 </span>
               </Stack>
+              <Stack textAlign="center">
+                    <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                    Total Recuperaciones:
+                    </span>
+                    <span>
+                    {new Intl.NumberFormat("es-NI", {
+                      style: "currency",
+                      currency: "NIO",
+                    }).format(sumRecuperacion())}
+                    </span>
+             </Stack>
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total de Registros

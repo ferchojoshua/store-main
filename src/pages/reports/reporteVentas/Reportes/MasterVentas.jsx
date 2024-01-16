@@ -192,6 +192,8 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
       { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
       { t: "n", v: sumSaldo , z: '"C$"#,##0.00'},
     ];
+
+    
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
   
     const wb = XLSX.utils.book_new();

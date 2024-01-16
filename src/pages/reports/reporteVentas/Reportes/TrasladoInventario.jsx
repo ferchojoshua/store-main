@@ -25,7 +25,7 @@ import { Table } from "react-bootstrap";
 import { getTrasladosAsync } from "../../../../services/ReportApi";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+// import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
@@ -233,12 +233,10 @@ const TrasladoInventario = () => {
                 {currentItem.map((item) => {
                   return (
                     <tr key={item.id}>
-                      <td style={{ textAlign: "center" }}>
-                        {moment(item.fecha).format("L")}
-                      </td>
+                      <td style={{ textAlign: "center" }}>{moment(item.fecha).format("L")}</td>
                       <td style={{ textAlign: "left" }}>{item.concepto}</td>
                       <td style={{ textAlign: "center" }}>{item.productCount}</td>
-                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.name} </td>
+                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.almacen} </td>
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
                           style: "currency",
@@ -304,7 +302,7 @@ const TrasladoInventario = () => {
             fecha={`Desde: ${moment(desde).format("L")} - Hasta: ${moment(
               hasta
             ).format("L")}`}
-            titulo={"Productos Vendidos"}
+            titulo={"Traslados de Inventario"}
           >
             <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
               <hr />
@@ -339,7 +337,7 @@ const TrasladoInventario = () => {
                           </td>
                           <td style={{ textAlign: "left" }}>{item.concepto}</td>
                           <td style={{ textAlign: "center" }}>{item.productCount}</td>
-                          <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.name} </td>
+                          <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{item.almacen} </td>
                           <td style={{ textAlign: "center" }}>
                             {new Intl.NumberFormat("es-NI", {
                               style: "currency",
@@ -393,14 +391,14 @@ const TrasladoInventario = () => {
             </Container>
           </PrintReport>
           
- <ReactHTMLTableToExcel
+ {/* <ReactHTMLTableToExcel
                     id="test-table-xls-button"
                     className="btn btn-success"
                     table="table-to-xls"
                     filename="Productos Vendidos"
                     sheet="Pagina 1"
                                            
-                    />
+                    /> */}
         </div>
       </Dialog>
     </div>

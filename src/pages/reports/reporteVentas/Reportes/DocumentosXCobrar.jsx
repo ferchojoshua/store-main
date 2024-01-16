@@ -450,8 +450,7 @@ export const DocumentosXCobrar = () => {
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "left" }}>{item.store.name}</td>
-                        <td style={{ textAlign: "left" }}>
-                          {item.client.nombreCliente}
+                        <td style={{ textAlign: "left" }}>{item.client.nombreCliente}
                         </td>
                         <td style={{ textAlign: "center" }}>
                           {new Intl.NumberFormat("es-NI", {
