@@ -253,7 +253,7 @@ export const SelectorMasterVentas = () => {
                     key={"t"}
                     value={"t"}
                     disabled={
-                        storeList.length > 6 || storeList.length > 5 || storeList.length > 4 || storeList.length > 3 || storeList.length > 2
+                      storeList.length <=  6 || storeList.length <=  5 || storeList.length <=  4 || storeList.length <=  3 || storeList.length <=  2 || storeList.length <= 1
                           ? false
                           : true
                       }

@@ -168,6 +168,38 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
   };
 
 
+    
+    
+  const sumGanancia = (data) => {
+    const ganancias = data.filter((item) => typeof item.ganancia === 'number');
+    const totalGanancia = ganancias.reduce((accumulator, currentValue) => accumulator + currentValue.ganancia, 0);
+    return totalGanancia.toFixed(2);
+  };
+  
+  const sumDescuentos = (saleDetails) => {
+    let sum = 0;
+    if (saleDetails && Array.isArray(saleDetails)) {
+      saleDetails.forEach(detail => {
+        if (typeof detail.descuento === 'number') {
+          sum += detail.descuento;
+        }
+      });
+    }
+    return sum;
+  };
+  
+  // const sumDescuentos = (item) => {
+  //   let sum = 0;
+  //   if (item && item.saleDetails && Array.isArray(item.saleDetails)) {
+  //     item.saleDetails.forEach(detail => {
+  //       if (typeof detail.descuento === 'number') {
+  //         sum += detail.descuento;
+  //       }
+  //     });
+  //   }
+  //   return sum;
+  // }; 
+  
   const downloadExcel = () => {
     exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(),sumSaldo());
   };
@@ -201,6 +233,8 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
   
     XLSX.writeFile(wb, `${filename}.xlsx`);
   };
+
+  
 
   return (
     <div>
@@ -297,62 +331,53 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                   <th style={{ textAlign: "center" }}>Status</th>
                   <th style={{ textAlign: "center" }}>M. Venta</th>
                   <th style={{ textAlign: "center" }}>T. Abonado</th>
+                  <th style={{ textAlign: "center" }}>Descuento</th>
                   <th style={{ textAlign: "center" }}>Saldo</th>
-                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                    <th style={{ textAlign: "center" }}>%Utilidad</th>
-                  ) : (
-                    <></>
-                  )}
+                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>Utilidad C$</th>) : (<></>)} 
+                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>%Utilidad</th>) : (<></> )}
                 </tr>
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
                   const { saleDetails } = item;
-                  return (
+                   return (
                     <tr key={item.id}>
                       <td style={{ textAlign: "center" }}>
-                        {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
-                      </td>
-                      <td style={{ textAlign: "center" }}>{item.id}</td>
-                      <td style={{ textAlign: "left" }}>
-                        {isEmpty(item.client)
-                          ? "CLIENTE EVENTUAL"
-                          : item.client.nombreCliente}
-                      </td>
+                        {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")} </td>
+                      <td style={{ textAlign: "center" }}>{item.id} </td>
+                      <td style={{ textAlign: "left" }}>{isEmpty(item.client) ? "CLIENTE EVENTUAL" : item.client.nombreCliente}</td>
                       <td style={{ textAlign: "center" }}>{item.store.name}</td>
-                      <td style={{ textAlign: "center" }}>
-                        {item.isContado ? "Contado" : "Credito"}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                        }).format(item.montoVenta)}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                        }).format(item.montoVenta - item.saldo)}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                        }).format(item.saldo)}
-                      </td>
-                      {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                      <td style={{ textAlign: "center" }}>{item.isContado ? "Contado" : "Credito"}</td>
+                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO", }).format(item.montoVenta)}</td>
+                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(item.montoVenta - item.saldo)}</td>
+                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency",currency: "NIO",}).format(sumDescuentos(item.saleDetails))}</td>
+                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO", }).format(item.saldo)} </td>   
+                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
                         <td style={{ textAlign: "center" }}>
-                        {`${(utilityPercent(saleDetails) * 100).toFixed(2)}%`}
+                        {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                        }).format(sumGanancia(saleDetails))}
                         </td>
-                      ) : (
+                        ) : (
                         <></>
-                      )}
-                    </tr>
-                  );
-                })}
+                        )}
+                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                        <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        }).format(utilityPercent(saleDetails))}
+                        </td>
+                        ) : (
+                        <></>
+                        )}
+        </tr>
+      );
+    })}
               </tbody>
-            </Table>
+            </Table> 
           )}
           <PaginationComponent
             data={data}
@@ -483,7 +508,13 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     <th style={{ textAlign: "center" }}>Status</th>
                     <th style={{ textAlign: "center" }}>M. Venta</th>
                     <th style={{ textAlign: "center" }}>T. Abonado</th>
+                    <th style={{ textAlign: "center" }}>Descuento</th>
                     <th style={{ textAlign: "center" }}>Saldo</th>
+                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                    <th style={{ textAlign: "center" }}>%Utilidad C$</th>
+                  ) : (
+                    <></>
+                  )} 
                     {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
                     <th style={{ textAlign: "center" }}>%Utilidad</th>
                   ) : (
@@ -501,9 +532,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                         </td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "left" }}>
-                          {isEmpty(item.client)
-                            ? "CLIENTE EVENTUAL"
-                            : item.client.nombreCliente}
+                          {isEmpty(item.client)? "CLIENTE EVENTUAL" : item.client.nombreCliente}
                         </td>
                         <td style={{ textAlign: "center" }}>
                           {item.store.name}
@@ -522,7 +551,13 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                             style: "currency",
                             currency: "NIO",
                           }).format(item.montoVenta - item.saldo)}
-                        </td>
+                        </td> 
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                          style: "currency",
+                          currency: "NIO",
+                          }).format(sumDescuentos(item.saleDetails))}
+                          </td>
                         <td style={{ textAlign: "center" }}>
                           {new Intl.NumberFormat("es-NI", {
                             style: "currency",
@@ -531,11 +566,25 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                         </td>
                         {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
                         <td style={{ textAlign: "center" }}>
-                        {`${(utilityPercent(saleDetails) * 100).toFixed(2)}%`}
+                        {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                        }).format(sumGanancia(saleDetails))}
                         </td>
-                      ) : (
+                        ) : (
                         <></>
-                      )}
+                        )}
+                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
+                        <td style={{ textAlign: "center" }}>
+                        {new Intl.NumberFormat("es-NI", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        }).format(utilityPercent(saleDetails))}
+                        </td>
+                        ) : (
+                        <></>
+                        )}
                       </tr>
                     );
                   })}
@@ -632,13 +681,6 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             <hr />
           </Container>
         </PrintReport>
-        
- {/* <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="btn btn-success"
-                    table="table-to-xls"
-                    sheet="Pagina 1"
-                    /> */}
       </div>
     </div>
   );
