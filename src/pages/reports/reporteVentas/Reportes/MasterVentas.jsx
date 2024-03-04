@@ -146,6 +146,16 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     credSales.map((item) => (sum += item.saldo));
     return sum;
   };
+  
+  const sumDescuentosTotales = () => {
+    let sum = 0;
+    data.forEach(item => {
+      if (typeof item.descuento === 'number') {
+        sum += item.descuento;
+      }
+    });
+    return sum;
+  };
 
   const utilityPercent = (data) => {
     let utilidadTotal = 0;
@@ -167,7 +177,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     return utilidadTotal.toFixed(2);
   };
 
-
+ 
     
     
   const sumGanancia = (data) => {
@@ -436,7 +446,6 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             ) : (
               <></>
             )}
-
             {creditSales ? (
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
@@ -447,6 +456,22 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     style: "currency",
                     currency: "NIO",
                   }).format(sumAbonado())}
+                </span>
+              </Stack>
+            ) : (
+              <></>
+            )}
+            
+            {creditSales ? (
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Total de Descuento
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumDescuentosTotales())}
                 </span>
               </Stack>
             ) : (
@@ -661,6 +686,23 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               ) : (
                 <></>
               )}
+
+              {creditSales ? (
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Total de Descuento
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(sumDescuentosTotales())}
+                </span>
+              </Stack>
+            ) : (
+              <></>
+            )}
+
 
               {creditSales ? (
                 <Stack textAlign="center">
