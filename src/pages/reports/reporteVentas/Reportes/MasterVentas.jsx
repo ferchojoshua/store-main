@@ -42,6 +42,7 @@ export const MasterVentas = () => {
     desde,
     hasta,
     creditSales,
+    items,
     contadoSales,
     horaDesde,
     horaHasta,
@@ -145,19 +146,25 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     let sum = 0;
     credSales.map((item) => (sum += item.saldo));
     return sum;
+  }; 
+
+  const sumDescuentosTotales = (ventas) => {
+    let total = 0;
+    if (ventas && Array.isArray(ventas)) {
+      ventas.forEach(venta => {
+        if (venta && venta.saleDetails && Array.isArray(venta.saleDetails)) {
+          venta.saleDetails.forEach(detail => {
+            if (typeof detail.descuento === 'number' && detail.descuento > 0) {
+              total += detail.descuento;
+            }
+          });
+        }
+      });
+    }
+    return total;
   };
   
-  const sumDescuentosTotales = () => {
-    let sum = 0;
-    data.forEach(item => {
-      if (typeof item.descuento === 'number') {
-        sum += item.descuento;
-      }
-    });
-    return sum;
-  };
-
-  const utilityPercent = (data) => {
+    const utilityPercent = (data) => {
     let utilidadTotal = 0;
     data.map((item) => {
       if (
@@ -177,9 +184,10 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     return utilidadTotal.toFixed(2);
   };
 
- 
-    
-    
+
+  
+
+       
   const sumGanancia = (data) => {
     const ganancias = data.filter((item) => typeof item.ganancia === 'number');
     const totalGanancia = ganancias.reduce((accumulator, currentValue) => accumulator + currentValue.ganancia, 0);
@@ -198,24 +206,56 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     return sum;
   };
   
-  // const sumDescuentos = (item) => {
-  //   let sum = 0;
-  //   if (item && item.saleDetails && Array.isArray(item.saleDetails)) {
-  //     item.saleDetails.forEach(detail => {
-  //       if (typeof detail.descuento === 'number') {
-  //         sum += detail.descuento;
-  //       }
-  //     });
-  //   }
-  //   return sum;
-  // }; 
   
+  const utilityPercentGlobal = (data) => {
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn('El array de datos está vacío o no es válido.');
+      return 0;
+    }
+  
+    let utilidadTotal = 0;
+  
+    data.forEach((item) => {
+      if (
+        typeof item.costoTotal === 'number' &&
+        typeof item.costoCompra === 'number' &&
+        typeof item.ganancia === 'number'
+      ) {
+        if (
+          (item.costoTotal - item.costoCompra).toFixed(2) ===
+          item.ganancia.toFixed(2)
+        ) {
+          let utilidadDetail = 1 - item.costoCompra / item.costoTotal;
+          utilidadTotal += utilidadDetail;
+        } else {
+          let utilidadDetail =
+            1 - (item.costoCompra * item.cantidad) / item.costoTotal;
+          utilidadTotal += utilidadDetail;
+        }
+      } else {
+        console.warn('Elemento no tiene la estructura esperada:', item);
+      }
+    });
+  
+    if (data.length !== 0) {
+      utilidadTotal = utilidadTotal / data.length;
+    } else {
+      console.warn('No hay utilidad para calcular.');
+    }
+  
+    return utilidadTotal.toFixed(2);
+  };
+  
+  
+     
+  
+      
   const downloadExcel = () => {
-    exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(),sumSaldo());
+    exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(), sumDescuentosTotales(),sumSaldo());
   };
 
   
-  const exportExcel = (tableId, filename, totalMaster, sumSales, sumContadoSales, sumCreditoSales ,sumAbonado ,sumSaldo) => {
+  const exportExcel = (tableId, filename, totalMaster, sumSales, sumContadoSales, sumCreditoSales ,sumAbonado,sumDescuentosTotales ,sumSaldo) => {
     const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
   
@@ -231,6 +271,8 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
       { t: "n", v: sumCreditoSales , z: '"C$"#,##0.00'}, 
       { t: "s", v: "Total de Abonado", s: { font: { bold: true } } },
       { t: "n", v: sumAbonado , z: '"C$"#,##0.00'},
+       { t: "s", v: "Total de Descuento", s: { font: { bold: true } } },
+      { t: "n", v: sumDescuentosTotales , z: '"C$"#,##0.00'},
       { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
       { t: "n", v: sumSaldo , z: '"C$"#,##0.00'},
     ];
@@ -471,7 +513,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                   {new Intl.NumberFormat("es-NI", {
                     style: "currency",
                     currency: "NIO",
-                  }).format(sumDescuentosTotales())}
+                  }).format(sumDescuentosTotales(data))}
                 </span>
               </Stack>
             ) : (
@@ -488,6 +530,23 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     style: "currency",
                     currency: "NIO",
                   }).format(sumSaldo())}
+                </span>
+              </Stack>
+            ) : (
+              <></>
+            )} 
+            
+             {creditSales ? (
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Utilidad Global
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                  }).format(utilityPercentGlobal(data))}
                 </span>
               </Stack>
             ) : (
@@ -696,7 +755,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                   {new Intl.NumberFormat("es-NI", {
                     style: "currency",
                     currency: "NIO",
-                  }).format(sumDescuentosTotales())}
+                  }).format(sumDescuentosTotales(data))}
                 </span>
               </Stack>
             ) : (
@@ -719,6 +778,23 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               ) : (
                 <></>
               )}
+
+              {creditSales ? (
+              <Stack textAlign="center">
+                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
+                  Utilidad Global
+                </span>
+                <span>
+                  {new Intl.NumberFormat("es-NI", {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                  }).format(utilityPercentGlobal(data))}
+                </span>
+              </Stack>
+            ) : (
+              <></>
+            )}
             </Stack>
             <hr />
           </Container>
