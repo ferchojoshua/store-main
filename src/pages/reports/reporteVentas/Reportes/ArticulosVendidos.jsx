@@ -333,13 +333,12 @@ export const ArticulosVendidos = () => {
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total Cantidad Vendida
                 </span>
-                {/* <span> */}
-                <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
-                  {/* {new Intl.NumberFormat("es-NI", {
+               <span>
+                  {new Intl.NumberFormat("es-NI", {
                     style: "currency",
                     currency: "NIO",
                   }).format(sumcantidadV())}
-                </span> */}
+                </span>
               </Stack>
 
             {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
@@ -499,13 +498,12 @@ export const ArticulosVendidos = () => {
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total Cantidad Vendida
                 </span>
-                {/* <span> */}
-                <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
-                  {/* {new Intl.NumberFormat("es-NI", {
+                 <span>
+                       {new Intl.NumberFormat("es-NI", {
                     style: "currency",
                     currency: "NIO",
                   }).format(sumcantidadV())}
-                </span> */}
+                </span> 
               </Stack>
 
               {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
@@ -548,13 +546,12 @@ export const ArticulosVendidos = () => {
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total Cantidad Vendida
-                </span>
-                {/* <span>
+                </span> <span>
                   {new Intl.NumberFormat("es-NI", {
                     style: "currency",
                     currency: "NIO",
                   }).format(sumcantidadV())}
-                </span> */}
+                </span> 
               </Stack> 
               {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
                 <Stack textAlign="center">

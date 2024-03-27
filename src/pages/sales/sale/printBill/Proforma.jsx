@@ -104,12 +104,10 @@ const Proforma = React.forwardRef((props, ref) => {
       <img
         loading="lazy"
         src={
-          store.id === 1
-            ? require("../../../../components/media/Icono.png")
-            : store.id === 2
-            ? require("../../../../components/media/autoFull.jpeg")
-            : store.id === 3
-            ? require("../../../../components/media/Icono.png")
+          store.id === 1 ? require("../../../../components/media/Icono.png")
+            : store.id === 2 ? require("../../../../components/media/autoFull.jpeg")
+            : store.id === 3 ? require("../../../../components/media/Icono.png")
+            : store.id === 8 ? require("../../../../components/media/autoFull.jpeg")
             : require("../../../../components/media/superMoto.jpeg")
         }
         alt="logo"
@@ -117,7 +115,7 @@ const Proforma = React.forwardRef((props, ref) => {
       />
 
       <Stack>
-        <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
+        <Typography style={{ fontWeight: "bold", fontSize: 20 }}>
           PROFORMA
         </Typography>
 
@@ -142,9 +140,15 @@ const Proforma = React.forwardRef((props, ref) => {
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
               <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
-              <Typography style={{ fontSize: 11 }}>
-                Chinandega, Semaforos Super 7, 1/2 C. al Norte
-              </Typography>
+              {store.id === 2 || store.id === 8 ? (
+                <Typography style={{ fontSize: 11 }}>
+                  Chinandega, Donde fue el Variedades 1/2 al Norte
+                </Typography>
+              ) : (
+                <Typography style={{ fontSize: 11 }}>
+                  Chinandega, Semaforos Super 7, 1/2 C. al Norte
+                </Typography>
+              )}
             </Stack>
           </Grid>
         </Grid>
@@ -172,7 +176,15 @@ const Proforma = React.forwardRef((props, ref) => {
 
           <Grid item xs={8}>
             <Stack textAlign="left">
-              <Typography style={{ fontSize: 11 }}>+505 7837-6964</Typography>
+            {store.id === 2 || store.id === 8 ? (
+                <Typography style={{ fontSize: 11 }}>
+                  +505 7633-4531
+                </Typography>
+              ) : (
+                <Typography style={{ fontSize: 11 }}>
+                  +505 7837-6964
+                </Typography>
+              )}
               <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography>
               <Typography style={{ fontSize: 11 }}>
                 {moment(hoy).format("L")}

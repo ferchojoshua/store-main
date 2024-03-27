@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIdCardClip, faUsersGear } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 import UserList from "./securityUsers/UserList";
 import RolList from "./securityRoles/RolList";
+// import Admin from
 import { DataContext } from "../../context/DataContext";
 import { getRuta, isAccess } from "../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
@@ -89,6 +89,18 @@ const SecurityContiner = () => {
                 <FontAwesomeIcon icon={faIdCardClip} style={{ fontSize: 20 }} />
               }
               label="Roles"
+              {...a11yProps(0)}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            ""
+          )}
+          {isAccess(access, "ROLES VER") ? (
+            <Tab
+              icon={
+                <FontAwesomeIcon icon={faIdCardClip} style={{ fontSize: 20 }} />
+              }
+              label="Configuracion"
               {...a11yProps(0)}
               style={{ fontSize: 12 }}
             />
