@@ -119,10 +119,9 @@ const CajaChica = () => {
     exportExcel(
       "table-to-xls",
       "Caja Chica",
-      data.length,
       sumEntradas(),
       sumSalidas(),
-      saldoAnterior
+      saldoAnterior,
     );
   };
 
@@ -131,16 +130,16 @@ const CajaChica = () => {
     filename,
     sumEntradas,
     sumSalidas,
-    saldoAnterior
-  ) => {
-    const calculatedTotalValue = sumEntradas - sumSalidas + saldoAnterior;
+    saldoAnterior,
+     ) => {
+    const calculatedTotalValue = saldoAnterior + sumEntradas - sumSalidas;
     const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
     const totalRow = [
       { t: "s", v: " Total de Entradas", s: { font: { bold: true } } },
-      { t: "n", v: sumEntradas, z: '#,##0.00'   },
+      { t: "n", v:  sumEntradas , z: '#,##0.00'   },
       { t: "s", v: "Total de Salidas", s: { font: { bold: true } } },
-      { t: "n", v: sumSalidas, z: '#,##0.00'  },
+      { t: "n", v:  sumSalidas, z: '#,##0.00'  },
       { t: "s", v: "Saldo Inicial", s: { font: { bold: true } } },
       { t: "n", v: saldoAnterior , z: '#,##0.00' },
       { t: "s", v: "Saldo Final", s: { font: { bold: true } } },
@@ -149,7 +148,7 @@ const CajaChica = () => {
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws_data, "Documentos por Cobrar");
+    XLSX.utils.book_append_sheet(wb, ws_data, "Caja Chica");
 
     XLSX.writeFile(wb, `${filename}.xlsx`);
   };
@@ -248,6 +247,7 @@ const CajaChica = () => {
               <thead>
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
+                  <th style={{ textAlign: "center" }}>Almacen</th>
                   <th style={{ textAlign: "left" }}>Descripcion</th>
                   <th style={{ textAlign: "center" }}>Entrada</th>
                   <th style={{ textAlign: "center" }}>Salida</th>
@@ -256,14 +256,13 @@ const CajaChica = () => {
               </thead>
               <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                 {currentItem.map((item) => {
-                  const { id, fecha, description, entradas, salidas, saldo } =
+                  const { id, fecha, description, store, entradas, salidas, saldo } =
                     item;
 
                   return (
                     <tr key={id}>
-                      <td style={{ textAlign: "center" }}>
-                        {moment(fecha).format("L")}
-                      </td>
+                      <td style={{ textAlign: "center" }}>{moment(fecha).format("L")}</td>
+                      <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{store.name} </td>
                       <td style={{ textAlign: "left" }}>{description}</td>
                       <td style={{ textAlign: "center" }}>
                         {new Intl.NumberFormat("es-NI", {
@@ -373,6 +372,7 @@ const CajaChica = () => {
                   <thead>
                     <tr>
                       <th style={{ textAlign: "center" }}>Fecha</th>
+                      <th style={{ textAlign: "center" }}>Almacen</th>
                       <th style={{ textAlign: "left" }}>Descripcion</th>
                       <th style={{ textAlign: "center" }}>Entrada</th>
                       <th style={{ textAlign: "center" }}>Salida</th>
@@ -384,6 +384,7 @@ const CajaChica = () => {
                       const {
                         id,
                         fecha,
+                        store,
                         description,
                         entradas,
                         salidas,
@@ -396,6 +397,7 @@ const CajaChica = () => {
                             {moment(fecha).format("L")}
                           </td>
                           <td style={{ textAlign: "left" }}>{description}</td>
+                          <td style={{ textAlign: "center", width: "1%",whiteSpace: "nowrap", }}>{store.name} </td>
                           <td style={{ textAlign: "center" }}>
                             {new Intl.NumberFormat("es-NI", {
                               style: "currency",

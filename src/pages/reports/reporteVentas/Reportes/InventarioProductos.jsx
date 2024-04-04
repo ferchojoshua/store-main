@@ -172,8 +172,10 @@ export const InventarioProductos = () => {
       { t: "n", v: precioDetalle , z: '"C$"#,##0.00'},
       { t: "s", v: "Total Precio Mayor", s: { font: { bold: true } } },
       { t: "n", v: totalPrecioMayor , z: '"C$"#,##0.00'},
-      { t: "s", v: "Total Costo Total", s: { font: { bold: true } } },
-      { t: "n", v: costototal , z: '"C$"#,##0.00'},
+      // { t: "s", v: "Total Costo Total", s: { font: { bold: true } } },
+      // { t: "n", v: costototal , z: '"C$"#,##0.00'},
+      showCost ? { t: "s", v: "Total Costo Total", s: { font: { bold: true } } } : { t: "s", v: "", s: { font: { bold: true } } },
+      showCost ? { t: "n", v: costototal, z: '"C$"#,##0.00' } : null,
     ];
     XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
   
@@ -408,6 +410,7 @@ export const InventarioProductos = () => {
               >
                 <thead>
                   <tr>
+                   <th style={{ textAlign: "center" }}>Codigo.B</th> 
                   <th style={{ textAlign: "center" }}>Producto</th>   
                     <th style={{ textAlign: "center" }}>Almacen</th>                                 
                     <th style={{ textAlign: "center" }}>Existencia</th>
@@ -436,7 +439,8 @@ export const InventarioProductos = () => {
                         costo_total,
                     } = item;
                     return (
-                      <tr key={id}>                                       
+                    <tr key={id}>    
+                    <td style={{ textAlign: "center"}}>{id}</td>                                      
                     <td style={{ textAlign: "center"}}>{nombre_producto}</td> 
                     <td style={{ textAlign: "center" ,width: "1%",whiteSpace: "nowrap",}}>{nombre_almacen}</td>                                      
                     <td style={{ textAlign: "center" }}>{existencia}</td>    
@@ -444,8 +448,8 @@ export const InventarioProductos = () => {
                     <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(total_detalle)}</td> 
                     <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(precio_xmayor)}</td> 
                     <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(total_mayor)}</td> 
-                    {showCost && <td style={{ textAlign: "right" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO", }).format(costo_unitario)}</td>}
-                    {showCost && <td style={{ textAlign: "right" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO", }).format(costo_total)}</td>}  
+                    {showCost && <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO", }).format(costo_unitario)}</td>}
+                    {showCost && <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO", }).format(costo_total)}</td>}  
                     {/* <td style={{ textAlign: "right" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(costo_unitario)}</td> 
                     <td style={{ textAlign: "right" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(costo_total)}</td> */}
                       </tr>

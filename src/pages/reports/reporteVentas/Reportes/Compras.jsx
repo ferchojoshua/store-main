@@ -38,7 +38,7 @@ const Compras = () => {
   const compRef = useRef();
   const { params } = useParams();
   const dataJson = JSON.parse(params);
-  const { desde, hasta, contadoCompras, creditCompras } = dataJson;
+  const { desde, hasta, selectedStore, contadoCompras, creditCompras } = dataJson;
 
   const [data, setData] = useState([]);
   const [dataContado, setDataContado] = useState([]);
@@ -71,6 +71,7 @@ const Compras = () => {
       const datos = {
         desde: new Date(desde),
         hasta: new Date(hasta),
+        storeId: selectedStore === "t" ? 0 : selectedStore,
         contadoCompras,
         creditCompras,
       };
@@ -136,7 +137,7 @@ const Compras = () => {
     const ws_data = XLSX.utils.table_to_sheet(table);
 
     const totalRow = [
-      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
+      { t: "s", v: "Total Compras", s: { font: { bold: true } } },
       { t: "n", v: Totalcompras },
       {
         t: "s",
@@ -255,6 +256,7 @@ const Compras = () => {
                 <tr>
                   <th style={{ textAlign: "center" }}>Fecha</th>
                   <th style={{ textAlign: "center" }}>N° Factura</th>
+                  <th style={{ textAlign: "left" }}>Almacen</th>
                   <th style={{ textAlign: "left" }}>Proveedor</th>
                   <th style={{ textAlign: "center" }}>Tipo Pago</th>
                   <th style={{ textAlign: "center" }}>Antes Descuento</th>
@@ -269,8 +271,8 @@ const Compras = () => {
                         {moment(item.fechaIngreso).format("L")}
                       </td>
                       <td style={{ textAlign: "center" }}>{item.noFactura}</td>
-                      <td style={{ textAlign: "left" }}>
-                        {item.provider.nombre}
+                      <td style={{ textAlign: "left" }}>{item.almacen.name}</td>
+                      <td style={{ textAlign: "left" }}>{item.provider.nombre}
                       </td>
                       <td style={{ textAlign: "center" }}>
                         {item.tipoPago.toUpperCase()}
@@ -303,7 +305,7 @@ const Compras = () => {
           <Stack direction="row" flex="row" justifyContent="space-around">
             <Stack textAlign="center">
               <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total de Ventas
+              Total de Compras
               </span>
               <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
             </Stack>
@@ -371,7 +373,7 @@ const Compras = () => {
           fecha={`Desde: ${moment(desde).format("L")} - Hasta: ${moment(
             hasta
           ).format("L")}`}
-          titulo={"Documentos por Cobrar"}
+          titulo={"Reporte de Compras"}
         >
           <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
             <hr />
@@ -389,6 +391,7 @@ const Compras = () => {
                   <tr>
                     <th style={{ textAlign: "center" }}>Fecha</th>
                     <th style={{ textAlign: "center" }}>N° Factura</th>
+                    <th style={{ textAlign: "left" }}>Almacen</th>
                     <th style={{ textAlign: "left" }}>Proveedor</th>
                     <th style={{ textAlign: "center" }}>Tipo Pago</th>
                     <th style={{ textAlign: "center" }}>Antes Descuento</th>
@@ -402,15 +405,10 @@ const Compras = () => {
                         <td style={{ textAlign: "center" }}>
                           {moment(item.fechaIngreso).format("L")}
                         </td>
-                        <td style={{ textAlign: "center" }}>
-                          {item.noFactura}
-                        </td>
-                        <td style={{ textAlign: "left" }}>
-                          {item.provider.nombre}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {item.tipoPago.toUpperCase()}
-                        </td>
+                        <td style={{ textAlign: "center" }}>{item.noFactura}</td>
+                        <td style={{ textAlign: "left" }}>{item.almacen.name}</td>
+                        <td style={{ textAlign: "left" }}>{item.provider.nombre}</td>
+                        <td style={{ textAlign: "center" }}>{item.tipoPago.toUpperCase()}</td>
                         <td style={{ textAlign: "center" }}>
                           {new Intl.NumberFormat("es-NI", {
                             style: "currency",
@@ -434,7 +432,7 @@ const Compras = () => {
             <Stack direction="row" flex="row" justifyContent="space-around">
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Ventas
+                  Total de Compras
                 </span>
                 <span>
                   {new Intl.NumberFormat("es-NI").format(data.length)}
