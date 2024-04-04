@@ -57,7 +57,7 @@ export const ArticulosVendidos = () => {
 
    
   const downloadExcel = () => {
-    exportExcel("table-to-xls", "Articulos Vendidos", data.length, sumCostoCompra(), sumVentaNeta(), sumDesc(), data.length, sumUtilidad());
+    exportExcel("table-to-xls", "Articulos Vendidos", data.length, sumCostoCompra(), sumVentaNeta(), sumDesc(), sumcantidadV(), sumUtilidad());
 
   };
 
@@ -146,7 +146,7 @@ export const ArticulosVendidos = () => {
   };
 
     
-  const exportExcel = (tableId, filename, TotalPVendidos, sumCostoCompra, sumVentaNeta,sumDesc, TotalCVendidos , sumUtilidad) => {
+  const exportExcel = (tableId, filename, TotalPVendidos, sumCostoCompra, sumVentaNeta,sumDesc, sumcantidadV , sumUtilidad) => {
     const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
     //////////const colWidths = Array.from(table.rows[0]?.cells).map(cell => ({ wch: cell.clientWidth / 8 }));
@@ -162,7 +162,7 @@ export const ArticulosVendidos = () => {
       { t: "s", v: "Total Descuento", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
       { t: "n", v: sumDesc, z: '"C$"#,##0.00'  },  
       { t: "s", v: "Total Cantidad Vendida", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
-      { t: "n", v: TotalCVendidos},
+      { t: "n", v: sumcantidadV},
       { t: "s", v: "Utilidad Neta", s: { font: { bold: true }, alignment: { horizontal: "center" } } },
       { t: "n", v: sumUtilidad, z: '"C$"#,##0.00' },
     ];
@@ -334,10 +334,7 @@ export const ArticulosVendidos = () => {
                   Total Cantidad Vendida
                 </span>
                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumcantidadV())}
+                  {new Intl.NumberFormat("es-NI").format(sumcantidadV())}
                 </span>
               </Stack>
 
@@ -498,12 +495,9 @@ export const ArticulosVendidos = () => {
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Total Cantidad Vendida
                 </span>
-                 <span>
-                       {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumcantidadV())}
-                </span> 
+               <span>
+                  {new Intl.NumberFormat("es-NI").format(sumcantidadV())}
+                </span>
               </Stack>
 
               {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
@@ -543,16 +537,6 @@ export const ArticulosVendidos = () => {
                   }).format(sumDesc())}
                 </span>
               </Stack>
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total Cantidad Vendida
-                </span> <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumcantidadV())}
-                </span> 
-              </Stack> 
               {isAccess(access, "PRODVENDIDOSUTIL VER") ? (
                 <Stack textAlign="center">
                   <span style={{ fontWeight: "bold", color: "#03a9f4" }}>

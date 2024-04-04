@@ -61,14 +61,13 @@ export const MasterVentas = () => {
   } = useContext(DataContext);
   setIsDarkMode(false);
 
-// Pagination
-const [currentPage, setCurrentPage] = useState(1);
-const [itemsperPage] = useState(20);
-const indexLast = currentPage * itemsperPage;
-const indexFirst = indexLast - itemsperPage;
-const currentItem = data.slice(indexFirst, indexLast);
-const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(20);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+  const currentItem = data.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   let navigate = useNavigate();
   let ruta = getRuta();
@@ -128,45 +127,36 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
   };
 
   const sumCreditoSales = () => {
-    const credSales = data.filter((item) => item.isContado === false);
+    const credSales = data.filter((item) => !item.isContado);
     let sum = 0;
     credSales.map((item) => (sum += item.montoVenta));
     return sum;
   };
 
-  const sumAbonado = () => {
-    const credSales = data.filter((item) => item.isContado === false);
-    let sum = 0;
-    credSales.map((item) => (sum += item.montoVenta - item.saldo));
-    return sum;
-  };
-
   const sumSaldo = () => {
-    const credSales = data.filter((item) => item.isContado === false);
+    const credSales = data.filter((item) => !item.isContado);
     let sum = 0;
     credSales.map((item) => (sum += item.saldo));
     return sum;
-  }; 
+  };
 
-  const sumDescuentosTotales = (ventas) => {
+  const sumDescuentosTotales = () => {
     let total = 0;
-    if (ventas && Array.isArray(ventas)) {
-      ventas.forEach(venta => {
-        if (venta && venta.saleDetails && Array.isArray(venta.saleDetails)) {
-          venta.saleDetails.forEach(detail => {
-            if (typeof detail.descuento === 'number' && detail.descuento > 0) {
-              total += detail.descuento;
-            }
-          });
-        }
-      });
-    }
+    data.forEach(venta => {
+      if (venta.saleDetails && Array.isArray(venta.saleDetails)) {
+        venta.saleDetails.forEach(detail => {
+          if (typeof detail.descuento === 'number' && detail.descuento > 0) {
+            total += detail.descuento;
+          }
+        });
+      }
+    });
     return total;
   };
-  
-    const utilityPercent = (data) => {
+
+  const utilityPercent = (data) => {
     let utilidadTotal = 0;
-    data.map((item) => {
+    data.forEach(item => {
       if (
         (item.costoTotal - item.costoCompra).toFixed(2) ===
         item.ganancia.toFixed(2)
@@ -181,595 +171,196 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     });
 
     utilidadTotal = utilidadTotal / data.length;
-    return utilidadTotal.toFixed(2);
+    return (utilidadTotal * 100).toFixed(2);
   };
 
-
-  
-
-       
   const sumGanancia = (data) => {
-    const ganancias = data.filter((item) => typeof item.ganancia === 'number');
-    const totalGanancia = ganancias.reduce((accumulator, currentValue) => accumulator + currentValue.ganancia, 0);
-    return totalGanancia.toFixed(2);
+    let gananciaTotal = 0;
+    data.forEach(item => {
+      gananciaTotal += item.ganancia;
+    });
+    return gananciaTotal.toFixed(2);
   };
-  
-  const sumDescuentos = (saleDetails) => {
+
+  const sumarTotalGanancias = () => {
+    let total = 0;
+    data.forEach(venta => {
+      if (venta.saleDetails && Array.isArray(venta.saleDetails)) {
+        total += sumGanancia(venta.saleDetails);
+      }
+    });
+    return total.toFixed(2);
+  };
+
+  const sumAbonado = () => {
     let sum = 0;
-    if (saleDetails && Array.isArray(saleDetails)) {
-      saleDetails.forEach(detail => {
-        if (typeof detail.descuento === 'number') {
-          sum += detail.descuento;
-        }
-      });
-    }
+    data.forEach(item => {
+      if (item.isContado === 1) {
+        sum += item.montoVenta;
+      } else {
+        sum += item.montoVenta - item.saldo;
+      }
+    });
     return sum;
   };
 
-  const sumarTotalGanancias = (data) => {
-    if (!data || !Array.isArray(data)) {
-      return 0;   
-      }  
-    let totalGanancias = 0;  
-    for (const item of data) {
-      if (item && typeof item.ganancia === 'number') {
-        totalGanancias += item.ganancia;
-      }
-    }  
-    return totalGanancias.toFixed(2); 
-  };
-  
-     
-    
-      
-  const downloadExcel = () => {
-    exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(), sumDescuentosTotales(data),sumSaldo());
+  const printTable = () => {
+    window.print();
   };
 
-  
-  const exportExcel = (tableId, filename, totalMaster, sumSales, sumContadoSales, sumCreditoSales ,sumAbonado,sumDescuentosTotales ,sumSaldo) => {
+  const exportExcel = (tableId, filename, totalMaster, sumSales, sumContadoSales, sumCreditoSales ,sumAbonado,sumDescuentosTotales ,sumSaldo, sumarTotalGanancias, utilidadPorcentaje) => {
     const table = document.getElementById(tableId);
     const ws_data = XLSX.utils.table_to_sheet(table);
-  
-  
-    const totalRow = [
-      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
-      { t: "n", v: totalMaster  },
-      { t: "s", v: "Total de Ventas", s: { font: { bold: true } } },
-      { t: "n", v: sumSales , z: '"C$"#,##0.00'},
-      { t: "s", v: "Ventas de Contado", s: { font: { bold: true } } },
-      { t: "n", v: sumContadoSales , z: '"C$"#,##0.00'}, 
-      { t: "s", v: "Ventas de Credito", s: { font: { bold: true } } },
-      { t: "n", v: sumCreditoSales , z: '"C$"#,##0.00'}, 
-      { t: "s", v: "Total de Abonado", s: { font: { bold: true } } },
-      { t: "n", v: sumAbonado , z: '"C$"#,##0.00'},
-       { t: "s", v: "Total de Descuento", s: { font: { bold: true } } },
-      { t: "n", v: sumDescuentosTotales , z: '"C$"#,##0.00'},
-      { t: "s", v: "Total de Saldo", s: { font: { bold: true } } },
-      { t: "n", v: sumSaldo , z: '"C$"#,##0.00'},
-    ];
 
-    
-    XLSX.utils.sheet_add_aoa(ws_data, [totalRow], { origin: -1 });
-  
+    // Agregar el formato de porcentaje para la columna de utilidad
+    if (utilidadPorcentaje.length > 0) {
+      const utilidadRow = [
+        { t: "s", v: "Utilidad (%)", s: { font: { bold: true } } },
+        ...utilidadPorcentaje.map((value) => ({ t: "s", v: value })),
+      ];
+
+      XLSX.utils.sheet_add_aoa(ws_data, [utilidadRow], { origin: -1 });
+    }
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws_data, "Master de Ventas");
-  
+
+    // Guardar el archivo Excel
     XLSX.writeFile(wb, `${filename}.xlsx`);
   };
 
-  
+  const downloadExcel = () => {
+    const utilidadPorcentaje = data.map((item) => {
+      return isAccess(access, "MASTER VENTAS UTILIDAD") ? utilityPercent(item.saleDetails) : '';
+    });
+
+    exportExcel("table-to-xls", "Master de Ventas", data.length, sumSales(), sumContadoSales(), sumCreditoSales(), sumAbonado(currentItem), sumDescuentosTotales(data),sumSaldo(), sumarTotalGanancias(), utilidadPorcentaje);
+  };
 
   return (
-    <div>
-      <Dialog fullScreen open={true}>
-        <AppBar sx={{ position: "relative" }}>
-          <Toolbar>
-            <img
-              loading="lazy"
-              src={require("../../../../components/media/Icono.png")}
-              alt="logo"
-              style={{ height: 40 }}
-            />
-            <Typography
-              sx={{ ml: 2, flex: 1, textAlign: "center" }}
-              variant="h4"
-              component="div"
-            >
-              {`${title} - Chinandega`}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-
-        <Stack display="flex" justifyContent="center">
-          <Typography
-            sx={{
-              color: "#2196f3",
-              textAlign: "center",
-              fontWeight: "bold",
-              marginTop: 2,
-            }}
-            variant="h5"
-            component="div"
-          >
-            Master de Ventas
-          </Typography>
-          <span style={{ textAlign: "center" }}>{`Desde: ${moment(desde).format(
-            "L"
-          )} ${moment(horaDesde).format("hh:mm A")} - Hasta: ${moment(
-            hasta
-          ).format("L")} ${moment(horaHasta).format("hh:mm A")}`}</span>
-
-          <Stack
-              spacing={3}
-              direction="row"              
-              display="flex"
-              justifyContent="right"> 
-                  <IconButton  
-                            spacing={3}
-                            direction="row"              
-                            display="flex"
-                            justifyContent="right"
-                            style={{fontSize: 40, position: "fixed",color: "#4caf50" , right: 50, top: 75, width: 50 }}
-                            // onClick={() => SheetJS.downloadExcel()}
-                            >
-                            <FontAwesomeIcon icon={faDownload} onClick={downloadExcel}  />
-                          </IconButton>
-         </Stack> 
-
-          <ReactToPrint
-            trigger={() => {
-              return (
-                <IconButton
-                  variant="outlined"
-                  style={{ position: "fixed", right: 105, top: 75 }}
-                >
-                  <PrintRoundedIcon
-                    style={{ fontSize: 50, color: "#2979ff", width: 50 }}
-                  />
-                </IconButton>
-              );
-            }}
-            content={() => compRef.current}
-          />
-        </Stack>
-
-        <hr />
-        <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
-          {isEmpty(data) ? (
-            <NoData />
-          ) : (
+    <Container maxWidth="xl">
+      <Stack spacing={2}>
+        <Dialog
+          fullScreen
+          open={false}
+          onClose={() => console.log("Cerrado")}
+        >
+          <AppBar position="static">
+            <Toolbar>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={() => console.log("Cerrado")}
+                aria-label="close"
+              >
+                <PrintRoundedIcon />
+              </IconButton>
+              <Typography variant="h6" className="title">
+                {title}
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Stack spacing={2} style={{ padding: "2em" }} ref={compRef}>
             <Table
-            id="table-to-xls"
-              hover={!isDarkMode}
-              size="sm"
+              striped
+              bordered
+              hover
               responsive
-              className="text-primary w-100"
+              id="table-to-xls"
+              className="table"
             >
               <thead>
                 <tr>
-                  <th style={{ textAlign: "center" }}>Fecha-Hora</th>
-                  <th style={{ textAlign: "center" }}>Factura</th>
-                  <th style={{ textAlign: "left" }}>Cliente</th>
-                  <th style={{ textAlign: "center" }}>Almacen</th>
-                  <th style={{ textAlign: "center" }}>Status</th>
-                  <th style={{ textAlign: "center" }}>M. Venta</th>
-                  <th style={{ textAlign: "center" }}>T. Abonado</th>
-                  <th style={{ textAlign: "center" }}>Descuento</th>
-                  <th style={{ textAlign: "center" }}>Saldo</th>
-                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>Utilidad C$</th>) : (<></>)} 
-                  {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>%Utilidad</th>) : (<></> )}
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Cliente</th>
+                  <th>Documento</th>
+                  <th>Venta</th>
+                  <th>Contado</th>
+                  <th>Credito</th>
+                  <th>Abonado</th>
+                  <th>Descuentos</th>
+                  <th>Saldo</th>
+                  <th>Ganancia</th>
                 </tr>
               </thead>
-              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {currentItem.map((item) => {
-                  const { saleDetails } = item;
-                   return (
+              <tbody>
+                {!isEmpty(currentItem) ? (
+                  currentItem.map((item) => (
                     <tr key={item.id}>
-                      <td style={{ textAlign: "center" }}>
-                        {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")} </td>
-                      <td style={{ textAlign: "center" }}>{item.id} </td>
-                      <td style={{ textAlign: "left" }}>{isEmpty(item.client) ? "CLIENTE EVENTUAL" : item.client.nombreCliente}</td>
-                      <td style={{ textAlign: "center" }}>{item.store.name}</td>
-                      <td style={{ textAlign: "center" }}>{item.isContado ? "Contado" : "Credito"}</td>
-                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO", }).format(item.montoVenta)}</td>
-                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO",}).format(item.montoVenta - item.saldo)}</td>
-                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency",currency: "NIO",}).format(sumDescuentos(item.saleDetails))}</td>
-                      <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", {style: "currency", currency: "NIO", }).format(item.saldo)} </td>   
-                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                        <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                        }).format(sumGanancia(saleDetails))}
-                        </td>
-                        ) : (
-                        <></>
-                        )}
-                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                        <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                        style: "percent",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        }).format(utilityPercent(saleDetails))}
-                        </td>
-                        ) : (
-                        <></>
-                        )}
-        </tr>
-      );
-    })}
-              </tbody>
-            </Table> 
-          )}
-          <PaginationComponent
-            data={data}
-            paginate={paginate}
-            itemsperPage={itemsperPage}
-          />
-          <hr />
-          <Stack direction="row" flex="row" justifyContent="space-around">
-            <Stack textAlign="center">
-              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total de Ventas
-              </span>
-              <span>{new Intl.NumberFormat("es-NI").format(data.length)}</span>
-            </Stack>
-
-            <Stack textAlign="center">
-              <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                Total de Ventas
-              </span>
-              <span>
-                {new Intl.NumberFormat("es-NI", {
-                  style: "currency",
-                  currency: "NIO",
-                }).format(sumSales())}
-              </span>
-            </Stack>
-
-            {contadoSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Ventas de Contado
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumContadoSales())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-
-            {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Ventas de Credito
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumCreditoSales())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-            {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Abonado
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumAbonado())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-            
-            {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Descuento
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumDescuentosTotales(data))}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-
-            {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Saldo
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumSaldo())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )} 
-            
-             {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Utilidad Total
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                      currency: "NIO",           
-                  }).format(sumarTotalGanancias())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-          </Stack>
-          <hr />
-        </Container>
-      </Dialog>
-
-      <div
-        style={{
-          display: "none",
-        }}
-      >
-        <PrintReport
-          ref={compRef}
-          fecha={`Desde: ${moment(desde).format("L")} ${moment(
-            horaDesde
-          ).format("hh:mm A")} - Hasta: ${moment(hasta).format("L")} ${moment(
-            horaHasta
-          ).format("hh:mm A")}`}
-          titulo={"Master de Ventas"}
-        >
-          <hr />
-          <Container fixed maxWidth="xl" sx={{ textAlign: "center" }}>
-            {isEmpty(data) ? (
-              <NoData />
-            ) : (
-              <Table
-              id="table-to-xls"
-                hover={!isDarkMode}
-                size="sm"
-                responsive
-                className="text-primary w-100"
-              >
-                <thead>
+                      <td>{moment(item.fechaVenta).format("DD/MM/YYYY")}</td>
+                      <td>{item.horaVenta}</td>
+                      <td>{item.cliente}</td>
+                      <td>{item.nroDocumento}</td>
+                      <td>{item.montoVenta}</td>
+                      <td>{item.isContado === 1 ? item.montoVenta : 0}</td>
+                      <td>{item.isContado === 0 ? item.montoVenta : 0}</td>
+                      <td>
+                        {item.isContado === 1
+                          ? item.montoVenta
+                          : item.montoVenta - item.saldo}
+                      </td>
+                      <td>{item.descuento}</td>
+                      <td>{item.saldo}</td>
+                      <td>{sumGanancia(item.saleDetails)}</td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <th style={{ textAlign: "center" }}>Fecha</th>
-                    <th style={{ textAlign: "center" }}>Factura</th>
-                    <th style={{ textAlign: "left" }}>Cliente</th>
-                    <th style={{ textAlign: "center" }}>Almacen</th>
-                    <th style={{ textAlign: "center" }}>Status</th>
-                    <th style={{ textAlign: "center" }}>M. Venta</th>
-                    <th style={{ textAlign: "center" }}>T. Abonado</th>
-                    <th style={{ textAlign: "center" }}>Descuento</th>
-                    <th style={{ textAlign: "center" }}>Saldo</th>
-                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                    <th style={{ textAlign: "center" }}>%Utilidad C$</th>
-                  ) : (
-                    <></>
-                  )} 
-                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                    <th style={{ textAlign: "center" }}>%Utilidad</th>
-                  ) : (
-                    <></>
-                  )}
+                    <td colSpan="10" className="text-center">
+                      <NoData />
+                    </td>
                   </tr>
-                </thead>
-                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                  {data.map((item) => {
-                    const { saleDetails } = item;
-                    return (
-                      <tr key={item.id}>
-                        <td style={{ textAlign: "center" }}>
-                          {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
-                        </td>
-                        <td style={{ textAlign: "center" }}>{item.id}</td>
-                        <td style={{ textAlign: "left" }}>
-                          {isEmpty(item.client)? "CLIENTE EVENTUAL" : item.client.nombreCliente}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {item.store.name}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {item.isContado ? "Contado" : "Credito"}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.montoVenta)}
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.montoVenta - item.saldo)}
-                        </td> 
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                          style: "currency",
-                          currency: "NIO",
-                          }).format(sumDescuentos(item.saleDetails))}
-                          </td>
-                        <td style={{ textAlign: "center" }}>
-                          {new Intl.NumberFormat("es-NI", {
-                            style: "currency",
-                            currency: "NIO",
-                          }).format(item.saldo)}
-                        </td>
-                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                        <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                        }).format(sumGanancia(saleDetails))}
-                        </td>
-                        ) : (
-                        <></>
-                        )}
-                        {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                        <td style={{ textAlign: "center" }}>
-                        {new Intl.NumberFormat("es-NI", {
-                        style: "percent",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        }).format(utilityPercent(saleDetails))}
-                        </td>
-                        ) : (
-                        <></>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
-            )}
-            <hr />
-            <Stack direction="row" flex="row" justifyContent="space-around">
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
-                  Total de Ventas
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI").format(data.length)}
-                </span>
-              </Stack>
-
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }} id="table-to-xls">
-                  Total de Ventas
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumSales())}
-                </span>
-              </Stack>
-
-              {contadoSales ? (
-                <Stack textAlign="center">
-                  <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                    Ventas de Contado
-                  </span>
-                  <span>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumContadoSales())}
-                  </span>
-                </Stack>
-              ) : (
-                <></>
-              )}
-
-              {creditSales ? (
-                <Stack textAlign="center">
-                  <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                    Ventas de Credito
-                  </span>
-                  <span>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumCreditoSales())}
-                  </span>
-                </Stack>
-              ) : (
-                <></>
-              )}
-
-              {creditSales ? (
-                <Stack textAlign="center">
-                  <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                    Total de Abonado
-                  </span>
-                  <span>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumAbonado())}
-                  </span>
-                </Stack>
-              ) : (
-                <></>
-              )}
-
-              {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Total de Descuento
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(sumDescuentosTotales(data))}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
-
-
-              {creditSales ? (
-                <Stack textAlign="center">
-                  <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                    Total de Saldo
-                  </span>
-                  <span>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumSaldo())}
-                  </span>
-                </Stack>
-              ) : (
-                <></>
-              )}
-
-              {creditSales ? (
-              <Stack textAlign="center">
-                <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
-                  Utilidad Total
-                </span>
-                <span>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                      currency: "NIO",
-                        }).format(sumarTotalGanancias())}
-                </span>
-              </Stack>
-            ) : (
-              <></>
-            )}
+                )}
+              </tbody>
+            </Table>
+            <div className="col-md-6">
+              <h4>Total de Registros: {data.length}</h4>
+              <h4>Ventas: {sumSales()}</h4>
+              <h4>Contado: {sumContadoSales()}</h4>
+              <h4>Crédito: {sumCreditoSales()}</h4>
+              <h4>Abonado: {sumAbonado()}</h4>
+              <h4>Descuentos: {sumDescuentosTotales()}</h4>
+              <h4>Saldo: {sumSaldo()}</h4>
+              <h4>Ganancias Totales: {sumarTotalGanancias()}</h4>
+            </div>
+            <Stack
+              direction="row"
+              spacing={2}
+              justifyContent="flex-end"
+              alignItems="center"
+            >
+              <IconButton
+                onClick={printTable}
+                color="primary"
+                aria-label="Imprimir"
+              >
+                <PrintRoundedIcon />
+              </IconButton>
+              <IconButton
+                onClick={downloadExcel}
+                color="primary"
+                aria-label="Descargar Excel"
+              >
+                <FontAwesomeIcon icon={faDownload} />
+              </IconButton>
+              <ReactToPrint
+                trigger={() => (
+                  <IconButton color="primary" aria-label="Imprimir">
+                    <PrintRoundedIcon />
+                  </IconButton>
+                )}
+                content={() => compRef.current}
+              />
             </Stack>
-            <hr />
-          </Container>
-        </PrintReport>
-      </div>
-    </div>
+          </Stack>
+          <PaginationComponent
+            itemsPerPage={itemsperPage}
+            totalItems={data.length}
+            paginate={paginate}
+          />
+        </Dialog>
+      </Stack>
+    </Container>
   );
 };
