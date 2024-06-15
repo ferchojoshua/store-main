@@ -371,6 +371,24 @@ const NavbarComponent = () => {
                 <></>
               )} */}
 
+              
+              {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+                <NavDropdown.Item
+                  as={Link}
+                  to={`${ruta}/administration`}
+                  eventKey="administration"
+                >
+                  <FontAwesomeIcon
+                    icon={faShield}
+                    style={{ marginRight: 10 }}
+                  />
+                  Administracion
+                </NavDropdown.Item>
+              ) : (
+                <></>
+              )}
+              
+
 
                   {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
                 <NavDropdown.Item

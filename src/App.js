@@ -36,6 +36,7 @@ import InventoryContainer from "./pages/inventory/InventoryContainer";
 import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
 import SalesContainer from "./pages/sales/SalesContainer";
 import Departments from "./pages/settings/locations/Departments";
+import Administration from "./pages/settings/administration/CreateLogo";
 import Municipalities from "./pages/settings/locations/municipalities/Municipalities";
 import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -323,6 +324,12 @@ function App() {
                   element={<SecurityContiner />}
                 />
 
+                   {/* Gunner */}
+                <Route 
+                path={`${ruta}/administration`}
+                 element={<Administration />}
+                />
+
                 {/* Rutas miscelaneos */}
                 <Route path={`${ruta}/stores`} element={<Stores />} />
                 <Route path={`${ruta}/store/:id`} element={<StoreDetails />} />
@@ -343,6 +350,7 @@ function App() {
                   path={`${ruta}/departments/:id`}
                   element={<Municipalities />}
                 />
+
                 <Route
                   path={`${ruta}/departments/municipalities/:id`}
                   element={<MunicipalityDetails />}

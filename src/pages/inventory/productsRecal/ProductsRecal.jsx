@@ -94,104 +94,111 @@ const ProductsRecal = () => {
 
   const [showKardexModal, setShowKardexModal] = useState(false);
   const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState("selectedStore");
+  const [selectedStore, setSelectedStore] = useState("");
   const [tNegocioList, setTNegocioList] = useState([]);
   const [selectedTNegocio, setSelectedTNegocio] = useState("t");
   const [familiaList, setFamiliaList] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState("t");
   const [isAlmacenSelected, setIsAlmacenSelected] = useState(false);
   const [isMasivoSelected, setIsMasivoSelected] = useState(false);
+  const [isTNEnabled, setIsTNEnabled] = useState(false);
+  const [isFamiliaEnabled, setIsFamiliaEnabled] = useState(false);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-         // Obtener la lista de productos
-         const productResult = await getProductsAsync(token); // Asegúrate de que getProductsAsync esté definido
-         if (!productResult.statusResponse) {
-           setIsLoading(false);
-           if (productResult.error.request.status === 401) {
-             navigate(`${ruta}/unauthorized`);
-             return;
-           }
-           toastError(productResult.error.message);
-           return;
-         }
-   
-         if (productResult.data === "eX01") {
-           setIsLoading(false);
-           deleteUserData();
-           deleteToken();
-           setIsLogged(false);
-           return;
-         }
-   
-         if (productResult.data.isDefaultPass) {
-           setIsLoading(false);
-           setIsDefaultPass(true);
-           return;
-         }
-         setIsLoading(false);
-         setProductList(productResult.data);
-   
-         // Obtener la lista de almacenes
-         const storeResult = await getStoresByUserAsync(token); // Asegúrate de que getStoresByUserAsync esté definido
-         if (!storeResult.statusResponse) {
-           setIsLoading(false);
-           if (storeResult.error.request.status === 401) {
-             navigate(`${ruta}/unauthorized`);
-             return;
-           }
-           toastError(storeResult.error.message);
-           return;
-         }
-   
-         if (storeResult.data === "eX01") {
-           setIsLoading(false);
-           deleteUserData();
-           deleteToken();
-           setIsLogged(false);
-           return;
-         }
-   
-         if (storeResult.data.isDefaultPass) {
-           setIsLoading(false);
-           setIsDefaultPass(true);
-           return;
-         }
-   
-         setStoreList(storeResult.data);
-         if (storeResult.data.length > 0) {
-           setSelectedStore(storeResult.data[0].id);
-         }
-         const result = await getTipoNegocioAsync(token);
-         if (!result.statusResponse) {
-           setIsLoading(false);
-           if (result.error.request.status === 401) {
-             navigate(`${ruta}/unauthorized`);
-             return;
-           }
-           toastError(result.error.message);
-           return;
-         }
-   
-         if (result.data === "eX01") {
-           setIsLoading(false);
-           deleteUserData();
-           deleteToken();
-           setIsLogged(false);
-           return;
-         }
-   
-         if (result.data.isDefaultPass) {
-           setIsLoading(false);
-           setIsDefaultPass(true);
-           return;
-         }
-         setTNegocioList(result.data);
-         setIsLoading(false);
-       })();
-     }, [reload]);
-   
+      // Obtener la lista de productos
+      const productResult = await getProductsAsync(token); // Asegúrate de que getProductsAsync esté definido
+      if (!productResult.statusResponse) {
+        setIsLoading(false);
+        if (productResult.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(productResult.error.message);
+        return;
+      }
+
+      if (productResult.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (productResult.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setProductList(productResult.data);
+
+      // Obtener la lista de almacenes
+      const storeResult = await getStoresByUserAsync(token); // Asegúrate de que getStoresByUserAsync esté definido
+      if (!storeResult.statusResponse) {
+        setIsLoading(false);
+        if (storeResult.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(storeResult.error.message);
+        return;
+      }
+
+      if (storeResult.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (storeResult.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setStoreList(storeResult.data);
+      if (storeResult.data.length > 0) {
+        setSelectedStore(storeResult.data[0].id);
+      }
+      const result = await getTipoNegocioAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setTNegocioList(result.data);
+      setIsLoading(false);
+    })();
+  }, [reload]);
+
+  const onChangeAlmacen = (value) => {
+    setSelectedStore(value);
+    setIsTNEnabled(true); // Habilitar el combo de Tipo de Negocio
+  };
+
   const onChangeSearch = (val) => {
     setCurrentPage(1);
     setSearchTerm(val);
@@ -206,6 +213,7 @@ const ProductsRecal = () => {
 
   const onChangeTN = async (value) => {
     setSelectedTNegocio(value);
+    setIsFamiliaEnabled(true); // Habilitar el combo de Familia
     if (value === "t") {
       setSelectedFamilia("t");
       return;
@@ -242,7 +250,6 @@ const ProductsRecal = () => {
       setFamiliaList(resultFamilias.data);
     }
   };
-
   const record = { id: 0, name: "Todos" };
 
   return (
@@ -250,14 +257,14 @@ const ProductsRecal = () => {
       <h1>Modificar Precio Masivo </h1>
       <Container>
         <FormControl
-            variant="standard"
-            fullWidth
-            style={{
-              textAlign: "left",
-              width: 250,
-              marginTop: 20,
-            }}
-          >
+          variant="standard"
+          fullWidth
+          style={{
+            textAlign: "left",
+            width: 250,
+            marginTop: 20,
+          }}
+        >
           <FormLabel id="demo-radio-buttons-group-label">
             Seleccione una opcion
           </FormLabel>
@@ -277,79 +284,78 @@ const ProductsRecal = () => {
             <FormControlLabel value="Masivo" control={<Radio />} label="Masivo" />
           </RadioGroup>
         </FormControl>
+
         {selectedradio === "Individual" || !isMasivoSelected ? (
           <></>
         ) : (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+          <FormControl
+  variant="standard"
+  fullWidth
+  style={{
+    textAlign: "left",
+    width: 250,
+    marginTop: 20,
+    marginRight: 20,
+    display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
+  }}
+>
+  <InputLabel id="demo-simple-select-standard-label">
+    Seleccione un Almacén
+  </InputLabel>
+  <Select
+    defaultValue=""
+    labelId="demo-simple-select-standard-label"
+    id="demo-simple-select-standard"
+    value={selectedStore || ""}
+    onChange={(e) => {
+      setSelectedStore(e.target.value);  
+      onChangeAlmacen(e.target.value);                
+    }}
+    label="Almacén"
+    style={{ textAlign: "left" }}
+  >
+    <MenuItem value="">
+      <em>Seleccione un Almacén</em>
+    </MenuItem>
+    {storeList.map((item) => {
+      return (
+        <MenuItem key={item.id} value={item.id}>
+          {item.name}
+        </MenuItem>
+      );
+    })}
+    <MenuItem
+      key={"t"}
+      value={"t"}
+      disabled={
+        storeList.length <= 6 ||
+        storeList.length <= 5 ||
+        storeList.length <= 4 ||
+        storeList.length <= 3 ||
+        storeList.length <= 2 ||
+        storeList.length <= 1
+          ? false
+          : true
+      }
+    >
+      Todos...
+    </MenuItem>
+  </Select>
+</FormControl>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 20,
-          }}
-        >
-           <FormControl
+
+            <FormControl
               variant="standard"
               fullWidth
               style={{
-              textAlign: "left",
-              width: "32%",  
-              marginRight: "1%",  
-              display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none', 
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
               }}
-              >
-
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un Almacen
-              </InputLabel>
-              <Select
-                defaultValue=""
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedStore || ""} onChange={(e) => {
-                    setSelectedStore(e.target.value);
-                    setIsAlmacenSelected(true); 
-                  }}
-                  label="Almacen"
-                  style={{ textAlign: "left" }}
-                >
-                <MenuItem key={-1} value="">
-                  <em> Seleccione un Almacen</em>
-                </MenuItem>
-                {storeList.map((item) => {
-                  return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-                <MenuItem
-                  key={"t"}
-                  value={"t"}
-                  disabled={
-                        storeList.length > 6 || storeList.length > 5 || storeList.length > 4 || storeList.length > 3 || storeList.length > 2
-                          ? false
-                          : true
-                      }
-                >
-                  Todos...
-                </MenuItem>
-              </Select>
-            </FormControl>
-
-              <FormControl
-              variant="standard"
-              fullWidth
-              style={{
-              textAlign: "left",
-              width: "30%",  
-              marginRight: "1%",  
-              display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none', 
-              }}
-              >
+            >
               <InputLabel id="demo-simple-select-standard-label">
                 Seleccione un Tipo de Negocio
               </InputLabel>
@@ -357,11 +363,11 @@ const ProductsRecal = () => {
                 defaultValue=""
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
-                value={selectedTNegocio}
+                value={selectedTNegocio || ""}
                 onChange={(e) => onChangeTN(e.target.value)}
                 label="Tipo de Negocio"
                 style={{ textAlign: "left" }}
-                disabled={!isAlmacenSelected}
+                disabled={!isTNEnabled}
               >
                 <MenuItem key={-1} value="">
                   <em> Seleccione un Tipo de Negocio</em>
@@ -381,15 +387,16 @@ const ProductsRecal = () => {
             </FormControl>
 
             <FormControl
-            variant="standard"
-            fullWidth
-            style={{
-              textAlign: "left",
-              width: "32%",  
-              marginRight: "1%",  
-              display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none', 
-            }}
-          >
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
+              }}
+            >
               <InputLabel id="demo-simple-select-standard-label">
                 Seleccione una Familia
               </InputLabel>
@@ -397,7 +404,7 @@ const ProductsRecal = () => {
                 defaultValue=""
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
-                value={selectedFamilia}
+                value={selectedFamilia || ""}
                 onChange={(e) => {
                   if (e.target.value.length === 0) {
                     setSelectedFamilia("t");
@@ -406,7 +413,7 @@ const ProductsRecal = () => {
                   setSelectedFamilia(e.target.value);
                 }}
                 style={{ textAlign: "left" }}
-                disabled={!isAlmacenSelected}
+                disabled={!isFamiliaEnabled}
               >
                 <MenuItem key={-1} value="">
                   <em> Seleccione una Familia</em>
@@ -424,9 +431,9 @@ const ProductsRecal = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-        </div>
+          </div>
         )}
-        
+
         <hr />
 
         <div

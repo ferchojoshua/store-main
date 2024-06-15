@@ -17,14 +17,7 @@ export const serverMessages = async () => {
 
     connection.on("alertaCampana", (message) => {
       // console.log("Recepcion: ", message);
-    });
-
-
-
-
-
-
-    
+    }); 
 
     await connection.start();
     await connection.invoke("SendMessage");

@@ -2087,6 +2087,76 @@ setProductsRecalDelete(!isFullAccess);
         </Grid>
       </Grid>
 
+       {/* Modulo Administracion */}
+       <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+
+      <Typography
+          style={{
+            fontSize: 17,
+            color: "#2196f3",
+            fontWeight: 800,
+            textAlign: "center",
+          }}
+        >
+          Modulo Administracion
+        </Typography>
+        <Divider />
+        <Stack direction="row" display="flex" justifyContent="space-around">
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={contVer}
+                onChange={() => setRolesVer(!rolesVer)}
+              />
+            }
+            label="Ver"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={contCreate}
+                onChange={() => setRolesCreate(!rolesCreate)}
+              />
+            }
+            label="Crear"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={contUpdate}
+                onChange={() => setRolesUpdate(!rolesUpdate)}
+              />
+            }
+            label="Editar"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+                checked={contDelete}
+                onChange={() => setRolesDelete(!rolesDelete)}
+              />
+            }
+            label="Eliminar"
+          />
+        </Stack>
+      </Paper>
+      
+
+
       <Button
         fullWidth
         variant="outlined"

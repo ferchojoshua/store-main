@@ -2305,6 +2305,7 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
                 }
                 label="Editar"
               />
+              
 
               <FormControlLabel
                 labelPlacement="top"
@@ -2321,6 +2322,78 @@ const [warehousesDelete, setWarehousesDelete] = useState(false);
           </Paper>
         </Grid>
       </Grid>
+
+      <Paper
+            elevation={10}
+            style={{
+              borderRadius: 30,
+              padding: 10,
+              marginTop: 20,
+            }}
+          >
+
+      <Typography
+          style={{
+            fontSize: 17,
+            color: "#2196f3",
+            fontWeight: 800,
+            textAlign: "center",
+          }}
+        >
+          Modulo Administracion
+        </Typography>
+        <Divider />
+        <Stack direction="row" display="flex" justifyContent="space-around">
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+              disabled={!isEdit}
+                checked={rolesVer}
+                onChange={() => setRolesVer(!rolesVer)}
+              />
+            }
+            label="Ver"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+              disabled={!isEdit}
+                checked={rolesCreate}
+                onChange={() => setRolesCreate(!rolesCreate)}
+              />
+            }
+            label="Crear"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+              disabled={!isEdit}
+                checked={rolesUpdate}
+                onChange={() => setRolesUpdate(!rolesUpdate)}
+              />
+            }
+            label="Editar"
+          />
+
+          <FormControlLabel
+            labelPlacement="top"
+            control={
+              <Checkbox
+              disabled={!isEdit}
+                checked={rolesDelete}
+                onChange={() => setRolesDelete(!rolesDelete)}
+              />
+            }
+            label="Eliminar"
+          />
+        </Stack>
+      </Paper>
+      
 
       {isAccess(access, "ROLES UPDATE") ? (
         <Button

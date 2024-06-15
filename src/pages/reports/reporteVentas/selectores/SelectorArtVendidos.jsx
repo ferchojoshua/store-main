@@ -35,8 +35,7 @@ import {
 } from "../../../../services/TipoNegocioApi";
 
 export const SelectorArtVendidos = () => {
-  const { setIsLoading, setIsDefaultPass, setIsLogged } =
-    useContext(DataContext);
+  const { setIsLoading, setIsDefaultPass, setIsLogged } =    useContext(DataContext);
 
   var date = new Date();
   const [fechaDesde, setDesdeFecha] = useState(

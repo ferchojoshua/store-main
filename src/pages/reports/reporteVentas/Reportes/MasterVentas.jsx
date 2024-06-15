@@ -511,7 +511,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
               <></>
             )} 
             
-             {creditSales ? (
+             {creditSales && isAccess(access, "MASTER VENTAS UTILIDAD")? (
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Utilidad Total
@@ -568,16 +568,8 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                     <th style={{ textAlign: "center" }}>T. Abonado</th>
                     <th style={{ textAlign: "center" }}>Descuento</th>
                     <th style={{ textAlign: "center" }}>Saldo</th>
-                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                    <th style={{ textAlign: "center" }}>%Utilidad C$</th>
-                  ) : (
-                    <></>
-                  )} 
-                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (
-                    <th style={{ textAlign: "center" }}>%Utilidad</th>
-                  ) : (
-                    <></>
-                  )}
+                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>%Utilidad C$</th>) : ( <></>)} 
+                    {isAccess(access, "MASTER VENTAS UTILIDAD") ? (<th style={{ textAlign: "center" }}>%Utilidad</th>) : ( <></> )}
                   </tr>
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -753,7 +745,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
                 <></>
               )}
 
-              {creditSales ? (
+              {creditSales && isAccess(access, "MASTER VENTAS UTILIDAD") ? (
               <Stack textAlign="center">
                 <span style={{ fontWeight: "bold", color: "#03a9f4" }}>
                   Utilidad Total

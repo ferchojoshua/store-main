@@ -296,7 +296,8 @@ const Facrturar = () => {
     <div>
       <Container maxWidth="xl">
         <Typography variant="h4" textAlign={"left"}>
-          Facturar         </Typography>
+          Facturar    
+          </Typography>
         <hr />
         <Paper
           elevation={10}

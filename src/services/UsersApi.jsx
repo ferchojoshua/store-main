@@ -155,7 +155,7 @@ export const deactivateUserAsync = async (token, data) => {
   return result;
 };
 
-export const resetPasswordAsync = async (token, data) => {
+export const resetPasswordAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}ResetPassword/`;
   const authAxios = axios.create({
@@ -165,7 +165,7 @@ export const resetPasswordAsync = async (token, data) => {
     },
   });
   try {
-    await authAxios.post(service + data).then((resp) => {
+    await authAxios.post(service + id).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.status;
