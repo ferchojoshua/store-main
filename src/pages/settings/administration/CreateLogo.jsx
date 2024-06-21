@@ -13,7 +13,7 @@ import { CreateLogoAsync, getLogoByStoreIdAsync } from "../../../services/Create
 const LogoCreate = ({ setShowModal }) => {
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } = useContext(DataContext);
   const [showModalSave, setShowModalSave] = useState(false);
-  const [selectedStore, setSelectedStore] = useState(""); // Inicializado como cadena vacía
+  const [selectedStore, setSelectedStore] = useState(""); // Inicializado como cadena vacía...........................
   const [direccion, setDireccion] = useState("");
   const [ruc, setRuc] = useState("");
   const [telefono, setTelefono] = useState("+505");
