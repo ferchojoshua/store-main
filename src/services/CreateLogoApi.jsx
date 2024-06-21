@@ -14,7 +14,7 @@ export const CreateLogoAsync = async (token, data) => {
     const resp = await axios.post(baseURL, data, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json', // Agregar el tipo de contenido si es necesario
+        'Content-Type': 'application/json', // Agregar el tipo de contenido si es necesario.............
       },
     });
 
