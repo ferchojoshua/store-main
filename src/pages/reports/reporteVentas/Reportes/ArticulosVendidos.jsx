@@ -20,13 +20,13 @@ import { useParams } from "react-router-dom";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+//
 import { Table } from "react-bootstrap";
 import { getProductosVendidosAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx'
 
 export const ArticulosVendidos = () => {
   const [data, setData] = useState([]);

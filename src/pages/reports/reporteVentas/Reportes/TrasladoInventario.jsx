@@ -25,7 +25,7 @@ import { Table } from "react-bootstrap";
 import { getTrasladosAsync } from "../../../../services/ReportApi";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-// import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+
 import moment from "moment";
 import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";

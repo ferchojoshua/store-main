@@ -23,7 +23,7 @@ import ReactToPrint from "react-to-print";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+//
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
 import moment from "moment";

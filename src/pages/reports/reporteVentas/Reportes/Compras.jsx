@@ -28,7 +28,7 @@ import "../../../../components/styles/estilo.css";
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+///
 import XLSX from "xlsx";
 import "./estilo.css";
 import { getComprasAsync } from "../../../../services/ReportApi";

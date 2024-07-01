@@ -26,7 +26,7 @@ import { getCuentasXCobrarAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, } from "@fortawesome/free-solid-svg-icons";
-///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+///
 import "../../../../components/styles/estilo.css";
 import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { PrintReport } from "../../../../components/modals/PrintReport";

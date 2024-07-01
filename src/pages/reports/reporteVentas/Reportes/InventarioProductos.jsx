@@ -24,7 +24,6 @@ import PaginationComponent from "../../../../components/PaginationComponent";
 import { Table } from "react-bootstrap";
 import { getProductosInventrioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
-//import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { PrintReport } from "../../../../components/modals/PrintReport";
 import "../../../../components/styles/estilo.css";
 import XLSX from 'xlsx';

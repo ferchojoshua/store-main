@@ -25,7 +25,7 @@ import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-///import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+///
 import { getGetCierreDiarioAsync } from "../../../../services/ReportApi";
 import moment from "moment";
 import { PrintReport } from "../../../../components/modals/PrintReport";

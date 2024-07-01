@@ -31,7 +31,7 @@ import XLSX from 'xlsx';
 
 // ...
 
-// import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+
 
 export const ProdNoVendidos = () => {
   const [data, setData] = useState([]);
