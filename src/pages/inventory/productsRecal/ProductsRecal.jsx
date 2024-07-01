@@ -46,6 +46,7 @@ import {
   deleteUserData,
 } from "../../../services/Account";
 import MediumModal from "../../../components/modals/MediumModal";
+import ProductsRecalDetails from "./ProductsRecalDetails";
 import { ProductKardex } from "../productExistences/ProductKardex";
 
 const ProductsRecal = () => {
@@ -570,7 +571,7 @@ const ProductsRecal = () => {
                         ) : (
                           <></>
                         )}
-                      </Stack>
+                      </Stack> 
                     </td>
                   </tr>
                 );
@@ -598,10 +599,10 @@ const ProductsRecal = () => {
         isVisible={showEditModal}
         setVisible={setShowEditModal}
       >
-        {/* <ProductsDetails
+        <ProductsRecalDetails
         selectedProduct={selectedProduct}
         setShowModal={setShowEditModal}
-      /> */}
+      />
       </MediumModal>
 
       <MediumModal

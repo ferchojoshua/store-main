@@ -8,14 +8,14 @@ import {
   MenuItem,
   FormControl,
   Paper,
-  FormLabel,
+  // FormLabel,
 } from "@mui/material";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
+// import Radio from "@mui/material/Radio";
+// import RadioGroup from "@mui/material/RadioGroup";
+// import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
-import { updateProductAsync } from "../../../services/ProductsApi";
+import { updateProductrecallAsync } from "../../../services/ProductsApi";
 import {
   getFamiliasByTNAsync,
   getTipoNegocioAsync,
@@ -51,6 +51,8 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(
     selectedProduct.tipoNegocio.id
   );
+  const [catalogo, setCatalogo] = useState([]);
+const [selectedCatalogo, setSelectedCatalogo] = useState('');
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(
     selectedProduct.familia ? selectedProduct.familia.id : ""
@@ -120,13 +122,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   const saveChangesAsync = async () => {
     const data = {
       id: selectedProduct.id,
-      tipoNegocioId: selectedTipoNegocio,
-      familiaId: selectedFamilia,
-      description: description,
-      barCode: barCode,
-      marca: marca === "" ? "S/M" : marca,
-      modelo: modelo === "" ? "S/M" : modelo,
-      uM: uM,
+      porcentaje: selectedCatalogo,     
     };
 
     if (selectedTipoNegocio === "" || selectedTipoNegocio === 0) {
@@ -144,7 +140,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
       return;
     }
     setIsLoading(true);
-    const result = await updateProductAsync(token, data);
+    const result = await updateProductrecallAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
@@ -225,18 +221,6 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
         }}
       >
         <Container>
-        <FormControl>
-      <FormLabel id="demo-radio-buttons-group-label">Choose Gender</FormLabel>
-      <RadioGroup
-        aria-labelledby="demo-radio-buttons-group-label"
-        defaultValue="female"
-        name="radio-buttons-group"
-      >
-        <FormControlLabel value="female" control={<Radio />} label="Female" />
-        <FormControlLabel value="male" control={<Radio />} label="Male" />
-        <FormControlLabel value="other" control={<Radio />} label="Other" />
-      </RadioGroup>
-    </FormControl>
           <FormControl
             variant="standard"
             fullWidth
@@ -254,6 +238,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
               onChange={(e) => handleChangeTN(e.target.value)}
               label="Tipo de Negocio"
               style={{ textAlign: "left" }}
+              disabled={true}
             >
               <MenuItem key={0} value="">
                 <em> Seleccione un tipo de negocio</em>
@@ -285,6 +270,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
               onChange={(e) => setSelectedFamilia(e.target.value)}
               label="Familia"
               style={{ textAlign: "left" }}
+              disabled={true}
             >
               <MenuItem key={0} value="">
                 <em> Seleccione una familia</em>
@@ -307,7 +293,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
             onChange={(e) => setDescription(e.target.value.toUpperCase())}
             label={"Descripcion"}
             value={description ? description : ""}
-            disabled={!isEdit}
+            disabled={true}
           />
 
           <TextField
@@ -318,7 +304,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
             onChange={(e) => setBarCode(e.target.value)}
             label={"Codigo de barras"}
             value={barCode ? barCode : ""}
-            disabled={!isEdit}
+            disabled={true}
           />
 
           <TextField
@@ -329,7 +315,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
             label={"Marca"}
             value={marca ? marca : ""}
             style={{ marginTop: 20 }}
-            disabled={!isEdit}
+            disabled={true}
           />
 
           <TextField
@@ -340,7 +326,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
             onChange={(e) => setModelo(e.target.value.toUpperCase())}
             label={"Modelo"}
             value={modelo ? modelo : ""}
-            disabled={!isEdit}
+            disabled={true}
           />
 
           <FormControl
@@ -348,7 +334,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
             fullWidth
             style={{ marginTop: 20 }}
             required
-            disabled={!isEdit}
+            disabled={true}
           >
             <InputLabel id="demo-simple-select-standard-label">
               Seleccione una U/M...
@@ -360,6 +346,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
               onChange={(e) => setUM(e.target.value)}
               label="Unidad de Medida"
               style={{ textAlign: "left" }}
+              disabled={true}
             >
               <MenuItem key={0} value="">
                 <em>Seleccione una U/M...</em>
@@ -376,6 +363,36 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
               </MenuItem>
             </Select>
           </FormControl>
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            required
+            disabled={!isEdit}
+            >
+            <InputLabel id="catalogo-select-label">
+              Seleccione un item del catálogo
+            </InputLabel>
+            <Select
+              labelId="catalogo-select-label"
+              id="catalogo-select"
+              value={selectedCatalogo}
+              onChange={(e) => setSelectedCatalogo(e.target.value)}
+              label="Catálogo"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={0} value="">
+                <em>Seleccione un item del catálogo</em>
+              </MenuItem>
+              {catalogo.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.description}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+            </FormControl>
 
           <div
             style={{
