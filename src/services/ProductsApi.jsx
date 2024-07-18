@@ -191,10 +191,9 @@ export const getAllStoresKardexAsync = async (token, data) => {
 };
 
 
-
 export const updateProductrecallAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}UpdaterecallProduct`;
+  let service = `${controller}UpdaterecallProductId`;
   const authAxios = axios.create({
     baseURL: service,
     withCredentials: false,
@@ -218,3 +217,5 @@ export const updateProductrecallAsync = async (token, data) => {
   }
   return result;
 };
+
+

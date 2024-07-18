@@ -4,16 +4,18 @@ import { Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { getListAsync } from "../../../services/CreateLogoApi";
 import {
   getRuta,
   isAccess,
   toastError,
   // toastSuccess,
 } from "../../../helpers/Helpers";
+import { getProductsAsync } from "../../../services/ProductsApi";
 import {
-  getProductsAsync,
-} from "../../../services/ProductsApi";
-import {getFamiliasByTNAsync,getTipoNegocioAsync,} from "../../../services/TipoNegocioApi";
+  getFamiliasByTNAsync,
+  getTipoNegocioAsync,
+} from "../../../services/TipoNegocioApi";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import {
   Button,
@@ -104,6 +106,8 @@ const ProductsRecal = () => {
   const [isMasivoSelected, setIsMasivoSelected] = useState(false);
   const [isTNEnabled, setIsTNEnabled] = useState(false);
   const [isFamiliaEnabled, setIsFamiliaEnabled] = useState(false);
+  const [catalogo, setCatalogo] = useState([]);
+  const [selectedCatalogo, setSelectedCatalogo] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -166,6 +170,35 @@ const ProductsRecal = () => {
       if (storeResult.data.length > 0) {
         setSelectedStore(storeResult.data[0].id);
       }
+
+      const data = {
+        operacion: 2,
+      };
+
+      const resultList = await getListAsync(token, data);
+      if (!resultList.statusResponse) {
+        setIsLoading(false);
+        if (resultList.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultList.error.message);
+        return;
+      }
+
+      if (resultList.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultList.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setCatalogo(resultList.data);
       const result = await getTipoNegocioAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
@@ -208,8 +241,8 @@ const ProductsRecal = () => {
 
   const handleChangeRadio = (event) => {
     setSelectedRadio(event.target.value);
-    setIsMasivoSelected(event.target.value === 'Masivo');
-    setIsAlmacenSelected(event.target.value === 'Masivo');
+    setIsMasivoSelected(event.target.value === "Masivo");
+    setIsAlmacenSelected(event.target.value === "Masivo");
   };
 
   const onChangeTN = async (value) => {
@@ -282,7 +315,11 @@ const ProductsRecal = () => {
               control={<Radio />}
               label="Individual"
             />
-            <FormControlLabel value="Masivo" control={<Radio />} label="Masivo" />
+            <FormControlLabel
+              value="Masivo"
+              control={<Radio />}
+              label="Masivo"
+            />
           </RadioGroup>
         </FormControl>
 
@@ -290,61 +327,61 @@ const ProductsRecal = () => {
           <></>
         ) : (
           <div style={{ display: "flex", justifyContent: "center" }}>
-          <FormControl
-  variant="standard"
-  fullWidth
-  style={{
-    textAlign: "left",
-    width: 250,
-    marginTop: 20,
-    marginRight: 20,
-    display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
-  }}
->
-  <InputLabel id="demo-simple-select-standard-label">
-    Seleccione un Almacén
-  </InputLabel>
-  <Select
-    defaultValue=""
-    labelId="demo-simple-select-standard-label"
-    id="demo-simple-select-standard"
-    value={selectedStore || ""}
-    onChange={(e) => {
-      setSelectedStore(e.target.value);  
-      onChangeAlmacen(e.target.value);                
-    }}
-    label="Almacén"
-    style={{ textAlign: "left" }}
-  >
-    <MenuItem value="">
-      <em>Seleccione un Almacén</em>
-    </MenuItem>
-    {storeList.map((item) => {
-      return (
-        <MenuItem key={item.id} value={item.id}>
-          {item.name}
-        </MenuItem>
-      );
-    })}
-    <MenuItem
-      key={"t"}
-      value={"t"}
-      disabled={
-        storeList.length <= 6 ||
-        storeList.length <= 5 ||
-        storeList.length <= 4 ||
-        storeList.length <= 3 ||
-        storeList.length <= 2 ||
-        storeList.length <= 1
-          ? false
-          : true
-      }
-    >
-      Todos...
-    </MenuItem>
-  </Select>
-</FormControl>
-
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
+              }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacén
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedStore || ""}
+                onChange={(e) => {
+                  setSelectedStore(e.target.value);
+                  onChangeAlmacen(e.target.value);
+                }}
+                label="Almacén"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem value="">
+                  <em>Seleccione un Almacén</em>
+                </MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem
+                  key={"t"}
+                  value={"t"}
+                  disabled={
+                    storeList.length <= 6 ||
+                    storeList.length <= 5 ||
+                    storeList.length <= 4 ||
+                    storeList.length <= 3 ||
+                    storeList.length <= 2 ||
+                    storeList.length <= 1
+                      ? false
+                      : true
+                  }
+                >
+                  Todos...
+                </MenuItem>
+              </Select>
+            </FormControl>
 
             <FormControl
               variant="standard"
@@ -354,7 +391,8 @@ const ProductsRecal = () => {
                 width: 250,
                 marginTop: 20,
                 marginRight: 20,
-                display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
               }}
             >
               <InputLabel id="demo-simple-select-standard-label">
@@ -386,6 +424,35 @@ const ProductsRecal = () => {
                 </MenuItem>
               </Select>
             </FormControl>
+            <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            required
+                      >
+            <InputLabel id="catalogo-select-label">
+              Seleccione un item del catálogo
+            </InputLabel>
+            <Select
+              labelId="catalogo-select-label"
+              id="catalogo-select"
+              value={selectedCatalogo}
+              onChange={(e) => setSelectedCatalogo(e.target.value)}
+              label="Catálogo"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={0} value="">
+                <em>Seleccione un item del catálogo</em>
+              </MenuItem>
+              {catalogo.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.valor}%
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
 
             <FormControl
               variant="standard"
@@ -395,7 +462,8 @@ const ProductsRecal = () => {
                 width: 250,
                 marginTop: 20,
                 marginRight: 20,
-                display: isAlmacenSelected && isMasivoSelected ? 'block' : 'none',
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
               }}
             >
               <InputLabel id="demo-simple-select-standard-label">
@@ -571,7 +639,7 @@ const ProductsRecal = () => {
                         ) : (
                           <></>
                         )}
-                      </Stack> 
+                      </Stack>
                     </td>
                   </tr>
                 );
@@ -600,9 +668,9 @@ const ProductsRecal = () => {
         setVisible={setShowEditModal}
       >
         <ProductsRecalDetails
-        selectedProduct={selectedProduct}
-        setShowModal={setShowEditModal}
-      />
+          selectedProduct={selectedProduct}
+          setShowModal={setShowEditModal}
+        />
       </MediumModal>
 
       <MediumModal

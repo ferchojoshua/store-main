@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { Paper, Box, Tabs, Tab, Divider } from "@mui/material";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faIdCardClip, faUsersGear, faBuilding} from "@fortawesome/free-solid-svg-icons";
+import { faIdCardClip, faBuilding} from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
 import CreateLogo from "./Logo/CreateLogo";
-import Ajustes from "./Ajustes/Ajustes";
+import Ajustes from "./Ajuste/Ajustes";
 
 // import Admin from
 import { DataContext } from "../../context/DataContext";

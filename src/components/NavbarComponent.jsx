@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
-import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown, OverlayTrigger , Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,6 +10,7 @@ import {
   faHome,
   faPeopleCarryBox,
   faShield,
+  faCogs,
   faSignOutAlt,
   faSitemap,
   faSliders,
@@ -24,7 +25,7 @@ import {
   faBell,
   faScroll,
 } from "@fortawesome/free-solid-svg-icons";
-import { Divider, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import {
   changeThemeAsync,
   deleteToken,
@@ -333,6 +334,60 @@ const NavbarComponent = () => {
             ) : (
               <></>
             )}
+            {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+                <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip id="administration-tooltip">Empresa</Tooltip>}
+              >
+                
+                <Nav.Link
+                  as={Link}
+                  to={`${ruta}/Administration`}
+                  eventKey="Administration"
+                >
+                  <FontAwesomeIcon
+                    icon={faCogs}
+                    style={{ marginRight: 10,
+                      color: active === "admon" ? "#bbdefb" : "#9e9e9e"
+                       }}
+                  />
+                </Nav.Link>
+                </OverlayTrigger>
+              ) : (
+                <></>
+              )}
+            {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip id="administration-tooltip">Seguridad</Tooltip>}
+              >
+                <Nav.Link
+                  as={Link}
+                  to={`${ruta}/security`}
+                  eventKey="security"
+                >
+                  <FontAwesomeIcon
+                    icon={faShield}
+                    
+                    style={{ marginRight: 10,
+                     color: active === "admon" ? "#bbdefb" : "#9e9e9e"
+                       }}
+                  />
+               
+                </Nav.Link>
+                </OverlayTrigger>
+              ) : (
+                <></>
+              )}              
+            
+              <MenuItem onClick={changeTheme}>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip id="administration-tooltip">Modo de apariencia</Tooltip>}
+              >
+            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} style={{ marginRight: 3 }} />
+            </OverlayTrigger>
+            </MenuItem>
             <NavDropdown
               drop="start"
               title={
@@ -346,6 +401,7 @@ const NavbarComponent = () => {
                   }}
                 />
               }
+              
               // id="navbarScrollingDropdown"
               // onSelect={(selectedKey) => setActive(selectedKey)}
             >
@@ -370,7 +426,6 @@ const NavbarComponent = () => {
               ) : (
                 <></>
               )} */}
-
               
               {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
                 <NavDropdown.Item
@@ -436,6 +491,7 @@ const NavbarComponent = () => {
               ) : (
                 <></>
               )} */}
+             
 
               {isAccess(access, "COMMUNITIES VER") ? (
                 <NavDropdown.Item
@@ -445,7 +501,7 @@ const NavbarComponent = () => {
                 >
                   <FontAwesomeIcon
                     icon={faLocationDot}
-                    style={{ marginRight: 10, marginRight: 15 }}
+                    style={{ marginRight: 10}}
                   />
                   Ubicaciones
                 </NavDropdown.Item>
@@ -454,23 +510,7 @@ const NavbarComponent = () => {
               )}
             </NavDropdown>
           </Nav>
-
-          {isAccess(access, "CONT VER") ? (
-            <Tooltip title="Notificaciones">
-              <IconButton
-                onClick={handleClickNot}
-                sx={{ mr: 1, width: 40 }}
-                aria-controls={openNotifications ? "account-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={openNotifications ? "true" : undefined}
-              >
-                <FontAwesomeIcon icon={faBell} style={{ color: "#ffc107" }} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <></>
-          )}
-
+       
           <Menu
             anchorEl={anchorElNot}
             id="account-menu"
@@ -506,11 +546,13 @@ const NavbarComponent = () => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
+       
+            
             <MenuItem style={{ display: "flex", justifyContent: "center" }}>
-              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
-                Notificaciones
-              </span>
-            </MenuItem>
+            <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+            Notificaciones
+            </span>
+            </MenuItem> 
             <Divider />
             {/* <MenuItem> */}
             {/* <ListItemIcon> */}
@@ -519,22 +561,7 @@ const NavbarComponent = () => {
             {/* Notificaciones */}
             {/* </MenuItem> */}
           </Menu>
-
-          <div>
-            <a
-              href="#"
-              onClick={myAccount}
-              style={{
-                fontWeight: "bold",
-                color: "#a7ffeb",
-                fontSize: 15,
-                textDecoration: "none",
-              }}
-            >
-              {user}
-            </a>
-
-            <IconButton
+          <IconButton
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
@@ -550,6 +577,22 @@ const NavbarComponent = () => {
                 }}
               />
             </IconButton>
+          
+          <div>
+            <a
+              href="#"
+              onClick={myAccount}
+              style={{
+                fontWeight: "bold",
+                color: "#a7ffeb",
+                fontSize: 11,
+                textDecoration: "none",
+              }}
+            >
+              {user}
+            </a>
+
+         
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
@@ -565,23 +608,37 @@ const NavbarComponent = () => {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem onClick={myAccount}>
-                <FontAwesomeIcon icon={faUserCog} style={{ marginRight: 20 }} />
-                Mi cuenta
-              </MenuItem>
+            
+         
 
-              <MenuItem onClick={changeTheme}>
+          {/* {isAccess(access, "CONT VER") ? (
+            <Tooltip title="Notificaciones">
+              <IconButton
+                onClick={handleClickNot}
+                sx={{ mr: 1, width: 40 }}
+                aria-controls={openNotifications ? "account-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={openNotifications ? "true" : undefined}
+              >
+                <FontAwesomeIcon icon={faBell} style={{ color: "#ffc107" }} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <></>
+          )} */}
+
+          {/* <MenuItem onClick={changeTheme}>
                 <FontAwesomeIcon
                   icon={isDarkMode ? faSun : faMoon}
                   style={{ marginRight: 20 }}
                 />
                 {isDarkMode ? "Tema Claro" : "Tema Oscuro"}
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem onClick={logOut}>
                 <FontAwesomeIcon
                   icon={faSignOutAlt}
-                  style={{ marginRight: 20 }}
-                />
+                  style={{ marginRight: 10 }}
+                /> 
                 Cerrar Sesion
               </MenuItem>
               {/* <Divider />

@@ -8,11 +8,7 @@ import {
   MenuItem,
   FormControl,
   Paper,
-  // FormLabel,
 } from "@mui/material";
-// import Radio from "@mui/material/Radio";
-// import RadioGroup from "@mui/material/RadioGroup";
-// import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { updateProductrecallAsync } from "../../../services/ProductsApi";
@@ -25,6 +21,7 @@ import {
   deleteUserData,
   deleteToken,
 } from "../../../services/Account";
+import { getListAsync } from "../../../services/CreateLogoApi";
 import { DataContext } from "../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -33,7 +30,11 @@ import {
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
+const ProductsRecalDetails = ({
+  selectedProduct,
+  setShowModal,
+  selectedStore,
+}) => {
   let ruta = getRuta();
 
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -41,18 +42,16 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(selectedProduct.description);
-
   const [barCode, setBarCode] = useState(selectedProduct.barCode);
   const [marca, setMarca] = useState(selectedProduct.marca);
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [uM, setUM] = useState(selectedProduct.um);
-
   const [tipoNegocio, setTipoNegocio] = useState([]);
   const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(
-    selectedProduct.tipoNegocio.id
+    selectedProduct?.tipoNegocio?.id
   );
   const [catalogo, setCatalogo] = useState([]);
-const [selectedCatalogo, setSelectedCatalogo] = useState('');
+  const [selectedCatalogo, setSelectedCatalogo] = useState("");
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(
     selectedProduct.familia ? selectedProduct.familia.id : ""
@@ -87,6 +86,34 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
         return;
       }
       setTipoNegocio(resultTipoNegocio.data);
+      const data = {
+        operacion: 2,
+      };
+
+      const resultList = await getListAsync(token, data);
+      if (!resultList.statusResponse) {
+        setIsLoading(false);
+        if (resultList.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultList.error.message);
+        return;
+      }
+
+      if (resultList.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultList.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+      setCatalogo(resultList.data);
 
       const result = await getFamiliasByTNAsync(
         token,
@@ -119,57 +146,72 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
     })();
   }, []);
 
-  const saveChangesAsync = async () => {
+  const savesChangesAsync = async () => {
+    
     const data = {
-      id: selectedProduct.id,
-      porcentaje: selectedCatalogo,     
+       id: selectedProduct.id,
+      // tipoNegocioId: selectedTipoNegocio,
+      // familiaId: selectedFamilia,
+      // description: description,
+      // barCode: barCode,
+      // marca: marca === "" ? "S/M" : marca,
+      // modelo: modelo === "" ? "S/M" : modelo,
+      // uM: uM,
+    storeId: selectedStore?.id ?? 0, 
+      porcentaje: selectedCatalogo,
     };
-
-    if (selectedTipoNegocio === "" || selectedTipoNegocio === 0) {
-      toastError("Seleccione un tipo de negocio...");
-      return;
-    }
-
-    if (selectedFamilia === "" || selectedFamilia === 0) {
-      toastError("Seleccione una familia...");
-      return;
-    }
-
-    if (description === "") {
-      toastError("Ingrese una descripcion...");
-      return;
-    }
-    setIsLoading(true);
-    const result = await updateProductrecallAsync(token, data);
-    if (!result.statusResponse) {
-      setIsLoading(false);
-      if (result.error.request.status === 401) {
-        navigate(`${ruta}/unauthorized`);
+  
+    try {
+      if (selectedTipoNegocio === "" || selectedTipoNegocio === 0) {
+        toastError("Seleccione un tipo de negocio...");
         return;
       }
-      toastError(result.error.message);
-      return;
-    }
-
-    if (result.data === "eX01") {
+  
+      if (selectedFamilia === "" || selectedFamilia === 0) {
+        toastError("Seleccione una familia...");
+        return;
+      }
+  
+      if (description.trim() === "") {
+        toastError("Ingrese una descripcion...");
+        return;
+      }
+  
+      setIsLoading(true);
+      const result = await updateProductrecallAsync(token, data);
+        if (!result.statusResponse) {
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+  
+      if (result.data === "eX01") {
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+  
+      if (result.data.isDefaultPass) {
+        setIsDefaultPass(true);
+        return;
+      }
+  
+      toastSuccess("Producto Actualizado...!");
+      setReload(!reload);
+      setIsEdit(false);
+      setShowModal(false);
+    } catch (error) {
+      toastError("Ocurrió un error al actualizar el producto.");
+      console.error("Error en savesChangesAsync:", error);
+    } finally {
       setIsLoading(false);
-      deleteUserData();
-      deleteToken();
-      setIsLogged(false);
-      return;
     }
-
-    if (result.data.isDefaultPass) {
-      setIsLoading(false);
-      setIsDefaultPass(true);
-      return;
-    }
-    setIsLoading(true);
-    setReload(!reload);
-    toastSuccess("Producto Actualizado...!");
-    setIsEdit(false);
-    setShowModal(false);
   };
+  
 
   const handleChangeTN = async (value) => {
     setFamilia([]);
@@ -178,6 +220,7 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
 
     if (value !== "") {
       setIsLoading(true);
+
       const result = await getFamiliasByTNAsync(token, value);
       if (!result.statusResponse) {
         setIsLoading(false);
@@ -369,7 +412,7 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
             style={{ marginTop: 20 }}
             required
             disabled={!isEdit}
-            >
+          >
             <InputLabel id="catalogo-select-label">
               Seleccione un item del catálogo
             </InputLabel>
@@ -386,13 +429,13 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
               </MenuItem>
               {catalogo.map((item) => {
                 return (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.description}
+                  <MenuItem key={item.id} value={item.valor}>
+                    {item.valor} % 
                   </MenuItem>
                 );
               })}
             </Select>
-            </FormControl>
+          </FormControl>
 
           <div
             style={{
@@ -427,7 +470,7 @@ const [selectedCatalogo, setSelectedCatalogo] = useState('');
               variant="outlined"
               style={{ borderRadius: 20, marginLeft: 10 }}
               startIcon={<FontAwesomeIcon icon={faSave} />}
-              onClick={() => saveChangesAsync()}
+              onClick={() => savesChangesAsync()}
               disabled={!isEdit}
             >
               Actualizar Producto

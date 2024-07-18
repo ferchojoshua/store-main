@@ -9,10 +9,10 @@ const Footer = () => {
         padding: '3px 0',
         background: '#0d47a1',
         borderRadius: '0 0 10px 10px',
-        width: '100%', // Ocupa el ancho completo del contenedor
-        position: 'fixed', // Posición fija para mantenerlo en la parte inferior
-        bottom: 0, // Lo fija en la parte inferior de la ventana
-        zIndex: 100, // Asegura que el footer esté sobre otros elementos
+        width: '100%', 
+        position: 'fixed', 
+        bottom: 0, 
+        zIndex: 100, 
       }}
     >
       <Typography

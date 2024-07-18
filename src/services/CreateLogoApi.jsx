@@ -1,77 +1,197 @@
 import axios from "axios";
 const { REACT_APP_PRODURL, REACT_APP_URL } = process.env;
 
-let baseURL = "";
+let controller = "";
 if (process.env.NODE_ENV === "production") {
-  baseURL = `${REACT_APP_PRODURL}CreateLogo/`;
+  controller = `${REACT_APP_PRODURL}CreateLogo/`;
 } else {
-  baseURL = `${REACT_APP_URL}CreateLogo/`;
+  controller = `${REACT_APP_URL}CreateLogo/`;
 }
 
 export const CreateLogoAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}CreateLogo`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    const resp = await axios.post(baseURL, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json', // Agregar el tipo de contenido si es necesario.............
-      },
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
     });
-
-    if (resp.status >= 200 && resp.status < 300) {
-      result.data = resp.data;
-    } else {
-      result.statusResponse = false;
-      result.error = resp.statusText;
-    }
   } catch (error) {
     result.statusResponse = false;
-    result.error = error.message;
+    result.error = error;
   }
+
   return result;
 };
 
 export const getLogoByStoreIdAsync = async (token, storeId) => {
   const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}CreateLogo`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   try {
-    const resp = await axios.get(`${baseURL}${storeId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    await authAxios.post(service, storeId).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
     });
-
-    if (resp.status === 200) {
-      result.data = resp.data;
-    } else {
-      result.statusResponse = false;
-      result.error = resp.statusText;
-    }
   } catch (error) {
     result.statusResponse = false;
-    result.error = error.message;
+    result.error = error;
   }
+
+  return result;
+};
+
+export const updateLogoAsync = async (token, storeId) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}CreateLogo`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, storeId).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+
   return result;
 };
 
 
-export const updateLogoAsync = async (token, storeId) => {
-  const result = { statusResponse: true, data: [], error: null };
-  try {
-    const resp = await axios.get(`${baseURL}${storeId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  export const AjustesAsync = async (token, data) => {
+    const result = {statusResponse: true, data: [], error: null};
+    let service = `${controller}AjustesAdd`;
+    const authAxios = axios.create({
+      baseURL: service,
+      headers: { Authorization: `Bearer ${token}`,
       },
     });
-
-    if (resp.status === 200) {
-      result.data = resp.data;
-    } else {
+    try {
+      await authAxios.post(service, data).then((resp) => {
+        if (resp.status <= 200 && resp.status >= 300) {
+          result.statusResponse = false;
+          result.error = resp.title;
+        } else {
+          result.statusResponse = true;
+          result.data = resp.data;
+        }
+      });
+    } catch (error) {
       result.statusResponse = false;
-      result.error = resp.statusText;
+      result.error = error;
     }
+  
+    return result;
+  };
+
+
+  export const AjustesUpdateAsync = async (token, data) => {
+    const result = {statusResponse: true, data: [], error: null};
+    let service = `${controller}AjustesUpdate`;
+    const authAxios = axios.create({
+      baseURL: service,
+      headers: { Authorization: `Bearer ${token}`,
+      },
+    });
+    try {
+      await authAxios.post(service, data).then((resp) => {
+        if (resp.status <= 200 && resp.status >= 300) {
+          result.statusResponse = false;
+          result.error = resp.title;
+        } else {
+          result.statusResponse = true;
+          result.data = resp.data;
+        }
+      });
+    } catch (error) {
+      result.statusResponse = false;
+      result.error = error;
+    }
+  
+    return result;
+  };
+
+
+   export const getListAsync = async (token, data) => {
+   const result = { statusResponse: true, data: [], error: null };
+   let service = `${controller}AjustesGetList`;
+     const authAxios = axios.create({
+       baseURL: service,
+      headers: {
+        Authorization: `Bearer ${token}`,
+       },
+    });
+    try {
+       await authAxios.post(service, data).then((resp) => {
+         if (resp.status <= 200 && resp.status >= 299) {
+           result.statusResponse = false;
+           result.error = resp.title;
+         } else {
+           result.statusResponse = true;
+           result.data = resp.data;
+         }
+      });
+     } catch (error) {
+       result.statusResponse = false;
+       result.error = error;
+     }
+  
+     return result;
+   };
+
+
+export const deleteConfigAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  const authAxios = axios.create({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.delete(id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
   } catch (error) {
     result.statusResponse = false;
-    result.error = error.message;
+    result.error = error;
   }
   return result;
 };
