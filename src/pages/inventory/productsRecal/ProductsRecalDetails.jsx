@@ -8,6 +8,8 @@ import {
   MenuItem,
   FormControl,
   Paper,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -29,11 +31,12 @@ import {
   faPenToSquare,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
+import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 
 const ProductsRecalDetails = ({
   selectedProduct,
   setShowModal,
-  selectedStore,
+  // selectedStore,
 }) => {
   let ruta = getRuta();
 
@@ -47,15 +50,16 @@ const ProductsRecalDetails = ({
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [uM, setUM] = useState(selectedProduct.um);
   const [tipoNegocio, setTipoNegocio] = useState([]);
-  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(
-    selectedProduct?.tipoNegocio?.id
-  );
+  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(selectedProduct?.tipoNegocio?.id );
+  const [storeList, setStoreList] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("t");
   const [catalogo, setCatalogo] = useState([]);
   const [selectedCatalogo, setSelectedCatalogo] = useState("");
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(
-    selectedProduct.familia ? selectedProduct.familia.id : ""
-  );
+    selectedProduct.familia ? selectedProduct.familia.id : "" );
+    const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
+    const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
 
   const token = getToken();
 
@@ -89,6 +93,36 @@ const ProductsRecalDetails = ({
       const data = {
         operacion: 2,
       };
+
+      const resultStore = await getStoresByUserAsync(token);
+      if (!resultStore.statusResponse) {
+        setIsLoading(false);
+        if (resultStore.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(resultStore.error.message);
+        return;
+      }
+
+      if (resultStore.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+
+      if (resultStore.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+
+      setStoreList(resultStore.data);
+      if (resultStore.data.length < 4) {
+        setSelectedStore(resultStore.data[0].id);
+      }
 
       const resultList = await getListAsync(token, data);
       if (!resultList.statusResponse) {
@@ -159,6 +193,8 @@ const ProductsRecalDetails = ({
       // uM: uM,
     storeId: selectedStore?.id ?? 0, 
       porcentaje: selectedCatalogo,
+      actualizarVentaDetalle,
+      actualizarVentaMayor,
     };
   
     try {
@@ -407,35 +443,107 @@ const ProductsRecalDetails = ({
             </Select>
           </FormControl>
           <FormControl
-            variant="standard"
-            fullWidth
-            style={{ marginTop: 20 }}
-            required
-            disabled={!isEdit}
-          >
-            <InputLabel id="catalogo-select-label">
-              Seleccione un item del catálogo
-            </InputLabel>
-            <Select
-              labelId="catalogo-select-label"
-              id="catalogo-select"
-              value={selectedCatalogo}
-              onChange={(e) => setSelectedCatalogo(e.target.value)}
-              label="Catálogo"
-              style={{ textAlign: "left" }}
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20 }}
+                disabled={!isEdit}
             >
-              <MenuItem key={0} value="">
-                <em>Seleccione un item del catálogo</em>
-              </MenuItem>
-              {catalogo.map((item) => {
-                return (
-                  <MenuItem key={item.id} value={item.valor}>
-                    {item.valor} % 
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacen
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedStore}
+                onChange={(e) => setSelectedStore(e.target.value)}
+                label="Almacen"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un Almacen</em>
+                </MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem
+                  key={"t"}
+                  value={"t"}
+                  disabled={
+                    storeList.length <=  6 || storeList.length <=  5 || storeList.length <=  4 || storeList.length <=  3 || storeList.length <=  2 || storeList.length <= 1
+                          ? false
+                          : true
+                      }
+                >
+                  Todos...
+                </MenuItem>
+              </Select>
+            </FormControl>
+                      
+            <FormControl
+  variant="standard"
+  fullWidth
+  style={{ marginTop: 20 }}
+  required
+  disabled={!isEdit}
+>
+  <InputLabel id="catalogo-select-label">
+    Seleccione un item del catálogo
+  </InputLabel>
+  <Select
+    labelId="catalogo-select-label"
+    id="catalogo-select"
+    value={selectedCatalogo}
+    onChange={(e) => setSelectedCatalogo(e.target.value)}
+    label="Catálogo"
+    style={{ textAlign: "left" }}
+  >
+    <MenuItem key={0} value="">
+      <em>Seleccione un item del catálogo</em>
+    </MenuItem>
+    {catalogo.map((item) => {
+      // Filtrar solo los elementos con estado activo (estado === true)
+      if (item.estado) {
+        return (
+          <MenuItem key={item.id} value={item.valor}>
+            {item.valor} %
+          </MenuItem>
+        );
+      }
+      return null; // Si el estado no es activo, no renderizar el MenuItem
+    })}
+  </Select>
+</FormControl>
+
+
+          
+          {/* Agregar Checkboxes */}
+          <div style={{ marginTop: 20 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={actualizarVentaDetalle}
+                  onChange={(e) => setActualizarVentaDetalle(e.target.checked)}
+                  disabled={!isEdit}
+                />
+              }
+              label="Actualizar Venta Detalle"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={actualizarVentaMayor}
+                  onChange={(e) => setActualizarVentaMayor(e.target.checked)}
+                  disabled={!isEdit}
+                />
+              }
+              label="Actualizar Venta Mayor"
+            />
+          </div>
 
           <div
             style={{

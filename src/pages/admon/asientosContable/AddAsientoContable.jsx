@@ -357,145 +357,36 @@ export const AddAsientoContable = ({ setShowModal }) => {
             />
           </Grid>
           <Grid item xs={3}>
-           {/* Combo de Almacén */}
-<FormControl
-  variant="standard"
-  fullWidth
-  style={{
-    textAlign: "left",
-    marginRight: 20,
-    width: "calc(33.33% - 24px)", // Mismo tamaño que el código proporcionado
-    display: isAlmacenSelected && isMasivoSelected ? "block" : "none",
-  }}
->
-  <InputLabel id="demo-simple-select-standard-label">
-    Seleccione un Almacen
-  </InputLabel>
-  <Select
-    defaultValue=""
-    labelId="demo-simple-select-standard-label"
-    id="demo-simple-select-standard"
-    value={selectedStore || ""}
-    onChange={(e) => {
-      setSelectedStore(e.target.value);
-      setIsAlmacenSelected(true);
-    }}
-    label="Almacen"
-    style={{ textAlign: "left" }}
-  >
-    <MenuItem key={-1} value="">
-      <em> Seleccione un Almacen</em>
-    </MenuItem>
-    {storeList.map((item) => {
-      return (
-        <MenuItem key={item.id} value={item.id}>
-          {item.name}
-        </MenuItem>
-      );
-    })}
-    <MenuItem
-      key={"t"}
-      value={"t"}
-      disabled={
-        storeList.length > 6 ||
-        storeList.length > 5 ||
-        storeList.length > 4 ||
-        storeList.length > 3 ||
-        storeList.length > 2
-          ? false
-          : true
-      }
-    >
-      Todos...
-    </MenuItem>
-  </Select>
-</FormControl>
-
-{/* Combo de Tipo de Negocio */}
-<FormControl
-  variant="standard"
-  fullWidth
-  style={{
-    textAlign: "left",
-    marginRight: 20,
-    width: "calc(33.33% - 24px)", // Mismo tamaño que el código proporcionado
-    display: isAlmacenSelected && isMasivoSelected ? "block" : "none",
-  }}
->
-  <InputLabel id="demo-simple-select-standard-label">
-    Seleccione un Tipo de Negocio
-  </InputLabel>
-  <Select
-    defaultValue=""
-    labelId="demo-simple-select-standard-label"
-    id="demo-simple-select-standard"
-    value={selectedTNegocio}
-    onChange={(e) => onChangeTN(e.target.value)}
-    label="Tipo de Negocio"
-    style={{ textAlign: "left" }}
-    disabled={!isAlmacenSelected}
-  >
-    <MenuItem key={-1} value="">
-      <em> Seleccione un Tipo de Negocio</em>
-    </MenuItem>
-    {tNegocioList.map((item) => {
-      return (
-        <MenuItem key={item.id} value={item.id}>
-          {item.description}
-        </MenuItem>
-      );
-    })}
-    <MenuItem key={"t"} value={"t"}>
-      Todos...
-    </MenuItem>
-  </Select>
-</FormControl>
-
-{/* Combo de Familia */}
-<FormControl
-  variant="standard"
-  fullWidth
-  style={{
-    textAlign: "left",
-    marginRight: 20,
-    width: "calc(33.33% - 24px)", // Mismo tamaño que el código proporcionado
-    display: isAlmacenSelected && isMasivoSelected ? "block" : "none",
-  }}
->
-  <InputLabel id="demo-simple-select-standard-label">
-    Seleccione una Familia
-  </InputLabel>
-  <Select
-    defaultValue=""
-    labelId="demo-simple-select-standard-label"
-    id="demo-simple-select-standard"
-    value={selectedFamilia}
-    onChange={(e) => {
-      if (e.target.value.length === 0) {
-        setSelectedFamilia("t");
-        return;
-      }
-      setSelectedFamilia(e.target.value);
-    }}
-    style={{ textAlign: "left" }}
-    disabled={!isAlmacenSelected}
-  >
-    <MenuItem key={-1} value="">
-      <em> Seleccione una Familia</em>
-    </MenuItem>
-    {familiaList.map((item) => {
-      return (
-        <MenuItem key={item.id} value={item.id}>
-          {item.description}
-        </MenuItem>
-      );
-    })}
-    <MenuItem key={"t"} value={"t"}>
-      Todos...
-    </MenuItem>
-  </Select>
-</FormControl>
-
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{ marginRight: 20 }}
+              required
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacen
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedStore}
+                onChange={(e) => setSelectedStore(e.target.value)}
+                label="Almacen"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un Almacen</em>
+                </MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.almacen.id} value={item.almacen.id}>
+                      {item.almacen.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={4}>
             <FormControl

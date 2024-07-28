@@ -66,10 +66,23 @@ export function validateCedula(cedula) {
   return re.test(cedula);
 }
 
+// export function isAccess(access, permiso) {
+//   let result = find(access, { description: permiso }, "isEnable");
+//   return result.isEnable;
+// } Esta es la Version pr defaul 18-07-2024
+
 export function isAccess(access, permiso) {
-  let result = find(access, { description: permiso }, "isEnable");
+  if (!access || !Array.isArray(access) || access.length === 0) {
+    return false; 
+    }
+
+  const result = access.find(item => item.description === permiso);
+   if (!result || !result.isEnable) {
+    return false;
+  }
   return result.isEnable;
 }
+
 
 export const getUserLocation = async () => {
   return new Promise((resolve, reject) => {
