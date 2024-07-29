@@ -11,7 +11,10 @@ import {
   toastError,
   toastSuccess,
 } from "../../../helpers/Helpers";
-import { updateProductrecallAsync, getProductsListMAsync } from "../../../services/ProductsApi";
+import {
+  updateProductrecallAsync,
+  getProductsListMAsync,
+} from "../../../services/ProductsApi";
 import {
   getFamiliasByTNAsync,
   getTipoNegocioAsync,
@@ -81,8 +84,6 @@ const ProductsRecal = () => {
     }
   });
 
-
-
   // Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsperPage] = useState(10);
@@ -115,20 +116,17 @@ const ProductsRecal = () => {
   const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
   const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
-const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
 
-
-
-
-
-  useEffect(() => { (async () => {
+  useEffect(() => {
+    (async () => {
       setIsLoading(true);
 
       const dato = {
-        storeId: parseInt(selectedStore, 10) || 0, 
+        storeId: parseInt(selectedStore, 10) || 0,
         tipoNegocio: parseInt(selectedTNegocio, 10) || 0,
         familia: parseInt(selectedFamilia, 10) || 0,
-  };
+      };
 
       const productResult = await getProductsListMAsync(token, dato); // Asegúrate de que getProductsAsync esté definido
       if (!productResult.statusResponse) {
@@ -243,7 +241,18 @@ const [selectedWarehouse, setSelectedWarehouse] = useState("");
       setTNegocioList(result.data);
       setIsLoading(false);
     })();
-  }, [reload, selectedStore, selectedTNegocio,navigate,selectedFamilia, token, ruta, setIsLoading, setIsDefaultPass, setIsLogged]);
+  }, [
+    reload,
+    selectedStore,
+    selectedTNegocio,
+    navigate,
+    selectedFamilia,
+    token,
+    ruta,
+    setIsLoading,
+    setIsDefaultPass,
+    setIsLogged,
+  ]);
   // }, [reload]);
 
   // const onChangeAlmacen = (value) => {
@@ -252,20 +261,19 @@ const [selectedWarehouse, setSelectedWarehouse] = useState("");
   // };
 
   const onChangeAlmacen = async (value) => {
-setSelectedStore(value);
-setIsTNEnabled(true); // Habilitar el combo de Tipo de Negocio
+    setSelectedStore(value);
+    setIsTNEnabled(true); // Habilitar el combo de Tipo de Negocio
 
-// Si no se seleccionó ningún almacén, mostrar todos los productos
-if (value === "") {
-  setFilteredProducts(productList);
-  return;
-}
+    // Si no se seleccionó ningún almacén, mostrar todos los productos
+    if (value === "") {
+      setFilteredProducts(productList);
+      return;
+    }
 
-// Filtrar productos por almacén seleccionado
-const filtered = productList.filter((product) => product.storeId === value);
-setFilteredProducts(filtered);
-};
-
+    // Filtrar productos por almacén seleccionado
+    const filtered = productList.filter((product) => product.storeId === value);
+    setFilteredProducts(filtered);
+  };
 
   const onChangeSearch = (val) => {
     setCurrentPage(1);
@@ -324,17 +332,17 @@ setFilteredProducts(filtered);
       toastError("No catalog selected.");
       return;
     }
-  
+
     if (productList.length === 0) {
       toastError("No products available to update.");
       return;
     }
-  
+
     try {
       setIsLoading(true);
       const storeId = selectedStore ?? 0;
       let successCount = 0;
-  
+
       for (const product of productList) {
         const data = {
           id: product.id,
@@ -343,10 +351,10 @@ setFilteredProducts(filtered);
           actualizarVentaDetalle,
           actualizarVentaMayor,
         };
-  
+
         try {
           const result = await updateProductrecallAsync(token, data);
-  
+
           if (!result.statusResponse) {
             if (result.error.request.status === 401) {
               navigate(`${ruta}/unauthorized`);
@@ -355,29 +363,35 @@ setFilteredProducts(filtered);
             toastError(result.error.message);
             continue;
           }
-  
+
           if (result.data === "eX01") {
             deleteUserData();
             deleteToken();
             setIsLogged(false);
             return;
           }
-  
+
           if (result.data.isDefaultPass) {
             setIsDefaultPass(true);
             return;
           }
-  
+
           successCount++; // Incrementar el contador de productos actualizados exitosamente
         } catch (error) {
           console.error(`Error updating product with ID ${product.id}:`, error);
-          toastError(`There was an error updating product with ID ${product.id}.`);
+          toastError(
+            `There was an error updating product with ID ${product.id}.`
+          );
           continue;
         }
       }
-  
+
       setReload(!reload);
-      MySwal.fire("Success", `${successCount} products have been updated.`, "success"); // Mostrar el total de productos actualizados
+      MySwal.fire(
+        "Success",
+        `${successCount} products have been updated.`,
+        "success"
+      ); // Mostrar el total de productos actualizados
     } catch (error) {
       console.error("Error updating products:", error);
       toastError("There was an error updating the products.");
@@ -385,252 +399,261 @@ setFilteredProducts(filtered);
       setIsLoading(false);
     }
   };
-  
-  
-  
+
   const record = { id: 0, name: "Todos" };
 
   return (
     <div>
       <h1>Modificar Precio Masivo </h1>
-        <Container>
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{
-              textAlign: "left",
-              width: 250,
-              marginTop: 20,
-            }}
+      <Container>
+        <FormControl
+          variant="standard"
+          fullWidth
+          style={{
+            textAlign: "left",
+            width: 250,
+            marginTop: 20,
+          }}
+        >
+          <FormLabel id="demo-radio-buttons-group-label">
+            Seleccione una opcion
+          </FormLabel>
+          <RadioGroup
+            row
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue="Individual"
+            name="radio-buttons-group"
+            value={selectedradio}
+            onChange={handleChangeRadio}
           >
-            <FormLabel id="demo-radio-buttons-group-label">
-              Seleccione una opcion
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="Individual"
-              name="radio-buttons-group"
-              value={selectedradio}
-              onChange={handleChangeRadio}
+            <FormControlLabel
+              value="Individual"
+              control={<Radio />}
+              label="Individual"
+            />
+            <FormControlLabel
+              value="Masivo"
+              control={<Radio />}
+              label="Masivo"
+            />
+          </RadioGroup>
+        </FormControl>
+
+        {selectedradio === "Individual" || !isMasivoSelected ? (
+          <></>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
+              }}
             >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Almacén
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedStore || ""}
+                onChange={(e) => {
+                  setSelectedStore(e.target.value);
+                  onChangeAlmacen(e.target.value);
+                }}
+                label="Almacén"
+                style={{ textAlign: "left" }}
+              >
+                <MenuItem value="">Seleccione un Almacén</MenuItem>
+                {storeList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem
+                  key={"t"}
+                  value={"t"}
+                  disabled={
+                    storeList.length <= 6 ||
+                    storeList.length <= 5 ||
+                    storeList.length <= 4 ||
+                    storeList.length <= 3 ||
+                    storeList.length <= 2 ||
+                    storeList.length <= 1
+                      ? false
+                      : true
+                  }
+                ></MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
+              }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione un Tipo de Negocio
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedTNegocio || ""}
+                onChange={(e) => onChangeTN(e.target.value)}
+                label="Tipo de Negocio"
+                style={{ textAlign: "left" }}
+                disabled={!isTNEnabled}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione un Tipo de Negocio</em>
+                </MenuItem>
+
+                {tNegocioList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem key={"t"} value={""}>
+                  Todos...
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+                marginRight: 20,
+                display:
+                  isAlmacenSelected && isMasivoSelected ? "block" : "none",
+              }}
+            >
+              <InputLabel id="demo-simple-select-standard-label">
+                Seleccione una Familia
+              </InputLabel>
+              <Select
+                defaultValue=""
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={selectedFamilia || ""}
+                onChange={(e) => {
+                  if (e.target.value.length === 0) {
+                    setSelectedFamilia("");
+                    return;
+                  }
+                  setSelectedFamilia(e.target.value);
+                }}
+                style={{ textAlign: "left" }}
+                disabled={!isFamiliaEnabled}
+              >
+                <MenuItem key={-1} value="">
+                  <em> Seleccione una Familia</em>
+                </MenuItem>
+
+                {familiaList.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.description}
+                    </MenuItem>
+                  );
+                })}
+                <MenuItem key={"t"} value={""}>
+                  Todos...
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{
+                textAlign: "left",
+                width: 250,
+                marginTop: 20,
+              }}
+            >
+              <InputLabel id="catalogo-select-label">Seleccione</InputLabel>
+              <Select
+                labelId="catalogo-select-label"
+                id="catalogo-select"
+                value={selectedCatalogo}
+                onChange={(e) => setSelectedCatalogo(e.target.value)}
+                label="Catálogo"
+              >
+                <MenuItem key={0} value="">
+                  <em>Seleccione un item del catálogo</em>
+                </MenuItem>
+                {catalogo.map((item) => {
+                  return (
+                    <MenuItem key={item.id} value={item.valor}>
+                      {item.valor}%
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+
+            {/* Agregar Checkboxes */}
+            <div style={{ marginTop: 20 }}>
               <FormControlLabel
-                value="Individual"
-                control={<Radio />}
-                label="Individual"
+                control={
+                  <Checkbox
+                    checked={actualizarVentaDetalle}
+                    onChange={(e) =>
+                      setActualizarVentaDetalle(e.target.checked)
+                    }
+                    // disabled={!isEdit}
+                  />
+                }
+                label="Actualizar Venta Detalle"
               />
               <FormControlLabel
-                value="Masivo"
-                control={<Radio />}
-                label="Masivo"
+                control={
+                  <Checkbox
+                    checked={actualizarVentaMayor}
+                    onChange={(e) => setActualizarVentaMayor(e.target.checked)}
+                    // disabled={!isEdit}
+                  />
+                }
+                label="Actualizar Venta Mayor"
               />
-            </RadioGroup>
-          </FormControl>
-
-          {selectedradio === "Individual" || !isMasivoSelected ? (
-            <></>
-          ) : (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <FormControl
-                variant="standard"
-                fullWidth
-                style={{
-                  textAlign: "left",
-                  width: 250,
-                  marginTop: 20,
-                  marginRight: 20,
-                  display:
-                    isAlmacenSelected && isMasivoSelected ? "block" : "none",
-                }}
-              >
-                <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione un Almacén
-                </InputLabel>
-                <Select
-                  defaultValue=""
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={selectedStore || ""}
-                  onChange={(e) => {
-                    setSelectedStore(e.target.value);
-                    onChangeAlmacen(e.target.value);
-                  }}
-                  label="Almacén"
-                  style={{ textAlign: "left" }}
-                >
-                  <MenuItem value="">Seleccione un Almacén</MenuItem>
-                  {storeList.map((item) => {
-                    return (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    );
-                  })}
-                  <MenuItem
-                    key={"t"}
-                    value={"t"}
-                    disabled={
-                      storeList.length <= 6 ||
-                      storeList.length <= 5 ||
-                      storeList.length <= 4 ||
-                      storeList.length <= 3 ||
-                      storeList.length <= 2 ||
-                      storeList.length <= 1
-                        ? false
-                        : true
-                    }
-                  ></MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl
-                variant="standard"
-                fullWidth
-                style={{
-                  textAlign: "left",
-                  width: 250,
-                  marginTop: 20,
-                  marginRight: 20,
-                  display:
-                    isAlmacenSelected && isMasivoSelected ? "block" : "none",
-                }}
-              >
-                <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione un Tipo de Negocio
-                </InputLabel>
-                <Select
-                  defaultValue=""
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={selectedTNegocio || ""}
-                  onChange={(e) => onChangeTN(e.target.value)}
-                  label="Tipo de Negocio"
-                  style={{ textAlign: "left" }}
-                  disabled={!isTNEnabled}
-                >
-                  <MenuItem key={-1} value="">
-                    <em> Seleccione un Tipo de Negocio</em>
-                  </MenuItem>
-
-                  {tNegocioList.map((item) => {
-                    return (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.description}
-                      </MenuItem>
-                    );
-                  })}
-                  <MenuItem key={"t"} value={""}>
-                    Todos...
-                  </MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl
-                variant="standard"
-                fullWidth
-                style={{
-                  textAlign: "left",
-                  width: 250,
-                  marginTop: 20,
-                  marginRight: 20,
-                  display:
-                    isAlmacenSelected && isMasivoSelected ? "block" : "none",
-                }}
-              >
-                <InputLabel id="demo-simple-select-standard-label">
-                  Seleccione una Familia
-                </InputLabel>
-                <Select
-                  defaultValue=""
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={selectedFamilia || ""}
-                  onChange={(e) => {
-                    if (e.target.value.length === 0) {
-                      setSelectedFamilia("");
-                      return;
-                    }
-                    setSelectedFamilia(e.target.value);
-                  }}
-                  style={{ textAlign: "left" }}
-                  disabled={!isFamiliaEnabled}
-                >
-                  <MenuItem key={-1} value="">
-                    <em> Seleccione una Familia</em>
-                  </MenuItem> 
-
-                  {familiaList.map((item) => {
-                    return (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.description}
-                      </MenuItem>
-                    );
-                  })}
-                  <MenuItem key={"t"} value={""}>
-                    Todos...
-                  </MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl
-                variant="standard"
-                fullWidth
-                style={{
-                  textAlign: "left",
-                  width: 250,
-                  marginTop: 20,
-                }}
-              >
-                <InputLabel id="catalogo-select-label">Seleccione</InputLabel>
-                <Select
-                  labelId="catalogo-select-label"
-                  id="catalogo-select"
-                  value={selectedCatalogo}
-                  onChange={(e) => setSelectedCatalogo(e.target.value)}
-                  label="Catálogo"
-                >
-                  <MenuItem key={0} value="">
-                    <em>Seleccione un item del catálogo</em>
-                  </MenuItem>
-                  {catalogo.map((item) => {
-                    return (
-                      <MenuItem key={item.id} value={item.valor}>
-                        {item.valor}%
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-
-                
-          {/* Agregar Checkboxes */}
-          <div style={{ marginTop: 20 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={actualizarVentaDetalle}
-                  onChange={(e) => setActualizarVentaDetalle(e.target.checked)}
-                  // disabled={!isEdit}
-                />
-              }
-              label="Actualizar Venta Detalle"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={actualizarVentaMayor}
-                  onChange={(e) => setActualizarVentaMayor(e.target.checked)}
-                  // disabled={!isEdit}
-                />
-              }
-              label="Actualizar Venta Mayor"
-            />
-          </div>
-
             </div>
-          )}
+          </div>
+        )}
 
-          <hr />
+        <hr />
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h1>Lista de Productos</h1>
 
           <div
             style={{
@@ -638,22 +661,11 @@ setFilteredProducts(filtered);
               flexDirection: "row",
               alignContent: "center",
               justifyContent: "space-between",
-              alignItems: "center",
             }}
           >
-            <h1>Lista de Productos</h1>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <></>
-              {isAccess(access, "MISCELANEOS UPDATE") ? (
-                <Button
+            <></>
+            {isAccess(access, "MISCELANEOS UPDATE") ? (
+              <Button
                 variant="outlined"
                 style={{
                   borderRadius: 20,
@@ -664,11 +676,12 @@ setFilteredProducts(filtered);
                 startIcon={
                   <FontAwesomeIcon
                     icon={faBoxesPacking}
-                    style={{color: "#ff5722",}}
+                    style={{ color: "#ff5722" }}
                   />
                 }
                 onClick={() => {
-                  if (!selectedCatalogo) {toastError("Please select a catalog before updating.");
+                  if (!selectedCatalogo) {
+                    toastError("Please select a catalog before updating.");
                     return;
                   }
                   updateAllProducts(selectedCatalogo);
@@ -676,121 +689,113 @@ setFilteredProducts(filtered);
               >
                 Actualización Masiva
               </Button>
-
-              ) : (
-                <></>
-              )}
-            </div>
+            ) : (
+              <></>
+            )}
           </div>
+        </div>
 
-          <hr />
+        <hr />
 
-          {selectedradio === "Individual" && (
-            <TextField
-              style={{ marginBottom: 20, maxWidth: 600 }}
-              fullWidth
-              variant="standard"
-              onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
-              value={searchTerm}
-              label={"Modificar Precio Masivo"}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        style={{ color: "#1769aa" }}
-                      />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          )}
-
-          {isEmpty(withSearch) ? (
-            <NoData />
-          ) : (
-            <Table
-              hover={!isDarkMode}
-              size="sm"
-              responsive
-              className="text-primary"
-            >
-              <thead>
-                <tr>
-                 <th style={{ textAlign: "center" }}>Producto</th>
-                  <th style={{ textAlign: "center" }}>T. Negocio</th>
-                  <th style={{ textAlign: "left" }}>Familia</th>
-                  <th style={{ textAlign: "left" }}>Descripcion</th>
-     
-                  <th style={{ textAlign: "left" }}>Marca</th>
-                  <th style={{ textAlign: "left" }}>Modelo</th>
-                  <th style={{ textAlign: "left" }}>U/M</th>
-                  <th style={{ textAlign: "right" }}>PVD</th>
-                  <th style={{ textAlign: "right" }}>PVM</th>
-                  {isAccess(access, "PRODUCTS UPDATE") ||
-                  isAccess(access, "PRODUCTS DELETE") ? (
-                    <th>Acciones</th>
-                  ) : (
-                    <></>
-                  )}
-                </tr>
-              </thead>
-              <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                {currentItem.map((item) => {
-                  const isSelected = selectedProducts.includes(item.id);
-                  return (
-                    <tr key={item.id}>
-                      <td>{item.idProducto}</td>
-                      <td style={{ textAlign: "left" }}>{item.tipoNegocio}</td>
-                      <td style={{ textAlign: "left" }}>{item.familia}</td>
-                      <td style={{ textAlign: "left" }}>{item.description}</td>
-                      <td style={{ textAlign: "left" }}>{item.almacen}</td>                       
-                      <td style={{ textAlign: "left" }}>{item.marca}</td>
-                      <td style={{ textAlign: "left" }}>{item.modelo}</td>
-                      <td style={{ textAlign: "left" }}>{item.um}</td>
-                      <td style={{ textAlign: "left" }}>{item.pvd}</td>
-                      <td style={{ textAlign: "left" }}>{item.pvm}</td>
-                      <td>
-                        <Stack spacing={1} direction="row">
-                          {isAccess(access, "PRODUCTS UPDATE") ? (
-                            <IconButton
-                              style={{ color: "#009688" }}
-                              onClick={() => {
-                                setSelectedProduct(item);
-                                setShowEditModal(true);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faExternalLinkAlt} />
-                            </IconButton>
-                          ) : (
-                            <></>
-                          )}
-                        </Stack>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          )}
-          <PaginationComponent
-            data={withSearch}
-            paginate={paginate}
-            itemsperPage={itemsperPage}
+        {selectedradio === "Individual" && (
+          <TextField
+            style={{ marginBottom: 20, maxWidth: 600 }}
+            fullWidth
+            variant="standard"
+            onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
+            value={searchTerm}
+            label={"Modificar Precio Masivo"}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      style={{ color: "#1769aa" }}
+                    />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
-        </Container>
+        )}
 
-      <MediumModal
-        titulo={"Agregar Producto"}
-        isVisible={showModal}
-        setVisible={setShowModal}
-      >
-        {/* <Productsadd setShowModal={setShowModal} /> */}
-      </MediumModal>
+        {isEmpty(withSearch) ? (
+          <NoData />
+        ) : (
+          <Table
+            hover={!isDarkMode}
+            size="sm"
+            responsive
+            className="text-primary"
+          >
+            <thead>
+              <tr>
+                <th style={{ textAlign: "center" }}>Producto</th>
+                <th style={{ textAlign: "center" }}>Almacen</th>
+                <th style={{ textAlign: "center" }}>T. Negocio</th>
+                <th style={{ textAlign: "left" }}>Familia</th>
+                <th style={{ textAlign: "left" }}>Descripcion</th>
+                <th style={{ textAlign: "left" }}>Marca</th>
+                <th style={{ textAlign: "left" }}>Modelo</th>
+                <th style={{ textAlign: "left" }}>U/M</th>
+                <th style={{ textAlign: "right" }}>PVD</th>
+                <th style={{ textAlign: "right" }}>PVM</th>
+                {isAccess(access, "PRODUCTS UPDATE") ||
+                isAccess(access, "PRODUCTS DELETE") ? (
+                  <th>Acciones</th>
+                ) : (
+                  <></>
+                )}
+              </tr>
+            </thead>
+            <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+              {currentItem.map((item) => { const isSelected = selectedProducts.includes(item.id); 
+                   return (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td style={{ textAlign: "left" }}>{item.almacen}</td>
+                    <td style={{ textAlign: "left" }}>{item.tipoNegocio}</td>
+                    <td style={{ textAlign: "left" }}>{item.familia}</td>
+                    <td style={{ textAlign: "left" }}>{item.description}</td>            
+                    <td style={{ textAlign: "left" }}>{item.marca}</td>
+                    <td style={{ textAlign: "left" }}>{item.modelo}</td>
+                    <td style={{ textAlign: "left" }}>{item.um}</td>
+                    <td style={{ textAlign: "left" }}>{item.pvd}</td>
+                    <td style={{ textAlign: "left" }}>{item.pvm}</td>
+                    <td style={{ textAlign: "left", display: "none" }}>{item.aid}</td>
+                    <td style={{ textAlign: "left", display: "none" }}>{item.tnId}</td>
+                    <td style={{ textAlign: "left", display: "none" }}>{item.fid}</td>
+                    
+                    <td>
+                      <Stack spacing={1} direction="row">
+                        {isAccess(access, "PRODUCTS UPDATE") ? (
+                          <IconButton
+                            style={{ color: "#009688" }}
+                            onClick={() => { setSelectedProduct(item);
+                                            setShowEditModal(true);
+                            }}                 >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
+                      </Stack>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        )}
+        <PaginationComponent
+          data={withSearch}
+          paginate={paginate}
+          itemsperPage={itemsperPage}
+        />
+      </Container>
 
-      <MediumModal
+       <MediumModal
         titulo={`Editar: ${selectedProduct.description}`}
         isVisible={showEditModal}
         setVisible={setShowEditModal}
@@ -799,15 +804,10 @@ setFilteredProducts(filtered);
           selectedProduct={selectedProduct}
           setShowModal={setShowEditModal}
         />
-      </MediumModal>
+        
 
-      <MediumModal
-        titulo="Consultar Cardex"
-        isVisible={showKardexModal}
-        setVisible={setShowKardexModal}
-      >
-        <ProductKardex productList={productList} />
-      </MediumModal>
+      </MediumModal> 
+
     </div>
   );
 };

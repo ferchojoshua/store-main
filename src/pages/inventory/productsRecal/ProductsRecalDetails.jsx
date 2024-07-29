@@ -23,6 +23,7 @@ import {
   deleteUserData,
   deleteToken,
 } from "../../../services/Account";
+import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import { getListAsync } from "../../../services/CreateLogoApi";
 import { DataContext } from "../../../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,13 +32,9 @@ import {
   faPenToSquare,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
-import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 
-const ProductsRecalDetails = ({
-  selectedProduct,
-  setShowModal,
-  // selectedStore,
-}) => {
+
+const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
   let ruta = getRuta();
 
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -45,21 +42,22 @@ const ProductsRecalDetails = ({
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(selectedProduct.description);
-  const [barCode, setBarCode] = useState(selectedProduct.barCode);
-  const [marca, setMarca] = useState(selectedProduct.marca);
-  const [modelo, setModelo] = useState(selectedProduct.modelo);
-  const [uM, setUM] = useState(selectedProduct.um);
-  const [tipoNegocio, setTipoNegocio] = useState([]);
-  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(selectedProduct?.tipoNegocio?.id );
   const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState("t");
+  const [selectedStore, setSelectedStore] = useState(selectedProduct.aid);
+  const [tipoNegocio, setTipoNegocio] = useState([]);
+  const [selectedTNegocio, setselectedTNegocio] = useState(selectedProduct.tnId);
+  const [familia, setFamilia] = useState([]);
+  const [selectedFamilia, setSelectedFamilia] = useState(selectedProduct.fid);
+  const [marca, setmarca] = useState(selectedProduct.marca);
+  const [modelo, setModelo] = useState(selectedProduct.modelo);
+  const [pvd, setPvd] = useState(selectedProduct.pvd);
+  const [pvm, setPvm] = useState(selectedProduct.pvm);
+  const [um, setUM] = useState(selectedProduct.um); 
   const [catalogo, setCatalogo] = useState([]);
   const [selectedCatalogo, setSelectedCatalogo] = useState("");
-  const [familia, setFamilia] = useState([]);
-  const [selectedFamilia, setSelectedFamilia] = useState(
-    selectedProduct.familia ? selectedProduct.familia.id : "" );
-    const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
-    const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
+
+  const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
+  const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
 
   const token = getToken();
 
@@ -90,9 +88,8 @@ const ProductsRecalDetails = ({
         return;
       }
       setTipoNegocio(resultTipoNegocio.data);
-      const data = {
-        operacion: 2,
-      };
+
+      const data = { operacion: 2, };
 
       const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
@@ -181,41 +178,34 @@ const ProductsRecalDetails = ({
   }, []);
 
   const savesChangesAsync = async () => {
-    
     const data = {
-       id: selectedProduct.id,
-      // tipoNegocioId: selectedTipoNegocio,
-      // familiaId: selectedFamilia,
-      // description: description,
-      // barCode: barCode,
-      // marca: marca === "" ? "S/M" : marca,
-      // modelo: modelo === "" ? "S/M" : modelo,
-      // uM: uM,
-    storeId: selectedStore?.id ?? 0, 
+      id: selectedProduct.id,
+
+      storeId: selectedStore?.id ?? 0,
       porcentaje: selectedCatalogo,
       actualizarVentaDetalle,
       actualizarVentaMayor,
     };
-  
+
     try {
-      if (selectedTipoNegocio === "" || selectedTipoNegocio === 0) {
+      if (selectedTNegocio === "" || selectedTNegocio === 0) {
         toastError("Seleccione un tipo de negocio...");
         return;
       }
-  
+
       if (selectedFamilia === "" || selectedFamilia === 0) {
         toastError("Seleccione una familia...");
         return;
       }
-  
+
       if (description.trim() === "") {
         toastError("Ingrese una descripcion...");
         return;
       }
-  
+
       setIsLoading(true);
       const result = await updateProductrecallAsync(token, data);
-        if (!result.statusResponse) {
+      if (!result.statusResponse) {
         if (result.error.request.status === 401) {
           navigate(`${ruta}/unauthorized`);
           return;
@@ -223,19 +213,19 @@ const ProductsRecalDetails = ({
         toastError(result.error.message);
         return;
       }
-  
+
       if (result.data === "eX01") {
         deleteUserData();
         deleteToken();
         setIsLogged(false);
         return;
       }
-  
+
       if (result.data.isDefaultPass) {
         setIsDefaultPass(true);
         return;
       }
-  
+
       toastSuccess("Producto Actualizado...!");
       setReload(!reload);
       setIsEdit(false);
@@ -247,12 +237,11 @@ const ProductsRecalDetails = ({
       setIsLoading(false);
     }
   };
-  
 
   const handleChangeTN = async (value) => {
     setFamilia([]);
     setSelectedFamilia("");
-    setSelectedTipoNegocio(value);
+    setselectedTNegocio(value);
 
     if (value !== "") {
       setIsLoading(true);
@@ -300,6 +289,52 @@ const ProductsRecalDetails = ({
         }}
       >
         <Container>
+        <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginRight: 20 }}
+            disabled={!isEdit}
+          >
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione un Almacen
+            </InputLabel>
+            <Select
+              defaultValue=""
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedStore}
+              onChange={(e) => setSelectedStore(e.target.value)}
+              label="Almacen"
+              style={{ textAlign: "left" }}
+            >
+              <MenuItem key={-1} value="">
+                <em> Seleccione un Almacen</em>
+              </MenuItem>
+              {storeList.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                );
+              })}
+              <MenuItem
+                key={"t"}
+                value={"t"}
+                disabled={
+                  storeList.length <= 6 ||
+                  storeList.length <= 5 ||
+                  storeList.length <= 4 ||
+                  storeList.length <= 3 ||
+                  storeList.length <= 2 ||
+                  storeList.length <= 1
+                    ? false
+                    : true
+                }
+              >
+                Todos...
+              </MenuItem>
+            </Select>
+          </FormControl>
           <FormControl
             variant="standard"
             fullWidth
@@ -313,7 +348,7 @@ const ProductsRecalDetails = ({
             <Select
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
-              value={selectedTipoNegocio}
+              value={selectedTNegocio}
               onChange={(e) => handleChangeTN(e.target.value)}
               label="Tipo de Negocio"
               style={{ textAlign: "left" }}
@@ -374,7 +409,7 @@ const ProductsRecalDetails = ({
             value={description ? description : ""}
             disabled={true}
           />
-
+          {/* 
           <TextField
             fullWidth
             required
@@ -384,14 +419,14 @@ const ProductsRecalDetails = ({
             label={"Codigo de barras"}
             value={barCode ? barCode : ""}
             disabled={true}
-          />
+          /> */}
 
           <TextField
             fullWidth
             required
             variant="standard"
-            onChange={(e) => setMarca(e.target.value.toUpperCase())}
-            label={"Marca"}
+            onChange={(e) => setmarca(e.target.value.toUpperCase())}
+            label={"marca"}
             value={marca ? marca : ""}
             style={{ marginTop: 20 }}
             disabled={true}
@@ -406,6 +441,28 @@ const ProductsRecalDetails = ({
             label={"Modelo"}
             value={modelo ? modelo : ""}
             disabled={true}
+          /> 
+          
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setPvd(e.target.value.toUpperCase())}
+            label={"PVD"}
+            value={pvd ? pvd : ""}
+            disabled={true}
+          />
+
+          <TextField
+          fullWidth
+          required
+          style={{ marginTop: 20 }}
+          variant="standard"
+          onChange={(e) => setPvm(e.target.value.toUpperCase())}
+          label={"PVM"}
+          value={pvm ? pvm : ""}
+          disabled={true}
           />
 
           <FormControl
@@ -421,7 +478,7 @@ const ProductsRecalDetails = ({
             <Select
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
-              value={uM}
+              value={um}
               onChange={(e) => setUM(e.target.value)}
               label="Unidad de Medida"
               style={{ textAlign: "left" }}
@@ -442,85 +499,43 @@ const ProductsRecalDetails = ({
               </MenuItem>
             </Select>
           </FormControl>
+       
+
           <FormControl
-              variant="standard"
-              fullWidth
-              style={{ marginRight: 20 }}
-                disabled={!isEdit}
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            required
+            disabled={!isEdit}
+          >
+            <InputLabel id="catalogo-select-label">
+              Seleccione un item del catálogo
+            </InputLabel>
+            <Select
+              labelId="catalogo-select-label"
+              id="catalogo-select"
+              value={selectedCatalogo}
+              onChange={(e) => setSelectedCatalogo(e.target.value)}
+              label="Catálogo"
+              style={{ textAlign: "left" }}
             >
-              <InputLabel id="demo-simple-select-standard-label">
-                Seleccione un Almacen
-              </InputLabel>
-              <Select
-                defaultValue=""
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={selectedStore}
-                onChange={(e) => setSelectedStore(e.target.value)}
-                label="Almacen"
-                style={{ textAlign: "left" }}
-              >
-                <MenuItem key={-1} value="">
-                  <em> Seleccione un Almacen</em>
-                </MenuItem>
-                {storeList.map((item) => {
+              <MenuItem key={0} value="">
+                <em>Seleccione un item del catálogo</em>
+              </MenuItem>
+              {catalogo.map((item) => {
+                // Filtrar solo los elementos con estado activo (estado === true)
+                if (item.estado) {
                   return (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
+                    <MenuItem key={item.id} value={item.valor}>
+                      {item.valor} %
                     </MenuItem>
                   );
-                })}
-                <MenuItem
-                  key={"t"}
-                  value={"t"}
-                  disabled={
-                    storeList.length <=  6 || storeList.length <=  5 || storeList.length <=  4 || storeList.length <=  3 || storeList.length <=  2 || storeList.length <= 1
-                          ? false
-                          : true
-                      }
-                >
-                  Todos...
-                </MenuItem>
-              </Select>
-            </FormControl>
-                      
-            <FormControl
-  variant="standard"
-  fullWidth
-  style={{ marginTop: 20 }}
-  required
-  disabled={!isEdit}
->
-  <InputLabel id="catalogo-select-label">
-    Seleccione un item del catálogo
-  </InputLabel>
-  <Select
-    labelId="catalogo-select-label"
-    id="catalogo-select"
-    value={selectedCatalogo}
-    onChange={(e) => setSelectedCatalogo(e.target.value)}
-    label="Catálogo"
-    style={{ textAlign: "left" }}
-  >
-    <MenuItem key={0} value="">
-      <em>Seleccione un item del catálogo</em>
-    </MenuItem>
-    {catalogo.map((item) => {
-      // Filtrar solo los elementos con estado activo (estado === true)
-      if (item.estado) {
-        return (
-          <MenuItem key={item.id} value={item.valor}>
-            {item.valor} %
-          </MenuItem>
-        );
-      }
-      return null; // Si el estado no es activo, no renderizar el MenuItem
-    })}
-  </Select>
-</FormControl>
+                }
+                return null; // Si el estado no es activo, no renderizar el MenuItem
+              })}
+            </Select>
+          </FormControl>
 
-
-          
           {/* Agregar Checkboxes */}
           <div style={{ marginTop: 20 }}>
             <FormControlLabel
