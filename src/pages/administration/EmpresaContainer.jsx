@@ -7,7 +7,7 @@ import { Container } from "react-bootstrap";
 import CreateLogo from "./Logo/CreateLogo";
 import Ajustes from "./Ajuste/Ajustes";
 
-// import Admin from
+// import Admin from guerold no se que pasa
 import { DataContext } from "../../context/DataContext";
 import { getRuta, isAccess } from "../../helpers/Helpers";
 import { useNavigate } from "react-router-dom";
