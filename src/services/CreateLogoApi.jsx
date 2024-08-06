@@ -83,7 +83,7 @@ export const getLogoByStoreIdAsync = async (token, storeId) => {
 //       }
 //     });
 //   } catch (error) {
-//     result.statusResponse = false;
+//     result.statusR    esponse = false;
 //     result.error = error;
 //   }
 
