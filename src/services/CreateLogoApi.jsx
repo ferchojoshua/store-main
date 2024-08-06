@@ -35,11 +35,11 @@ export const CreateLogoAsync = async (token, data) => {
   return result;
 };
 
-
+// ---
 export const getLogoByStoreIdAsync = async (token, storeId) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetLogoByStoreId/`;
-  // alert(`Token: ${token}, Store ID Selected api: ${storeId}`); 
+  alert(`Token: ${token}, Store ID Selected api: ${storeId}`); 
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -83,14 +83,14 @@ export const getLogoByStoreIdAsync = async (token, storeId) => {
 //       }
 //     });
 //   } catch (error) {
-//     result.statusResponse = false;
+//     result.statusR    esponse = false;
 //     result.error = error;
 //   }
 
 //   return result;
 // };
 
-export const updateLogoAsync = async (token, data) => {
+export const UpdateLogoAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}UpdateLogo`;
   const authAxios = axios.create({
