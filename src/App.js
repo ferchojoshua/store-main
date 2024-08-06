@@ -36,7 +36,7 @@ import AdmonContainer from "./pages/admon/AdmonContainer";
 import AddEntradaProducto from "./pages/inventory/entradaProducto/AddEntradaProducto";
 import SalesContainer from "./pages/sales/SalesContainer";
 import Departments from "./pages/settings/locations/Departments";
-import Administration from "./pages/administration/Logo/CreateLogo";
+import CreateLogo from "./pages/administration/Logo/CreateLogo";
 import Municipalities from "./pages/settings/locations/municipalities/Municipalities";
 import MunicipalityDetails from "./pages/settings/locations/municipalities/MunicipalityDetails";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -65,6 +65,7 @@ let controller = getController();
 
 function App() {
   let ruta = getRuta();
+
   const {
     setIsLoading,
     isLogged,
@@ -94,129 +95,46 @@ function App() {
     }
 
     (async () => {
-      try {
-        const result = await getUserAsync(token);
-        if (!result.statusResponse) {
-          setIsLoading(false);
-          if (result.error.request.status === 401) {
-            navigate(`${ruta}/unauthorized`);
-            return;
-          }
-          simpleMessage("No se pudo conectar con el servidor", "error");
-          return;
-        }
-        if (result.data === "eX01") {
-          setIsLoading(false);
-          deleteUserData();
-          deleteToken();
-          setIsLogged(false);
-          return;
-        }
-        if (result.data.isDefaultPass) {
-          setIsLoading(false);
-          setIsDefaultPass(true);
-          return;
-        }
-        setIsDarkMode(result.data.isDarkMode);
-        setAccess(result.data.rol.permissions);
-        setIsDefaultPass(false);
-        setIsLogged(true);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      const result = await getUserAsync(token);
+      if (!result.statusResponse) {
         setIsLoading(false);
-        simpleMessage("Error al obtener los datos del usuario", "error");
-      } finally {
-        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+
+        simpleMessage("No se pudo conectar con el servidor", "error");
+        return;
       }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsDarkMode(result.data.isDarkMode);
+      setAccess(result.data.rol.permissions);
+      setIsDefaultPass(false);
+      setIsLogged(true);
+      setIsLoading(false);
+
+      const notifications = serverMessages();
+
+      const resultRol = await getRolAsync(token);
+
+      setServerAccess(!resultRol.data.isServerAccess);
     })();
     setUser(user);
-  }, [
-    user,
-    token,
-    setIsLoading,
-    setIsLogged,
-    setIsDefaultPass,
-    navigate,
-    ruta,
-    setUser,
-  ]);
+    setIsLogged(true);
 
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      try {
-        const result = await onCloseNavigatorAsync(token);
-        if (!result.statusResponse) {
-          setIsLoading(false);
-          if (result.error.request.status === 401) {
-            navigate(`${ruta}/unauthorized`);
-            return;
-          }
-          simpleMessage("No se pudo conectar con el servidor", "error");
-          return;
-        }
-        if (result.data === "eX01") {
-          setIsLoading(false);
-          deleteUserData();
-          deleteToken();
-          setIsLogged(false);
-          return;
-        }
-      } catch (error) {
-        console.error("Error on beforeunload event:", error);
-        setIsLoading(false);
-        simpleMessage("Error al cerrar la sesión", "error");
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [token, setIsLoading, setIsLogged, navigate, ruta]);
-
-  useEffect(() => {
-    const connection = new HubConnectionBuilder()
-      .withUrl(`${controller}serverHub`)
-      .build();
-
-    const startConnection = async () => {
-      try {
-        await connection.start();
-        connection.on("serverAccess", () => {
-          serverAccess();
-        });
-      } catch (error) {
-        console.error("Error starting SignalR connection:", error);
-      }
-    };
-
-    const serverAccess = async () => {
-      try {
-        const result = await getRolAsync(token);
-        setServerAccess(!result.data.isServerAccess);
-      } catch (error) {
-        console.error("Error fetching server access:", error);
-      }
-    };
-
-    startConnection();
-
-    return () => {
-      connection
-        .stop()
-        .then(() => {
-          console.log("SignalR connection stopped.");
-        })
-        .catch((error) => {
-          console.error("Error stopping SignalR connection:", error);
-        });
-    };
-  }, [token, setServerAccess]);
-
-  if (isLogged === null || isDefaultPass === null || access.length === 0) {
-    return <Loading />;
-  }
+    setIsLoading(false);
+  }, [isLogged]);
 
   const darkTheme = createTheme({
     palette: {
@@ -224,15 +142,57 @@ function App() {
     },
   });
 
+  // Actualización de la conexión a SignalR usando useEffect
+  useEffect(() => {
+    const connection = new HubConnectionBuilder()
+      // .withUrl(`${controller}serverHub`, { accessTokenFactory: () => token })
+          .withUrl(`${controller}signalR`, { accessTokenFactory: () => token })
+      .withAutomaticReconnect()
+      .build();
+
+    const startConnection = async () => {
+      try {
+        await connection.start();
+        console.log("SignalR connected.");
+        connection.on("serverAccess", () => {
+          serverAccess();
+        });
+      } catch (err) {
+        console.error("Error starting SignalR connection:", err);
+        setTimeout(startConnection, 5000);
+      }
+    };
+
+    connection.onclose(async () => {
+      await startConnection();
+    });
+
+    startConnection();
+
+    return () => {
+      connection.stop();
+    };
+  }, [token, setServerAccess]); // Agregado punto y coma aquí
+
+  const serverAccess = async () => {
+    const result = await getRolAsync(token);
+    setServerAccess(!result.data.isServerAccess);
+  };
+
+  if (isLogged === null || isDefaultPass === null || access.length === 0) {
+    return <Loading />;
+  }
+
   return isLogged ? (
     <ThemeProvider theme={darkTheme}>
       <Box
         sx={{
           height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          bgcolor: "background.default", 
+          overflow: "auto",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "background.default",
         }}
       >
         {isDefaultPass ? (
@@ -242,141 +202,125 @@ function App() {
             <div className={isDarkMode ? "App text-white" : "App"}>
               <NavbarComponent />
               <Box sx={{ flex: 1, overflow: "auto" }}>
-                 <Routes>
-                <Route path={`${ruta}/`} element={<Home />} />
-                {/* Rutas Account */}
-                <Route path={`${ruta}/account`} element={<MyAccount />} />
+                <Routes>
+                  <Route path={`${ruta}/`} element={<Home />} />
+                  {/* Rutas Account */}
+                  <Route path={`${ruta}/account`} element={<MyAccount />} />
 
-                {/* Ruta Inventario */}
-                <Route path={`${ruta}/sales`} element={<SalesContainer />} />
+                  {/* Ruta Inventario */}
+                  <Route path={`${ruta}/sales`} element={<SalesContainer />} />
 
-                {/* Ruta Inventario */}
-                <Route
-                  path={`${ruta}/inventory`}
-                  element={<InventoryContainer />}
-                />
-                <Route
-                  path={`${ruta}/traslado/add`}
-                  element={<MoverProductoAdd />}
-                /> 
-                
-                 <Route
-                  path={`${ruta}/traslado/add`}
-                  element={<MoverProductoAdd />}
-                />
+                  {/* Ruta Inventario */}
+                  <Route
+                    path={`${ruta}/inventory`}
+                    element={<InventoryContainer />}
+                  />
+                  <Route
+                    path={`${ruta}/traslado/add`}
+                    element={<MoverProductoAdd />}
+                  /> 
 
-                <Route
-                  path={`${ruta}/entrada/add`}
-                  element={<AddEntradaProducto />}
-                />            
-                <Route
-                  path={`${ruta}/entrada/:id`}
-                  element={<EntradaProductoDetails />}
-                />
-                 {/*
-                <Route
-                  path={`${ruta}/entrada/:id`}
-                  element={<EntradaProductoRecalDetails />}
-                />  */}
+                  <Route
+                    path={`${ruta}/entrada/add`}
+                    element={<AddEntradaProducto />}
+                  />            
+                  <Route
+                    path={`${ruta}/entrada/:id`}
+                    element={<EntradaProductoDetails />}
+                  />
 
-                {/* Rutas Reportes */}
-                <Route
-                  path={`${ruta}/reports`}
-                  element={<ReportsContainer />}
-                />  
-                <Route
-                  path={`${ruta}/r-master-vetas/:params`}
-                  element={<MasterVentas />}
-                />
-                <Route
-                  path={`${ruta}/r-docs-cobrar/:params`}
-                  element={<DocumentosXCobrar />}
-                />
-                <Route
-                  path={`${ruta}/r-sales-prods/:params`}
-                  element={<ArticulosVendidos />}
-                />
-                <Route
-                  path={`${ruta}/r-daily-close/:params`}
-                  element={<CierreDiario />}
-                />
-                <Route
-                  path={`${ruta}/r-caja-chica/:params`}
-                  element={<CajaChica />}
-                />
-                <Route
-                  path={`${ruta}/r-no-sales-prods/:params`}
-                  element={<ProdNoVendidos />}
-                />
-                <Route
-                  path={`${ruta}/r-ingresos/:params`}
-                  element={<Ingresos />}
-                />
-                <Route
-                  path={`${ruta}/r-compras/:params`}
-                  element={<Compras />}
-                />
+                  {/* Rutas Reportes */}
+                  <Route
+                    path={`${ruta}/reports`}
+                    element={<ReportsContainer />}
+                  />
+                  <Route
+                    path={`${ruta}/r-master-vetas/:params`}
+                    element={<MasterVentas />}
+                  />
+                  <Route
+                    path={`${ruta}/r-docs-cobrar/:params`}
+                    element={<DocumentosXCobrar />}
+                  />
+                  <Route
+                    path={`${ruta}/r-sales-prods/:params`}
+                    element={<ArticulosVendidos />}
+                  />
+                  <Route
+                    path={`${ruta}/r-daily-close/:params`}
+                    element={<CierreDiario />}
+                  />
+                  <Route
+                    path={`${ruta}/r-caja-chica/:params`}
+                    element={<CajaChica />}
+                  />
+                  <Route
+                    path={`${ruta}/r-no-sales-prods/:params`}
+                    element={<ProdNoVendidos />}
+                  />
+                  <Route
+                    path={`${ruta}/r-ingresos/:params`}
+                    element={<Ingresos />}
+                  />
+                  <Route
+                    path={`${ruta}/r-compras/:params`}
+                    element={<Compras />}
+                  />
+                  <Route
+                    path={`${ruta}/r-traslado-inventario/:params`}
+                    element={<TrasladoInventario />}
+                  />
+                  <Route
+                    path={`${ruta}/r-inventario-prods/:params`}
+                    element={<InventarioProductos />}
+                  />
 
-                <Route
-                  path={`${ruta}/r-traslado-inventario/:params`}
-                  element={<TrasladoInventario />}
-                />
-
-                {/* M. Sc. Mario Talavera */}
-                <Route
-                  path={`${ruta}/r-inventario-prods/:params`}
-                  element={<InventarioProductos />}
-                />
-
+                  
                 {/* Rutas Administration */}
                 <Route path={`${ruta}/admon`} element={<AdmonContainer />} />
 
-                {/* Rutas Seguridad */}
-                <Route
-                  path={`${ruta}/security`}
-                  element={<SecurityContiner />}
-                />
 
-                {/* Rutas miscelaneos */}
-                <Route path={`${ruta}/stores`} element={<Stores />} />
-                <Route path={`${ruta}/store/:id`} element={<StoreDetails />} />
-                <Route path={`${ruta}/providers`} element={<Providers />} />
+                  {/* Rutas Seguridad */}
+                  <Route
+                    path={`${ruta}/security`}
+                    element={<SecurityContiner />}
+                  />
 
-                {/* <Route path="/product/:id" element={<ProductsDetails />} /> */}
-                <Route
-                  path={`${ruta}/tipo-negocio`}
-                  element={<TipoNegocio />}
-                />
-                <Route
-                  path={`${ruta}/tipo-negocio/:id`}
-                  element={<TipoNegocioDetails />}
-                />
-
-                <Route path={`${ruta}/departments`} element={<Departments />} />
-                <Route
-                  path={`${ruta}/departments/:id`}
-                  element={<Municipalities />}
-                />
-                <Route
-                  path={`${ruta}/departments/municipalities/:id`}
-                  element={<MunicipalityDetails />}
-                />
+                  {/* Rutas miscelaneos */}
+                  <Route path={`${ruta}/stores`} element={<Stores />} />
+                  <Route path={`${ruta}/store/:id`} element={<StoreDetails />} />
+                  <Route path={`${ruta}/providers`} element={<Providers />} />
+                  <Route
+                    path={`${ruta}/tipo-negocio`}
+                    element={<TipoNegocio />}
+                  />
+                  <Route
+                    path={`${ruta}/tipo-negocio/:id`}
+                    element={<TipoNegocioDetails />}
+                  />
+                  <Route path={`${ruta}/departments`} element={<Departments />} />
+                  <Route
+                    path={`${ruta}/departments/:id`}
+                    element={<Municipalities />}
+                  />
+                  <Route
+                    path={`${ruta}/departments/municipalities/:id`}
+                    element={<MunicipalityDetails />}
+                  />
+                  
+                  {/* Rutas Administration */}
                   <Route
                     path={`${ruta}/administration`}
-                    element={<EmpresaContainer />}
-                  />
-                  <Route
+                    element={<EmpresaContainer/>}
+                  />  
+                   <Route
                     path={`${ruta}/administration/logo`}
-                    element={<Administration />}
-                  />
-
-                   <Route path={`${ruta}/admon`} 
-                   element={<AdmonContainer />} />
-                   
-                  <Route                  
+                    element={<CreateLogo />}
+                  />        
+                  <Route
                     path={`${ruta}/administration/Ajuste`}
                     element={<Ajustes />}
-                  />
+                  /> 
                   <Route path={`${ruta}/unauthorized`} element={<Page401 />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
@@ -386,7 +330,7 @@ function App() {
           </LocalizationProvider>
         )}
       </Box>
-      <ToastContainer />
+      <FullScreenModal />
     </ThemeProvider>
   ) : (
     <Login />
