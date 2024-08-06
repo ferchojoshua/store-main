@@ -37,16 +37,12 @@ const ProductsDetails = ({ selectedProduct, setShowModal }) => {
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(selectedProduct.description);
-
   const [barCode, setBarCode] = useState(selectedProduct.barCode);
   const [marca, setMarca] = useState(selectedProduct.marca);
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [uM, setUM] = useState(selectedProduct.um);
-
   const [tipoNegocio, setTipoNegocio] = useState([]);
-  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState(
-    selectedProduct.tipoNegocio.id
-  );
+  const [selectedTipoNegocio, setSelectedTipoNegocio] = useState( selectedProduct.tipoNegocio.id );
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(
     selectedProduct.familia ? selectedProduct.familia.id : ""

@@ -145,8 +145,8 @@ function App() {
   // Actualización de la conexión a SignalR usando useEffect
   useEffect(() => {
     const connection = new HubConnectionBuilder()
-      // .withUrl(`${controller}serverHub`, { accessTokenFactory: () => token })
-          .withUrl(`${controller}signalR`, { accessTokenFactory: () => token })
+      // .withUrl(${controller}serverHub, { accessTokenFactory: () => token })
+      .withUrl(`${controller}signalR`, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
       .build();
 
@@ -229,8 +229,8 @@ function App() {
                     element={<EntradaProductoDetails />}
                   />
 
-                  {/* Rutas Reportes */}
-                  <Route
+                   {/* Rutas Reportes */}
+                   <Route
                     path={`${ruta}/reports`}
                     element={<ReportsContainer />}
                   />
@@ -274,6 +274,7 @@ function App() {
                     path={`${ruta}/r-inventario-prods/:params`}
                     element={<InventarioProductos />}
                   />
+
 
                   
                 {/* Rutas Administration */}
@@ -320,7 +321,7 @@ function App() {
                   <Route
                     path={`${ruta}/administration/Ajuste`}
                     element={<Ajustes />}
-                  /> 
+                  />  
                   <Route path={`${ruta}/unauthorized`} element={<Page401 />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -287,9 +287,9 @@ const Products = () => {
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-              {currentItem.map((item) => {
+              {currentItem.map((item, index) => {
                 return (
-                  <tr key={item.id}>
+                  <tr key={item.id  || index}>
                     <td>{item.id}</td>
                     <td style={{ textAlign: "left" }}>
                       {item.tipoNegocio.description}

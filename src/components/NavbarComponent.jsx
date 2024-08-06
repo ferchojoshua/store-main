@@ -342,8 +342,8 @@ const NavbarComponent = () => {
                 
                 <Nav.Link
                   as={Link}
-                  to={`${ruta}/Administration`}
-                  eventKey="Administration"
+                 to={`${ruta}/administration`}
+                  eventKey="administration"
                 >
                   <FontAwesomeIcon
                     icon={faCogs}
@@ -367,8 +367,7 @@ const NavbarComponent = () => {
                   eventKey="security"
                 >
                   <FontAwesomeIcon
-                    icon={faShield}
-                    
+                    icon={faShield}                    
                     style={{ marginRight: 10,
                      color: active === "admon" ? "#bbdefb" : "#9e9e9e"
                        }}
@@ -444,8 +443,8 @@ const NavbarComponent = () => {
               )}
               
 
-
-                  {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+{/* -- */}
+                  {/* {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
                 <NavDropdown.Item
                   as={Link}
                   to={`${ruta}/security`}
@@ -459,7 +458,7 @@ const NavbarComponent = () => {
                 </NavDropdown.Item>
               ) : (
                 <></>
-              )}
+              )} */}
               {/* {isAccess(access, "MISCELANEOS VER") ? (
                 <NavDropdown.Item
                   as={Link}

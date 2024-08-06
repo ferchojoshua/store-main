@@ -10,6 +10,7 @@ import {
   Paper,
   Checkbox,
   FormControlLabel,
+  InputAdornment ,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -52,10 +53,9 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [pvd, setPvd] = useState(selectedProduct.pvd);
   const [pvm, setPvm] = useState(selectedProduct.pvm);
-  const [um, setUM] = useState(selectedProduct.um); 
+  const [um, setUM] = useState(selectedProduct.UM); 
   const [catalogo, setCatalogo] = useState([]);
   const [selectedCatalogo, setSelectedCatalogo] = useState("");
-
   const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
   const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
 
@@ -146,10 +146,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
       }
       setCatalogo(resultList.data);
 
-      const result = await getFamiliasByTNAsync(
-        token,
-        selectedProduct.tipoNegocio.id
-      );
+      const result = await getFamiliasByTNAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -181,7 +178,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
     const data = {
       id: selectedProduct.id,
 
-      storeId: selectedStore?.id ?? 0,
+      storeId: selectedStore,
       porcentaje: selectedCatalogo,
       actualizarVentaDetalle,
       actualizarVentaMayor,
@@ -238,45 +235,45 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
     }
   };
 
-  const handleChangeTN = async (value) => {
-    setFamilia([]);
-    setSelectedFamilia("");
-    setselectedTNegocio(value);
+  // const handleChangeTN = async (value) => {
+  //   // setFamilia([]);
+  //   // setSelectedFamilia("");
+  //   // setselectedTNegocio(value);
 
-    if (value !== "") {
-      setIsLoading(true);
+  //   if (value !== "") {
+  //     setIsLoading(true);
 
-      const result = await getFamiliasByTNAsync(token, value);
-      if (!result.statusResponse) {
-        setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(result.error.message);
-        return;
-      }
+  //     const result = await getFamiliasByTNAsync(token, value);
+  //     if (!result.statusResponse) {
+  //       setIsLoading(false);
+  //       if (result.error.request.status === 401) {
+  //         navigate(`${ruta}/unauthorized`);
+  //         return;
+  //       }
+  //       toastError(result.error.message);
+  //       return;
+  //     }
 
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
+  //     if (result.data === "eX01") {
+  //       setIsLoading(false);
+  //       deleteUserData();
+  //       deleteToken();
+  //       setIsLogged(false);
+  //       return;
+  //     }
 
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
+  //     if (result.data.isDefaultPass) {
+  //       setIsLoading(false);
+  //       setIsDefaultPass(true);
+  //       return;
+  //     }
 
-      setIsLoading(false);
-      setFamilia(result.data);
-    } else {
-      setFamilia([]);
-    }
-  };
+  //     setIsLoading(false);
+  //     setFamilia(result.data);
+  //   } else {
+  //     setFamilia([]);
+  //   }
+  // };
 
   return (
     <div>
@@ -306,6 +303,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               onChange={(e) => setSelectedStore(e.target.value)}
               label="Almacen"
               style={{ textAlign: "left" }}
+              disabled={true}
             >
               <MenuItem key={-1} value="">
                 <em> Seleccione un Almacen</em>
@@ -349,13 +347,13 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
               value={selectedTNegocio}
-              onChange={(e) => handleChangeTN(e.target.value)}
+              onChange={(e) => setselectedTNegocio(e.target.value)}
               label="Tipo de Negocio"
               style={{ textAlign: "left" }}
               disabled={true}
             >
               <MenuItem key={0} value="">
-                <em> Seleccione un tipo de negocio</em>
+                <em> Tipo de negocio</em>
               </MenuItem>
               {tipoNegocio.map((item) => {
                 return (
@@ -366,7 +364,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               })}
             </Select>
           </FormControl>
-
+ 
           <FormControl
             variant="standard"
             fullWidth
@@ -380,7 +378,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
             <Select
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
-              value={selectedFamilia}
+              value={selectedFamilia.fid}
               onChange={(e) => setSelectedFamilia(e.target.value)}
               label="Familia"
               style={{ textAlign: "left" }}
@@ -444,27 +442,33 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
           /> 
           
           <TextField
-            fullWidth
-            required
-            style={{ marginTop: 20 }}
-            variant="standard"
-            onChange={(e) => setPvd(e.target.value.toUpperCase())}
-            label={"PVD"}
-            value={pvd ? pvd : ""}
-            disabled={true}
-          />
+  fullWidth
+  required
+  style={{ marginTop: 20 }}
+  variant="standard"
+  onChange={(e) => setPvd(e.target.value.toUpperCase())}
+  label="PVD"
+  value={pvd ? pvd : ""}
+  disabled={true}
+  InputProps={{
+    startAdornment: <InputAdornment position="start">C$</InputAdornment>,
+  }}
+/>
 
-          <TextField
-          fullWidth
-          required
-          style={{ marginTop: 20 }}
-          variant="standard"
-          onChange={(e) => setPvm(e.target.value.toUpperCase())}
-          label={"PVM"}
-          value={pvm ? pvm : ""}
-          disabled={true}
-          />
-
+<TextField
+  fullWidth
+  required
+  style={{ marginTop: 20 }}
+  variant="standard"
+  onChange={(e) => setPvm(e.target.value.toUpperCase())}
+  label="PVM"
+  value={pvm ? pvm : ""}
+  disabled={true}
+  InputProps={{
+    startAdornment: <InputAdornment position="start">C$</InputAdornment>,
+  }}
+/>
+{/* 
           <FormControl
             variant="standard"
             fullWidth
@@ -482,8 +486,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               onChange={(e) => setUM(e.target.value)}
               label="Unidad de Medida"
               style={{ textAlign: "left" }}
-              disabled={true}
-            >
+              disabled={true}>
               <MenuItem key={0} value="">
                 <em>Seleccione una U/M...</em>
               </MenuItem>
@@ -498,7 +501,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
                 PAR
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
        
 
           <FormControl

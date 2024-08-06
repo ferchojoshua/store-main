@@ -753,7 +753,7 @@ const ProductsRecal = () => {
               {currentItem.map((item) => { const isSelected = selectedProducts.includes(item.id); 
                    return (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
+                    <td>{item.idProducto}</td>
                     <td style={{ textAlign: "left" }}>{item.almacen}</td>
                     <td style={{ textAlign: "left" }}>{item.tipoNegocio}</td>
                     <td style={{ textAlign: "left" }}>{item.familia}</td>
@@ -761,8 +761,14 @@ const ProductsRecal = () => {
                     <td style={{ textAlign: "left" }}>{item.marca}</td>
                     <td style={{ textAlign: "left" }}>{item.modelo}</td>
                     <td style={{ textAlign: "left" }}>{item.um}</td>
-                    <td style={{ textAlign: "left" }}>{item.pvd}</td>
-                    <td style={{ textAlign: "left" }}>{item.pvm}</td>
+                    <td style={{ textAlign: "left" }}>
+                        {item.pvd.toLocaleString('es-NI', { style: 'currency', currency: 'NIO' })}
+                        </td>
+                        <td style={{ textAlign: "left" }}>
+                        {item.pvm.toLocaleString('es-NI', { style: 'currency', currency: 'NIO' })}
+                        </td>
+                    {/* <td style={{ textAlign: "left" }}>{item.pvd}</td>
+                    <td style={{ textAlign: "left" }}>{item.pvm}</td> */}
                     <td style={{ textAlign: "left", display: "none" }}>{item.aid}</td>
                     <td style={{ textAlign: "left", display: "none" }}>{item.tnId}</td>
                     <td style={{ textAlign: "left", display: "none" }}>{item.fid}</td>
