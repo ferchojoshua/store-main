@@ -24,7 +24,7 @@ import {
 } from "@mui/material";
 import { isEmpty } from "lodash";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
-import { CreateLogoAsync, UpdateLogoAsync, getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
+import { CreateLogoAsync, UpdateLogoAsync , getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
 
 const LogoCreate = ({ setShowModal }) => {
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } = useContext(DataContext);
@@ -48,13 +48,13 @@ const LogoCreate = ({ setShowModal }) => {
 
   const getLogo = async (storeId) => {
     setIsLoading(true);
-    // alert(`Store ID Selected1: ${storeId}`); 
+    // alert(Store ID Selected1: ${storeId}); 
     const result = await getLogoByStoreIdAsync(token, storeId);
     setIsLoading(false);
 
     if (!result.statusResponse) {
       if (result.error?.request?.status === 401) {
-        navigate(`${ruta}/No autorizado`);
+        navigate(`${ruta}/unauthorized`);
         return null;
       }
       return null;
@@ -95,7 +95,7 @@ const LogoCreate = ({ setShowModal }) => {
     setIsEditing(false);
     setHasExistingRecord(true);
     // setPreviewLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
-    // alert(`Store ID Selected1: ${storeId}`); 
+    // alert(Store ID Selected1: ${storeId}); 
 
     return result.data;
   };
@@ -161,7 +161,7 @@ const LogoCreate = ({ setShowModal }) => {
 
   const handleStoreChange = async (event) => {
     const storeId = Number(event.target.value);
-    // alert(`Store ID Selected 2: ${storeId}`); 
+    // alert(Store ID Selected 2: ${storeId}); 
   
     setSelectedStore(storeId);
   
@@ -238,7 +238,7 @@ const LogoCreate = ({ setShowModal }) => {
 
       let result;
       if (hasExistingRecord) {
-        result = await UpdateLogoAsync(token, data);
+        result = await UpdateLogoAsync(token, data);  // Asegúrate de tener una función UpdateLogoAsync
       } else {
         result = await CreateLogoAsync(token, data);
       }
@@ -349,7 +349,6 @@ const LogoCreate = ({ setShowModal }) => {
                 cursor: "pointer",
               }}
               onClick={() => document.getElementById("fileInput").click()}
-              disabled={hasExistingRecord && !isEditing}
             >
               {previewLogo ? (
                 <img
