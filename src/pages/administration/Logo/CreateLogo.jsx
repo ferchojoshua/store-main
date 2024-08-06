@@ -24,7 +24,7 @@ import {
 } from "@mui/material";
 import { isEmpty } from "lodash";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
-import { CreateLogoAsync, getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
+import { CreateLogoAsync, UpdateLogoAsync, getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
 
 const LogoCreate = ({ setShowModal }) => {
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } = useContext(DataContext);
@@ -41,12 +41,14 @@ const LogoCreate = ({ setShowModal }) => {
   const [hasExistingRecord, setHasExistingRecord] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [previewLogo, setPreviewLogo] = useState(null);
+
   let navigate = useNavigate();
   const token = getToken();
   let ruta = getRuta();
 
   const getLogo = async (storeId) => {
     setIsLoading(true);
+    // alert(`Store ID Selected1: ${storeId}`); 
     const result = await getLogoByStoreIdAsync(token, storeId);
     setIsLoading(false);
 
@@ -80,9 +82,20 @@ const LogoCreate = ({ setShowModal }) => {
     setRuc(result.data.ruc || "");
     setTelefono(result.data.telefono || "+505");
     setTelefonow(result.data.telefonoWhatsApp || "+505");
-    setLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
+    // setLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
+    if (result.data.imagenUrl) {
+      setLogo(result.data.imagenUrl);
+      setPreviewLogo(result.data.imagenUrl);
+      console.log('Setting image URL:', result.data.imagenUrl);
+    } else {
+      setLogo(null);
+      setPreviewLogo(null);
+      console.log('No image URL found');
+    }
     setIsEditing(false);
     setHasExistingRecord(true);
+    // setPreviewLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
+    // alert(`Store ID Selected1: ${storeId}`); 
 
     return result.data;
   };
@@ -142,10 +155,16 @@ const LogoCreate = ({ setShowModal }) => {
     setIsFileSelected(true);
   };
 
-  const handleStoreChange = async (event) => {
-    const storeId = event.target.value;
-    setSelectedStore(storeId);
+  const handleEditClick = () => {
+    setIsEditing(true);
+};
 
+  const handleStoreChange = async (event) => {
+    const storeId = Number(event.target.value);
+    // alert(`Store ID Selected 2: ${storeId}`); 
+  
+    setSelectedStore(storeId);
+  
     if (storeId) {
       const logoData = await getLogo(storeId);
       if (logoData) {
@@ -156,7 +175,7 @@ const LogoCreate = ({ setShowModal }) => {
         setLogo(logoData.imagenUrl ? logoData.imagenUrl : null);
         setIsEditing(false);
         setHasExistingRecord(true);
-        setPreviewLogo(logoData.imagenUrl ? logoData.imagenUrl : null); // Mostrar preview del logo existente
+        setPreviewLogo(logoData.imagenUrl ? logoData.imagenUrl : null);
       } else {
         setHasExistingRecord(false);
         clearFields();
@@ -165,7 +184,7 @@ const LogoCreate = ({ setShowModal }) => {
       clearFields();
     }
   };
-
+  
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -176,7 +195,7 @@ const LogoCreate = ({ setShowModal }) => {
           navigate(`${ruta}/unauthorized`);
           return;
         }
-        toastError(resultStore.error?.message || "An unexpected error occurred");
+        toastError(resultStore.error?.message);
         return;
       }
 
@@ -211,15 +230,27 @@ const LogoCreate = ({ setShowModal }) => {
       data.append("TelefonoWhatsApp", telefonow);
       data.append("StoreId", selectedStore);
 
+      // setIsLoading(true);
+      // const result = await CreateLogoAsync(token, data);
+      // setIsLoading(false);
+
       setIsLoading(true);
-      const result = await CreateLogoAsync(token, data);
+
+      let result;
+      if (hasExistingRecord) {
+        result = await UpdateLogoAsync(token, data);
+      } else {
+        result = await CreateLogoAsync(token, data);
+      }
+  
       setIsLoading(false);
+
       if (!result.statusResponse) {
         if (result.error?.request?.status === 401) {
           navigate(`${ruta}/unauthorized`);
           return;
         }
-        toastError(result.error?.message || "An unexpected error occurred");
+        toastError(result.error?.message);
         return;
       }
 
@@ -240,6 +271,7 @@ const LogoCreate = ({ setShowModal }) => {
       setSelectedStore("");
       setReload(!reload);
       setShowModal(false);
+      toastSuccess("Exito...!", "success");
     }
   };
 
@@ -317,6 +349,7 @@ const LogoCreate = ({ setShowModal }) => {
                 cursor: "pointer",
               }}
               onClick={() => document.getElementById("fileInput").click()}
+              disabled={hasExistingRecord && !isEditing}
             >
               {previewLogo ? (
                 <img
@@ -324,7 +357,7 @@ const LogoCreate = ({ setShowModal }) => {
                   alt="Logo"
                   style={{
                     maxWidth: "100%",
-                    maxHeight: "100%",
+                    maxHeight: "200px",
                     display: "block",
                   }}
                 />
@@ -446,13 +479,16 @@ const LogoCreate = ({ setShowModal }) => {
               style={{ marginBottom: 20 }}
             />
             <div style={{ textAlign: "center", marginTop: 20 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setShowModalSave(true)}
-              >
-                Guardar
-              </Button>
+            {hasExistingRecord && isEditing && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setShowModalSave(true)}
+                  style={{ marginRight: 10 }}
+                >
+                  Guardar
+                </Button>
+              )}
               <Button
                 variant="contained"
                 color="secondary"

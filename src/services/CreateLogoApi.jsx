@@ -35,9 +35,11 @@ export const CreateLogoAsync = async (token, data) => {
   return result;
 };
 
+
 export const getLogoByStoreIdAsync = async (token, storeId) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}CreateLogo`;
+  let service = `${controller}GetLogoByStoreId/`;
+  // alert(`Token: ${token}, Store ID Selected api: ${storeId}`); 
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -45,7 +47,7 @@ export const getLogoByStoreIdAsync = async (token, storeId) => {
     },
   });
   try {
-    await authAxios.post(service, storeId).then((resp) => {
+    await authAxios.get(service + storeId).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
@@ -58,13 +60,39 @@ export const getLogoByStoreIdAsync = async (token, storeId) => {
     result.statusResponse = false;
     result.error = error;
   }
-
   return result;
 };
 
-export const updateLogoAsync = async (token, storeId) => {
+// export const getLogoByStoreIdAsync = async (token, storeId) => {
+//   const result = { statusResponse: true, data: [], error: null };
+//   let service = `${controller}GetLogoByStoreId`;
+//   const authAxios = axios.create({
+//     baseURL: service,
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   });
+//   try {
+//     await authAxios.post(service + storeId).then((resp) => {
+//       if (resp.status <= 200 && resp.status >= 299) {
+//         result.statusResponse = false;
+//         result.error = resp.title;
+//       } else {
+//         result.statusResponse = true;
+//         result.data = resp.data;
+//       }
+//     });
+//   } catch (error) {
+//     result.statusResponse = false;
+//     result.error = error;
+//   }
+
+//   return result;
+// };
+
+export const updateLogoAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}CreateLogo`;
+  let service = `${controller}UpdateLogo`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -72,7 +100,7 @@ export const updateLogoAsync = async (token, storeId) => {
     },
   });
   try {
-    await authAxios.post(service, storeId).then((resp) => {
+    await authAxios.post(service, data).then((resp) => {
       if (resp.status <= 200 && resp.status >= 299) {
         result.statusResponse = false;
         result.error = resp.title;
