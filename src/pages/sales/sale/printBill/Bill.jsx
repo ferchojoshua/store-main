@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Divider, Grid, Stack, Typography } from "@mui/material";
 import moment from "moment";
 import { Table } from "react-bootstrap";
 import { isEmpty } from "lodash";
+import { getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
 
 export const Bill = React.forwardRef((props, ref) => {
   const {
@@ -21,6 +22,21 @@ export const Bill = React.forwardRef((props, ref) => {
     descuentoXMonto,
   } = props.data;
 
+  const [storeLogo, setStoreLogo] = useState(null);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const response = await getLogoByStoreIdAsync(store.id);
+        setStoreLogo(response.imagenBase64);
+      } catch (error) {
+        console.error("Error al obtener el logo:", error);
+      }
+    };
+
+    fetchLogo();
+  }, [store.id]);
+
   return (
     <div
       ref={ref}
@@ -29,22 +45,16 @@ export const Bill = React.forwardRef((props, ref) => {
         textAlign: "center",
       }}
     >
-      <img
-        loading="lazy"
-        src={
-          store.id === 1
-            ? require("../../../../components/media/Icono.png")
-            : store.id === 2
-            ? require("../../../../components/media/autoFull.jpeg")
-            : store.id === 3
-            ? require("../../../../components/media/Icono.png")
-            : store.id === 8
-            ? require("../../../../components/media/autoFull.jpeg")
-            : require("../../../../components/media/superMoto.jpeg")
-        }
-        alt="logo"
-        style={{ height: 80 }}
-      />
+      {storeLogo ? (
+        <img
+          loading="lazy"
+          src={`data:image/png;base64,${storeLogo}`}
+          alt="logo"
+          style={{ height: 80 }}
+        />
+      ) : (
+        <p>Cargando logo...</p>
+      )}
       <Stack textAlign="center">
         <Typography style={{ fontWeight: "bold", fontSize: 20 }}>
           FACTURA
@@ -73,16 +83,10 @@ export const Bill = React.forwardRef((props, ref) => {
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>{id}</Typography>
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
-              <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
-              {store.id === 2 || store.id === 8 ? (
-                <Typography style={{ fontSize: 11 }}>
-                  Chinandega, Donde fue el Variedades 1/2 al Norte
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  Chinandega, Semaforos Super 7, 1/2 C. al Norte
-                </Typography>
-              )}
+              <Typography style={{ fontSize: 11 }}>{store.ruc}</Typography>
+              <Typography style={{ fontSize: 11 }}>
+                {store.direccion}
+              </Typography>
             </Stack>
           </Grid>
         </Grid>
@@ -99,9 +103,7 @@ export const Bill = React.forwardRef((props, ref) => {
               <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
                 F. Emision:
               </Typography>
-              {isContado ? (
-                <></>
-              ) : (
+              {!isContado && (
                 <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
                   Vence:
                 </Typography>
@@ -113,35 +115,19 @@ export const Bill = React.forwardRef((props, ref) => {
           </Grid>
           <Grid item xs={8}>
             <Stack textAlign="left">
-              {store.id === 2 || store.id === 8 ? (
-                <Typography style={{ fontSize: 11 }}>
-                  +505 7633-4531
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  +505 7837-6964
-                </Typography>
-              )}
-              <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.telefonoWhatsApp}</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.telefono}</Typography>
               <Typography style={{ fontSize: 11 }}>
                 {moment(fechaVenta).format("DD/MM/YYYY HH:mm A")}
               </Typography>
-              {isContado ? (
-                <></>
-              ) : (
+              {!isContado && (
                 <Typography style={{ fontSize: 11 }}>
                   {moment(fechaVencimiento).format("L")}
                 </Typography>
               )}
-              {isEmpty(client) ? (
-                <Typography style={{ fontSize: 11 }}>
-                  {nombreCliente === "" ? "Cliente Eventual" : nombreCliente}
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  {client.nombreCliente}
-                </Typography>
-              )}
+              <Typography style={{ fontSize: 11 }}>
+                {isEmpty(client) ? (nombreCliente === "" ? "Cliente Eventual" : nombreCliente) : client.nombreCliente}
+              </Typography>
             </Stack>
           </Grid>
         </Grid>
@@ -164,50 +150,40 @@ export const Bill = React.forwardRef((props, ref) => {
           </thead>
 
           <tbody>
-            {saleDetails.map((item) => {
-              return (
-                <tr key={item.id}>
-                  <td style={{ textAlign: "left", fontSize: 9 }}>
-                    {item.product.description}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 9 }}>
-                    {item.cantidad}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 9 }}>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(item.costoUnitario)}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 9 }}>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(item.descuento * item.cantidad)}
-                  </td>
-
-                  <td style={{ textAlign: "center", fontSize: 9 }}>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(item.costoTotal)}
-                  </td>
-                </tr>
-              );
-            })}
+            {saleDetails.map((item) => (
+              <tr key={item.id}>
+                <td style={{ textAlign: "left", fontSize: 9 }}>
+                  {item.product.description}
+                </td>
+                <td style={{ textAlign: "center", fontSize: 9 }}>
+                  {item.cantidad}
+                </td>
+                <td style={{ textAlign: "center", fontSize: 9 }}>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(item.costoUnitario)}
+                </td>
+                <td style={{ textAlign: "center", fontSize: 9 }}>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(item.descuento * item.cantidad)}
+                </td>
+                <td style={{ textAlign: "center", fontSize: 9 }}>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(item.costoTotal)}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
 
         <Stack justifyContent="right">
-          <Stack
-            display="flex"
-            spacing={1}
-            direction="row"
-            justifyContent={"right"}
-          >
-            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-              Sub Total:
-            </Typography>
+          <Stack display="flex" spacing={1} direction="row" justifyContent={"right"}>
+            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Sub Total:</Typography>
             <Typography style={{ fontSize: 11 }}>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
@@ -216,15 +192,8 @@ export const Bill = React.forwardRef((props, ref) => {
             </Typography>
           </Stack>
 
-          <Stack
-            display="flex"
-            spacing={1}
-            direction="row"
-            justifyContent={"right"}
-          >
-            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-              Descuento:
-            </Typography>
+          <Stack display="flex" spacing={1} direction="row" justifyContent={"right"}>
+            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Descuento:</Typography>
             <Typography style={{ fontSize: 11 }}>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
@@ -233,15 +202,8 @@ export const Bill = React.forwardRef((props, ref) => {
             </Typography>
           </Stack>
 
-          <Stack
-            display="flex"
-            spacing={1}
-            direction="row"
-            justifyContent={"right"}
-          >
-            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-              Monto Total:
-            </Typography>
+          <Stack display="flex" spacing={1} direction="row" justifyContent={"right"}>
+            <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Monto Total:</Typography>
             <Typography style={{ fontSize: 11 }}>
               {new Intl.NumberFormat("es-NI", {
                 style: "currency",
@@ -251,15 +213,8 @@ export const Bill = React.forwardRef((props, ref) => {
           </Stack>
 
           {isContado ? (
-            <Stack
-              display="flex"
-              spacing={1}
-              direction="row"
-              justifyContent={"right"}
-            >
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Saldo:
-              </Typography>
+            <Stack display="flex" spacing={1} direction="row" justifyContent={"right"}>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Saldo:</Typography>
               <Typography style={{ fontSize: 11 }}>
                 {new Intl.NumberFormat("es-NI", {
                   style: "currency",
@@ -268,40 +223,20 @@ export const Bill = React.forwardRef((props, ref) => {
               </Typography>
             </Stack>
           ) : (
-            <Stack
-              display="flex"
-              spacing={1}
-              direction="row"
-              justifyContent={"left"}
-            >
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Dias de Credito:
-              </Typography>
+            <Stack display="flex" spacing={1} direction="row" justifyContent={"left"}>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Dias de Credito:</Typography>
               <Typography style={{ fontSize: 11 }}>15</Typography>
             </Stack>
           )}
         </Stack>
 
-        <Stack
-          display="flex"
-          spacing={1}
-          direction="row"
-          justifyContent={"center"}
-        >
-          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-            Gestor:
-          </Typography>
-          <Typography style={{ fontSize: 11 }}>
-            {facturedBy.fullName}
-          </Typography>
+        <Stack display="flex" spacing={1} direction="row" justifyContent={"center"}>
+          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Gestor:</Typography>
+          <Typography style={{ fontSize: 11 }}>{facturedBy.fullName}</Typography>
         </Stack>
 
-        <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-          GRACIAS POR SU COMPRA!
-        </Typography>
-        <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-          NO SE ACEPTAN DEVOLUCIONES
-        </Typography>
+        <Typography style={{ fontWeight: "bold", fontSize: 11 }}>GRACIAS POR SU COMPRA!</Typography>
+        <Typography style={{ fontWeight: "bold", fontSize: 11 }}>NO SE ACEPTAN DEVOLUCIONES</Typography>
       </Stack>
 
       <hr />

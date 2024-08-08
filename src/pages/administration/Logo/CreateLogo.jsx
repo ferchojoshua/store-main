@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import { isEmpty } from "lodash";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
-import { CreateLogoAsync, UpdateLogoAsync , getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
+import { CreateLogoAsync, UpdateLogoAsync , getLogoByStoreIdAsync} from "../../../services/CreateLogoApi";
 
 const LogoCreate = ({ setShowModal }) => {
   const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } = useContext(DataContext);
@@ -58,7 +58,8 @@ const LogoCreate = ({ setShowModal }) => {
         navigate(`${ruta}/unauthorized`);
         return null;
       }
-      return null;
+      toastError(result.error.message);
+      return ;
     }
 
     if (result.data === "eX01") {
@@ -83,21 +84,16 @@ const LogoCreate = ({ setShowModal }) => {
     setRuc(result.data.ruc || "");
     setTelefono(result.data.telefono || "+505");
     setTelefonow(result.data.telefonoWhatsApp || "+505");
-    // setLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
-    if (result.data.imagenUrl) {
-      setLogo(result.data.imagenUrl);
-      setPreviewLogo(result.data.imagenUrl);
-      console.log('Setting image URL:', result.data.imagenUrl);
+    if (result.data.imagenBase64) {
+      const imageUrl = `data:image/jpeg;base64,${result.data.imagenBase64}`; // Mostrar el logo seleccionado
+      setLogo(imageUrl);
+      setPreviewLogo(imageUrl);
     } else {
       setLogo(null);
       setPreviewLogo(null);
-      console.log('No image URL found');
     }
     setIsEditing(false);
     setHasExistingRecord(true);
-    // setPreviewLogo(result.data.imagenUrl ? result.data.imagenUrl : null);
-    // alert(Store ID Selected1: ${storeId}); 
-
     return result.data;
   };
 
@@ -145,7 +141,7 @@ const LogoCreate = ({ setShowModal }) => {
     setSelectedFile(null);
     setIsFileSelected(false);
     setIsEditing(false);
-    setPreviewLogo(null); // Limpiar el preview del logo al limpiar los campos
+    setPreviewLogo(null); 
   };
 
   const handleFileChange = (event) => {
@@ -160,31 +156,35 @@ const LogoCreate = ({ setShowModal }) => {
     setIsEditing(true);
 };
 
-  const handleStoreChange = async (event) => {
-    const storeId = Number(event.target.value);
-    // alert(Store ID Selected 2: ${storeId}); 
-  
-    setSelectedStore(storeId);
-  
-    if (storeId) {
-      const logoData = await getLogo(storeId);
-      if (logoData) {
-        setDireccion(logoData.direccion || "");
-        setRuc(logoData.ruc || "");
-        setTelefono(logoData.telefono || "+505");
-        setTelefonow(logoData.telefonoWhatsApp || "+505");
-        setLogo(logoData.imagenUrl ? logoData.imagenUrl : null);
-        setIsEditing(false);
-        setHasExistingRecord(true);
-        setPreviewLogo(logoData.imagenUrl ? logoData.imagenUrl : null);
+const handleStoreChange = async (event) => {
+  const storeId = Number(event.target.value);
+  setSelectedStore(storeId);
+
+  if (storeId) {
+    const logoData = await getLogo(storeId);
+    if (logoData) {
+      setDireccion(logoData.direccion || "");
+      setRuc(logoData.ruc || "");
+      setTelefono(logoData.telefono || "+505");
+      setTelefonow(logoData.telefonoWhatsApp || "+505");
+      if (logoData.imagenBase64) {
+        const imageUrl = `data:image/jpeg;base64,${logoData.imagenBase64}`;
+        setLogo(imageUrl);
+        setPreviewLogo(imageUrl);
       } else {
-        setHasExistingRecord(false);
-        clearFields();
+        setLogo(null);
+        setPreviewLogo(null);
       }
+      setIsEditing(false);
+      setHasExistingRecord(true);
     } else {
+      setHasExistingRecord(false);
       clearFields();
     }
-  };
+  } else {
+    clearFields();
+  }
+};
   
   useEffect(() => {
     (async () => {
@@ -216,6 +216,12 @@ const LogoCreate = ({ setShowModal }) => {
     })();
   }, [token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
 
+
+  const handleDireccionChange = (e) => {
+    const value = e.target.value.replace(/\s/g, ""); // Remover espacios en blanco
+    setDireccion(value);
+  };
+
   const CreateLogoAdd = async () => {
     if (!selectedStore) {
       toastError("Debe seleccionar un almacén");
@@ -231,11 +237,7 @@ const LogoCreate = ({ setShowModal }) => {
       data.append("TelefonoWhatsApp", telefonow);
       data.append("StoreId", selectedStore);
 
-      // setIsLoading(true);
-      // const result = await CreateLogoAsync(token, data);
-      // setIsLoading(false);
-
-      setIsLoading(true);
+           setIsLoading(true);
 
       let result;
       if (hasExistingRecord) {
@@ -266,13 +268,18 @@ const LogoCreate = ({ setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-
-      toastSuccess(result.data);
-      clearFields();
-      setSelectedStore("");
       setReload(!reload);
+      setSelectedStore("");
+      clearFields();
+      
+      if (hasExistingRecord) {
+        toastSuccess("Registro actualizado correctamente.");
+      } else {
+        toastSuccess("Producto guardado correctamente.");
+      }
+  
       setShowModal(false);
-      toastSuccess("Exito...!", "success");
+   
     }
   };
 
@@ -447,7 +454,8 @@ const LogoCreate = ({ setShowModal }) => {
               multiline
               rows={4}
               value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
+              // onChange={(e) => setDireccion(e.target.value)}
+              onChange={handleDireccionChange}
               disabled={hasExistingRecord && !isEditing}
               style={{ marginBottom: 20 }}
             />
