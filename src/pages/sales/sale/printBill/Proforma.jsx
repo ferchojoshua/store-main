@@ -14,31 +14,96 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import { getStoreByIdAsync } from "../../../../services/AlmacenApi";
+import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
 
 const Proforma = React.forwardRef((props, ref) => {
-  const { idClient, storeid, montoVenta, nombreCliente, saleDetails } =
-    props.data;
+  const { idClient, storeid, montoVenta, nombreCliente, saleDetails } = props.data;
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const { setIsLoading, setIsLogged, setIsDefaultPass } =
-    useContext(DataContext);
+  const { setIsLoading, setIsLogged, setIsDefaultPass } = useContext(DataContext);
   const token = getToken();
   const user = getUser();
 
-  let ruta = getRuta();
+  const ruta = getRuta();
   const [client, setClient] = useState([]);
   const [store, setStore] = useState([]);
+  const [storeLogo, setStoreLogo] = useState(null);
+  const [storeLogoData, setStorelogoData] = useState(null);
 
   const hoy = new Date();
 
   useEffect(() => {
-    (async () => {
+    const fetchStoreLogoAndData = async () => {
       setIsLoading(true);
-      if (!isUndefined(idClient)) {
+      try {
+        const resultStore = await getStoreByIdAsync(token, storeid);
+        if (!resultStore.statusResponse) {
+          if (resultStore.error.request.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(resultStore.error.message);
+          return;
+        }
+        if (resultStore.data === "eX01") {
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+        if (resultStore.data.isDefaultPass) {
+          setIsDefaultPass(true);
+          return;
+        }
+        setStore(resultStore.data);
+
+        // Fetch the store logo
+        const logoResult = await getLogoByStoreIdAsync(token, storeid);
+        setIsLoading(false);
+        if (!logoResult.statusResponse) {
+          if (logoResult.error?.request?.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(logoResult.error.message);
+          return;
+        }
+
+        if (logoResult.data === "eX01") {
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return null;
+        }
+
+        if (logoResult.data.isDefaultPass) {
+          setIsDefaultPass(true);
+          return null;
+        }
+        setStore(logoResult.data);
+
+        const imageUrl = `data:image/jpeg;base64,${logoResult.data.imagenBase64}`;
+        setStoreLogo(imageUrl);   
+      } catch (error) {
+        toastError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStoreLogoAndData();
+  }, [storeid, token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
+
+  useEffect(() => {
+    const fetchClientData = async () => {
+      if (isUndefined(idClient)) return;
+
+      setIsLoading(true);
+      try {
         const resultClient = await getClientByIdAsync(token, idClient);
+
         if (!resultClient.statusResponse) {
-          setIsLoading(false);
           if (resultClient.error.request.status === 401) {
             navigate(`${ruta}/unauthorized`);
             return;
@@ -48,7 +113,6 @@ const Proforma = React.forwardRef((props, ref) => {
         }
 
         if (resultClient.data === "eX01") {
-          setIsLoading(false);
           deleteUserData();
           deleteToken();
           setIsLogged(false);
@@ -56,99 +120,48 @@ const Proforma = React.forwardRef((props, ref) => {
         }
 
         if (resultClient.data.isDefaultPass) {
-          setIsLoading(false);
           setIsDefaultPass(true);
           return;
         }
 
         setClient(resultClient.data);
-      }
-
-      const result = await getStoreByIdAsync(token, storeid);
-      if (!result.statusResponse) {
+      } catch (error) {
+        toastError(error.message);
+      } finally {
         setIsLoading(false);
-        if (result.error.request.status === 401) {
-          navigate(`${ruta}/unauthorized`);
-          return;
-        }
-        toastError(result.error.message);
-        return;
       }
+    };
 
-      if (result.data === "eX01") {
-        setIsLoading(false);
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (result.data.isDefaultPass) {
-        setIsLoading(false);
-        setIsDefaultPass(true);
-        return;
-      }
-      setStore(result.data);
-      setIsLoading(false);
-    })();
-  }, []);
+    fetchClientData();
+  }, [idClient, token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        paddingRight: 10,
-        textAlign: "center",
-      }}
-    >
-      <img
-        loading="lazy"
-        src={
-          store.id === 1 ? require("../../../../components/media/Icono.png")
-            : store.id === 2 ? require("../../../../components/media/autoFull.jpeg")
-            : store.id === 3 ? require("../../../../components/media/Icono.png")
-            : store.id === 8 ? require("../../../../components/media/autoFull.jpeg")
-            : require("../../../../components/media/superMoto.jpeg")
-        }
-        alt="logo"
-        style={{ height: 80 }}
-      />
+    <div ref={ref} style={{ paddingRight: 10, textAlign: "center" }}>
+      {storeLogo ? (
+        <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 80 }} />
+      ) : (
+        <p>Cargando logotipo...</p>
+      )}
 
       <Stack>
-        <Typography style={{ fontWeight: "bold", fontSize: 20 }}>
-          PROFORMA
-        </Typography>
+        <Typography style={{ fontWeight: "bold", fontSize: 20 }}>PROFORMA</Typography>
 
         <Divider />
 
         <Grid spacing={1} container>
           <Grid item xs={4}>
             <Stack textAlign="right">
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Agencia:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Ruc:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Direccion:
-              </Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Agencia:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Ruc:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Dirección:</Typography>
             </Stack>
           </Grid>
 
           <Grid item xs={8}>
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
-              <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
-              {store.id === 2 || store.id === 8 ? (
-                <Typography style={{ fontSize: 11 }}>
-                  Chinandega, Donde fue el Variedades 1/2 al Norte
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  Chinandega, Semaforos Super 7, 1/2 C. al Norte
-                </Typography>
-              )}
+              <Typography style={{ fontSize: 11 }}>{store.ruc}</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.direccion}</Typography>
             </Stack>
           </Grid>
         </Grid>
@@ -156,60 +169,32 @@ const Proforma = React.forwardRef((props, ref) => {
         <Grid spacing={1} container>
           <Grid item xs={4}>
             <Stack textAlign="right">
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                WhatsApp:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Telefono:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                F. Emision:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Vence:
-              </Typography>
-              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-                Cliente:
-              </Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>WhatsApp:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Teléfono:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>F. Emisión:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Vence:</Typography>
+              <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Cliente:</Typography>
             </Stack>
           </Grid>
 
           <Grid item xs={8}>
             <Stack textAlign="left">
-            {store.id === 2 || store.id === 8 ? (
-                <Typography style={{ fontSize: 11 }}>
-                  +505 7633-4531
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  +505 7837-6964
-                </Typography>
-              )}
-              <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.telefonoWhatsApp}</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.telefono}</Typography>
+              <Typography style={{ fontSize: 11 }}>{moment(hoy).format("L")}</Typography>
+              <Typography style={{ fontSize: 11 }}>{moment(hoy).add(15, "d").format("L")}</Typography>
               <Typography style={{ fontSize: 11 }}>
-                {moment(hoy).format("L")}
+                {isUndefined(idClient)
+                  ? nombreCliente === ""
+                    ? "Cliente Eventual"
+                    : nombreCliente
+                  : client.nombreCliente}
               </Typography>
-
-              <Typography style={{ fontSize: 11 }}>
-                {moment(hoy).add(15, "d").format("L")}
-              </Typography>
-
-              {isUndefined(idClient) ? (
-                <Typography style={{ fontSize: 11 }}>
-                  {nombreCliente === "" ? "Cliente Eventual" : nombreCliente}
-                </Typography>
-              ) : (
-                <Typography style={{ fontSize: 11 }}>
-                  {client.nombreCliente}
-                </Typography>
-              )}
             </Stack>
           </Grid>
         </Grid>
 
-        <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
-          DETALLE DE PROFORMA
-        </Typography>
+        <Typography style={{ fontWeight: "bold", fontSize: 15 }}>DETALLE DE PROFORMA</Typography>
 
         <Table size="sm" responsive>
           <thead>
@@ -221,42 +206,29 @@ const Proforma = React.forwardRef((props, ref) => {
             </tr>
           </thead>
           <tbody>
-            {saleDetails.map((item) => {
-              return (
-                <tr key={saleDetails.indexOf(item) + 1}>
-                  <td style={{ textAlign: "left", fontSize: 11 }}>
-                    {item.product.description}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 11 }}>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(item.costoUnitario)}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 11 }}>
-                    {item.cantidad}
-                  </td>
-                  <td style={{ textAlign: "center", fontSize: 11 }}>
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(item.costoTotal)}
-                  </td>
-                </tr>
-              );
-            })}
+            {saleDetails.map((item, index) => (
+              <tr key={index}>
+                <td style={{ textAlign: "left", fontSize: 11 }}>{item.product.description}</td>
+                <td style={{ textAlign: "center", fontSize: 11 }}>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(item.costoUnitario)}
+                </td>
+                <td style={{ textAlign: "center", fontSize: 11 }}>{item.cantidad}</td>
+                <td style={{ textAlign: "center", fontSize: 11 }}>
+                  {new Intl.NumberFormat("es-NI", {
+                    style: "currency",
+                    currency: "NIO",
+                  }).format(item.costoTotal)}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
 
-        <Stack
-          display="flex"
-          spacing={1}
-          direction="row"
-          justifyContent={"center"}
-        >
-          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-            Monto Total:
-          </Typography>
+        <Stack display="flex" spacing={1} direction="row" justifyContent={"center"}>
+          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Monto Total:</Typography>
           <Typography style={{ fontSize: 11 }}>
             {new Intl.NumberFormat("es-NI", {
               style: "currency",
@@ -265,23 +237,16 @@ const Proforma = React.forwardRef((props, ref) => {
           </Typography>
         </Stack>
 
-        <Stack
-          display="flex"
-          spacing={1}
-          direction="row"
-          justifyContent={"center"}
-        >
-          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
-            Gestor:
-          </Typography>
+        <Stack display="flex" spacing={1} direction="row" justifyContent={"center"}>
+          <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Gestor:</Typography>
           <Typography style={{ fontSize: 11 }}>{user}</Typography>
         </Stack>
       </Stack>
 
       <hr />
-      <hr />
-      <hr />
-      <hr />
+      <Typography style={{ fontSize: 11 }}>
+        {store.razonSocial || "Razón social no disponible"}
+      </Typography>
     </div>
   );
 });

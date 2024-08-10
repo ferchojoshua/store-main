@@ -1,9 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useContext} from "react";
 import { Divider, Grid, Stack, Typography } from "@mui/material";
+import { DataContext } from "../../../../context/DataContext";
 import moment from "moment";
 import { Table } from "react-bootstrap";
-import { isEmpty } from "lodash";
-import { getLogoByStoreIdAsync } from "../../../services/CreateLogoApi";
+import { isEmpty } from "lodash";import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+  getUser,
+} from "../../../../services/Account";
+import { useNavigate } from "react-router-dom";
+import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
+
 
 export const Bill = React.forwardRef((props, ref) => {
   const {
@@ -23,20 +32,72 @@ export const Bill = React.forwardRef((props, ref) => {
   } = props.data;
 
   const [storeLogo, setStoreLogo] = useState(null);
+  const navigate = useNavigate();
+  
+  const token = getToken();
+  const ruta = getRuta();
+  const { setIsLoading, setIsLogged, setIsDefaultPass } = useContext(DataContext);
+  const [stores, setStores] = useState([]);
 
-  useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const response = await getLogoByStoreIdAsync(store.id);
-        setStoreLogo(response.imagenBase64);
-      } catch (error) {
-        console.error("Error al obtener el logo:", error);
-      }
-    };
+  
 
-    fetchLogo();
-  }, [store.id]);
+  // useEffect(() => {
+  //   const fetchLogo = async () => {
+  //     try {
+  //       const response = await getLogoByStoreIdAsync(store.id);
+  //       setStoreLogo(response.imagenBase64);
+  //     } catch (error) {
+  //       console.error("Error al obtener el logo:", error);
+  //     }
+  //   };
 
+  //   fetchLogo();
+  // }, [store.id]);
+
+  
+        // Fetch the store logo
+        useEffect(() => {
+          const fetchLogo = async () => {
+            try {
+              const logoResult = await getLogoByStoreIdAsync(token,  store.storeid);
+        
+              if (!logoResult.statusResponse) {
+                if (logoResult.error?.request?.status === 401) {
+                  navigate(`${ruta}/unauthorized`);
+                  return;
+                }
+                toastError(logoResult.error.message);
+                return;
+              }
+        
+              if (logoResult.data === "eX01") {
+                deleteUserData();
+                deleteToken();
+                setIsLogged(false);
+                return;
+              }
+        
+              if (logoResult.data.isDefaultPass) {
+                setIsDefaultPass(true);
+                return;
+              }
+        
+              const imageUrl = `data:image/jpeg;base64,${logoResult.data.imagenBase64}`;
+              setStoreLogo(imageUrl);
+              setStores(logoResult.data);
+            } catch (error) {
+              toastError(error.message);
+            } finally {
+              setIsLoading(false);
+            }
+          };
+        
+          fetchLogo();
+        }, [store.storeid, token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
+        
+
+
+  
   return (
     <div
       ref={ref}
@@ -45,15 +106,10 @@ export const Bill = React.forwardRef((props, ref) => {
         textAlign: "center",
       }}
     >
-      {storeLogo ? (
-        <img
-          loading="lazy"
-          src={`data:image/png;base64,${storeLogo}`}
-          alt="logo"
-          style={{ height: 80 }}
-        />
+       {storeLogo ? (
+        <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 80 }} />
       ) : (
-        <p>Cargando logo...</p>
+        <p>Cargando logotipo...</p>
       )}
       <Stack textAlign="center">
         <Typography style={{ fontWeight: "bold", fontSize: 20 }}>
@@ -84,9 +140,7 @@ export const Bill = React.forwardRef((props, ref) => {
               <Typography style={{ fontSize: 11 }}>{id}</Typography>
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
               <Typography style={{ fontSize: 11 }}>{store.ruc}</Typography>
-              <Typography style={{ fontSize: 11 }}>
-                {store.direccion}
-              </Typography>
+              <Typography style={{ fontSize: 11 }}>{store.direccion}</Typography>
             </Stack>
           </Grid>
         </Grid>

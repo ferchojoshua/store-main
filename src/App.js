@@ -142,44 +142,57 @@ function App() {
     },
   });
 
-  // Actualización de la conexión a SignalR usando useEffect
-  useEffect(() => {
-    const connection = new HubConnectionBuilder()
-      // .withUrl(${controller}serverHub, { accessTokenFactory: () => token })
-      .withUrl(`${controller}signalR`, { accessTokenFactory: () => token })
-      .withAutomaticReconnect()
-      .build();
+  window.addEventListener("beforeunload", function (event) {
+    (async () => {
+      const result = await onCloseNavigatorAsync(token);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
 
-    const startConnection = async () => {
-      try {
-        await connection.start();
-        console.log("SignalR connected.");
-        connection.on("serverAccess", () => {
-          serverAccess();
-        });
-      } catch (err) {
-        console.error("Error starting SignalR connection:", err);
-        setTimeout(startConnection, 5000);
+        simpleMessage("No se pudo conectar con el servidor", "error");
+        return;
       }
-    };
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+    })();
+  });
 
-    connection.onclose(async () => {
-      await startConnection();
-    });
+  const connection = new HubConnectionBuilder()
+    .withUrl(`${controller}serverHub`)
+    // .configureLogging(LogLevel.Information)
+    .build();
 
-    startConnection();
+  async function start() {
+    try {
+      await connection.start();
+      connection.on("serverAccess", () => {
+        serverAccess();
+      });
+    } catch (err) {
+      setTimeout(start, 5000);
+    }
+  }
 
-    return () => {
-      connection.stop();
-    };
-  }, [token, setServerAccess]); // Agregado punto y coma aquí
+  connection.onclose(async () => {
+    await start();
+  });
+
+  start();
 
   const serverAccess = async () => {
     const result = await getRolAsync(token);
     setServerAccess(!result.data.isServerAccess);
   };
 
-  if (isLogged === null || isDefaultPass === null || access.length === 0) {
+  if (isLogged === null || isDefaultPass === null || access === []) {
     return <Loading />;
   }
 

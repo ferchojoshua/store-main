@@ -39,7 +39,7 @@ export const CreateLogoAsync = async (token, data) => {
 export const getLogoByStoreIdAsync = async (token, storeId) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetLogoByStoreId/`;
-  alert(`Token: ${token}, Store ID Selected api: ${storeId}`); 
+  // alert(`Token: ${token}, Store ID Selected api: ${storeId}`); 
   const authAxios = axios.create({
     baseURL: service,
     headers: {
