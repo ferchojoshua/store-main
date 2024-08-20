@@ -165,6 +165,7 @@ function App() {
     })();
   });
 
+   useEffect(() => {
   const connection = new HubConnectionBuilder()
     .withUrl(`${controller}serverHub`)
     // .configureLogging(LogLevel.Information)
@@ -177,7 +178,8 @@ function App() {
         serverAccess();
       });
     } catch (err) {
-      setTimeout(start, 5000);
+      // setTimeout(start, 5000);
+      console.error(start, err);
     }
   }
 
@@ -187,6 +189,17 @@ function App() {
 
   start();
 
+
+    return () => {
+      connection.stop()
+        .then(() => {
+          console.log('SignalR connection stopped.');
+        })
+        .catch(error => {
+          console.error('Error stopping SignalR connection:', error);
+        });
+    };
+  }, []);
   const serverAccess = async () => {
     const result = await getRolAsync(token);
     setServerAccess(!result.data.isServerAccess);

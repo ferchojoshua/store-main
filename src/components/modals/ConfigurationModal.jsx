@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogActions, Button, FormControlLabel, Switch } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import Modal from 'react-bootstrap/Modal';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faTimes } from '@fortawesome/free-solid-svg-icons';
+// import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ConfigurationModal = ({ open, handleClose, handleConfirm, title, children }) => {

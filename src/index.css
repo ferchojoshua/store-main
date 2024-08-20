@@ -13,4 +13,8 @@ code {
     monospace;
 }
 
-
+.table-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

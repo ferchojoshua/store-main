@@ -397,6 +397,7 @@ const Facrturar = () => {
           data={dataProforma}
           setShowModal={setShowProformaModal}
         />
+        
       </SmallModal>
     </div>
   );

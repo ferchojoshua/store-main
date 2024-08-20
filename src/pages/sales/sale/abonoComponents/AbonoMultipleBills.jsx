@@ -1,11 +1,27 @@
-import React from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { Divider, Grid, Stack, Typography } from "@mui/material";
 import moment from "moment";
+import { DataContext } from "../../../../context/DataContext";
+import { useNavigate } from "react-router-dom";
+import {
+  deleteToken,
+  deleteUserData,
+  getToken,
+} from "../../../../services/Account";
+import { getRuta, toastError } from "../../../../helpers/Helpers";
+import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
 
 const AbonoMultipleBills = React.forwardRef((props, ref) => {
   const { client, data } = props;
   const { fechaAbono, realizedBy, store } = data[0];
   const { nombreCliente } = client;
+  const [storeLogo, setStoreLogo] = useState(null);
+  const navigate = useNavigate();
+  const token = getToken();
+  const ruta = getRuta();
+  const { setIsLoading, setIsLogged, setIsDefaultPass } = useContext(DataContext);
+  const [stores, setStores] = useState([]);
+  
 
   const totalAbonado = () => {
     let sum = 0;
@@ -15,6 +31,47 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
     return sum;
   };
 
+          // Fetch the store logo
+          useEffect(() => {
+            const fetchLogo = async () => {
+              try {
+                const logoResult = await getLogoByStoreIdAsync(token, store.id);
+          
+                if (!logoResult.statusResponse) {
+                  if (logoResult.error?.request?.status === 401) {
+                    navigate(`${ruta}/unauthorized`);
+                    return;
+                  }
+                  toastError(logoResult.error.message);
+                  return;
+                }
+          
+                if (logoResult.data === "eX01") {
+                  deleteUserData();
+                  deleteToken();
+                  setIsLogged(false);
+                  return;
+                }
+          
+                if (logoResult.data.isDefaultPass) {
+                  setIsDefaultPass(true);
+                  return;
+                }
+          
+                const imageUrl = `data:image/jpeg;base64,${logoResult.data.imagenBase64}`;
+                setStoreLogo(imageUrl);
+                setStores(logoResult.data);
+              } catch (error) {
+                toastError(error.message);
+              } finally {
+                setIsLoading(false);
+              }
+            };
+          
+            fetchLogo();
+          }, [store, token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
+          
+
   return (
     <div
       ref={ref}
@@ -23,7 +80,13 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
         textAlign: "center",
       }}
     >
-      <img
+      <div ref={ref} style={{ paddingRight: 10, textAlign: "center" }}>
+      {storeLogo ? (
+        <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 80 }} />
+      ) : (
+        <p>Cargando logotipo...</p>
+      )}  
+      {/* <img
         loading="lazy"
         src={
           store.id === 1 ? require("../../../../components/media/Icono.png")
@@ -34,7 +97,7 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
         }
         alt="logo"
         style={{ height: 80 }}
-      />
+      /> */}
       <Stack>
         <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
           Recibo de Pago
@@ -59,7 +122,13 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
           <Grid item xs={8}>
             <Stack textAlign="left">
               <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
-              <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
+              <Typography style={{ fontSize: 11 }}>{store.name}</Typography>
+              <Typography style={{ fontSize: 11 }}>{stores.ruc}</Typography>
+              <Typography style={{ fontSize: 11 }}>{stores.direccion}</Typography>
+            </Stack>
+          </Grid>
+        </Grid>
+              {/* <Typography style={{ fontSize: 11 }}>2810505810009A</Typography>
               {store.id === 2 || store.id === 8 ? (
                 <Typography style={{ fontSize: 11 }}>
                   Chinandega, Donde fue el Variedades 1/2 al Norte
@@ -71,7 +140,7 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
               )}
             </Stack>
           </Grid>
-        </Grid>
+        </Grid> */}
 
         <Grid spacing={1} container>
           <Grid item xs={4}>
@@ -93,7 +162,9 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
           </Grid>
           <Grid item xs={8}>
             <Stack textAlign="left">
-            {store.id === 2 || store.id === 8 ? (
+            <Typography style={{ fontSize: 11 }}>{stores.telefonoWhatsApp}</Typography>
+            <Typography style={{ fontSize: 11 }}>{stores.telefono}</Typography>
+            {/* {store.id === 2 || store.id === 8 ? (
                 <Typography style={{ fontSize: 11 }}>
                   +505 7633-4531
                 </Typography>
@@ -102,7 +173,7 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
                   +505 7837-6964
                 </Typography>
               )}
-              <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography>
+              <Typography style={{ fontSize: 11 }}>+505 2340 2464</Typography> */}
               <Typography style={{ fontSize: 11 }}>
                 {moment(fechaAbono).format("DD/MM/YYYY HH:mm A")}
               </Typography>
@@ -216,6 +287,7 @@ const AbonoMultipleBills = React.forwardRef((props, ref) => {
       <hr />
       <hr />
       <hr />
+    </div>
     </div>
   );
 });
