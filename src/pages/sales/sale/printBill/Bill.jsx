@@ -67,7 +67,7 @@ export const Bill = React.forwardRef((props, ref) => {
           setIsDefaultPass(true);
           return;
         }
-         
+
     const imageUrl = `data:image/jpeg;base64,${logoResult.data.imagenBase64}`;
     const img = new Image();
     img.src = imageUrl;

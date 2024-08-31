@@ -43,9 +43,10 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(selectedProduct.description);
-  const [storeList, setStoreList] = useState([]);
-  const [selectedStore, setSelectedStore] = useState(selectedProduct.aid);
+   const [storeList, setStoreList] = useState([]);
+  const [aid, setaid] = useState(selectedProduct.aid);
   const [tipoNegocio, setTipoNegocio] = useState([]);
+  const [selectedStore, setSelectedStore] = useState(selectedProduct.aid);
   const [selectedTNegocio, setselectedTNegocio] = useState(selectedProduct.tnId);
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(selectedProduct.fid);
@@ -170,7 +171,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
         return;
       }
       setIsLoading(false);
-      setFamilia(result.data);
+      setSelectedFamilia(result.data);
     })();
   }, []);
 
@@ -234,46 +235,6 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
       setIsLoading(false);
     }
   };
-
-  // const handleChangeTN = async (value) => {
-  //   // setFamilia([]);
-  //   // setSelectedFamilia("");
-  //   // setselectedTNegocio(value);
-
-  //   if (value !== "") {
-  //     setIsLoading(true);
-
-  //     const result = await getFamiliasByTNAsync(token, value);
-  //     if (!result.statusResponse) {
-  //       setIsLoading(false);
-  //       if (result.error.request.status === 401) {
-  //         navigate(`${ruta}/unauthorized`);
-  //         return;
-  //       }
-  //       toastError(result.error.message);
-  //       return;
-  //     }
-
-  //     if (result.data === "eX01") {
-  //       setIsLoading(false);
-  //       deleteUserData();
-  //       deleteToken();
-  //       setIsLogged(false);
-  //       return;
-  //     }
-
-  //     if (result.data.isDefaultPass) {
-  //       setIsLoading(false);
-  //       setIsDefaultPass(true);
-  //       return;
-  //     }
-
-  //     setIsLoading(false);
-  //     setFamilia(result.data);
-  //   } else {
-  //     setFamilia([]);
-  //   }
-  // };
 
   return (
     <div>
@@ -364,38 +325,43 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               })}
             </Select>
           </FormControl>
- 
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ marginTop: 20 }}
-            disabled={!isEdit}
-            required
-          >
-            <InputLabel id="demo-simple-select-standard-label">
-              Seleccione una familia
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={selectedFamilia.fid}
-              onChange={(e) => setSelectedFamilia(e.target.value)}
-              label="Familia"
-              style={{ textAlign: "left" }}
-              disabled={true}
-            >
-              <MenuItem key={0} value="">
-                <em> Seleccione una familia</em>
-              </MenuItem>
-              {familia.map((item) => {
-                return (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.description}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+    
+    
+    
+         {false && (
+  <FormControl
+    variant="standard"
+    fullWidth
+    style={{ marginTop: 20 }}
+    disabled={!isEdit}
+    required
+  >
+    <InputLabel id="demo-simple-select-standard-label">
+      Seleccione una familia.
+    </InputLabel>
+    <Select
+      labelId="demo-simple-select-standard-label"
+      id="demo-simple-select-standard"
+      value={selectedFamilia}
+      onChange={(e) => setSelectedFamilia(e.target.value)}
+      label="Familia"
+      style={{ textAlign: "left" }}
+      disabled={true}
+    >
+      <MenuItem key={0} value="">
+        <em> Seleccione una familia</em>
+      </MenuItem>
+      {familia.map((item) => {
+        return (
+          <MenuItem key={item.id} value={item.id}>
+            {item.description}
+          </MenuItem>
+        );
+      })}
+    </Select>
+  </FormControl>
+)}
+
 
           <TextField
             fullWidth
@@ -407,19 +373,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
             value={description ? description : ""}
             disabled={true}
           />
-          {/* 
-          <TextField
-            fullWidth
-            required
-            style={{ marginTop: 20 }}
-            variant="standard"
-            onChange={(e) => setBarCode(e.target.value)}
-            label={"Codigo de barras"}
-            value={barCode ? barCode : ""}
-            disabled={true}
-          /> */}
-
-          <TextField
+            <TextField
             fullWidth
             required
             variant="standard"
@@ -468,43 +422,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
     startAdornment: <InputAdornment position="start">C$</InputAdornment>,
   }}
 />
-{/* 
-          <FormControl
-            variant="standard"
-            fullWidth
-            style={{ marginTop: 20 }}
-            required
-            disabled={true}
-          >
-            <InputLabel id="demo-simple-select-standard-label">
-              Seleccione una U/M...
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={um}
-              onChange={(e) => setUM(e.target.value)}
-              label="Unidad de Medida"
-              style={{ textAlign: "left" }}
-              disabled={true}>
-              <MenuItem key={0} value="">
-                <em>Seleccione una U/M...</em>
-              </MenuItem>
-
-              <MenuItem key={1} value={"PIEZA"}>
-                PIEZA
-              </MenuItem>
-              <MenuItem key={2} value={"SET"}>
-                SET
-              </MenuItem>
-              <MenuItem key={3} value={"PAR"}>
-                PAR
-              </MenuItem>
-            </Select>
-          </FormControl> */}
-       
-
-          <FormControl
+         <FormControl
             variant="standard"
             fullWidth
             style={{ marginTop: 20 }}
@@ -526,7 +444,6 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
                 <em>Seleccione un item del catálogo</em>
               </MenuItem>
               {catalogo.map((item) => {
-                // Filtrar solo los elementos con estado activo (estado === true)
                 if (item.estado) {
                   return (
                     <MenuItem key={item.id} value={item.valor}>
@@ -534,7 +451,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
                     </MenuItem>
                   );
                 }
-                return null; // Si el estado no es activo, no renderizar el MenuItem
+                return null; 
               })}
             </Select>
           </FormControl>

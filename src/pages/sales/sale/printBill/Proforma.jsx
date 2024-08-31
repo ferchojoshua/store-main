@@ -15,10 +15,10 @@ import { useNavigate } from "react-router-dom";
 import { getRuta, toastError } from "../../../../helpers/Helpers";
 import { getStoreByIdAsync } from "../../../../services/AlmacenApi";
 import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
-// import "../../../sales/estilos.css"
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+ import "../../../sales/estilos.css"
+// import pdfMake from "pdfmake/build/pdfmake";
+// import pdfFonts from "pdfmake/build/vfs_fonts";
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 const Proforma = React.forwardRef((props, ref) => {
@@ -141,96 +141,7 @@ const Proforma = React.forwardRef((props, ref) => {
 
     fetchClientData();
   }, [idClient, token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
-
-  const generatePDF = () => {
-    const docDefinition = {
-      content: [
-        {
-          text: 'PROFORMA',
-          style: 'header'
-        },
-        {
-          columns: [
-            {
-              width: 'auto',
-              text: [
-                { text: 'Agencia: ', bold: true },
-                store.name + '\n',
-                { text: 'RUC: ', bold: true },
-                store.ruc + '\n',
-                { text: 'Dirección: ', bold: true },
-                store.direccion + '\n',
-                { text: 'WhatsApp: ', bold: true },
-                store.telefonoWhatsApp + '\n',
-                { text: 'Teléfono: ', bold: true },
-                store.telefono
-              ]
-            },
-            {
-              width: '*',
-              text: [
-                { text: 'Fecha Emisión: ', bold: true },
-                moment().format('L') + '\n',
-                { text: 'Vence: ', bold: true },
-                moment().add(15, 'days').format('L') + '\n',
-                { text: 'Cliente: ', bold: true },
-                nombreCliente === "" ? "Cliente Eventual" : nombreCliente
-              ],
-              alignment: 'right'
-            }
-          ]
-        },
-        {
-          text: 'DETALLE DE PROFORMA',
-          style: 'subheader'
-        },
-        {
-          table: {
-            widths: ['*', 'auto', 'auto', 'auto'],
-            body: [
-              [
-                { text: 'Detalle', bold: true },
-                { text: 'P/Unit', bold: true, alignment: 'center' },
-                { text: 'Cantidad', bold: true, alignment: 'center' },
-                { text: 'Total', bold: true, alignment: 'center' }
-              ],
-              ...saleDetails.map(item => [
-                item.product.description,
-                { text: new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO" }).format(item.costoUnitario), alignment: 'center' },
-                { text: item.cantidad.toString(), alignment: 'center' },
-                { text: new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO" }).format(item.costoTotal), alignment: 'center' }
-              ])
-            ]
-          }
-        },
-        {
-          columns: [
-            { text: 'Monto Total:', style: 'totalLabel' },
-            { text: new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO" }).format(montoVenta), style: 'totalValue', alignment: 'right' }
-          ]
-        },
-        {
-          columns: [
-            { text: 'Gestor:', style: 'gestorLabel' },
-            { text: user, style: 'gestorValue', alignment: 'right' }
-          ]
-        }
-      ],
-      styles: {
-        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
-        subheader: { fontSize: 15, bold: true, margin: [0, 10, 0, 5] },
-        totalLabel: { fontSize: 11, bold: true, margin: [0, 10, 0, 5] },
-        totalValue: { fontSize: 11, bold: true },
-        gestorLabel: { fontSize: 11, bold: true, margin: [0, 10, 0, 5] },
-        gestorValue: { fontSize: 11 }
-      }
-    };
-    console.log("Generando PDF...");
-    pdfMake.createPdf(docDefinition).download('proforma.pdf');
-    console.log("PDF generado y descargado.");
-  };
   
-
 
   return (
     <div ref={ref} style={{ paddingRight: 10, textAlign: "center" }}>
