@@ -142,6 +142,7 @@ const LogoCreate = ({ setShowModal }) => {
     setIsFileSelected(false);
     setIsEditing(false);
     setPreviewLogo(null); 
+    setSelectedStore(null);   
   };
 
   const handleFileChange = (event) => {
@@ -217,9 +218,9 @@ const handleStoreChange = async (event) => {
   }, [token, navigate, ruta, setIsLoading, setIsLogged, setIsDefaultPass]);
 
 
+
   const handleDireccionChange = (e) => {
-    const value = e.target.value.replace(/\s/g, ""); // Remover espacios en blanco
-    setDireccion(value);
+    setDireccion(e.target.value);
   };
 
   const CreateLogoAdd = async () => {
@@ -227,95 +228,216 @@ const handleStoreChange = async (event) => {
       toastError("Debe seleccionar un almacén");
       return;
     }
-
+  
     if (validate()) {
       const data = new FormData();
-      data.append("Imagen", selectedFile);
+  // Verifica si `selectedFile` es un archivo nuevo
+if (selectedFile) {
+  data.append("Imagen", selectedFile);  
+} else if (hasExistingRecord && logo) {
+  // Convierte el logo en Base64 a un Blob si viene de la BD
+  if (typeof logo === "string" && logo.startsWith("data:image")) {
+    // Extrae los datos Base64 y conviértelos en un array de bytes
+    const base64Data = logo.split(',')[1];
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    // Crea un Blob y luego un File
+    const blob = new Blob([byteArray], { type: 'image/png' }); // Cambia el tipo según sea necesario
+    const fileFromBlob = new File([blob], "logo-existente.png", { type: blob.type });
+
+    data.append("Imagen", fileFromBlob);
+  } else {
+    toastError("Debe proporcionar un archivo de imagen o tener un logo existente.");
+    return;
+  }
+} else {
+  toastError("Debe proporcionar un archivo de imagen o tener un logo existente.");
+  return;
+}
+
+  
+      // Agrega los demás campos necesarios
       data.append("Direccion", direccion);
       data.append("Ruc", ruc);
       data.append("Telefono", telefono);
       data.append("TelefonoWhatsApp", telefonow);
-      data.append("StoreId", selectedStore);
-
-           setIsLoading(true);
-
-      let result;
-      if (hasExistingRecord) {
-        result = await UpdateLogoAsync(token, data);  // Asegúrate de tener una función UpdateLogoAsync
-      } else {
-        result = await CreateLogoAsync(token, data);
-      }
   
-      setIsLoading(false);
-
-      if (!result.statusResponse) {
-        if (result.error?.request?.status === 401) {
-          navigate(`${ruta}/unauthorized`);
+      // Asegúrate de que StoreId se pasa como entero
+      const storeIdInt = parseInt(selectedStore, 10);
+      if (isNaN(storeIdInt)) {
+        toastError("El valor del almacén no es un número válido.");
+        return;
+      }
+      data.append("StoreId", storeIdInt);
+  
+      setIsLoading(true);
+  
+      try {
+        let result;
+        // Si hay un registro existente, actualiza el logo
+        if (hasExistingRecord) {
+          result = await UpdateLogoAsync(token, data);
+        } 
+        // Si no hay registro existente, crea uno nuevo
+        else {
+          result = await CreateLogoAsync(token, data);
+        }
+  
+        // Manejo de respuestas del API
+        if (!result.statusResponse) {
+          if (result.error?.request?.status === 401) {
+            navigate(`${ruta}/unauthorized`);
+            return;
+          }
+          toastError(result.error?.message);
           return;
         }
-        toastError(result.error?.message);
-        return;
-      }
-
-      if (result.data === "eX01") {
-        deleteUserData();
-        deleteToken();
-        setIsLogged(false);
-        return;
-      }
-
-      if (result.data.isDefaultPass) {
-        setIsDefaultPass(true);
-        return;
-      }
-      setReload(!reload);
-      setSelectedStore("");
-      clearFields();
-      
-      if (hasExistingRecord) {
-        toastSuccess("Registro actualizado correctamente.");
-      } else {
-        toastSuccess("Producto guardado correctamente.");
-      }
   
-      setShowModal(false);
-   
+        if (result.data === "eX01") {
+          deleteUserData();
+          deleteToken();
+          setIsLogged(false);
+          return;
+        }
+  
+        if (result.data.isDefaultPass) {
+          setIsDefaultPass(true);
+          return;
+        }
+  
+        setReload(!reload);
+        setSelectedStore("");
+        clearFields();
+  
+        if (hasExistingRecord) {
+          toastSuccess("Registro actualizado correctamente.");
+        } else {
+          toastSuccess("Producto guardado correctamente.");
+        }
+  
+        setShowModal(false);
+      } catch (error) {
+        toastError("Ocurrió un error al guardar los datos.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
+  
+
+  // const CreateLogoAdd = async () => {
+  //   if (!selectedStore) {
+  //     toastError("Debe seleccionar un almacén");
+  //     return;
+  //   }
+
+  //   if (validate()) {
+  //     const data = new FormData();
+  //     // data.append("Imagen", selectedFile);
+  //     if (selectedFile) {
+  //       data.append("Imagen", selectedFile);
+  //     } else if 
+  //     (hasExistingRecord && logo) {
+  //              data.append("Imagen", logo);
+  //     }
+  //      else 
+  //     {
+  //       toastError("Debe proporcionar un archivo de imagen o tener un logo existente.");
+  //       return; 
+  //       }
+  //     }
+  //     data.append("Direccion", direccion);
+  //     data.append("Ruc", ruc);
+  //     data.append("Telefono", telefono);
+  //     data.append("TelefonoWhatsApp", telefonow);
+  //     data.append("StoreId", selectedStore);
+
+  //          setIsLoading(true);
+
+  //     let result;
+  //     if (hasExistingRecord) {
+  //       result = await UpdateLogoAsync(token, data);  // Asegúrate de tener una función UpdateLogoAsync
+  //     } else {
+  //       result = await CreateLogoAsync(token, data);
+  //     }
+  
+  //     setIsLoading(false);
+
+  //     if (!result.statusResponse) {
+  //       if (result.error?.request?.status === 401) {
+  //         navigate(`${ruta}/unauthorized`);
+  //         return;
+  //       }
+  //       toastError(result.error?.message);
+  //       return;
+  //     }
+
+  //     if (result.data === "eX01") {
+  //       deleteUserData();
+  //       deleteToken();
+  //       setIsLogged(false);
+  //       return;
+  //     }
+
+  //     if (result.data.isDefaultPass) {
+  //       setIsDefaultPass(true);
+  //       return;
+  //     }
+  //     setReload(!reload);
+  //     setSelectedStore("");
+  //     clearFields();
+      
+  //     if (hasExistingRecord) {
+  //       toastSuccess("Registro actualizado correctamente.");
+  //     } else {
+  //       toastSuccess("Producto guardado correctamente.");
+  //     }
+  
+  //     setShowModal(false);
+   
+  //   }
+  // };
 
   const validate = () => {
     let isValid = true;
 
-    if (!isFileSelected) {
+    // const cleanedDireccion = direccion.replace(/\s/g, "");
+
+    if (!isFileSelected && !logo) {
       toastError("Debe seleccionar un archivo");
       isValid = false;
     }
+  
 
-    if (isEmpty(direccion)) {
+    if (isEmpty(direccion) && (!hasExistingRecord || (hasExistingRecord && isEditing))) {
       toastError("Debe ingresar una dirección");
       isValid = false;
     }
-
-    if (isEmpty(ruc)) {
+  
+    if (isEmpty(ruc) && (!hasExistingRecord || (hasExistingRecord && isEditing))) {
       toastError("Debe ingresar un número RUC");
       isValid = false;
     }
-
-    if (telefono.length < 9) {
+  
+    if (telefono.length < 9 && (!hasExistingRecord || (hasExistingRecord && isEditing))) {
       toastError("Debe ingresar un número de teléfono válido");
       isValid = false;
     }
-
-    if (telefonow.length < 9) {
+  
+    if (telefonow.length < 9 && (!hasExistingRecord || (hasExistingRecord && isEditing))) {
       toastError("Debe ingresar un número de WhatsApp válido");
       isValid = false;
     }
-
-    if (!selectedStore) {
+  
+    if (!selectedStore && (!hasExistingRecord || (hasExistingRecord && isEditing))) {
       toastError("Debe seleccionar un almacén");
       isValid = false;
     }
-
     return isValid;
   };
 
@@ -454,11 +576,11 @@ const handleStoreChange = async (event) => {
               multiline
               rows={4}
               value={direccion}
-              // onChange={(e) => setDireccion(e.target.value)}
               onChange={handleDireccionChange}
               disabled={hasExistingRecord && !isEditing}
               style={{ marginBottom: 20 }}
             />
+
             <TextField
               label="Teléfono"
               placeholder="Ingrese el Número de Teléfono"
@@ -526,9 +648,13 @@ const handleStoreChange = async (event) => {
           >
             Confirmar
           </Button>
-          <Button variant="contained" onClick={() => setShowModalSave(false)}>
-            Cancelar
-          </Button>
+          <Button
+  variant="contained"
+  color="secondary"
+  onClick={() => {clearFields();   setShowModalSave(false);  }}
+>
+  Cancelar
+</Button>
         </DialogActions>
       </Dialog>
     </Container>

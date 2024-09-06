@@ -10,7 +10,7 @@ import {
   Paper,
   Checkbox,
   FormControlLabel,
-  InputAdornment ,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -34,8 +34,7 @@ import {
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 
-
-const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
+const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   let ruta = getRuta();
 
   const { setIsLoading, reload, setReload, setIsDefaultPass, setIsLogged } =
@@ -43,18 +42,20 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
   let navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(selectedProduct.description);
-   const [storeList, setStoreList] = useState([]);
+  const [storeList, setStoreList] = useState([]);
   const [aid, setaid] = useState(selectedProduct.aid);
   const [tipoNegocio, setTipoNegocio] = useState([]);
   const [selectedStore, setSelectedStore] = useState(selectedProduct.aid);
-  const [selectedTNegocio, setselectedTNegocio] = useState(selectedProduct.tnId);
+  const [selectedTNegocio, setselectedTNegocio] = useState(
+    selectedProduct.tnId
+  );
   const [familia, setFamilia] = useState([]);
   const [selectedFamilia, setSelectedFamilia] = useState(selectedProduct.fid);
   const [marca, setmarca] = useState(selectedProduct.marca);
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [pvd, setPvd] = useState(selectedProduct.pvd);
   const [pvm, setPvm] = useState(selectedProduct.pvm);
-  const [um, setUM] = useState(selectedProduct.UM); 
+  const [um, setUM] = useState(selectedProduct.UM);
   const [catalogo, setCatalogo] = useState([]);
   const [selectedCatalogo, setSelectedCatalogo] = useState("");
   const [actualizarVentaDetalle, setActualizarVentaDetalle] = useState(false);
@@ -90,7 +91,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
       }
       setTipoNegocio(resultTipoNegocio.data);
 
-      const data = { operacion: 2, };
+      const data = { operacion: 2 };
 
       const resultStore = await getStoresByUserAsync(token);
       if (!resultStore.statusResponse) {
@@ -247,7 +248,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
         }}
       >
         <Container>
-        <FormControl
+          <FormControl
             variant="standard"
             fullWidth
             style={{ marginRight: 20 }}
@@ -325,43 +326,38 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
               })}
             </Select>
           </FormControl>
-    
-    
-    
-         {false && (
-  <FormControl
-    variant="standard"
-    fullWidth
-    style={{ marginTop: 20 }}
-    disabled={!isEdit}
-    required
-  >
-    <InputLabel id="demo-simple-select-standard-label">
-      Seleccione una familia.
-    </InputLabel>
-    <Select
-      labelId="demo-simple-select-standard-label"
-      id="demo-simple-select-standard"
-      value={selectedFamilia}
-      onChange={(e) => setSelectedFamilia(e.target.value)}
-      label="Familia"
-      style={{ textAlign: "left" }}
-      disabled={true}
-    >
-      <MenuItem key={0} value="">
-        <em> Seleccione una familia</em>
-      </MenuItem>
-      {familia.map((item) => {
-        return (
-          <MenuItem key={item.id} value={item.id}>
-            {item.description}
-          </MenuItem>
-        );
-      })}
-    </Select>
-  </FormControl>
-)}
 
+          <FormControl
+            variant="standard"
+            fullWidth
+            style={{ marginTop: 20 }}
+            disabled={!isEdit}
+            required
+          >
+            <InputLabel id="demo-simple-select-standard-label">
+              Seleccione una familia.
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedFamilia}
+              onChange={(e) => setSelectedFamilia(e.target.value)}
+              label="Familia"
+              style={{ textAlign: "left" }}
+              disabled={true}
+            >
+              <MenuItem key={0} value="">
+                <em> Seleccione una familia</em>
+              </MenuItem>
+              {familia.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.description}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
 
           <TextField
             fullWidth
@@ -373,7 +369,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
             value={description ? description : ""}
             disabled={true}
           />
-            <TextField
+          <TextField
             fullWidth
             required
             variant="standard"
@@ -393,36 +389,40 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
             label={"Modelo"}
             value={modelo ? modelo : ""}
             disabled={true}
-          /> 
-          
-          <TextField
-  fullWidth
-  required
-  style={{ marginTop: 20 }}
-  variant="standard"
-  onChange={(e) => setPvd(e.target.value.toUpperCase())}
-  label="PVD"
-  value={pvd ? pvd : ""}
-  disabled={true}
-  InputProps={{
-    startAdornment: <InputAdornment position="start">C$</InputAdornment>,
-  }}
-/>
+          />
 
-<TextField
-  fullWidth
-  required
-  style={{ marginTop: 20 }}
-  variant="standard"
-  onChange={(e) => setPvm(e.target.value.toUpperCase())}
-  label="PVM"
-  value={pvm ? pvm : ""}
-  disabled={true}
-  InputProps={{
-    startAdornment: <InputAdornment position="start">C$</InputAdornment>,
-  }}
-/>
-         <FormControl
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setPvd(e.target.value.toUpperCase())}
+            label="PVD"
+            value={pvd ? pvd : ""}
+            disabled={true}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">C$</InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            required
+            style={{ marginTop: 20 }}
+            variant="standard"
+            onChange={(e) => setPvm(e.target.value.toUpperCase())}
+            label="PVM"
+            value={pvm ? pvm : ""}
+            disabled={true}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">C$</InputAdornment>
+              ),
+            }}
+          />
+          <FormControl
             variant="standard"
             fullWidth
             style={{ marginTop: 20 }}
@@ -451,7 +451,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal,}) => {
                     </MenuItem>
                   );
                 }
-                return null; 
+                return null;
               })}
             </Select>
           </FormControl>
