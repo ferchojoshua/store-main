@@ -291,12 +291,8 @@ const Products = () => {
                 return (
                   <tr key={item.id  || index}>
                     <td>{item.id}</td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.tipoNegocio.description}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.familia ? item.familia.description : ""}
-                    </td>
+                    <td style={{ textAlign: "left" }}>{item.tipoNegocio.description}</td>
+                    <td style={{ textAlign: "left" }}>{item.familia ? item.familia.description : ""} </td>
                     <td style={{ textAlign: "left" }}>{item.description}</td>
                     <td style={{ textAlign: "left" }}>{item.barCode}</td>
                     <td style={{ textAlign: "left" }}>{item.marca}</td>

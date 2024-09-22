@@ -20,7 +20,7 @@ import {
   getTipoNegocioAsync,
 } from "../../../services/TipoNegocioApi";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
-import { getExistencesAsync } from "../../../services/ExistanceApi";
+// import { getExistencesAsync } from "../../../services/ExistanceApi";
 import {
   Button,
   IconButton,
@@ -182,10 +182,7 @@ const ProductsRecal = () => {
       }
 
       setStoreList(storeResult.data);
-      // if (storeResult.data.length > 0) {
-      //   setSelectedStore(storeResult.data[0].id);
-      // }
-
+    
       const data = {
         operacion: 2,
       };
@@ -253,24 +250,17 @@ const ProductsRecal = () => {
     setIsDefaultPass,
     setIsLogged,
   ]);
-  // }, [reload]);
-
-  // const onChangeAlmacen = (value) => {
-  //   setSelectedStore(value);
-  //   setIsTNEnabled(true); // Habilitar el combo de Tipo de Negocio
-  // };
 
   const onChangeAlmacen = async (value) => {
     setSelectedStore(value);
     setIsTNEnabled(true); // Habilitar el combo de Tipo de Negocio
 
-    // Si no se seleccionó ningún almacén, mostrar todos los productos
+  
     if (value === "") {
       setFilteredProducts(productList);
       return;
     }
 
-    // Filtrar productos por almacén seleccionado
     const filtered = productList.filter((product) => product.storeId === value);
     setFilteredProducts(filtered);
   };
@@ -282,23 +272,42 @@ const ProductsRecal = () => {
   };
 
   const handleChangeRadio = (event) => {
-    setSelectedRadio(event.target.value);
-    setIsMasivoSelected(event.target.value === "Masivo");
-    setIsAlmacenSelected(event.target.value === "Masivo");
-  };
+    const value = event.target.value;
+    setSelectedRadio(value);
+  
+    if (value === "Masivo") {
+      setIsMasivoSelected(true);
+      setIsAlmacenSelected(true);
+
+      setSelectedStore("");
+      setSelectedTNegocio(""); 
+      setSelectedFamilia(""); 
+      setFilteredProducts([]); 
+  
+      // Recargar 
+    setReload(!reload); 
+  } else if (value === "Individual") {
+    setIsMasivoSelected(false);
+    setIsAlmacenSelected(false);
+
+    // Clear filters related to "Masivo"
+    setSelectedStore(""); 
+    setSelectedTNegocio("");
+    setSelectedFamilia(""); 
+
+
+    setFilteredProducts([]);
+    setReload(!reload); 
+  }
+};
 
   const onChangeTN = async (value) => {
     setSelectedTNegocio(value);
-    setIsFamiliaEnabled(true); // Habilitar el combo de Familia
-    if (value === "t") {
-      setSelectedFamilia("");
-      return;
-    } else if (value === "") {
-      setSelectedFamilia("");
-      return;
-    } else {
-      setSelectedFamilia("");
+    setIsFamiliaEnabled(true); 
+  
+    setSelectedFamilia("");
       setIsLoading(true);
+      try {
       const resultFamilias = await getFamiliasByTNAsync(token, value);
       if (!resultFamilias.statusResponse) {
         setIsLoading(false);
@@ -324,6 +333,14 @@ const ProductsRecal = () => {
       }
       setIsLoading(false);
       setFamiliaList(resultFamilias.data);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        navigate(`${ruta}/unauthorized`);
+      } else {
+        toastError(error.message);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -404,7 +421,7 @@ const ProductsRecal = () => {
 
   return (
     <div>
-      <h1>Modificar Precio Masivo </h1>
+      <h1>Modificar Precio</h1>
       <Container>
         <FormControl
           variant="standard"
@@ -531,9 +548,6 @@ const ProductsRecal = () => {
                     </MenuItem>
                   );
                 })}
-                <MenuItem key={"t"} value={""}>
-                  Todos...
-                </MenuItem>
               </Select>
             </FormControl>
 
@@ -578,10 +592,7 @@ const ProductsRecal = () => {
                     </MenuItem>
                   );
                 })}
-                <MenuItem key={"t"} value={""}>
-                  Todos...
-                </MenuItem>
-              </Select>
+               </Select>
             </FormControl>
 
             <FormControl
@@ -704,7 +715,7 @@ const ProductsRecal = () => {
             variant="standard"
             onChange={(e) => onChangeSearch(e.target.value.toUpperCase())}
             value={searchTerm}
-            label={"Modificar Precio Masivo"}
+            label={"Modificar Precio"}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -750,9 +761,9 @@ const ProductsRecal = () => {
               </tr>
             </thead>
             <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-              {currentItem.map((item) => { const isSelected = selectedProducts.includes(item.id); 
+              {currentItem.map((item, index) => { const isSelected = selectedProducts.includes(item.id); 
                    return (
-                  <tr key={item.id}>
+                  <tr key={item.id || index}>
                     <td>{item.idProducto}</td>
                     <td style={{ textAlign: "left" }}>{item.almacen}</td>
                     <td style={{ textAlign: "left" }}>{item.tipoNegocio}</td>
@@ -765,8 +776,7 @@ const ProductsRecal = () => {
                     <td style={{ textAlign: "left" }}>{item.pvm.toLocaleString('es-NI', { style: 'currency', currency: 'NIO' })}</td>
                     <td style={{ textAlign: "left", display: "none" }}>{item.aid}</td>
                     <td style={{ textAlign: "left", display: "none" }}>{item.tnId}</td>
-                    <td style={{ textAlign: "left", display: "none" }}>{item.fid}</td>
-                    
+                    <td style={{  display: "none" }}>{item.fid}</td>                    
                     <td>
                       <Stack spacing={1} direction="row">
                         {isAccess(access, "PRODUCTS UPDATE") ? (

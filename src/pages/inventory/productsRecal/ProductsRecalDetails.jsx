@@ -15,10 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
 import { updateProductrecallAsync } from "../../../services/ProductsApi";
-import {
-  getFamiliasByTNAsync,
-  getTipoNegocioAsync,
-} from "../../../services/TipoNegocioApi";
+import { getFamiliaByIdAsync, getTipoNegocioAsync} from "../../../services/TipoNegocioApi";
 import {
   getToken,
   deleteUserData,
@@ -46,11 +43,10 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
   const [aid, setaid] = useState(selectedProduct.aid);
   const [tipoNegocio, setTipoNegocio] = useState([]);
   const [selectedStore, setSelectedStore] = useState(selectedProduct.aid);
-  const [selectedTNegocio, setselectedTNegocio] = useState(
-    selectedProduct.tnId
-  );
-  const [familia, setFamilia] = useState([]);
-  const [selectedFamilia, setSelectedFamilia] = useState(selectedProduct.fid);
+  const [selectedTNegocio, setselectedTNegocio] = useState(selectedProduct.tnId);
+  const [familia, setfamilia] = useState([]);
+   const [selectedfamilia, setSelectedfamilia] = useState(selectedProduct.fid);
+  // const [selectedFamilia, setSelectedFamilia] = useState(Number.isInteger(selectedProduct.fid) ? selectedProduct.fid : 0 );
   const [marca, setmarca] = useState(selectedProduct.marca);
   const [modelo, setModelo] = useState(selectedProduct.modelo);
   const [pvd, setPvd] = useState(selectedProduct.pvd);
@@ -148,7 +144,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
       }
       setCatalogo(resultList.data);
 
-      const result = await getFamiliasByTNAsync(token);
+      const result = await getFamiliaByIdAsync(token, selectedProduct.fid);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -172,9 +168,9 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
         return;
       }
       setIsLoading(false);
-      setSelectedFamilia(result.data);
+      setSelectedfamilia(result.data);
     })();
-  }, []);
+  }, [token, selectedProduct.fid]);
 
   const savesChangesAsync = async () => {
     const data = {
@@ -192,7 +188,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
         return;
       }
 
-      if (selectedFamilia === "" || selectedFamilia === 0) {
+      if (selectedfamilia === "" || selectedfamilia === 0) {
         toastError("Seleccione una familia...");
         return;
       }
@@ -326,22 +322,22 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
               })}
             </Select>
           </FormControl>
-
+{/* 
           <FormControl
             variant="standard"
             fullWidth
             style={{ marginTop: 20 }}
             disabled={!isEdit}
             required
-          >
+          > 
             <InputLabel id="demo-simple-select-standard-label">
               Seleccione una familia.
             </InputLabel>
             <Select
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
-              value={selectedFamilia}
-              onChange={(e) => setSelectedFamilia(e.target.value)}
+              value={selectedfamilia}
+              onChange={(e) => setSelectedfamilia(e.target.value)}
               label="Familia"
               style={{ textAlign: "left" }}
               disabled={true}
@@ -357,7 +353,7 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
                 );
               })}
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           <TextField
             fullWidth
