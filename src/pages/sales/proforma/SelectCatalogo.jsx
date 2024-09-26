@@ -1,11 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
-import { DataContext } from "../../../../context/DataContext";
+import { DataContext } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
 import {
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Autocomplete,
+  TextField,
+  Stack,
 } from "@mui/material"; // Ensure these are imported
 
 import { getListAsync } from "../../../../src/CreateLogoApi";
@@ -16,14 +19,17 @@ import {
 } from "../../../../src/Account";
 import { getRuta, toastError }  from "../../../helpers/Helpers";
 
-const SelectCatalogo = () => {
+const SelectCatalogo = ({
+   selectedCatalogo,
+   setSelectedCatalogo,
+}) => {
   let ruta = getRuta();
   const { setIsLoading, setIsLogged, reload, setIsDefaultPass } = useContext(DataContext);
   let navigate = useNavigate();
 
   const token = getToken();
   const [catalogoList, setCatalogoList] = useState([]);
-  const [selectedCatalogo, setSelectedCatalogo] = useState(null); // Initialize selectedCatalogo
+  // const [selectedCatalogo, setSelectedCatalogo] = useState(null); // Initialize selectedCatalogo
 
   useEffect(() => {
     (async () => {
@@ -74,7 +80,33 @@ const SelectCatalogo = () => {
 
   return (
     <div>
-      <FormControl
+     <Stack direction="row" spacing={1}>
+            <Autocomplete
+              id="combo-box-demo"
+              fullWidth
+              options={catalogoList}
+              getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
+              value={selectedCatalogo === "" ? null : selectedCatalogo}
+              onChange={(event, newValue) => {  onChangeSelectedCatalogo(newValue);
+              }}
+              noOptionsText="Cliente no encontrado..."
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={option.id}>
+                    {option.nombreCliente}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  variant="standard"
+                  {...params}
+                  label="Seleccione un cliente..."
+                />
+              )}
+            />
+            </Stack>
+      {/* <FormControl
         variant="standard"
         fullWidth
         style={{
@@ -100,8 +132,8 @@ const SelectCatalogo = () => {
             </MenuItem>
           ))}
         </Select>
-      </FormControl>
-    </div>
+      </FormControl>*/}
+    </div> 
   );
 };
 
