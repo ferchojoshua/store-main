@@ -1,76 +1,47 @@
 import React, { useState, useContext, useEffect } from "react";
-import { DataContext } from "../../../context/DataContext";
+import { DataContext } from "../../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
-
 import {
-  TextField,
-  Autocomplete,
-  FormControlLabel,
-  Checkbox,
-  Tooltip,
-  IconButton,
-  FormGroup,
-  Stack,
-  Typography,
-  Grid,
-  Divider,
-} from "@mui/material";
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material"; // Ensure these are imported
 
-import { getClientsAsync } from "../../../services/ClientsApi";
-
+import { getListAsync } from "../../../../src/CreateLogoApi";
 import {
   deleteToken,
   deleteUserData,
   getToken,
-} from "../../../services/Account";
-import { getRuta, isAccess, toastError } from "../../../helpers/Helpers";
+} from "../../../../src/Account";
+import { getRuta, toastError }  from "../../../helpers/Helpers";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import MediumModal from "../../../components/modals/MediumModal";
-import AddClient from "../clients/AddClient";
-
-const SelectClient = ({
-  selectedClient,
-  setSelectedClient,
-  eventualClient,
-  setEventualClient,
-  typeClient,
-  onTypeClientChange,
-  creditoDisponible,
-  setCreditoDisponible,
-  saldoVencido,
-  setSaldoVencido,
-  setFactVencidas,
-  typeVenta,
-}) => {
+const SelectCatalogo = () => {
   let ruta = getRuta();
-
-  const { setIsLoading, setIsLogged, reload, setIsDefaultPass, access } =
-    useContext(DataContext);
+  const { setIsLoading, setIsLogged, reload, setIsDefaultPass } = useContext(DataContext);
   let navigate = useNavigate();
 
   const token = getToken();
-
-  const [clientList, setClientList] = useState([]);
-
-  const [showModal, setShowModal] = useState(false);
+  const [catalogoList, setCatalogoList] = useState([]);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null); // Initialize selectedCatalogo
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const resultProducts = await getClientsAsync(token);
-      if (!resultProducts.statusResponse) {
+      const data = { operacion: 2 };
+
+      const resultList = await getListAsync(token, data);
+      if (!resultList.statusResponse) {
         setIsLoading(false);
-        if (resultProducts.error.request.status === 401) {
+        if (resultList.error.request.status === 401) {
           navigate(`${ruta}/unauthorized`);
           return;
         }
-        toastError(resultProducts.error.message);
+        toastError(resultList.error.message);
         return;
       }
 
-      if (resultProducts.data === "eX01") {
+      if (resultList.data === "eX01") {
         setIsLoading(false);
         deleteUserData();
         deleteToken();
@@ -78,154 +49,61 @@ const SelectClient = ({
         return;
       }
 
-      if (resultProducts.data.isDefaultPass) {
+      if (resultList.data.isDefaultPass) {
         setIsLoading(false);
         setIsDefaultPass(true);
         return;
       }
 
-      setClientList(resultProducts.data);
+      setCatalogoList(resultList.data); // Ensure this is the correct structure
       setIsLoading(false);
+
+
+      const filtered = resultList.data.filter(catalogs => 
+        catalogs.valor && catalogs.valor.includes("2")
+      );
+
+      setCatalogoList(filtered.data);
+
     })();
   }, [reload]);
 
-  const onChangeSelectedClient = (client) => {
-    if (client === null) {
-      setSelectedClient(client);
-      return;
-    } else {
-      const { limiteCredito, creditoConsumido } = client;
-      let diferencia = limiteCredito - creditoConsumido;
-
-      setCreditoDisponible(diferencia < 0 ? 0 : diferencia);
-      setSaldoVencido(client.saldoVencido);
-      setFactVencidas(client.facturasVencidas);
-      if (diferencia < 0 && typeVenta !== "contado") {
-        toastError("Limite de credito alcanzado");
-        toastError("Solo ventas de contado para este cliente");
-        return;
-      } else {
-        setSelectedClient(client);
-        return;
-      }
-    }
+  const onChangeSelectedCatalogo = (catalogo) => {
+    setSelectedCatalogo(catalogo);
   };
 
   return (
     <div>
-      <div style={{ textAlign: "left" }}>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="medium"
-                checked={typeClient}
-                onChange={() => onTypeClientChange(!typeClient)}
-              />
-            }
-            label="Cliente Eventual"
-          />
-        </FormGroup>
-      </div>
-
-      {typeClient ? (
-        <TextField
-          fullWidth
-          required
-          variant="standard"
-          label={"Nombre Cliente"}
-          value={eventualClient}
-          onChange={(e) => setEventualClient(e.target.value.toUpperCase())}
-        />
-      ) : (
-        <div>
-          <Stack direction="row" spacing={1}>
-            <Autocomplete
-              id="combo-box-demo"
-              fullWidth
-              options={clientList}
-              getOptionLabel={(op) => (op ? `${op.nombreCliente}` || "" : "")}
-              value={selectedClient === "" ? null : selectedClient}
-              onChange={(event, newValue) => {
-                onChangeSelectedClient(newValue);
-              }}
-              noOptionsText="Cliente no encontrado..."
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.id}>
-                    {option.nombreCliente}
-                  </li>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField
-                  variant="standard"
-                  {...params}
-                  label="Seleccione un cliente..."
-                />
-              )}
-            />
-            {isAccess(access, "CLIENTS CREATE") ? (
-              <Tooltip title="Agregar Cliente" style={{ marginTop: 5 }}>
-                <IconButton onClick={() => setShowModal(true)}>
-                  <FontAwesomeIcon
-                    style={{
-                      fontSize: 25,
-                      color: "#ff5722",
-                    }}
-                    icon={faCirclePlus}
-                  />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <></>
-            )}
-          </Stack>
-
-          {selectedClient ? (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              style={{ marginTop: 10 }}
-            >
-              <Stack spacing={1} direction="row">
-                <Typography style={{ color: "#2979ff" }}>
-                  Credito Disponible:
-                </Typography>
-                <Typography>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(creditoDisponible)}
-                </Typography>
-              </Stack>
-              <Stack spacing={1} direction="row">
-                <Typography style={{ color: "#f50057" }}>
-                  Saldo Vencido:
-                </Typography>
-                <Typography>
-                  {new Intl.NumberFormat("es-NI", {
-                    style: "currency",
-                    currency: "NIO",
-                  }).format(saldoVencido)}
-                </Typography>
-              </Stack>
-            </Stack>
-          ) : (
-            <></>
-          )}
-        </div>
-      )}
-
-      <MediumModal
-        titulo={"Agregar Cliente"}
-        isVisible={showModal}
-        setVisible={setShowModal}
+      <FormControl
+        variant="standard"
+        fullWidth
+        style={{
+          textAlign: "left",
+          width: 250,
+          marginTop: 20,
+        }}
       >
-        <AddClient setShowModal={setShowModal} />
-      </MediumModal>
+        <InputLabel id="catalogo-select-label">Seleccione</InputLabel>
+        <Select
+          labelId="catalogo-select-label"
+          id="catalogo-select"
+          value={selectedCatalogo || ""} // Default to empty string if null
+          onChange={(e) => onChangeSelectedCatalogo(e.target.value)}
+          label="Catálogo"
+        >
+          <MenuItem key={0} value="">
+            <em>Seleccione un item del catálogo</em>
+          </MenuItem>
+          {catalogoList.map((item) => (
+            <MenuItem key={item.id} value={item.valor}>
+              {item.valor}%
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </div>
   );
 };
 
-export default SelectClient;
+export default SelectCatalogo;
+
