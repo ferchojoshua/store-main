@@ -1,1 +1,92 @@
+import React, { useState, useContext, useEffect } from "react";
+import { TextField, Button, Paper, Typography } from "@mui/material";
+import { DataContext } from "../../../../context/DataContext";
+import { toastError, toastSuccess } from "../../../helpers/Helpers"; // Asegúrate de que estas funciones existan
+
+const SaleDetailProformaEdit = ({ selectedProduct, setShowModal, onUpdate }) => {
+  const { setIsLoading } = useContext(DataContext);
+  const [description, setDescription] = useState(selectedProduct.product.description);
+  const [unitPrice, setUnitPrice] = useState(selectedProduct.costoUnitario);
+  const [discount, setDiscount] = useState(selectedProduct.descuento);
+  const [quantity, setQuantity] = useState(selectedProduct.cantidad);
+
+  useEffect(() => {
+    setDescription(selectedProduct.product.description);
+    setUnitPrice(selectedProduct.costoUnitario);
+    setDiscount(selectedProduct.descuento);
+    setQuantity(selectedProduct.cantidad);
+  }, [selectedProduct]);
+
+  const updateProduct = () => {
+    const updatedProduct = {
+      ...selectedProduct,
+      product: {
+        ...selectedProduct.product,
+        description
+      },
+      costoUnitario: unitPrice,
+      descuento: discount,
+      cantidad: quantity,
+    };
+
+    // Aquí llamas a la función onUpdate para actualizar el producto en la lista
+    onUpdate(updatedProduct);
+
+    // Muestra un mensaje de éxito y cierra el modal
+    toastSuccess("Producto actualizado correctamente!");
+    setShowModal(false);
+  };
+
+  return (
+    <Paper elevation={10} style={{ padding: 20, borderRadius: 10 }}>
+      <Typography variant="h6" gutterBottom>
+        Editar Detalle del Producto
+      </Typography>
+      <TextField
+        label="Descripción"
+        variant="outlined"
+        fullWidth
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <TextField
+        label="Precio Unitario"
+        type="number"
+        variant="outlined"
+        fullWidth
+        value={unitPrice}
+        onChange={(e) => setUnitPrice(parseFloat(e.target.value))}
+        style={{ marginTop: 16 }}
+      />
+      <TextField
+        label="Descuento"
+        type="number"
+        variant="outlined"
+        fullWidth
+        value={discount}
+        onChange={(e) => setDiscount(parseFloat(e.target.value))}
+        style={{ marginTop: 16 }}
+      />
+      <TextField
+        label="Cantidad"
+        type="number"
+        variant="outlined"
+        fullWidth
+        value={quantity}
+        onChange={(e) => setQuantity(parseInt(e.target.value))}
+        style={{ marginTop: 16 }}
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={updateProduct}
+        style={{ marginTop: 16 }}
+      >
+        Actualizar Producto
+      </Button>
+    </Paper>
+  );
+};
+
+export default SaleDetailProformaEdit;
 
