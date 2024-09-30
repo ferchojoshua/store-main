@@ -1,0 +1,312 @@
+import React, { useEffect } from "react";
+import {
+  Divider,
+  Radio,
+  TextField,
+  Typography,
+  Button,
+  Stack,
+  Grid,
+  InputAdornment,
+  IconButton,
+  Paper,
+} from "@mui/material";
+import { toastError } from "../../../../../src/helpers/Helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
+
+const ProductDescriptiones = ({
+  selectedProduct,
+  cantidad,
+  setCantidad,
+  descuento,
+  setDescuento,
+  selectedPrecio,
+  setSelectedPrecio,
+  costoXProducto,
+  setcostoXProducto,
+  addToProductList,
+  barCodeSearch,
+  isDescPercent,
+  setIsDescPercent,
+  setDescuentoXPercent,
+  costoAntesDescuento,
+  setCostoAntesDescuento,
+  setDescuentoXMonto,
+  descuentoCod,
+  setDescuentoCod,
+}) => {
+  const {
+    precioVentaDetalle,
+    precioVentaMayor,
+    existencia,
+    producto,
+    precioCompra,
+  } = selectedProduct;
+
+  useEffect(() => {
+    if (cantidad.length > 0) {
+      funcCantidad(cantidad);
+    }
+  }, [selectedProduct]);
+  
+
+  const funcCantidad = (value) => {
+    if (value === 0 || value === "0") {
+      toastError("Ingrese un valor mayor a cero");
+      setcostoXProducto(0);
+      return;
+    }
+    if (value > existencia) {
+      toastError("No puede vender más de lo que hay en existencia");
+      return;
+    }
+
+    if (/^[0-9]+$/.test(value.toString()) || value === "") {
+      let price =
+        selectedPrecio === "PVD" ? precioVentaDetalle : precioVentaMayor;
+
+      let subPrecio = price * value;
+
+      let descMonto = 0;
+      let descPercent = 0;
+
+      if (isDescPercent) {
+        descPercent = descuento;
+        descMonto = subPrecio * (descuento / 100);
+      } else {
+        descMonto = descuento;
+        descPercent = (descuento / subPrecio) * 100;
+      }
+
+      setCostoAntesDescuento(subPrecio);
+      setDescuentoXMonto(descMonto);
+      setDescuentoXPercent(descPercent);
+      setcostoXProducto(subPrecio - descMonto * value);
+      setCantidad(value);
+      return;
+    }
+  };
+
+  const funcDescuento = (value) => {
+    if (value === 0 || value === "0") {
+      toastError("Ingrese descuento mayor que cero");
+      return;
+    }
+
+    if (/^\d*\.?\d*$/.test(value.toString())) {
+      let price =
+        selectedPrecio === "PVD" ? precioVentaDetalle : precioVentaMayor;
+      let subPrecio = price * cantidad;
+      let subPrecioUnit = subPrecio / cantidad;
+
+      let descPercent = 0;
+      let descMonto = 0;
+
+      if (isDescPercent) {
+        descPercent = value;
+        descMonto = subPrecioUnit * (value / 100);
+      } else {
+        descMonto = value;
+        descPercent = (value / subPrecioUnit) * 100;
+      }
+
+      if (subPrecioUnit - descMonto < precioCompra) {
+        toastError("No puede aplicar ese descuento");
+        descMonto = 0;
+        descPercent = 0;
+        return;
+      }
+
+      setCostoAntesDescuento(subPrecio);
+      setcostoXProducto(subPrecio - descMonto * cantidad);
+      setDescuentoXMonto(descMonto);
+      setDescuentoXPercent(descPercent);
+      setDescuento(value);
+      return;
+    }
+  };
+
+  const handleChange = (event) => {
+    let price =
+      event.target.value === "PVD" ? precioVentaDetalle : precioVentaMayor;
+
+    let subPrecio = price * cantidad;
+
+    let descMonto = 0;
+    let descPercent = 0;
+
+    if (isDescPercent) {
+      descPercent = descuento;
+      descMonto = subPrecio * (descuento / 100);
+    } else {
+      descMonto = descuento;
+      descPercent = (descuento / subPrecio) * 100;
+    }
+
+    setCostoAntesDescuento(subPrecio);
+    setcostoXProducto(subPrecio - descMonto * cantidad);
+    setDescuentoXMonto(descMonto);
+    setDescuentoXPercent(descPercent);
+    setSelectedPrecio(event.target.value);
+  };
+
+  const changeTipoDescuento = () => {
+    setDescuento("");
+    setDescuentoXPercent("");
+    setIsDescPercent(!isDescPercent);
+  };
+
+  return (
+<div style={{ padding: '20px', borderRadius: '10px' }}>
+  <Grid container spacing={2}>
+   <Paper elevation={20} sx={{ padding: '20px', borderRadius: '10px', width: '100%' }}> 
+    {/* <Paper  elevation={15} sx={{  marginTop: 5, borderRadius:  '10px', padding: '20px',  width: '50%' }}></Paper> */}
+      <Grid container item xs={12} spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Stack spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6" color="#2979ff" fontWeight="bold">
+                {barCodeSearch ? "Nombre:" : "Código:"}
+              </Typography>
+              <Typography>{barCodeSearch ? producto.description : producto.barCode}</Typography>
+            </Stack>
+
+            <Divider sx={{ marginBottom: 2 }} />
+
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6" color="#2979ff" fontWeight="bold">
+                Disponible:
+              </Typography>
+              <Typography>{selectedProduct.existencia}</Typography>
+            </Stack>
+          </Stack>
+        </Grid>
+
+        <Divider style={{ marginBottom: 20 }} />
+
+        {/* Agrupando y estilizando los precios */}
+        <Grid item xs={12} md={6}>
+          <Stack spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Radio
+                checked={selectedPrecio === "PVD"}
+                onChange={handleChange}
+                value="PVD"
+                name="radio-buttons"
+                sx={{
+                      '& .MuiSvgIcon-root': {
+                      fontSize: 18, 
+                      },
+                      }}
+              />
+              <Typography color="#4caf50" fontWeight="bold">
+                PRECIO AL DETALLE:
+              </Typography>
+              <Typography>
+                {selectedProduct.precioVentaDetalle.toLocaleString("es-NI", { style: "currency", currency: "NIO" })}
+              </Typography>
+            </Stack>
+            <Divider style={{ marginBottom: 1 }} />
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Radio
+                checked={selectedPrecio === "PVM"}
+                onChange={handleChange}
+                value="PVM"
+                name="radio-buttons"
+                sx={{
+                    '& .MuiSvgIcon-root': {
+                      fontSize: 18, 
+                    },
+                  }}
+              />
+              <Typography color="#2979ff" fontWeight="bold">
+                PRECIO AL POR MAYOR:
+              </Typography>
+              <Typography>
+                {selectedProduct.precioVentaMayor.toLocaleString("es-NI", { style: "currency", currency: "NIO" })}
+              </Typography>
+            </Stack>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Paper>
+
+      
+    <Divider style={{ marginBottom: 20 }} />
+
+        {/* Cantidad y Descuento */}
+        <Grid item xs={6}>
+        <Stack  direction="row" alignItems="center" spacing={1}>
+          <TextField
+            // fullWidth
+            required
+            variant="standard"
+            label="Cantidad"
+            value={cantidad}
+            onChange={(e) => funcCantidad(e.target.value)}
+            sx={{ marginBottom: '10px' }}
+          />
+          </Stack>
+        </Grid>
+        
+        <Grid item xs={7}>       
+        <Stack  direction="row" alignItems="center" spacing={1}>
+          <Typography fontWeight="bold">
+            Antes Descuento: {costoAntesDescuento.toLocaleString("es-NI", { style: "currency", currency: "NIO" })}
+          </Typography>
+          </Stack>
+        </Grid>
+
+        <Grid item xs={6}>
+        {/* <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="flex-start"> */}
+        <Stack  direction="row" alignItems="center" spacing={1}>
+            <TextField
+              variant="standard"
+              label={isDescPercent ? "Descuento en %" : "Descuento en C$"}
+              value={descuento}
+              onChange={(e) => funcDescuento(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={changeTipoDescuento}>
+                      {isDescPercent ? "C$" : "%"}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            {descuento && (
+              <TextField
+                variant="outlined"
+                type="password"
+                label="Código de Descuento"
+                value={descuentoCod}
+                onChange={(e) => setDescuentoCod(e.target.value.toLocaleUpperCase())}
+              />
+            )}
+          </Stack>
+        </Grid>
+        {/* Botón para añadir producto */}
+        <Grid item xs={6}>
+        <Stack direction="row" justifyContent="space-between">
+          <Button
+            variant="outlined"
+            color="primary"
+            style={{
+              borderRadius: 20,
+              borderColor: "#00a152",
+              color: "#00a152",   }}   onClick={addToProductList}  >
+            <Typography variant="subtitle1" fontWeight="bold">
+              Monto de Venta: {costoXProducto.toLocaleString("es-NI", { style: "currency", currency: "NIO" })}
+            </Typography>
+            <FontAwesomeIcon icon={faCartPlus} style={{ marginRight: 10, fontSize: 20 }} />
+          </Button>
+          </Stack>
+        </Grid>
+      </Grid>
+    </div>
+  );
+};
+
+export default ProductDescriptiones;
