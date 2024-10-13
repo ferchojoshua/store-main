@@ -4,6 +4,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   InputAdornment, IconButton, Grid, Typography, Switch, FormControlLabel
 } from '@mui/material';
+import PaginationComponent from "../../../../src/components/PaginationComponent";
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
@@ -35,6 +36,7 @@ const Ajustes = () => {
   const [selectedporcentaje, setSelectedporcentaje] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
 
+  
   const fetchData = async () => {
     try {
       const data = {
@@ -77,6 +79,16 @@ const Ajustes = () => {
       setToggleState('');
     }
   };
+
+
+  const handleValorChange = (e) => {
+    const value = e.target.value;
+    const regex = /^[a-zA-Z0-9 ]*$/;
+    if (regex.test(value)) {
+      setValor(value); 
+    }
+  };
+  
 
   const handleCancelar = () => {
     setShowModalSave(false);
@@ -154,6 +166,7 @@ const Ajustes = () => {
   };
 
 
+
   const editPorcentaje = (value) => {
     setSelectedporcentaje({
       id: value.id,
@@ -174,14 +187,28 @@ const Ajustes = () => {
     setToggleState(true);
   };
 
-  const filteredRecords = Array.isArray(records)
-    ? records.filter(record =>
-      ((typeof record.id === 'string' && record.id.includes(searchTerm)) ||
-      (typeof record.valor === 'string' && record.valor.includes(searchTerm)) ||
-      (typeof record.catalogo === 'string' && record.catalogo.includes(searchTerm)) ||
-      (typeof record.descripcion === 'string' && record.descripcion.includes(searchTerm)))
-    )
-    : [];
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsperPage] = useState(20);
+  const indexLast = currentPage * itemsperPage;
+  const indexFirst = indexLast - itemsperPage;
+
+  const filteredRecords = Array.isArray(records) && searchTerm.trim() !== ''
+  ? records.filter(record => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return (
+        (typeof record.id === 'string' && record.id.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (typeof record.valor === 'string' && record.valor.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (typeof record.catalogo === 'string' && record.catalogo.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (typeof record.descripcion === 'string' && record.descripcion.toLowerCase().includes(lowerCaseSearchTerm))
+      );
+    })
+  : records; 
+
+
+    // Current items for pagination
+  const currentItems = filteredRecords.slice(indexFirst, indexLast);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <Container>
@@ -222,7 +249,7 @@ const Ajustes = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredRecords.map((record) => (
+                {currentItems.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>{record.id}</TableCell>
                     <TableCell>{record.valor}</TableCell>
@@ -260,6 +287,12 @@ const Ajustes = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <PaginationComponent
+        itemsPerPage={itemsperPage}
+        totalItems={filteredRecords.length}
+        paginate={paginate}
+        currentPage={currentPage}
+      />
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
           <Grid container spacing={3}>
@@ -269,16 +302,15 @@ const Ajustes = () => {
             label="Valor *"
             variant="outlined"
             value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            InputProps={{
-            style: { borderRadius: '10px' },
-            inputProps: {
-            inputMode: 'numeric',
-            pattern: '[0-9]*', // Esto asegura que solo se puedan ingresar números
-            },
-            }}
-            type="number"
-            />
+                onChange={(e) => handleValorChange(e)}
+                InputProps={{
+                style: { borderRadius: '10px' },
+                inputProps: {
+                  inputMode: 'text', // Allows for both numbers and text input
+                },
+                }}
+                type="text" // Use text type to allow numbers and letters
+                />
           </Grid>
             <Grid item xs={12} sm={3}>
               <TextField

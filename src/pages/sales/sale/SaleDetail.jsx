@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext,useState } from "react";
 import { Table } from "react-bootstrap";
 import {
   Paper,
@@ -11,6 +11,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { DataContext } from "../../../context/DataContext";
+import { ProformAddAsync } from "../../../services/SalesApi";
+import { getRuta, toastError, toastSuccess } from "../../../helpers/Helpers";
+import { getToken, deleteUserData, deleteToken } from "../../../services/Account";
+import { useNavigate } from "react-router-dom";
+
+
+
 
 const SaleDetail = ({
   selectedProductList,
@@ -24,8 +31,18 @@ const SaleDetail = ({
   setMontoVentaAntesDescuento,
   isFacturar,
   addNewVenta,
+  idClient, 
+  userId,
+  storeid,
 }) => {
-  const { isDarkMode } = useContext(DataContext);
+
+const token = getToken();
+const [showModalSave, setShowModalSave] = useState(false);
+let ruta = getRuta();
+const { setIsLoading, setIsLogged, setIsDefaultPass, reload, setReload } =
+useContext(DataContext);
+let navigate = useNavigate();
+const { isDarkMode } = useContext(DataContext);
 
   const deleteFromProductDetailList = (item) => {
     const filtered = selectedProductList.filter(
@@ -35,6 +52,90 @@ const SaleDetail = ({
     setMontoVentaDespuesDescuento(montoVentaAntesDescuento - item.costoTotal);
     setSelectedProductList(filtered);
   };
+
+
+  const saveProforma = async () => {
+
+    const currentDate = new Date(); 
+    const dueDate = new Date(currentDate); 
+    dueDate.setDate(currentDate.getDate() + 14); 
+
+    const actionValue = 1;
+
+    const proformaData = {
+      Action: actionValue,
+      StoreId: storeid,
+      NombreCliente: idClient,
+      Detalle: selectedProductList[0].product.description,  // Solo mandas el primer producto como detalle
+      ProductoId : selectedProductList[0].product.id,
+      Cantidad: selectedProductList[0].cantidad,  // Cantidad del primer producto
+      PrecioUnitario: selectedProductList[0].costoUnitario,  // Precio del primer producto
+      Total: selectedProductList[0].costoTotalDespuesDescuento,  // Total del primer producto
+      MontoTotal: montoVentaDespuesDescuento,
+      FechaEmision: currentDate.toISOString(),
+      FechaVencimiento: dueDate.toISOString(),
+      ProformaRealizada: false,
+      ProformaVencida: false,
+    };
+
+    // const proformaData = {
+    //   productos: selectedProductList.map(item => ({
+    //     productId: item.product.id,  // ID del producto
+    //     Detalle: item.product.description, // Descripción del producto
+    //     cantidad: item.cantidad,  // Cantidad de productos
+    //     precioUnitario: item.costoUnitario,  // Precio unitario del producto
+    //     descuento: item.descuento,  // Descuento aplicado
+    //     costoTotalDespuesDescuento: item.costoTotalDespuesDescuento,  // Costo total con descuento
+    //   })),
+    //   montoAntesDescuento: montoVentaAntesDescuento,  // Monto antes de descuento
+    //   montoDespuesDescuento: montoVentaDespuesDescuento,  // Monto después de descuento
+    //   descuentoGlobal: descuentoGlobal,  // Descuento global en la proforma
+    //   fechaCreacion:  currentDate.toISOString(), 
+    //   fechaVencimiento: dueDate.toISOString(),
+    //   ProformaRealizada: false,
+    //   ProformaVencida: false,   
+    //   storeid: storeid, 
+    //   nombreCliente: idClient, 
+    //   userId: userId, 
+    //   action:  'I',
+   
+    // };
+  
+    setIsLoading(true);
+    try {
+    
+        const result = await ProformAddAsync(token, proformaData);
+        if (!result.statusResponse){
+          setIsLoading(false);
+          if (result.error?.request.status === 401)
+            {
+              navigate(`${ruta}/unauthorized`);
+              return;
+          }
+          toastError(result.error?.message || "Ocurrió un error inesperado");
+          return;
+        }
+
+        if (result.data === "eX01") {
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+        }
+
+        if (result.data.isDefaultPass) {
+          setIsDefaultPass(true);
+          return;
+        }
+        toastSuccess("Proforma guardada exitosamente");
+        // clearForm();
+    setShowModalSave(false);
+
+  } catch (error) {
+    setIsLoading(false);
+    toastError('Error al guardar la Proforma: ' + error.message);
+  }
+};
 
   return (
     <div>
@@ -145,11 +246,13 @@ const SaleDetail = ({
               borderColor: "#2979ff",
               color: "#2979ff",
             }}
-            onClick={() => addProformma()}
+            onClick={() => {
+              addProformma();
+              saveProforma();
+                        }}
           >
             <FontAwesomeIcon
-              style={{ marginRight: 10, fontSize: 20 }}
-              icon={faPrint}
+              style={{ marginRight: 10, fontSize: 20 }} icon={faPrint}
             />
             Proformar
           </Button>

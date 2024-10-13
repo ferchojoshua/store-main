@@ -5,6 +5,7 @@ import { Table } from "react-bootstrap";
 import { isUndefined } from "lodash";
 import { DataContext } from "../../../../context/DataContext";
 import { getClientByIdAsync } from "../../../../services/ClientsApi";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import {
   deleteToken,
   deleteUserData,
@@ -16,10 +17,6 @@ import { getRuta, toastError } from "../../../../helpers/Helpers";
 import { getStoreByIdAsync } from "../../../../services/AlmacenApi";
 import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
  import "../../../sales/estilos.css"
-// import pdfMake from "pdfmake/build/pdfmake";
-// import pdfFonts from "pdfmake/build/vfs_fonts";
-// pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 
 const Proforma = React.forwardRef((props, ref) => {
   const { idClient, storeid, montoVenta, nombreCliente, saleDetails } = props.data;

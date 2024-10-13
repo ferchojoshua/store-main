@@ -422,10 +422,7 @@ const UserList = () => {
                     <td style={{ width: 150 }}>
                       <IconButton
                         style={{ marginRight: 5, color: "#00a152" }}
-                        onClick={() => {
-                          userEdit(item);
-                         
-                        }}
+                        onClick={() => {userEdit(item);  }}
                       >
                         <FontAwesomeIcon icon={faExternalLinkAlt} />
                       </IconButton>

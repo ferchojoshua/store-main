@@ -79,6 +79,14 @@ const Editajustes = ({ selectedporcentaje, setShowModal }) => {
       setShowModal(false);
     }
   };
+  
+  const handleValorChange = (e) => {
+    const value = e.target.value;
+    const regex = /^[a-zA-Z0-9 ]*$/;
+    if (regex.test(value)) {
+      setValor(value); 
+    }
+  };
 
   const validate = () => {
     let isValid = true;
@@ -104,23 +112,22 @@ const Editajustes = ({ selectedporcentaje, setShowModal }) => {
   return (
     <Box p={3}>
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={3}>
-          <TextField
+      <Grid item xs={12} sm={3}>
+            <TextField
             fullWidth
             label="Valor *"
-            variant="standard"
+            variant="outlined"
             value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            InputProps={{
-              style: { borderRadius: '10px' },
-              inputProps: {
-                inputMode: 'numeric',
-                pattern: '[0-9]*',
-              },
-            }}
-            type="number"
-          />
-        </Grid>
+                onChange={(e) => handleValorChange(e)}
+                InputProps={{
+                style: { borderRadius: '10px' },
+                inputProps: {
+                  inputMode: 'text', // Allows for both numbers and text input
+                },
+                }}
+                type="text" // Use text type to allow numbers and letters
+                />
+          </Grid>
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth

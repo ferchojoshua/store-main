@@ -48,6 +48,7 @@ const SelectProduct = ({
   const [productList, setProductList] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       setIsLoading(true);
       const result = await getUserAsync(token);
@@ -109,6 +110,9 @@ const SelectProduct = ({
       }
       setIsLoading(false);
     })();
+    return () => {
+      isMounted = false; // Cleanup function to set flag to false when component unmounts
+    };
   }, [reload]);
 
   const handleChangeStore = async (event) => {
@@ -154,7 +158,7 @@ const SelectProduct = ({
       <FormControl
         variant="standard"
         fullWidth
-        style={{ textAlign: "left", marginTop: 20 }}
+        style={{ textAlign: "left", marginTop: 10 }}
       >
         <InputLabel id="selProc">Almacen</InputLabel>
         <Select

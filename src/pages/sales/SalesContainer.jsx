@@ -14,10 +14,9 @@ import {
   faMapMarked,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
-
 import ClientList from "./clients/ClientList";
 import NewSale from "./sale/NewSale";
- import Proform from "./sale/proforma/ProformVentas";
+import Proform from "./sale/proforma/ProformVentas";
 import SalesList from "./accountStatus/SalesList";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
@@ -65,7 +64,7 @@ const SalesContainer = () => {
   const tabIndex = (value) => {
     let result = null;
     for (let index = 0; index <= value; index++) {
-      if (isAccess(access, "SALES CREATE") && index === 0) {
+      if (isAccess(access, "SALES FACTURACION") && index === 0) {
         result === null ? (result = 0) : result++;
       } 
       if (isAccess(access, "SALES CREATE") && index === 1) {
@@ -105,7 +104,7 @@ const SalesContainer = () => {
           aria-label="icon label tabs example"
           centered
         >
-          {isAccess(access, "SALES CREATE") ? (
+          {isAccess(access, "SALES FACTURACION") ? (
             <Tab
               icon={
                 <FontAwesomeIcon

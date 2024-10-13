@@ -1,6 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
-import { Navbar, Nav, Container, NavDropdown, OverlayTrigger , Tooltip } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  NavDropdown,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -269,7 +276,7 @@ const NavbarComponent = () => {
             ) : (
               <></>
             )}
-         {isAccess(access, "WAREHOUSES VER") ? (
+            {isAccess(access, "WAREHOUSES VER") ? (
               <Nav.Link
                 style={{
                   fontWeight: active === "misc" ? "bold" : "",
@@ -291,8 +298,7 @@ const NavbarComponent = () => {
               <></>
             )}
 
-
-          {isAccess(access, "PROVIDERS VER") ? (
+            {isAccess(access, "PROVIDERS VER") ? (
               <Nav.Link
                 style={{
                   fontWeight: active === "admon" ? "bold" : "",
@@ -312,7 +318,7 @@ const NavbarComponent = () => {
               </Nav.Link>
             ) : (
               <></>
-            )}       
+            )}
             {isAccess(access, "TYPEBUSINESS VER") ? (
               <Nav.Link
                 style={{
@@ -335,57 +341,62 @@ const NavbarComponent = () => {
               <></>
             )}
             {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
-                <OverlayTrigger
+              <OverlayTrigger
                 placement="bottom"
                 overlay={<Tooltip id="administration-tooltip">Empresa</Tooltip>}
               >
-                
                 <Nav.Link
                   as={Link}
-                 to={`${ruta}/administration`}
+                  to={`${ruta}/administration`}
                   eventKey="administration"
                 >
                   <FontAwesomeIcon
                     icon={faCogs}
-                    style={{ marginRight: 10,
-                      color: active === "admon" ? "#bbdefb" : "#9e9e9e"
-                       }}
+                    style={{
+                      marginRight: 10,
+                      color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                    }}
                   />
                 </Nav.Link>
-                </OverlayTrigger>
-              ) : (
-                <></>
-              )}
+              </OverlayTrigger>
+            ) : (
+              <></>
+            )}
             {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
               <OverlayTrigger
                 placement="bottom"
-                overlay={<Tooltip id="administration-tooltip">Seguridad</Tooltip>}
+                overlay={
+                  <Tooltip id="administration-tooltip">Seguridad</Tooltip>
+                }
               >
-                <Nav.Link
-                  as={Link}
-                  to={`${ruta}/security`}
-                  eventKey="security"
-                >
+                <Nav.Link as={Link} to={`${ruta}/security`} eventKey="security">
                   <FontAwesomeIcon
-                    icon={faShield}                    
-                    style={{ marginRight: 10,
-                     color: active === "admon" ? "#bbdefb" : "#9e9e9e"
-                       }}
+                    icon={faShield}
+                    style={{
+                      marginRight: 10,
+                      color: active === "admon" ? "#bbdefb" : "#9e9e9e",
+                    }}
                   />
-               
                 </Nav.Link>
-                </OverlayTrigger>
-              ) : (
-                <></>
-              )}              
-            
-              <MenuItem onClick={changeTheme}>
+              </OverlayTrigger>
+            ) : (
+              <></>
+            )}
+
+            <MenuItem onClick={changeTheme}>
               <OverlayTrigger
                 placement="bottom"
-                overlay={<Tooltip id="administration-tooltip">Modo de apariencia</Tooltip>}
+                overlay={
+                  <Tooltip id="administration-tooltip">
+                    Modo de apariencia
+                  </Tooltip>
+                }
               >
-            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} style={{ marginRight: 3 }} />
-            </OverlayTrigger>
+                <FontAwesomeIcon
+                  icon={isDarkMode ? faSun : faMoon}
+                  style={{ marginRight: 3 }}
+                />
+              </OverlayTrigger>
             </MenuItem>
             <NavDropdown
               drop="start"
@@ -400,7 +411,7 @@ const NavbarComponent = () => {
                   }}
                 />
               }
-              
+
               // id="navbarScrollingDropdown"
               // onSelect={(selectedKey) => setActive(selectedKey)}
             >
@@ -409,7 +420,7 @@ const NavbarComponent = () => {
                 Miscelaneos
               </NavDropdown.Header>
               <NavDropdown.Divider /> */}
-{/* 
+              {/* 
               {isAccess(access, "MISCELANEOS VER") ? (
                 <NavDropdown.Item
                   as={Link}
@@ -425,8 +436,8 @@ const NavbarComponent = () => {
               ) : (
                 <></>
               )} */}
-              
-              {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+
+              {/* {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
                 <NavDropdown.Item
                   as={Link}
                   to={`${ruta}/administration`}
@@ -440,11 +451,10 @@ const NavbarComponent = () => {
                 </NavDropdown.Item>
               ) : (
                 <></>
-              )}
-              
+              )} */}
 
-{/* -- */}
-                  {/* {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
+              {/* -- */}
+              {/* {isAccess(access, "USER VER") || isAccess(access, "ROLES VER") ? (
                 <NavDropdown.Item
                   as={Link}
                   to={`${ruta}/security`}
@@ -490,7 +500,6 @@ const NavbarComponent = () => {
               ) : (
                 <></>
               )} */}
-             
 
               {isAccess(access, "COMMUNITIES VER") ? (
                 <NavDropdown.Item
@@ -500,7 +509,7 @@ const NavbarComponent = () => {
                 >
                   <FontAwesomeIcon
                     icon={faLocationDot}
-                    style={{ marginRight: 10}}
+                    style={{ marginRight: 10 }}
                   />
                   Ubicaciones
                 </NavDropdown.Item>
@@ -509,7 +518,7 @@ const NavbarComponent = () => {
               )}
             </NavDropdown>
           </Nav>
-       
+
           <Menu
             anchorEl={anchorElNot}
             id="account-menu"
@@ -545,13 +554,11 @@ const NavbarComponent = () => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-       
-            
             <MenuItem style={{ display: "flex", justifyContent: "center" }}>
-            <span style={{ color: "#2196f3", fontWeight: "bold" }}>
-            Notificaciones
-            </span>
-            </MenuItem> 
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+                Notificaciones
+              </span>
+            </MenuItem>
             <Divider />
             {/* <MenuItem> */}
             {/* <ListItemIcon> */}
@@ -561,23 +568,24 @@ const NavbarComponent = () => {
             {/* </MenuItem> */}
           </Menu>
           <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-              style={{ marginLeft: 10 }}
-            >
-              <FontAwesomeIcon
-                icon={faUserCircle}
-                className={active === "account" ? "fa-beat-fade" : ""}
-                style={{
-                  color: active === "account" ? "#bbdefb" : "#9e9e9e",
-                }}
-              />
-            </IconButton>
-          
-          <div>
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+            style={{ marginLeft: 10 }}
+          >
+            <FontAwesomeIcon
+              icon={faUserCircle}
+              className={active === "account" ? "fa-beat-fade" : ""}
+              style={{
+                color: active === "account" ? "#bbdefb" : "#9e9e9e",
+              }}
+            />
+          </IconButton>
+          {user}
+
+          <div>       
             <a
               href="#"
               onClick={myAccount}
@@ -588,10 +596,8 @@ const NavbarComponent = () => {
                 textDecoration: "none",
               }}
             >
-              {user}
             </a>
 
-         
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
@@ -607,10 +613,7 @@ const NavbarComponent = () => {
               open={open}
               onClose={handleClose}
             >
-            
-         
-
-          {/* {isAccess(access, "CONT VER") ? (
+              {/* {isAccess(access, "CONT VER") ? (
             <Tooltip title="Notificaciones">
               <IconButton
                 onClick={handleClickNot}
@@ -626,7 +629,7 @@ const NavbarComponent = () => {
             <></>
           )} */}
 
-          {/* <MenuItem onClick={changeTheme}>
+              {/* <MenuItem onClick={changeTheme}>
                 <FontAwesomeIcon
                   icon={isDarkMode ? faSun : faMoon}
                   style={{ marginRight: 20 }}
@@ -636,8 +639,8 @@ const NavbarComponent = () => {
               <MenuItem onClick={logOut}>
                 <FontAwesomeIcon
                   icon={faSignOutAlt}
-                  style={{ marginRight: 10 }}
-                /> 
+                  style={{ marginRight: 20 }}
+                />
                 Cerrar Sesion
               </MenuItem>
               {/* <Divider />
