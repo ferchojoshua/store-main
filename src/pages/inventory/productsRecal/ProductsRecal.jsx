@@ -117,6 +117,10 @@ const ProductsRecal = () => {
   const [actualizarVentaMayor, setActualizarVentaMayor] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  var date = new Date();
+  const [fechaDesde, setDesdeFecha] = useState(
+    new Date(date.getFullYear(), date.getMonth(), 1));
+    const [fechaHassta, setHasstaFecha] = useState(new Date());
 
   useEffect(() => {
     (async () => {
@@ -152,6 +156,8 @@ const ProductsRecal = () => {
         setIsDefaultPass(true);
         return;
       }
+
+      
       setIsLoading(false);
       setProductList(productResult.data);
 
@@ -210,7 +216,15 @@ const ProductsRecal = () => {
         setIsDefaultPass(true);
         return;
       }
-      setCatalogo(resultList.data);
+
+
+      const filtered = resultList.data.filter(catalogs => 
+        catalogs.descripcion && catalogs.description.includes("INCREMENTO DE")
+      );
+
+      setCatalogo(filtered.data);
+
+
       const result = await getTipoNegocioAsync(token);
       if (!result.statusResponse) {
         setIsLoading(false);

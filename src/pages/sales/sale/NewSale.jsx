@@ -9,6 +9,7 @@ import {
   deleteToken,
   deleteUserData,
   getToken,
+  getUser
 } from "../../../services/Account";
 import { isEmpty } from "lodash";
 import SelectClient from "./SelectClient";
@@ -82,6 +83,7 @@ const NewSale = () => {
 
   const [selectedTipopago, setSelectedTipoPago] = useState(1);
   const [reference, setReference] = useState("");
+  const user = getUser();
 
   useEffect(() => {
     setTypeClient(true);
@@ -387,6 +389,9 @@ const NewSale = () => {
           montoVentaDespuesDescuento={montoVentaDespuesDescuento}
           setMontoVentaDespuesDescuento={setMontoVentaDespuesDescuento}
           descuentoGlobal={descuentoGlobal}
+          storeid={selectedStore}
+          idClient = {selectedClient?.id ? selectedClient?.id : eventualClient}
+          userId = {user}
           isFacturar={false}
         />
       </Container>

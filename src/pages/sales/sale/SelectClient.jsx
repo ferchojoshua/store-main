@@ -57,6 +57,7 @@ const SelectClient = ({
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    let isMounted = true; 
     (async () => {
       setIsLoading(true);
       const resultProducts = await getClientsAsync(token);
@@ -87,6 +88,10 @@ const SelectClient = ({
       setClientList(resultProducts.data);
       setIsLoading(false);
     })();
+
+  return () => {
+    isMounted = false;
+  };
   }, [reload]);
 
   const onChangeSelectedClient = (client) => {

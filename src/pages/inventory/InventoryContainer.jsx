@@ -18,6 +18,7 @@ import Products from "./products/Products";
 import ProductsRecal from "./productsRecal/ProductsRecal";
 import ProductExistences from "./productExistences/ProductExistences";
 import { isAccess } from "../../helpers/Helpers";
+import PriceChangeIcon from '@mui/icons-material/PriceChange';
 import { DataContext } from "../../context/DataContext";
 
 function TabPanel(props) {

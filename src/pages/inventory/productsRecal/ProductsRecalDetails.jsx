@@ -142,7 +142,13 @@ const ProductsRecalDetails = ({ selectedProduct, setShowModal }) => {
         setIsDefaultPass(true);
         return;
       }
-      setCatalogo(resultList.data);
+
+
+      const filtered = resultList.data.filter(catalogs => 
+        catalogs.descripcion && catalogs.description.includes("INCREMENTO DE")
+      );
+
+      setCatalogo(filtered.data);
 
       const result = await getFamiliaByIdAsync(token, selectedProduct.fid);
       if (!result.statusResponse) {

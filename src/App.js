@@ -55,6 +55,7 @@ import MoverProductoAdd from "./pages/inventory/traslate-products/MoverProductoA
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { getRolAsync } from "./services/RolApi";
 import FullScreenModal from "./components/modals/FullScreenModal";
+import ConfigurationModal from "./components/modals/ConfigurationModal";
 import Compras from "./pages/reports/reporteVentas/Reportes/Compras";
 import TrasladoInventario from "./pages/reports/reporteVentas/Reportes/TrasladoInventario";
 import { InventarioProductos } from "./pages/reports/reporteVentas/Reportes/InventarioProductos";
@@ -214,10 +215,9 @@ function App() {
       <Box
         sx={{
           height: "100vh",
-          overflow: "auto",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "center",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
           bgcolor: "background.default",
         }}
       >
@@ -352,12 +352,12 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Box>
-              <Footer />
+              {/* <Footer /> */}
             </div>
           </LocalizationProvider>
         )}
       </Box>
-      <FullScreenModal />
+      <ToastContainer />
     </ThemeProvider>
   ) : (
     <Login />
