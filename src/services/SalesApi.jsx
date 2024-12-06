@@ -266,10 +266,9 @@ export const AnularVentaParcialAsync = async (token, data) => {
   }
   return result;
 };
-
-export const ProformAddAsync = async (token, data) => {
+export const UpdateSaleDetailsAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
-  let service = `${controller}ProformAdd/`;
+  let service = `${controller}UpdateSaleDetails/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {
@@ -293,4 +292,112 @@ export const ProformAddAsync = async (token, data) => {
   return result;
 };
 
+export const finishSaleStatusAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}finishSaleStatus/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
 
+export const ProformAddAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}ProformAdd`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+
+  return result;
+};
+
+export const deleteProformAsync = async (token, id) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}DeleteProform/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service + id).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
+
+export const GetContadoSalesByProfAsync = async (token, selectedStore = null) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = selectedStore 
+      ? `${controller}GetContadoSalesByProf/${selectedStore}`
+      : `${controller}GetContadoSalesByProf`;
+
+  const authAxios = axios.create({
+      baseURL: service,
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+  });
+
+  try {
+      await authAxios.get(service).then((resp) => {
+          if (resp.status <= 200 && resp.status >= 299) {
+              result.statusResponse = false;
+              result.error = resp.title;
+          } else {
+              result.statusResponse = true;
+              result.data = resp.data;
+          }
+      });
+  } catch (error) {
+      result.statusResponse = false;
+      result.error = error;
+  }
+  return result;
+};

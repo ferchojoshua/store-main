@@ -99,6 +99,8 @@ export const getUserLocation = async () => {
   });
 };
 
+
+
 export const getRuta = () => {
   const { REACT_APP_ROUTE, REACT_APP_PROD_ROUTE } = process.env;
   let ruta = "";
@@ -117,6 +119,8 @@ export const guid = () => {
     return v.toString(16);
   });
 };
+
+
 
 export const getController = () => {
   let ruta = "";

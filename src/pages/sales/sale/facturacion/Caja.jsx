@@ -15,6 +15,7 @@ import {
   MenuItem,
   Stack,
   Container,
+  Typography,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -476,13 +477,16 @@ const Caja = () => {
 
   return (
     <div>
-      <Container>
+      <Container maxWidth="xl"> 
         <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
           spacing={2}
         >
-          <h1 style={{ textAlign: "left" }}>Facturacion Piso</h1>
+        <Typography variant="h4" textAlign={"left"}>
+        Caja    
+          </Typography>
+          {/* <h1 style={{ textAlign: "left" }}>Caja</h1> */}
           <Stack
             spacing={2}
             direction={{ xs: "column", sm: "column", md: "row" }}

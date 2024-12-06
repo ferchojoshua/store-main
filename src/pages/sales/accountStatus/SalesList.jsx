@@ -490,7 +490,7 @@ const SalesList = () => {
                   />
                   Devoluciones
                 </MenuItem>
-                {/* <MenuItem key={3} value={3}>
+                 <MenuItem key={3} value={3}>
                   <FontAwesomeIcon
                     icon={faHandshakeAltSlash}
                     style={{
@@ -500,7 +500,7 @@ const SalesList = () => {
                     }}
                   />
                   Anuladas
-                </MenuItem>                  */}
+                </MenuItem>                  
               </Select>
             </FormControl>
           </div>

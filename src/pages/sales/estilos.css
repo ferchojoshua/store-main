@@ -1,0 +1,120 @@
+/* Estilos base adaptables */
+.proforma-wrapper {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.store-logo {
+  height: auto;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.proforma-title {
+  font-weight: bold !important;
+  text-align: center !important;
+}
+
+.header-info {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-weight: bold !important;
+  font-size: clamp(9px, 2vw, 11px) !important;
+}
+
+.value {
+  font-size: clamp(9px, 2vw, 11px) !important;
+}
+
+.address {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.details-title {
+  font-weight: bold !important;
+  font-size: clamp(11px, 2.5vw, 15px) !important;
+}
+
+.proforma-table {
+  width: 100%;
+  font-size: clamp(9px, 2vw, 11px);
+}
+
+.proforma-table th,
+.proforma-table td {
+  padding: 0.25rem;
+}
+
+/* Media queries para diferentes tamaños de papel */
+@media print {
+  /* Impresora térmica 58mm */
+  @media (max-width: 58mm) {
+    .proforma-wrapper {
+      width: 58mm;
+      font-size: 8pt;
+    }
+    
+    .store-logo {
+      max-height: 40px;
+    }
+  }
+
+  /* Impresora térmica 80mm */
+  @media (min-width: 58.1mm) and (max-width: 80mm) {
+    .proforma-wrapper {
+      width: 80mm;
+      font-size: 9pt;
+    }
+    
+    .store-logo {
+      max-height: 50px;
+    }
+  }
+
+  /* Papel carta/A4 */
+  @media (min-width: 80.1mm) {
+    .proforma-wrapper {
+      width: 100%;
+      max-width: 215.9mm;
+      font-size: 11pt;
+    }
+    
+    .store-logo {
+      max-height: 60px;
+    }
+  }
+
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}
+
+/* Estilos para vista previa en pantalla */
+@media screen {
+  .proforma-wrapper {
+    max-width: 800px;
+  }
+}
+
+/* Utilidades */
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.monospace {
+  font-family: monospace !important;
+}

@@ -109,7 +109,7 @@ const Pagar = ({
     setIsDescPercent(!isDescPercent);
   };
 
-  //Devuelve un entero positivo
+
   const funcMontoRecibido = (value) => {
     if (value === 0 || value === "0") {
       toastError("Ingrese descuento mayor que cero");
@@ -131,13 +131,13 @@ const Pagar = ({
     }
 
     const data = {
-      facturaId: id,
+      Id: id,
       tipoPagoId: selectedTipopago,
       montoVenta: montoVentaDespuesDescuento,
       isDescuento: descuentoGlobal ? true : false,
       descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
       descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
-      codigoDescuento: descuentoCod,
+      codigoDescuento: descuentoCod || null,
       montoVentaAntesDescuento,
       reference,
     };

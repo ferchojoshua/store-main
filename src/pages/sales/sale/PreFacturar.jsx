@@ -44,6 +44,8 @@ const PreFacturar = ({
   setSelectedTipoPago,
   reference,
   setReference,
+  setShowFacturarModal,
+  setDataBill,
 }) => {
   const [montoRecibido, setMontoRecibido] = useState("");
   const [cambio, setCambio] = useState("");
@@ -155,6 +157,24 @@ const PreFacturar = ({
       return;
     }
   };
+
+  const handleGuardarVenta = async () => {
+    try {
+      const result = await addNewVenta();
+      if (result?.success) {
+        // Si la venta fue exitosa, guardamos los datos para la factura
+        if (result.data) {
+          setDataBill(result.data);
+        }
+        // Cerramos el modal de facturación
+        setShowFacturarModal(false);
+      }
+    } catch (error) {
+      console.error("Error al guardar la venta:", error);
+      toastError("Error al guardar la venta");
+    }
+  };
+
 
   const handleChangeTipoPago = (event) => {
     setSelectedTipoPago(event.target.value);
@@ -301,7 +321,8 @@ const PreFacturar = ({
             color: "#00a152",
             marginTop: 20,
           }}
-          onClick={() => addNewVenta()}
+          // onClick={() => addNewVenta()}
+          onClick={handleGuardarVenta}
         >
           <FontAwesomeIcon
             style={{ marginRight: 10, fontSize: 20 }}

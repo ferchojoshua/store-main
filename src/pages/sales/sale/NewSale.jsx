@@ -17,10 +17,11 @@ import SelectProduct from "./SelectProduct";
 import SelectTipoVenta from "./SelectTipoVenta";
 import ProductDescription from "./ProductDescription";
 import SaleDetail from "./SaleDetail";
-import { addSaleAsync } from "../../../services/SalesApi";
+import { addSaleAsync,  GetContadoSalesByProfAsync, ProformAddAsync, finishSaleStatusAsync} from "../../../services/SalesApi";
 import SmallModal from "../../../components/modals/SmallModal";
 import { BillComponent } from "./printBill/BillComponent";
 import ProformaComponent from "./printBill/ProformaComponent";
+import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 import PreFacturar from "./PreFacturar";
 
 const NewSale = () => {
@@ -40,6 +41,7 @@ const NewSale = () => {
 
   const [typeVenta, setTypeVenta] = useState("contado");
 
+
   const [selectedProduct, setSelectedProduct] = useState("");
 
   const [cantidad, setCantidad] = useState("");
@@ -58,9 +60,7 @@ const NewSale = () => {
   const [selectedPrecio, setSelectedPrecio] = useState("PVM");
   const [costoAntesDescuento, setCostoAntesDescuento] = useState("");
   const [costoXProducto, setcostoXProducto] = useState("");
-
   const [selectedProductList, setSelectedProductList] = useState([]);
-
   const [montoVenta, setMontoVenta] = useState(0);
 
   const [barCodeSearch, setBarCodeSearch] = useState(false);
@@ -80,6 +80,7 @@ const NewSale = () => {
   const [creditoDisponible, setCreditoDisponible] = useState("");
   const [saldoVencido, setSaldoVencido] = useState("");
   const [factVencidas, setFactVencidas] = useState("");
+  const [selectedFACT, setselectedFACT] = useState([]);
 
   const [selectedTipopago, setSelectedTipoPago] = useState(1);
   const [reference, setReference] = useState("");
@@ -88,6 +89,10 @@ const NewSale = () => {
   useEffect(() => {
     setTypeClient(true);
     setTypeVenta("contado");
+    if(selectedStore) {
+      setSelectedProduct("");
+    }
+    
   }, []);
 
   const onTypeClientChange = (value) => {
@@ -100,10 +105,9 @@ const NewSale = () => {
       setEventualClient("");
     }
   };
-
   const addToProductList = () => {
-    const { precioVentaDetalle, precioVentaMayor, producto, almacen } =
-      selectedProduct;
+    const { precioVentaDetalle, precioVentaMayor, producto, almacen } = selectedProduct;
+    
     if (descuentoCod !== "VC.2022*" && !isEmpty(descuento)) {
       toastError("Codigo incorrecto");
       return;
@@ -112,74 +116,409 @@ const NewSale = () => {
       toastError("Ingrese cantidad a comprar");
       return;
     }
-
-    const filtered = selectedProductList.filter(
-      (item) => item.product.id === producto.id
+  
+    // Verificar si el producto ya existe (incluyendo productos de proforma)
+    const existingProductIndex = selectedProductList.findIndex(
+      (item) => {
+        // Comparar tanto el ID del producto como el código
+        return (
+          item.product.id === producto.id || 
+          item.product.barCode === producto.barCode ||
+          item.product.description === producto.description
+        );
+      }
     );
-
-    if (filtered.length > 0) {
-      let cantActual = parseInt(filtered[0].cantidad);
-      let cantNueva = parseInt(cantidad);
+  
+    if (existingProductIndex !== -1) {
+      // Obtener el producto existente
+      const currentProduct = selectedProductList[existingProductIndex];
+      const cantActual = parseInt(currentProduct.cantidad);
+      const cantNueva = parseInt(cantidad);
+      const costoUnitario = currentProduct.costoUnitario;
+      
       if (cantActual + cantNueva > selectedProduct.existencia) {
         toastError("No vender mas de lo que hay en existencia");
         setCantidad("");
         return;
       }
-      filtered[0].cantidad = cantActual + cantNueva;
-      filtered[0].costoTotal =
-        (cantActual + cantNueva) * filtered[0].costoUnitario;
-
-      let montoSumar = cantNueva * filtered[0].costoUnitario;
-
-      setMontoVentaAntesDescuento(
-        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
-      );
-      setMontoVentaDespuesDescuento(
-        parseFloat(montoSumar) + parseFloat(montoVentaAntesDescuento)
-      );
-      setSelectedProduct("");
-      setCantidad("");
-      setDescuento("");
-      setcostoXProducto("");
-      return;
+  
+      // Actualizar el producto existente
+      const newList = [...selectedProductList];
+      newList[existingProductIndex] = {
+        ...currentProduct,
+        cantidad: cantActual + cantNueva,
+        costoTotal: costoUnitario * (cantActual + cantNueva),
+        costoTotalAntesDescuento: costoUnitario * (cantActual + cantNueva),
+        costoTotalDespuesDescuento: descuentoXMonto === "" 
+          ? costoUnitario * (cantActual + cantNueva)
+          : (costoUnitario * (cantActual + cantNueva)) - parseFloat(descuentoXMonto)
+      };
+  
+      setSelectedProductList(newList);
+  
+   
+      const montoSumar = cantNueva * costoUnitario;
+      setMontoVentaAntesDescuento(prev => prev + montoSumar);
+      setMontoVentaDespuesDescuento(prev => prev + montoSumar);
+    } else {
+      // Si es un producto nuevo, mantener la lógica existente
+      const data = {
+        product: producto,
+        cantidad: parseInt(cantidad),
+        descuento: descuentoXMonto === "" ? 0 : parseFloat(descuentoXMonto),
+        costoUnitario: costoAntesDescuento / cantidad,
+        PVM: precioVentaMayor,
+        PVD: precioVentaDetalle,
+        costoTotalAntesDescuento: costoAntesDescuento,
+        costoTotalDespuesDescuento: descuentoXMonto === "" 
+          ? costoAntesDescuento 
+          : costoAntesDescuento - parseFloat(descuentoXMonto),
+        costoTotal: parseFloat(costoXProducto),
+        store: almacen,
+        isDescuento: descuento ? true : false,
+        descuentoXPercent: descuentoXPercent,
+        codigoDescuento: descuentoCod,
+        costoCompra: selectedProduct.precioCompra * parseInt(cantidad),
+      };
+  
+      setSelectedProductList([...selectedProductList, data]);
+      setMontoVentaAntesDescuento(prev => prev + parseFloat(costoXProducto));
+      setMontoVentaDespuesDescuento(prev => prev + parseFloat(costoXProducto));
     }
-
-    const data = {
-      product: producto,
-      cantidad: parseInt(cantidad),
-      descuento: descuentoXMonto === "" ? 0 : parseFloat(descuentoXMonto),
-      costoUnitario: costoAntesDescuento / cantidad,
-      PVM: precioVentaMayor,
-      PVD: precioVentaDetalle,
-      costoTotalAntesDescuento: costoAntesDescuento / cantidad,
-      costoTotalDespuesDescuento:
-        descuentoXMonto === ""
-          ? costoAntesDescuento / cantidad
-          : costoAntesDescuento / cantidad - parseFloat(descuentoXMonto),
-      costoTotal: parseFloat(costoXProducto),
-      store: almacen,
-      isDescuento: descuento ? true : false,
-      descuentoXPercent: descuentoXPercent,
-      codigoDescuento: descuentoCod,
-      costoCompra: selectedProduct.precioCompra * cantidad,
-    };
-
-    setMontoVentaAntesDescuento(
-      parseFloat(montoVentaAntesDescuento) + parseFloat(costoXProducto)
-    );
-    setMontoVentaDespuesDescuento(
-      parseFloat(montoVentaAntesDescuento) + parseFloat(costoXProducto)
-    );
-
+  
+    // Limpiar campos
     setSelectedProduct("");
     setCantidad("");
     setDescuento("");
     setcostoXProducto("");
     setDescuentoCod("");
-    setSelectedProductList([...selectedProductList, data]);
+    setDescuentoXMonto("");
+    setDescuentoXPercent("");
   };
 
-  const addNewVenta = async () => {
+  // const addNewVenta = async () => {
+  //   if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
+  //     toastError("Seleccione al menos un producto");
+  //     return;
+  //   }
+
+  //   if (descuentoCod !== "VC.2022*" && !isEmpty(descuentoGlobal)) {
+  //     toastError("Codigo incorrecto");
+  //     return;
+  //   }
+
+  //   if (!typeClient && isEmpty(selectedClient)) {
+  //     toastError("Seleccione un cliente");
+  //     return;
+  //   }
+
+  //   if (!typeClient && selectedClient.facturasVencidas > 0) {
+  //     toastError("El cliente tiene saldo vencido");
+  //     return;
+  //   }
+
+  //   const data = {
+  //     isEventual: typeClient,
+  //     nombreCliente: eventualClient,
+  //     idClient: selectedClient.id,
+  //     montoVenta: montoVentaDespuesDescuento,
+  //     saleDetails: selectedProductList,
+  //     isContado: typeVenta === "contado" ? true : false,
+  //     storeid: selectedStore,
+  //     isDescuento: descuentoGlobal ? true : false,
+  //     descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
+  //     descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
+  //     codigoDescuento: descuentoCod,
+  //     montoVentaAntesDescuento,
+  //     tipoPagoId: selectedTipopago,
+  //     reference,
+  //   };
+
+  //   setIsLoading(true);
+  //   const result = await addSaleAsync(token, data);
+  //   if (!result.statusResponse) {
+  //     setIsLoading(false);
+  //     if (result.error.request.status === 401) {
+  //       navigate(`${ruta}/unauthorized`);
+  //       return;
+  //     }
+  //     toastError(result.error.message);
+  //     return;
+  //   }
+  //   if (result.data === "eX01") {
+  //     setIsLoading(false);
+  //     deleteUserData();
+  //     deleteToken();
+  //     setIsLogged(false);
+  //     return;
+  //   }
+  //   if (result.data.isDefaultPass) {
+  //     setIsLoading(false);
+  //     setIsDefaultPass(true);
+  //     return;
+  //   }
+  //   setTypeClient(true);
+  //   setSelectedClient("");
+  //   setEventualClient("");
+  //   setMontoVenta(0);
+  //   setDescuento("");
+  //   setDescuentoCod("");
+  //   setDescuentoGlobal("");
+  //   setDescuentoGlobalMonto("");
+  //   setDescuentoGlobalPercent("");
+  //   setMontoVentaAntesDescuento(0);
+  //   setMontoVentaDespuesDescuento(0);
+  //   setSelectedTipoPago(1);
+  //   setReference("");
+  //   setSelectedStore("");
+  //   setSelectedProductList([]);
+  //   setIsLoading(false);
+  //   toastSuccess("Venta Realizada");
+  //   setReload(!reload);
+  //   setDataBill(result.data);
+  //   setShowFacturarModal(false);
+  //   printBill();
+  // };
+   const addNewVenta = async () => {
+    //  Validaciones iniciales
+    if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
+        toastError("Seleccione al menos un producto");
+        return;
+    }
+
+    if (descuentoCod !== "VC.2022*" && !isEmpty(descuentoGlobal)) {
+        toastError("Codigo incorrecto");
+        return;
+    }
+
+    if (!typeClient && isEmpty(selectedClient)) {
+        toastError("Seleccione un cliente");
+        return;
+    }
+
+    if (!typeClient && selectedClient.facturasVencidas > 0) {
+        toastError("El cliente tiene saldo vencido");
+        return;
+    }
+
+    if (!selectedStore) {
+      toastError("Seleccione un almacén");
+      return; 
+  }
+
+    try {
+      setIsLoading(true);
+      // const validProducts = selectedProductList.filter(item => item.product?.id);
+      // const isExistingProforma = validProducts.some(item => item.product.id >= 1);
+
+      const isExistingProforma = selectedProductList.some(item =>   item.hasOwnProperty('proformaId') && item.proformaId != null   );
+
+
+      let result;   
+      
+      if (isExistingProforma) {
+          // Primero creamos la venta con los productos seleccionados
+          const data = {
+              isEventual: typeClient,
+              nombreCliente: eventualClient,
+              idClient: selectedClient?.id || 0,
+              montoVenta: montoVentaDespuesDescuento,
+              saleDetails: selectedProductList,
+              isContado: typeVenta === "contado" ? true : false,
+              Storeid: selectedStore,
+              isDescuento: descuentoGlobal ? true : false,
+              descuentoXPercent: descuentoGlobalPercent || 0,
+              descuentoXMonto: descuentoGlobalMonto || 0,
+              codigoDescuento: descuentoCod,
+              montoVentaAntesDescuento,
+              tipoPagoId: selectedTipopago,
+              reference
+          };
+          
+          result = await addSaleAsync(token, data);
+          
+          if (!result.statusResponse) {
+              throw new Error(result.error?.message || "Error al crear la venta");
+          }
+
+          // console.log("Is Existing validProducts[0].id sz:", validProducts[0].id);
+          // Luego finalizamos la proforma
+          const finishData = {
+              Id: selectedProductList[0].proformaId,
+              tipoPagoId: selectedTipopago,
+              reference: reference || ""
+          };
+          // console.log("Is Existing ANTES:", finishData);
+          const proformaResult = await finishSaleStatusAsync(token, finishData);
+          // console.log("Is Existing LUEGO:", proformaResult);
+          
+          if (!proformaResult.statusResponse) {
+              throw new Error(proformaResult.error?.message || "Error al finalizar la proforma");
+          }
+          
+      } else {
+          // Venta directa normal
+          const data = {
+              isEventual: typeClient,
+              nombreCliente: eventualClient,
+              idClient: selectedClient.id,
+              montoVenta: montoVentaDespuesDescuento,
+              saleDetails: selectedProductList,
+              isContado: typeVenta === "contado" ? true : false,
+              storeid: selectedStore,
+              isDescuento: descuentoGlobal ? true : false,
+              descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
+              descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
+              codigoDescuento: descuentoCod,
+              montoVentaAntesDescuento,
+              tipoPagoId: selectedTipopago,
+              reference
+          };
+          
+          result = await addSaleAsync(token, data);
+      }
+
+      if (!result.statusResponse) {
+          if (result.error?.request?.status === 401) {
+              navigate(`${ruta}/unauthorized`);
+              return;
+          }
+          throw new Error(result.error?.message || "Error al procesar la venta");
+      }
+
+      // Limpiar formulario y mostrar mensaje de éxito
+      setTypeClient(true);
+      setSelectedClient("");
+      setEventualClient("");
+      setMontoVenta(0);
+      setDescuento("");
+      setDescuentoCod("");
+      setDescuentoGlobal("");
+      setDescuentoGlobalMonto("");
+      setDescuentoGlobalPercent("");
+      setMontoVentaAntesDescuento(0);
+      setMontoVentaDespuesDescuento(0);
+      setSelectedTipoPago(1);
+      setReference("");
+      setSelectedStore("");
+      setSelectedProductList([]);      
+      toastSuccess(isExistingProforma ? "Venta realizada y proforma finalizada exitosamente" : "Venta realizada exitosamente");
+      setReload(!reload);
+      setDataBill(result.data);
+      setShowFacturarModal(false);
+      printBill();
+
+  } catch (error) {
+      console.error("Error:", error);
+      toastError(error.message || "Error al procesar la venta");
+  } finally {
+      setIsLoading(false);
+  }
+};
+
+
+// Función auxiliar para limpiar el formulario
+const clearForm = () => {
+    setTypeClient(true);
+    setSelectedClient("");
+    setEventualClient("");
+    setMontoVenta(0);
+    setDescuento("");
+    setDescuentoCod("");
+    setDescuentoGlobal("");
+    setDescuentoGlobalMonto("");
+    setDescuentoGlobalPercent("");
+    setMontoVentaAntesDescuento(0);
+    setMontoVentaDespuesDescuento(0);
+    setSelectedTipoPago(1);
+    setReference("");
+    setSelectedStore("");
+    setSelectedProductList([]);
+};
+  //   if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
+  //     toastError("Seleccione al menos un producto");
+  //     return;
+  //   }
+
+  //   if (descuentoCod !== "VC.2022*" && !isEmpty(descuentoGlobal)) {
+  //     toastError("Codigo incorrecto");
+  //     return;
+  //   }
+
+  //   if (!typeClient && isEmpty(selectedClient)) {
+  //     toastError("Seleccione un cliente");
+  //     return;
+  //   }
+
+  //   if (!typeClient && selectedClient.facturasVencidas > 0) {
+  //     toastError("El cliente tiene saldo vencido");
+  //     return;
+  //   }
+
+  //   const data = {
+  //     isEventual: typeClient,
+  //     nombreCliente: eventualClient,
+  //     idClient: selectedClient.id,
+  //     montoVenta: montoVentaDespuesDescuento,
+  //     saleDetails: selectedProductList,
+  //     isContado: typeVenta === "contado" ? true : false,
+  //     storeid: selectedStore,
+  //     isDescuento: descuentoGlobal ? true : false,
+  //     descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
+  //     descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
+  //     codigoDescuento: descuentoCod,
+  //     montoVentaAntesDescuento,
+  //     tipoPagoId: selectedTipopago,
+  //     reference,
+  //   };
+
+  //   setIsLoading(true);
+  //   const result = await addSaleAsync(token, data);
+  //   if (!result.statusResponse) {
+  //     setIsLoading(false);
+  //     if (result.error.request.status === 401) {
+  //       navigate(`${ruta}/unauthorized`);
+  //       return;
+  //     }
+  //     toastError(result.error.message);
+  //     return;
+  //   }
+  //   if (result.data === "eX01") {
+  //     setIsLoading(false);
+  //     deleteUserData();
+  //     deleteToken();
+  //     setIsLogged(false);
+  //     return;
+  //   }
+  //   if (result.data.isDefaultPass) {
+  //     setIsLoading(false);
+  //     setIsDefaultPass(true);
+  //     return;
+  //   }
+  //   setTypeClient(true);
+  //   setSelectedClient("");
+  //   setEventualClient("");
+  //   setMontoVenta(0);
+  //   setDescuento("");
+  //   setDescuentoCod("");
+  //   setDescuentoGlobal("");
+  //   setDescuentoGlobalMonto("");
+  //   setDescuentoGlobalPercent("");
+  //   setMontoVentaAntesDescuento(0);
+  //   setMontoVentaDespuesDescuento(0);
+  //   setSelectedTipoPago(1);
+  //   setReference("");
+  //   setSelectedStore("");
+  //   setSelectedProductList([]);
+  //   setIsLoading(false);
+  //    toastSuccess("Venta Realizada"); 
+  //   setReload(!reload);
+  //   setDataBill(result.data);
+  //   setShowFacturarModal(false);
+  //   printBill();
+  // };
+
+  const addProformma = async () => {
     if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
       toastError("Seleccione al menos un producto");
       return;
@@ -205,8 +544,8 @@ const NewSale = () => {
       nombreCliente: eventualClient,
       idClient: selectedClient.id,
       montoVenta: montoVentaDespuesDescuento,
-      saleDetails: selectedProductList,
-      isContado: typeVenta === "contado" ? true : false,
+      ProformasDetails: selectedProductList,
+      isContado: false,
       storeid: selectedStore,
       isDescuento: descuentoGlobal ? true : false,
       descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
@@ -214,11 +553,11 @@ const NewSale = () => {
       codigoDescuento: descuentoCod,
       montoVentaAntesDescuento,
       tipoPagoId: selectedTipopago,
-      reference,
-    };
-
+      reference
+  };
+    try {
     setIsLoading(true);
-    const result = await addSaleAsync(token, data);
+    const result = await ProformAddAsync(token, data);
     if (!result.statusResponse) {
       setIsLoading(false);
       if (result.error.request.status === 401) {
@@ -256,14 +595,21 @@ const NewSale = () => {
     setSelectedStore("");
     setSelectedProductList([]);
     setIsLoading(false);
-    toastSuccess("Venta Realizada");
-    setReload(!reload);
-    setDataBill(result.data);
-    setShowFacturarModal(false);
-    printBill();
-  };
-
-  const addProformma = async () => {
+    toastSuccess("Proforma Guardada");
+    setDataProforma(data);
+    setShowProformaModal(true);
+    const proformas = await GetContadoSalesByProfAsync(token);
+    if (proformas) {
+        setReload(!reload);
+    }
+    
+} catch (error) {
+    toastError("Error al guardar la proforma");
+} finally {
+    setIsLoading(false);
+}
+};
+/*  const addProformma = async () => {
     if (isEmpty(selectedProductList) || montoVentaDespuesDescuento === 0) {
       toastError("Seleccione al menos un producto");
       return;
@@ -272,7 +618,7 @@ const NewSale = () => {
     if (!typeClient && isEmpty(selectedClient)) {
       toastError("Seleccione un cliente");
       return;
-    }
+    } 
 
     const data = {
       nombreCliente: eventualClient,
@@ -284,11 +630,34 @@ const NewSale = () => {
 
     setDataProforma(data);
     setShowProformaModal(true);
-  };
+  };*/
 
   const printBill = () => {
     setShowModal(true);
   };
+  useEffect(() => {
+    if(selectedStore) {
+      const LoadProductForStore = async () => {
+        setIsLoading(true);
+        try {
+          const data = {idAlmacen : selectedStore};
+          const result = await getStoresByUserAsync(token, data);
+
+          if(result.statusResponse){
+            setReload(!reload);
+          }
+
+    } catch (error) {
+          console.error("Error loading products:", error);
+          toastError("Error al cargar los productos del almacén");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      LoadProductForStore();
+    }
+  }, [selectedStore]);
 
   return (
     <div>
@@ -300,9 +669,8 @@ const NewSale = () => {
             alignContent: "center",
           }}
         >
-          <h1>Agregar Venta de Productos</h1>
+          <h1>Agregar Venta</h1>
         </div>
-
         <hr />
 
         <Paper
@@ -336,6 +704,7 @@ const NewSale = () => {
                 setSelectedProduct={setSelectedProduct}
                 barCodeSearch={barCodeSearch}
                 setBarCodeSearch={setBarCodeSearch}
+                key={selectedStore} 
               />
 
               <SelectTipoVenta
@@ -369,6 +738,7 @@ const NewSale = () => {
                   setDescuentoXMonto={setDescuentoXMonto}
                   descuentoCod={descuentoCod}
                   setDescuentoCod={setDescuentoCod}
+                  
                 />
               </Grid>
             ) : (
@@ -382,6 +752,7 @@ const NewSale = () => {
           setSelectedProductList={setSelectedProductList}
           addNewVenta={addNewVenta}
           addProformma={addProformma}
+          addToProductList={addToProductList}
           showFacturarModal={showFacturarModal}
           setShowFacturarModal={setShowFacturarModal}
           montoVentaAntesDescuento={montoVentaAntesDescuento}
@@ -390,12 +761,14 @@ const NewSale = () => {
           setMontoVentaDespuesDescuento={setMontoVentaDespuesDescuento}
           descuentoGlobal={descuentoGlobal}
           storeid={selectedStore}
+          setSelectedStore={setSelectedStore} // Este es el prop donde recibo el almacen here
+          almacen={selectedProduct?.almacen} // Este es el prop donde recibo el almacen here
           idClient = {selectedClient?.id ? selectedClient?.id : eventualClient}
           userId = {user}
           isFacturar={false}
         />
       </Container>
-
+  
       <SmallModal
         titulo={"Imprimir Recibo"}
         isVisible={showModal}
@@ -403,7 +776,7 @@ const NewSale = () => {
       >
         <BillComponent data={dataBill} setShowModal={setShowModal} />
       </SmallModal>
-
+      
       <SmallModal
         titulo={"Imprimir Proforma"}
         isVisible={showProformaModal}
@@ -437,6 +810,7 @@ const NewSale = () => {
           montoVentaAntesDescuento={montoVentaAntesDescuento}
           setMontoVentaAntesDescuento={setMontoVentaAntesDescuento}
           selectedProductList={selectedProductList}
+          setSelectedProductList={setSelectedProductList}
           typeVenta={typeVenta}
           setSelectedTipoPago={setSelectedTipoPago}
           selectedTipopago={selectedTipopago}

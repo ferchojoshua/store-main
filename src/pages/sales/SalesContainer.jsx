@@ -11,12 +11,11 @@ import {
   faCashRegister,
   faCartPlus,
   faMoneyCheckDollar,
-  faMapMarked,
 } from "@fortawesome/free-solid-svg-icons";
 import { Container } from "react-bootstrap";
+
 import ClientList from "./clients/ClientList";
 import NewSale from "./sale/NewSale";
-import Proform from "./sale/proforma/ProformVentas";
 import SalesList from "./accountStatus/SalesList";
 import { isAccess } from "../../helpers/Helpers";
 import { DataContext } from "../../context/DataContext";
@@ -64,25 +63,22 @@ const SalesContainer = () => {
   const tabIndex = (value) => {
     let result = null;
     for (let index = 0; index <= value; index++) {
-      if (isAccess(access, "SALES FACTURACION") && index === 0) {
-        result === null ? (result = 0) : result++;
-      } 
-      if (isAccess(access, "SALES CREATE") && index === 1) {
+      if (isAccess(access, "SALES CREATE") && index === 0) {
         result === null ? (result = 0) : result++;
       }
-      if (isAccess(access, "SALES FACTURACION") && index === 2) {
+      if (isAccess(access, "SALES FACTURACION") && index === 1) {
         result === null ? (result = 0) : result++;
       }
-      if (isAccess(access, "SALES CAJA") && index === 3) {
+      if (isAccess(access, "SALES CAJA") && index === 2) {
         result === null ? (result = 0) : result++;
       }
-      if (isAccess(access, "SALES VER") && index === 4) {
+      if (isAccess(access, "SALES VER") && index === 3) {
         result === null ? (result = 0) : result++;
       }
-      if (isAccess(access, "CAJA VER") && index === 5) {
+      if (isAccess(access, "CAJA VER") && index === 4) {
         result === null ? (result = 0) : result++;
       }
-      if (isAccess(access, "CLIENTS VER") && index === 6) {
+      if (isAccess(access, "CLIENTS VER") && index === 5) {
         result === null ? (result = 0) : result++;
       }
     }
@@ -104,23 +100,7 @@ const SalesContainer = () => {
           aria-label="icon label tabs example"
           centered
         >
-          {isAccess(access, "SALES FACTURACION") ? (
-            <Tab
-              icon={
-                <FontAwesomeIcon
-                  icon={faMapMarked}
-                  style={{ fontSize: 20 }}
-                />
-              }
-              label="Nueva Proforma"
-              {...a11yProps(0)}
-              style={{ fontSize: 12 }}
-            />
-          ) : (
-            ""
-          )} 
-          
-           {isAccess(access, "SALES CREATE") ? (
+          {isAccess(access, "SALES CREATE") ? (
             <Tab
               icon={
                 <FontAwesomeIcon
@@ -165,7 +145,9 @@ const SalesContainer = () => {
             ""
           )}
 
-          {isAccess(access, "SALES VER") ? (
+          {isAccess(access, "SALES VER")
+           ? (
+      
             <Tab
               icon={
                 <FontAwesomeIcon
@@ -179,7 +161,10 @@ const SalesContainer = () => {
             />
           ) : (
             ""
-          )}
+          )
+          
+          }
+
 
           {isAccess(access, "CAJA VER") ? (
             <Tab
@@ -211,14 +196,6 @@ const SalesContainer = () => {
 
         {isAccess(access, "SALES CREATE") ? (
           <TabPanel value={value} index={tabIndex(0)}>
-            <Proform />
-          </TabPanel>
-        ) : (
-          <></>
-        )}
-
-        {isAccess(access, "SALES CREATE") ? (
-          <TabPanel value={value} index={tabIndex(1)}>
             <NewSale />
           </TabPanel>
         ) : (
@@ -226,7 +203,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "SALES FACTURACION") ? (
-          <TabPanel value={value} index={tabIndex(2)}>
+          <TabPanel value={value} index={tabIndex(1)}>
             <Facrturar />
           </TabPanel>
         ) : (
@@ -234,7 +211,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "SALES CAJA") ? (
-          <TabPanel value={value} index={tabIndex(3)}>
+          <TabPanel value={value} index={tabIndex(2)}>
             <Caja />
           </TabPanel>
         ) : (
@@ -242,7 +219,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "SALES VER") ? (
-          <TabPanel value={value} index={tabIndex(4)}>
+          <TabPanel value={value} index={tabIndex(3)}>
             <SalesList />
           </TabPanel>
         ) : (
@@ -250,7 +227,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "CAJA VER") ? (
-          <TabPanel value={value} index={tabIndex(5)}>
+          <TabPanel value={value} index={tabIndex(4)}>
             <CashMovements />
           </TabPanel>
         ) : (
@@ -258,7 +235,7 @@ const SalesContainer = () => {
         )}
 
         {isAccess(access, "CLIENTS VER") ? (
-          <TabPanel value={value} index={tabIndex(6)}>
+          <TabPanel value={value} index={tabIndex(5)}>
             <ClientList />
           </TabPanel>
         ) : (

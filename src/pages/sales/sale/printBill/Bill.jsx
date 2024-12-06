@@ -96,17 +96,9 @@ export const Bill = React.forwardRef((props, ref) => {
 
   return (
     <div
-      ref={ref}
-      style={{
-        paddingRight: 10,
-        textAlign: "center",
-      }}
+      ref={ref} style={{paddingRight: 10, textAlign: "center", }}
     >
-      {storeLogo ? (
-        <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 80 }} />
-      ) : (
-        <p>Cargando logotipo...</p>
-      )}
+      {storeLogo && ( <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 60 }} />)}      
       <Typography style={{ fontSize: 11 }}>{store.direccion}</Typography>
       <Stack textAlign="center">
         <Typography style={{ fontWeight: "bold", fontSize: 20 }}>

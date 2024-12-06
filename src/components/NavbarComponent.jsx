@@ -485,22 +485,7 @@ const NavbarComponent = () => {
                 <></>
               )} */}
 
-              {/* {isAccess(access, "MISCELANEOS VER") ? (
-                <NavDropdown.Item
-                  as={Link}
-                  to={`${ruta}/tipo-negocio`}
-                  eventKey="misc"
-                >
-                  <FontAwesomeIcon
-                    icon={faSitemap}
-                    style={{ marginRight: 10 }}
-                  />
-                  Tipo Negocio
-                </NavDropdown.Item>
-              ) : (
-                <></>
-              )} */}
-
+           
               {isAccess(access, "COMMUNITIES VER") ? (
                 <NavDropdown.Item
                   as={Link}
@@ -560,12 +545,6 @@ const NavbarComponent = () => {
               </span>
             </MenuItem>
             <Divider />
-            {/* <MenuItem> */}
-            {/* <ListItemIcon> */}
-            {/* <PersonAdd fontSize="small" /> */}
-            {/* </ListItemIcon> */}
-            {/* Notificaciones */}
-            {/* </MenuItem> */}
           </Menu>
           <IconButton
             aria-label="account of current user"
@@ -629,13 +608,7 @@ const NavbarComponent = () => {
             <></>
           )} */}
 
-              {/* <MenuItem onClick={changeTheme}>
-                <FontAwesomeIcon
-                  icon={isDarkMode ? faSun : faMoon}
-                  style={{ marginRight: 20 }}
-                />
-                {isDarkMode ? "Tema Claro" : "Tema Oscuro"}
-              </MenuItem> */}
+         
               <MenuItem onClick={logOut}>
                 <FontAwesomeIcon
                   icon={faSignOutAlt}
@@ -643,15 +616,7 @@ const NavbarComponent = () => {
                 />
                 Cerrar Sesion
               </MenuItem>
-              {/* <Divider />
-              <MenuItem disabled style={{ color: "#2196f3" }}>
-                <FontAwesomeIcon
-                  icon={faCodeBranch}
-                  style={{ marginRight: 20 }}
-                />
-                {`Version - ${version}`}
-              </MenuItem> */}
-            </Menu>
+              </Menu>
           </div>
         </Navbar.Collapse>
       </Container>

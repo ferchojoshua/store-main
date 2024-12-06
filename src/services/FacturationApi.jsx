@@ -34,6 +34,33 @@ export const getFactUncancelledByStoreAsync = async (token, id) => {
   return result;
 };
 
+                                                                                                                                                                                                                                                                                                                                           
+export const GetProformasFacturacionAsync = async (token) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}GetProformasFacturacion/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.get(service).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+
 export const getTipoPagosAsync = async (token) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}GetTipoPagos`;
@@ -161,7 +188,8 @@ export const addFacturaAsync = async (token, data) => {
     result.error = error;
   }
   return result;
-};
+};	
+
 
 export const deleteFacturaAsync = async (token, id) => {
   const result = { statusResponse: true, data: [], error: null };
@@ -192,6 +220,31 @@ export const deleteFacturaAsync = async (token, id) => {
 export const paidFacturaAsync = async (token, data) => {
   const result = { statusResponse: true, data: [], error: null };
   let service = `${controller}Paidfactura/`;
+  const authAxios = axios.create({
+    baseURL: service,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  try {
+    await authAxios.post(service, data).then((resp) => {
+      if (resp.status <= 200 && resp.status >= 299) {
+        result.statusResponse = false;
+        result.error = resp.title;
+      } else {
+        result.statusResponse = true;
+        result.data = resp.data;
+      }
+    });
+  } catch (error) {
+    result.statusResponse = false;
+    result.error = error;
+  }
+  return result;
+};
+export const UpdateFacturarDetailsAsync = async (token, data) => {
+  const result = { statusResponse: true, data: [], error: null };
+  let service = `${controller}UpdateFacturarDetails/`;
   const authAxios = axios.create({
     baseURL: service,
     headers: {

@@ -19,8 +19,8 @@ import { getLogoByStoreIdAsync } from "../../../../services/CreateLogoApi";
  import "../../../sales/estilos.css"
 
 const Proforma = React.forwardRef((props, ref) => {
-  const { idClient, storeid, montoVenta, nombreCliente, saleDetails } = props.data;
-
+  const { idClient, storeid, montoVenta, nombreCliente, ProformasDetails = [] } = props.data;
+  
   const navigate = useNavigate();
 
   const { setIsLoading, setIsLogged, setIsDefaultPass } = useContext(DataContext);
@@ -142,21 +142,25 @@ const Proforma = React.forwardRef((props, ref) => {
 
   return (
     <div ref={ref} style={{ paddingRight: 10, textAlign: "center" }}>
-      {storeLogo ? (
-        <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 80 }} />
-      ) : (
-        <p>Cargando logotipo...</p>
-      )}
-      
+     {storeLogo && ( <img loading="lazy" src={storeLogo} alt="logo" style={{ height: 60 }} />)}      
       <Stack>
-        <Typography style={{ fontWeight: "bold", fontSize: 20 }}>PROFORMA</Typography>
-        
+      <Typography style={{ 
+      fontWeight: "bold", 
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: '15px'
+    }}>
+      PROFORMA
+    </Typography>
 
-        <Divider />
-
-  {/* Información de la agencia y del cliente */}
-   <Grid spacing={2} container>
-          <Grid item xs={4}>
+        <Divider style={{ margin: '10px 0' }} />
+        <div style={{ 
+      width: '400px',  // Ancho ajustable según necesites
+      margin: '0 auto',
+      marginBottom: '20px'
+    }}>
+   <Grid container spacing={1} >
+          <Grid item xs={5}>
             <Stack textAlign="right">
                 <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Agencia:</Typography>
                 <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Ruc:</Typography>
@@ -164,16 +168,17 @@ const Proforma = React.forwardRef((props, ref) => {
               </Stack>
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid item xs={7}>
               <Stack textAlign="left">
                 <Typography style={{ fontSize: 11 }}>{stores.name}</Typography>
                 <Typography style={{ fontSize: 11 }}>{store.ruc}</Typography>
-                <Typography style={{ fontSize: 11 }}>{store.direccion}</Typography>
+                <Typography style={{ fontSize: 11,   whiteSpace: 'normal', wordBreak: 'break-word',  lineHeight: '1.2',marginTop: '0'}}>{store.direccion}</Typography>
               </Stack>
             </Grid>
           </Grid>
-          <Grid spacing={1} container>
-          <Grid item xs={4}>
+          
+          <Grid container spacing={1} >
+          <Grid item xs={5}>
             <Stack textAlign="right">
                 <Typography style={{ fontWeight: "bold", fontSize: 11 }}>WhatsApp:</Typography>
                 <Typography style={{ fontWeight: "bold", fontSize: 11 }}>Teléfono:</Typography>
@@ -183,7 +188,7 @@ const Proforma = React.forwardRef((props, ref) => {
               </Stack>
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid item xs={7}>
               <Stack textAlign="Left">
                 <Typography style={{ fontSize: 11 }}>{store.telefonoWhatsApp}</Typography>
                 <Typography style={{ fontSize: 11 }}>{store.telefono}</Typography>
@@ -199,6 +204,7 @@ const Proforma = React.forwardRef((props, ref) => {
               </Stack>
             </Grid>
           </Grid>
+          </div>
 
       
         <Typography style={{ fontWeight: "bold", fontSize: 15 }}>
@@ -206,7 +212,7 @@ const Proforma = React.forwardRef((props, ref) => {
         </Typography>
 
    
-       <Table size="sm" responsive>
+        <Table size="sm" responsive className="proforma-table">
     <thead>
       <tr>
         <th style={{ textAlign: "left", fontSize: 11 }}>Detalle</th>
@@ -216,8 +222,8 @@ const Proforma = React.forwardRef((props, ref) => {
       </tr>
     </thead>
     <tbody>
-      {saleDetails.map((item) => (
-        <tr key={saleDetails.indexOf(item) + 1}>
+      {ProformasDetails.map((item) => (
+        <tr key={ProformasDetails.indexOf(item) + 1}>
           <td style={{ fontWeight: "monospace", textAlign: "left", fontSize: 11, wordWrap: 'break-word' }}>
             {item.product.description}
           </td>
@@ -231,7 +237,7 @@ const Proforma = React.forwardRef((props, ref) => {
             {item.cantidad}
           </td>
           <td style={{ fontWeight: "monospace", textAlign: "center", fontSize: 11 }}>
-            {new Intl.NumberFormat("es-NI", {
+            {new Intl.NumberFormat("es-NI", {   
               style: "currency",
               currency: "NIO",
             }).format(item.costoTotal)}
@@ -242,12 +248,7 @@ const Proforma = React.forwardRef((props, ref) => {
   </Table>
 
 
-  <Stack
-  display="flex"
-  spacing={1}
-  direction="row"
-  justifyContent="flex-end" // Usa "flex-end" para alinear el contenido a la derecha
->
+  <Stack className="total-amount">
   <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
     Monto Total:
   </Typography>
@@ -260,12 +261,7 @@ const Proforma = React.forwardRef((props, ref) => {
 </Stack>
 
 
-        <Stack
-          display="flex"
-          spacing={1}
-          direction="row"
-          justifyContent={"center"}
-        >
+        <Stack  className="footer-info">
           <Typography style={{ fontWeight: "bold", fontSize: 11 }}>
             Gestor:
           </Typography>
