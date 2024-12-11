@@ -331,7 +331,7 @@ const addNewVenta = async () => {
 
     // Mapear los detalles de facturación
     const mappedDetails = selectedProductList.map(item => ({
-      productId: item.product.id,
+      ProductId: item.product.id,
       cantidad: item.cantidad,
       isDescuento: item.isDescuento || false,
       descuentoXPercent: item.descuentoXPercent || 0,
@@ -357,7 +357,7 @@ const addNewVenta = async () => {
         clientId: selectedClient?.id || 0,
         montoVenta: montoVentaDespuesDescuento,
         facturacionDetails: mappedDetails,
-       isContado: typeVenta === "contado" ? true : false,
+        isContado: typeVenta === "contado" ? true : false,
         storeId: selectedStore,
         isDescuento: descuentoGlobal ? true : false,
         descuentoXPercent: descuentoGlobalPercent || 0,
@@ -394,7 +394,7 @@ const addNewVenta = async () => {
         clientId: selectedClient?.id || 0,
         montoVenta: montoVentaDespuesDescuento,
         facturacionDetails: mappedDetails,
-       isContado: typeVenta === "contado" ? true : false,
+        isContado: typeVenta === "contado" ? true : false,
         storeId: selectedStore,
         isDescuento: descuentoGlobal ? true : false,
         descuentoXPercent: descuentoGlobalPercent || 0,
