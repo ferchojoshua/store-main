@@ -131,10 +131,10 @@ const Pagar = ({
     }
 
     const data = {
-      Id: id,
+      FacturaId: id,
       tipoPagoId: selectedTipopago,
       montoVenta: montoVentaDespuesDescuento,
-      isDescuento: descuentoGlobal ? true : false,
+       isDescuento: descuentoGlobal ? true : false,
       descuentoXPercent: descuentoGlobalPercent ? descuentoGlobalPercent : 0,
       descuentoXMonto: descuentoGlobalMonto ? descuentoGlobalMonto : 0,
       codigoDescuento: descuentoCod || null,

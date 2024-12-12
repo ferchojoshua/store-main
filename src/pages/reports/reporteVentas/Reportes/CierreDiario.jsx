@@ -41,12 +41,14 @@ const CierreDiario = () => {
   const [dataVentasCredito, setDataVentasCredito] = useState([]);
   const [dataVentasContado, setDataVentasContado] = useState([]);
   const [dataDevoluciones, setDataDevoluciones] = useState([]);
+  const [dataAnulaciones, setDataAnulaciones] = useState([]);
   const [dataAbonos, setDataAbonos] = useState([]);
 
   const [sumContadoSales, setSumContadoSales] = useState(0);
   const [sumRecuperacion, setSumRecuperacion] = useState(0);
   const [sumCreditoSales, setSumCreditoSales] = useState(0);
   const [sumAnulatedSales, setSumAnulatedSales] = useState(0);
+  const [sumAnulatedforidSales, setSumAnulatedforidSales] = useState(0);
 
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
@@ -111,9 +113,11 @@ const CierreDiario = () => {
       setData(result.data);
       saleDesgloce(result.data);
       setDataDevoluciones(result.data.anulatedSaleList);
+      setDataAnulaciones(result.data.anulatedforIdSaleList);
       setDataAbonos(result.data.abonoList);
       sumRec(result.data.abonoList);
       sumAnulated(result.data.anulatedSaleList);
+      sumAnulatedforId(result.data.anulatedforIdSaleList);
       setIsLoading(false);
       setIsDarkMode(false);
     })();
@@ -132,28 +136,100 @@ const CierreDiario = () => {
     sumCredito(credSales);
   };
 
-  const sumContado = (data) => {
-    let result = 0;
-    data.map((item) => (result += item.montoVenta));
-    setSumContadoSales(result);
-  };
+   const sumContado = (data) => {
+     let result = 0;
+     data.map((item) => (result += item.montoVenta));
+     setSumContadoSales(result);
+   };
 
-  const sumCredito = (data) => {
+   const sumCredito = (data) => {
     let result = 0;
     data.map((item) => (result += item.montoVenta));
     setSumCreditoSales(result);
   };
 
+  // const sumContado = (data) => {
+  //   let result = data
+  //     .filter(item => item.tipoPagoId === 1) // Solo efectivo
+  //     .reduce((sum, item) => sum + item.montoVenta, 0);
+  //   setSumContadoSales(result);
+  // };
+  
   const sumRec = (data) => {
-    let result = 0;
-    data.map((item) => (result += item.monto));
+    // Todas las recuperaciones son en efectivo
+    let result = data.reduce((sum, item) => sum + item.monto, 0);
     setSumRecuperacion(result);
   };
-
+  
   const sumAnulated = (data) => {
-    let result = 0;
-    data.map((item) => (result += item.montoAnulado));
+    let result = data
+      .filter(item => item.ventaAfectada.tipoPagoId === 1) // Solo efectivo
+      .reduce((sum, item) => sum + item.montoAnulado, 0);
     setSumAnulatedSales(result);
+  };
+
+  const sumAnulatedforId = (data) => {
+    let result = data
+      .filter(item => item.tipoPagoId === 1) // Solo efectivo
+      .reduce((sum, item) => sum + item.montoVenta, 0);
+      setSumAnulatedforidSales(result);
+  };
+  
+
+  // const sumRec = (data) => {
+  //   let result = 0;
+  //   data.map((item) => (result += item.monto));
+  //   setSumRecuperacion(result);
+  // };
+
+  // const sumAnulated = (data) => {
+  //   let result = 0;
+  //   data.map((item) => (result += item.montoAnulado));
+  //   setSumAnulatedSales(result);
+  // };
+  const calcularEfectivoCaja = () => {
+    // 1. Calcular ventas en efectivo (tipoPagoId === 1)
+    const ventasEfectivo = dataVentasContado
+        .filter(venta => venta.tipoPagoId === 1)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0);
+
+    // 2. Calcular recuperaciones en efectivo
+    const recuperacionesEfectivo = dataAbonos
+        .filter(abono => abono.tipoPagoId === 1)
+        .reduce((sum, abono) => sum + abono.monto, 0);
+   
+    // 3. Efectivo total en caja (ventas + recuperaciones)
+    const efectivoReal = ventasEfectivo + recuperacionesEfectivo;
+    
+
+    // Resto de los tipos de pago (para el reporte completo)
+    const ventasTransferencia = dataVentasContado
+        .filter(venta => venta.tipoPagoId === 2)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0);
+    
+    const ventasTarjeta = dataVentasContado
+        .filter(venta => venta.tipoPagoId === 3)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0);
+    
+    const ventasCheque = dataVentasContado
+        .filter(venta => venta.tipoPagoId === 4)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0);
+
+    return {
+        efectivoReal,         
+        ventasEfectivo,       
+        recuperacionesEfectivo, 
+        ventasTransferencia,
+        ventasTarjeta,
+        ventasCheque
+    };
+};
+
+  const TIPO_PAGO = {
+    1: "EFECTIVO",
+    2: "TRANSFERENCIA",
+    3: "TARJETA",
+    4: "CHEQUE"
   };
   
   
@@ -362,7 +438,8 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
             <NoData />
           ) : (
             <Stack spacing={2}>
-              <Typography variant="h5">Ventas de Contado</Typography>
+              {/* <Typography variant="h5">Ventas de Contado</Typography> */}
+              <Typography variant="h5">Ventas </Typography>
               <Table
                 id="table-to-xls"
                 hover={!isDarkMode}
@@ -388,6 +465,7 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                 </caption>
                 <thead>
                   <tr>
+                    <th style={{ textAlign: "center" }}>N°</th>
                     <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
@@ -395,24 +473,24 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                     <th style={{ textAlign: "center" }}>Neto</th>
                     <th style={{ textAlign: "center" }}>Descuento</th>
                     <th style={{ textAlign: "center" }}>Venta Neta</th>
+                    {/* <th style={{ textAlign: "center" }}>Tipo de Pago</th> */}
                   </tr>
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
-                  {dataVentasContado.map((item) => {
+                  {dataVentasContado.map((item, index) => {
                     return (
                       <tr
                         key={item.id}
-                        style={{ color: item.isAnulado ? "red" : "" }}
-                      >
-                        <td style={{ textAlign: "center" }}>
-                          {moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}
-                        </td>
+                        style={{ color: item.isAnulado ? "red" : "" }}>
+                        <td style={{ textAlign: "center" }}>{index + 1}</td>
+                        <td style={{ textAlign: "center" }}>{moment(item.fechaVenta).format("D/M/yyyy hh:mm A")}</td>
                         <td style={{ textAlign: "center" }}>{item.id}</td>
                         <td style={{ textAlign: "center" }}>{item.store?.name}</td>
                         <td style={{ textAlign: "left" }}>{item.client ? item.client.nombreCliente : item.nombreCliente === "" ? "CLIENTE EVENTUAL" : item.nombreCliente}</td>
                         <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.montoVentaAntesDescuento)}</td>
                         <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.descuentoXMonto)} </td>
                         <td style={{ textAlign: "center" }}>{new Intl.NumberFormat("es-NI", { style: "currency", currency: "NIO",}).format(item.montoVenta)}
+                        {/* <td style={{ textAlign: "center" }}> {TIPO_PAGO[item.tipoPagoId] || "N/A"}</td> */}
                         </td>
                       </tr>
                     );
@@ -606,9 +684,9 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                     <th style={{ textAlign: "center" }}>Fecha-Hora</th>
                     <th style={{ textAlign: "center" }}>#.Factura</th>
                     <th style={{ textAlign: "center" }}>Almacen</th>
-                    <th style={{ textAlign: "left" }}>Cliente</th>
-                    <th style={{ textAlign: "center" }}>Neto Anulado</th>
-                    <th style={{ textAlign: "center" }}>Anulado Por</th>
+                    <th style={{ textAlign: "left" }}>Cliente</th> 
+                    <th style={{ textAlign: "center" }}>Neto En Devolucion</th>
+                    <th style={{ textAlign: "center" }}>Devolucion Por</th>
                   </tr>
                 </thead>
                 <tbody className={isDarkMode ? "text-white" : "text-dark"}>
@@ -655,86 +733,262 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
               </Table>
               <Divider />
 
-              <Stack spacing={1}>
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#ffc107", fontWeight: "bold" }}
-                  >
-                    Ventas de Credito:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumCreditoSales)}
-                  </Typography>
-                </Stack>
+              <Typography variant="h5">Anulaciones</Typography>
+              <Table
+                id="table-to-xls3"
+                hover={!isDarkMode}
+                size="sm"
+                responsive
+                className="text-primary"
+              >
+                <caption style={{ color: " #ef5350" }}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography
+                      variant="h6"
+                    >
+                      Total de Anulaciones
+                    </Typography>
+                    <Typography variant="h6" style={{ color: " #ef5350" }}>
+                      {new Intl.NumberFormat("es-NI", {
+                        style: "currency",
+                        currency: "NIO",
+                      }).format(sumAnulatedforidSales)}
+                    </Typography>
+                  </Stack>
+                </caption>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
+                    <th style={{ textAlign: "center" }}>#.Factura</th>
+                    <th style={{ textAlign: "center" }}>Almacen</th>
+                    <th style={{ textAlign: "left" }}>Cliente</th>
+                    <th style={{ textAlign: "center" }}>Neto Anulado</th>
+                    <th style={{ textAlign: "center" }}>Anulado Por</th>
+                  </tr>
+                </thead>
+                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                  {dataAnulaciones.map((item) => {
+                    const {
+                      id = '',
+                      fechaAnulacion = new Date(),
+                      store = {},
+                      nombreCliente = '',
+                      client = {},
+                      montoVenta = 0,
+                      anulatedBy = {},
+                    } = item || {};
+                    return (
+                      <tr key={id}>
+                        <td style={{ textAlign: "center" }}>
+                          {moment(fechaAnulacion).format("D/M/yyyy hh:mm A")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {id}
+                        </td>
+                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "left" }}>
+                          {item.client
+                            ? item.client.nombreCliente
+                            : item.nombreCliente === ""
+                            ? "CLIENTE EVENTUAL"
+                            : item.nombreCliente}
+                        </td>
 
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#ab003c", fontWeight: "bold" }}
-                  >
-                    Devoluciones:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumAnulatedSales)}
-                  </Typography>
-                </Stack>
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(montoVenta)}
+                        </td>
 
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#1c54b2", fontWeight: "bold" }}
-                  >
-                    Ventas de Contado:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumContadoSales)}
-                  </Typography>
-                </Stack>
+                        <td style={{ textAlign: "center" }}>
+                            {anulatedBy?.fullName || '-'}
+                        </td>
+                                              </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+              <Divider />
 
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#1c54b2", fontWeight: "bold" }}
-                  >
-                    Recuperacion Sobre Ventas:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(sumRecuperacion)}
-                  </Typography>
-                </Stack>
-                <Divider />
 
-                <Stack direction={"row"} justifyContent="space-between">
-                  <Typography
-                    variant="h6"
-                    style={{ color: "#1c54b2", fontWeight: "bold" }}
-                  >
-                    Efectivo en Caja:
-                  </Typography>
-                  <Typography variant="h6">
-                    {new Intl.NumberFormat("es-NI", {
-                      style: "currency",
-                      currency: "NIO",
-                    }).format(
-                      sumContadoSales + sumRecuperacion - sumAnulatedSales
-                    )}
-                  </Typography>
-                </Stack>
-              </Stack>
-            </Stack>
+              <Typography variant="h5">Resumen por Tipo de Pago</Typography>
+                        <Table hover={!isDarkMode} size="sm" responsive className="text-primary">
+                          <thead>
+                            <tr>
+                              <th style={{ textAlign: "center" }}>N°</th>
+                              <th style={{ textAlign: "center" }}>Tipo de Pago</th>
+                              <th style={{ textAlign: "center" }}>Ventas</th>
+                              <th style={{ textAlign: "center" }}># Ventas</th>
+                              <th style={{ textAlign: "center" }}>Recuperaciones</th>
+                              <th style={{ textAlign: "center" }}># Recuperaciones</th>
+                              <th style={{ textAlign: "center" }}>Total</th>
+                              <th style={{ textAlign: "center" }}>Total Transacciones</th>
+                            </tr>
+                          </thead>
+                          <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                            {Object.entries(TIPO_PAGO).map(([id, descripcion], index) => {
+                              // Ventas por tipo de pago
+                              const ventasTipo = dataVentasContado
+                                .filter(venta => venta.tipoPagoId === parseInt(id))
+                                .reduce((sum, venta) => sum + venta.montoVenta, 0);
+                              
+                              const numVentas = dataVentasContado
+                                .filter(venta => venta.tipoPagoId === parseInt(id)).length;
+
+                              // Recuperaciones por tipo de pago (sin filtrar por tipoPagoId)
+                              const recuperacionesTipo = dataAbonos
+                                .filter(abono => abono.tipoPagoId === parseInt(id))
+                                .reduce((sum, abono) => sum + abono.monto, 0);
+                              
+                              const numRecuperaciones = dataAbonos
+                                .filter(abono => abono.tipoPagoId === parseInt(id)).length;
+
+                              const totalTipo = ventasTipo + recuperacionesTipo;
+
+                              // Mostrar la fila si hay ventas O recuperaciones
+                              if (ventasTipo > 0 || recuperacionesTipo > 0 || numRecuperaciones > 0) {
+                                return (
+                                  <tr key={id}>
+                                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                                    <td style={{ textAlign: "center" }}>{descripcion}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(ventasTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numVentas}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(recuperacionesTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numRecuperaciones}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(totalTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numVentas + numRecuperaciones}</td>
+                                  </tr>
+                                );
+                              }
+                              return null;
+                            })}
+                           </tbody>
+                        </Table>
+                          <Divider />
+
+
+                                                                <Stack spacing={1}>
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#ffc107", fontWeight: "bold" }}>
+      Ventas de Credito:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumCreditoSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#1c54b2", fontWeight: "bold" }}>
+      Ventas de Contado:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumContadoSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#1c54b2", fontWeight: "bold" }}>
+      Recuperacion Sobre Ventas:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumRecuperacion)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#ab003c", fontWeight: "bold" }}>
+      Devoluciones:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumAnulatedSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ fontWeight: "bold" }}>
+      Pago con tarjeta:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(dataVentasContado
+        .filter(venta => venta.tipoPagoId === 3)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0))}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ fontWeight: "bold" }}>
+      Pago con transferencia:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(dataVentasContado
+        .filter(venta => venta.tipoPagoId === 2)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0))}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ fontWeight: "bold" }}>
+      Pago con cheque:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(dataVentasContado
+        .filter(venta => venta.tipoPagoId === 4)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0))}
+    </Typography>
+  </Stack>
+
+  <Divider />
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#1c54b2", fontWeight: "bold" }}>
+        Efectivo en Caja:
+    </Typography>
+    <Typography variant="h6">
+        {new Intl.NumberFormat("es-NI", {
+            style: "currency",
+            currency: "NIO",
+        }).format(calcularEfectivoCaja().efectivoReal)} 
+    </Typography>
+      </Stack>
+  </Stack>
+ </Stack>
           )}
         </Container>
       </Dialog>
@@ -794,7 +1048,7 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                   </thead>
                   <tbody className={isDarkMode ? "text-white" : "text-dark"}>
                     {dataVentasContado.map((item) => {
-                      console.log("item", item);
+                      {/* console.log("item", item); */}
                       return (
                         <tr
                           key={item.id}
@@ -1073,85 +1327,233 @@ XLSX.utils.sheet_add_aoa(ws_data.Sheets["Devoluciones"], [totalrowDevSales], { o
                 </Table>
                 <Divider />
 
-                <Stack spacing={1}>
-                  <Stack direction={"row"} justifyContent="space-between">
+                <Typography variant="h5">Anulaciones</Typography>
+              <Table
+                id="table-to-xls3"
+                hover={!isDarkMode}
+                size="sm"
+                responsive
+                className="text-primary"
+              >
+                <caption style={{ color: " #ef5350" }}>
+                  <Stack direction="row" justifyContent="space-between">
                     <Typography
                       variant="h6"
-                      style={{ color: "#ffc107", fontWeight: "bold" }}
                     >
-                      Ventas de Credito:
+                      Total de Anulaciones
                     </Typography>
-                    <Typography variant="h6">
+                    <Typography variant="h6" style={{ color: " #ef5350" }}>
                       {new Intl.NumberFormat("es-NI", {
                         style: "currency",
                         currency: "NIO",
-                      }).format(sumCreditoSales)}
+                      }).format(sumAnulatedforidSales)}
                     </Typography>
                   </Stack>
+                </caption>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "center" }}>Fecha-Hora</th>
+                    <th style={{ textAlign: "center" }}>#.Factura</th>
+                    <th style={{ textAlign: "center" }}>Almacen</th>
+                    <th style={{ textAlign: "left" }}>Cliente</th>
+                    <th style={{ textAlign: "center" }}>Neto Anulado</th>
+                    <th style={{ textAlign: "center" }}>Anulado Por</th>
+                  </tr>
+                </thead>
+                <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                  {dataAnulaciones.map((item) => {
+                    const {
+                      id = '',
+                      fechaAnulacion = new Date(),
+                      store = {},
+                      nombreCliente = '',
+                      client = {},
+                      montoVenta = 0,
+                      anulatedBy = {},
+                    } = item || {};
+                    return (
+                      <tr key={id}>
+                        <td style={{ textAlign: "center" }}>
+                          {moment(fechaAnulacion).format("D/M/yyyy hh:mm A")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {id}
+                        </td>
+                        <td style={{ textAlign: "center" }}>{store.name}</td>
+                        <td style={{ textAlign: "left" }}>
+                          {item.client
+                            ? item.client.nombreCliente
+                            : item.nombreCliente === ""
+                            ? "CLIENTE EVENTUAL"
+                            : item.nombreCliente}
+                        </td>
 
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#ab003c", fontWeight: "bold" }}
-                    >
-                      Devoluciones:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(sumAnulatedSales)}
-                    </Typography>
-                  </Stack>
+                        <td style={{ textAlign: "center" }}>
+                          {new Intl.NumberFormat("es-NI", {
+                            style: "currency",
+                            currency: "NIO",
+                          }).format(montoVenta)}
+                        </td>
 
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#1c54b2", fontWeight: "bold" }}
-                    >
-                      Ventas de Contado:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(sumContadoSales)}
-                    </Typography>
-                  </Stack>
+                        <td style={{ textAlign: "center" }}>
+                            {anulatedBy?.fullName || '-'}
+                        </td>
+                                              </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+              <Divider />
 
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#1c54b2", fontWeight: "bold" }}
-                    >
-                      Recuperacion Sobre Ventas:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(sumRecuperacion)}
-                    </Typography>
-                  </Stack>
-                  <Divider />
 
-                  <Stack direction={"row"} justifyContent="space-between">
-                    <Typography
-                      variant="h6"
-                      style={{ color: "#1c54b2", fontWeight: "bold" }}
-                    >
-                      Efectivo en Caja:
-                    </Typography>
-                    <Typography variant="h6">
-                      {new Intl.NumberFormat("es-NI", {
-                        style: "currency",
-                        currency: "NIO",
-                      }).format(
-                        sumContadoSales + sumRecuperacion - sumAnulatedSales
-                      )}
-                    </Typography>
-                  </Stack>
-                </Stack>
+              <Typography variant="h5">Resumen por Tipo de Pago</Typography>
+                        <Table hover={!isDarkMode} size="sm" responsive className="text-primary">
+                          <thead>
+                            <tr>
+                              <th style={{ textAlign: "center" }}>N°</th>
+                              <th style={{ textAlign: "center" }}>Tipo de Pago</th>
+                              <th style={{ textAlign: "center" }}>Ventas</th>
+                              <th style={{ textAlign: "center" }}># Ventas</th>
+                              <th style={{ textAlign: "center" }}>Recuperaciones</th>
+                              <th style={{ textAlign: "center" }}># Recuperaciones</th>
+                              <th style={{ textAlign: "center" }}>Total</th>
+                              <th style={{ textAlign: "center" }}>Total Transacciones</th>
+                            </tr>
+                          </thead>
+                          <tbody className={isDarkMode ? "text-white" : "text-dark"}>
+                            {Object.entries(TIPO_PAGO).map(([id, descripcion], index) => {
+                              // Ventas por tipo de pago
+                              const ventasTipo = dataVentasContado
+                                .filter(venta => venta.tipoPagoId === parseInt(id))
+                                .reduce((sum, venta) => sum + venta.montoVenta, 0);
+                              
+                              const numVentas = dataVentasContado
+                                .filter(venta => venta.tipoPagoId === parseInt(id)).length;
+
+                              // Recuperaciones por tipo de pago (sin filtrar por tipoPagoId)
+                              const recuperacionesTipo = dataAbonos
+                                .filter(abono => abono.tipoPagoId === parseInt(id))
+                                .reduce((sum, abono) => sum + abono.monto, 0);
+                              
+                              const numRecuperaciones = dataAbonos
+                                .filter(abono => abono.tipoPagoId === parseInt(id)).length;
+
+                              const totalTipo = ventasTipo + recuperacionesTipo;
+
+                              // Mostrar la fila si hay ventas O recuperaciones
+                              if (ventasTipo > 0 || recuperacionesTipo > 0 || numRecuperaciones > 0) {
+                                return (
+                                  <tr key={id}>
+                                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                                    <td style={{ textAlign: "center" }}>{descripcion}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(ventasTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numVentas}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(recuperacionesTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numRecuperaciones}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                      {new Intl.NumberFormat("es-NI", {
+                                        style: "currency",
+                                        currency: "NIO",
+                                      }).format(totalTipo)}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{numVentas + numRecuperaciones}</td>
+                                  </tr>
+                                );
+                              }
+                              return null;
+                            })}
+                           </tbody>
+                        </Table>
+                          <Divider />
+
+
+                                                                <Stack spacing={1}>
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#ffc107", fontWeight: "bold" }}>
+      Ventas de Credito:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumCreditoSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#1c54b2", fontWeight: "bold" }}>
+      Ventas de Contado:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumContadoSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#1c54b2", fontWeight: "bold" }}>
+      Recuperacion Sobre Ventas:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumRecuperacion)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ color: "#ab003c", fontWeight: "bold" }}>
+      Devoluciones:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(sumAnulatedSales)}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ fontWeight: "bold" }}>
+      Pago con tarjeta:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(dataVentasContado
+        .filter(venta => venta.tipoPagoId === 3)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0))}
+    </Typography>
+  </Stack>
+
+  <Stack direction={"row"} justifyContent="space-between">
+    <Typography variant="h6" style={{ fontWeight: "bold" }}>
+      Pago con transferencia:
+    </Typography>
+    <Typography variant="h6">
+      {new Intl.NumberFormat("es-NI", {
+        style: "currency",
+        currency: "NIO",
+      }).format(dataVentasContado
+        .filter(venta => venta.tipoPagoId === 2)
+        .reduce((sum, venta) => sum + venta.montoVenta, 0))}
+    </Typography>
+  </Stack>
+</Stack>
               </Stack>
             )}
           </Container>

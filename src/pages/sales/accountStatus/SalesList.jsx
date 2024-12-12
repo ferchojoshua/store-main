@@ -26,6 +26,7 @@ import {
   faMoneyBillTransfer,
   faHandshakeAltSlash,
   faSearch,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import PaginationComponent from "../../../components/PaginationComponent";
 import { isEmpty } from "lodash";
@@ -40,9 +41,11 @@ import {
   getAnulatedSalesByStoreAsync,
   getContadoSalesByStoreAsync,
   getCreditoSalesByStoreAsync,
+  getdevolutionSalesByStoreAsync,
 } from "../../../services/SalesApi";
 import NewAbono from "../sale/abonoComponents/NewAbono";
 import SaleReturn from "../sale/returnVenta/SaleReturn";
+import SaleAnulacion from "../sale/returnVenta/SaleAnulacion";
 import { getStoresByUserAsync } from "../../../services/AlmacenApi";
 
 import SmallModal from "../../../components/modals/SmallModal";
@@ -110,6 +113,7 @@ const SalesList = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [showRetunModal, setShowReturnModal] = useState(false);
+  const [showAnulacionModal, setShowAnulacionModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showSaleDetailModal, setShowSaleDetailModal] = useState(false);
 
@@ -247,12 +251,9 @@ const SalesList = () => {
       }
       setIsLoading(false);
       setListaVentas(result.data);
-    } else {
+    } else if (active === 2) {
       setIsLoading(true);
-      const result = await getAnulatedSalesByStoreAsync(
-        token,
-        event.target.value
-      );
+      const result = await getAnulatedSalesByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -277,7 +278,36 @@ const SalesList = () => {
       setIsLoading(false);
       setListaVentas(result.data);
     }
+    else  {
+      setIsLoading(true);
+      const result = await getdevolutionSalesByStoreAsync(token, selectedStore);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        console.log(`resultado: ${result.data}`);
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setListaVentas(result.data);
+    }
   };
+
 
   const onSelectChange = async (value) => {
     setActive(value);
@@ -333,9 +363,36 @@ const SalesList = () => {
       }
       setIsLoading(false);
       setListaVentas(result.data);
-    } else {
+    } else if (value === 2) {
       setIsLoading(true);
       const result = await getAnulatedSalesByStoreAsync(token, selectedStore);
+      if (!result.statusResponse) {
+        setIsLoading(false);
+        if (result.error.request.status === 401) {
+          navigate(`${ruta}/unauthorized`);
+          return;
+        }
+        toastError(result.error.message);
+        return;
+      }
+      if (result.data === "eX01") {
+        setIsLoading(false);
+        deleteUserData();
+        deleteToken();
+        setIsLogged(false);
+        return;
+      }
+      if (result.data.isDefaultPass) {
+        setIsLoading(false);
+        setIsDefaultPass(true);
+        return;
+      }
+      setIsLoading(false);
+      setListaVentas(result.data);
+    }
+    else  {
+      setIsLoading(true);
+      const result = await getdevolutionSalesByStoreAsync(token, selectedStore);
       if (!result.statusResponse) {
         setIsLoading(false);
         if (result.error.request.status === 401) {
@@ -546,12 +603,7 @@ const SalesList = () => {
                 <th style={{ textAlign: "left" }}>Cliente</th>
                 <th style={{ textAlign: "center" }}>Monto Venta</th>
                 <th style={{ textAlign: "center" }}>Productos</th>
-
-                {active === 1 ? (
-                  <th style={{ textAlign: "center" }}>Saldo </th>
-                ) : (
-                  <></>
-                )}
+                {active === 1 ? ( <th style={{ textAlign: "center" }}>Saldo </th> ) : (  <></>  )}
                 <th style={{ textAlign: "center" }}>Acciones</th>
               </tr>
             </thead>
@@ -559,26 +611,11 @@ const SalesList = () => {
               {currentItem.map((item) => {
                 return (
                   <tr key={item.id}>
-                    <td style={{ textAlign: "center" }}>
-                      {moment(item.fechaVenta).format("L")}
-                    </td>
+                    <td style={{ textAlign: "center" }}>{moment(item.fechaVenta).format("L")}</td>
                     <td>{item.id}</td>
-
-                    <td
-                      style={{
-                        textAlign: "left",
-                        color: item.isEventual ? "inherit" : "#ff5722",
-                        fontWeight: item.isEventual ? "normal" : "bold",
-                      }}
-                    >
-                      {item.isEventual
-                        ? item.nombreCliente === ""
-                          ? "CLIENTE EVENTUAL - S/N"
-                          : `CLIENTE EVENTUAL - ${item.nombreCliente}`
-                        : item.client.nombreCliente}
-                    </td>
-
-                    <td
+                    <td style={{ textAlign: "left", color: item.isEventual ? "inherit" : "#ff5722", fontWeight: item.isEventual ? "normal" : "bold", }} >
+                      {item.isEventual ? item.nombreCliente === "" ? "CLIENTE EVENTUAL - S/N" : `CLIENTE EVENTUAL - ${item.nombreCliente}` : item.client.nombreCliente}  </td>
+                   <td
                       style={{
                         textAlign: "center",
                         fontWeight: "bold",
@@ -688,6 +725,19 @@ const SalesList = () => {
                         >
                           <FontAwesomeIcon icon={faExternalLinkAlt} />
                         </IconButton>
+
+                        {isAccess(access, "COSTO VER") && (active === 0 || active === 1) && (
+                            <IconButton
+                                style={{ color: "#f44336" }}
+                                onClick={() => {
+                                    setSelectedVenta(item);
+                                    setShowAnulacionModal(true);
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faTrashAlt} />
+                            </IconButton>
+                        )}
+                                              
                       </Stack>
                     </td>
                   </tr>
@@ -723,7 +773,7 @@ const SalesList = () => {
         setVisible={setShowSaleDetailModal}
       >
         <AbonoDetails
-          selectedVenta={selectedVenta}
+          selectedVenta={selectedVenta} 
           setVisible={setShowSaleDetailModal}
         />
       </MediumModal>
@@ -738,6 +788,17 @@ const SalesList = () => {
           setVisible={setShowReturnModal}
         />
       </MediumModal>
+
+
+       <MediumModal
+          titulo={"Anular Venta"}
+          isVisible={showAnulacionModal}
+          setVisible={setShowAnulacionModal}>
+         <SaleAnulacion
+                  selectedVenta={selectedVenta}
+                  setVisible={setShowAnulacionModal}
+              />
+      </MediumModal> 
 
       <SmallModal
         titulo={"Reimprimir Recibo"}
